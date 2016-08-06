@@ -1,3 +1,12 @@
+today:
+	1. setup my phd project
+	2. setup my algorithm
+	3. write the other algorithms
+	4. setup test environment
+	5. gather data
+	6. do tests
+
+
 todo:
 	1. implement an evaluation system: 
 		input:
