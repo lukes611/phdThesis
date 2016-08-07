@@ -1,5 +1,8 @@
 today:
-	1. setup my phd project
+	1. setup my phd project:
+		RGB-D data comes from my Pix3D class and corresponding files
+		VMat data can be computed from a variety of places
+		VMat with Pic - used by the feature matching methods
 	2. setup my algorithm
 	3. write the other algorithms
 	4. setup test environment
