@@ -11,8 +11,8 @@
 
 #pragma once
 
-#include "VMatF.h"
-#include "R3.h"
+#include "../basics/VMatF.h"
+#include "../basics/R3.h"
 
 extern
 bool LLGPU_fft3d(VMat & v, VMat & re, VMat & im);

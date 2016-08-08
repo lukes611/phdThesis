@@ -1,5 +1,5 @@
 #include "LukesSmallObjectsAndFunctions.h"
-#include "BitReaderWriter.h"
+#include "../basics/BitReaderWriter.h"
 #include <time.h>
 using namespace BIT_MANIPULATOR;
 using namespace ll_pix3d;

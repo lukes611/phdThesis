@@ -6,9 +6,9 @@
 #include <sys/timeb.h>
 #include <string>
 #include <vector>
-#include "locv3.h"
-#include "Pixel3DSet.h"
-#include "R3.h"
+#include "../basics/locv3.h"
+#include "../basics/Pixel3DSet.h"
+#include "../basics/R3.h"
 
 using namespace std;
 
