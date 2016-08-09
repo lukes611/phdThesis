@@ -74,9 +74,11 @@ Mat leastSquaresTransform(vector<R3> & src, vector<R3> & dst, vector<int> & inde
 		src_m.at<float>(2, i) = src[i].z;
 		src_m.at<float>(3, i) = 1.0f;
 
-		dst_m.at<float>(0, i) = dst[i].x;
-		dst_m.at<float>(1, i) = dst[i].y;
-		dst_m.at<float>(2, i) = dst[i].z;
+		int j = indexes[i];
+
+		dst_m.at<float>(0, i) = dst[j].x;
+		dst_m.at<float>(1, i) = dst[j].y;
+		dst_m.at<float>(2, i) = dst[j].z;
 		dst_m.at<float>(3, i) = 1.0f;
 	}
 	//src^T x M^T = dst^T
@@ -193,13 +195,43 @@ void findBestReansformSVD(Mat& _m, Mat& _d) {
 	
 }
 
+Mat icp(vector<R3> & src, vector<R3> & dst, vector<R3> & out, double & error_out, double minError = -1.0, int maxIterations = -1)
+{
+	out.clear();
+	Mat ret = Mat::eye(Size(4,4), CV_32FC1);
+	vector<double> dl; vector<int> ind;
+	out = src;
+
+	double best_distance = DBL_MAX;
+	error_out = best_distance;
+	int iteration = 0;
+
+	Mat T = ret.clone();
+
+	while(true)
+	{
+		dl.clear(); ind.clear();
+		double current_distance = closestPoints(out, dst, ind, dl);
+		if(current_distance >= best_distance) break; //cannot do any better
+		ret = T * ret;
+		error_out = current_distance;
+		if(minError > 0.0 && current_distance < minError) break;
+		if(maxIterations >= 0 && iteration >= maxIterations) break;
+		best_distance = current_distance;
+		T = leastSquaresTransform(out, dst, ind);
+		for(int i = 0; i < out.size(); i++) Pixel3DSet::transform_point(T, out[i]);
+		iteration++;
+	}
+	return ret.clone();
+}
+
 int main(int argc, char * * argv)
 {
 	
 	vector<R3> p1, p2;
-	Mat km = VMat::transformation_matrix(100, 62.0f, 15.0f, 0.0f, 1.0f, 5.0f, 10.0f, 19.0f);
+	Mat km = VMat::transformation_matrix(100, 2.0f, 3.0f, 0.0f, 1.0f, 1.0f, 2.0f, 3.0f);
 
-	for (int i = 0; i < 100; i++)
+	for (int i = 0; i < 5; i++)
 	{
 		R3 point(rp(), rp(), rp());
 		p1.push_back(point);
@@ -208,19 +240,28 @@ int main(int argc, char * * argv)
 		p2.push_back(point2);
 	}
 
+	bool PRINT = true;
 
-	cout << "P1:" << endl;
-	for(int i = 0; i < p1.size(); i++) cout << p1[i] << endl;
-
-	cout << "P2:" << endl;
-	for(int i = 0; i < p2.size(); i++) cout << p2[i] << endl;
-
+	if(PRINT)
+	{
+		cout << "p1:" << endl;
+		for(int i = 0; i < p1.size(); i++) cout << p1[i] << endl;
+	}
+	if(PRINT)
+	{
+		cout << "P2:" << endl;
+		for(int i = 0; i < p2.size(); i++) cout << p2[i] << endl;
+	}
 	cout << "icp-ing...\n";
 
 	double dist = DBL_MAX;
 
-	vector<R3> out = p1;
-
+	vector<R3> out = p1; vector<int> tmp; vector<double> dst;
+	double error = closestPoints(p1, p2, tmp, dst);
+	cout << "error in: " << error << endl;
+	icp(p1, p2, out, error, -1.0, -1);
+	cout << "error: " << error << endl;
+	/*
 	while(true)
 	{
 		vector<double> dl; vector<int> ind;
@@ -235,15 +276,17 @@ int main(int argc, char * * argv)
 		
 	}
 
-	
-
-	cout << "out:" << endl;
-	for(int i = 0; i < out.size(); i++) cout << out[i] << endl;
-
-
-	cout << "P2:" << endl;
-	for(int i = 0; i < p2.size(); i++) cout << p2[i] << endl;
-
+	*/
+	if(PRINT)
+	{
+		cout << "out:" << endl;
+		for(int i = 0; i < out.size(); i++) cout << out[i] << endl;
+	}
+	if(PRINT)
+	{
+		cout << "P2:" << endl;
+		for(int i = 0; i < p2.size(); i++) cout << p2[i] << endl;
+	}
 
 	/*Mat a = r3List2MatRows44(p1);
 	Mat b = r3List2MatRows44(p2);
