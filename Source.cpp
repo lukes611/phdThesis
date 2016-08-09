@@ -6,6 +6,7 @@
 #include "code\basics\R3.h"
 #include "code\basics\llCamera.h"
 #include "code\basics\VMatF.h"
+#include "code\basics\LTimer.h"
 
 
 using namespace std;
@@ -15,6 +16,44 @@ using namespace ll_cam;
 
 //proto-type for experiments: VMat pc(VMat a, VMat b, double & time, Mat & transform, double & mse);
 //to-do:= pc, ipc, 
+
+Mat r3List2MatRows44(vector<R3> & inp)
+{
+	Mat ret = Mat::zeros(inp.size(), 4, CV_32FC1);
+	for(int i = 0; i < inp.size(); i++)
+	{
+		ret.at<float>(i,0) = inp[i].x;
+		ret.at<float>(i,1) = inp[i].y;
+		ret.at<float>(i,2) = inp[i].z;
+		ret.at<float>(i,3) = 1.0f;
+	}
+	return ret.clone();
+}
+
+float flann_knn(Mat& m_destinations, Mat& m_object, vector<int>& ptpairs, vector<float>& dists = vector<float>()) {
+    // find nearest neighbors using FLANN
+    cv::Mat m_indices(m_object.rows, 1, CV_32S);
+    cv::Mat m_dists(m_object.rows, 1, CV_32F);
+ 
+    Mat dest_32f; m_destinations.convertTo(dest_32f,CV_32FC2);
+    Mat obj_32f; m_object.convertTo(obj_32f,CV_32FC2);
+ 
+    assert(dest_32f.type() == CV_32F);
+ 
+    cv::flann::Index flann_index(dest_32f, cv::flann::KDTreeIndexParams(2));  // using 2 randomized kdtrees
+    flann_index.knnSearch(obj_32f, m_indices, m_dists, 1, cv::flann::SearchParams(64) ); 
+ 
+    int* indices_ptr = m_indices.ptr<int>(0);
+    //float* dists_ptr = m_dists.ptr<float>(0);
+    for (int i=0;i<m_indices.rows;++i) {
+        ptpairs.push_back(indices_ptr[i]);
+    }
+ 
+    dists.resize(m_dists.rows);
+    m_dists.copyTo(Mat(dists));
+ 
+    return cv::sum(m_dists)[0];
+}
 
 //a n^2 complexity search for the closest point for each point in src to dst,
 //returns an array of mappings src[i] mapped to dst[array[i]]
@@ -51,6 +90,17 @@ double closestPoints(vector<R3> & src, vector<R3> & dst, vector<int> & indexes, 
 	return averageDistance;
 }
 
+double closestPointsf(vector<R3> & src, vector<R3> & dst, vector<int> & indexes, vector<double> & distances)
+{
+	distances.clear();
+	indexes.clear();
+	Mat srcm = r3List2MatRows44(src), dstm = r3List2MatRows44(dst);
+	vector<float> dists;
+	double error = (double)flann_knn(dstm, srcm, indexes, dists);
+	for(int i = 0; i < dists.size(); i++) distances.push_back((double)dists[i]);
+	double divisor = max(src.size(), dst.size()) > 0 ? (double)(src.size() * src.size()) : 1.0;
+	return error / divisor;
+}
 
 //returns x from equation Mx = y
 Mat least_squares(Mat M, Mat y){
@@ -90,47 +140,13 @@ Mat leastSquaresTransform(vector<R3> & src, vector<R3> & dst, vector<int> & inde
 }
 
 
-float flann_knn(Mat& m_destinations, Mat& m_object, vector<int>& ptpairs, vector<float>& dists = vector<float>()) {
-    // find nearest neighbors using FLANN
-    cv::Mat m_indices(m_object.rows, 1, CV_32S);
-    cv::Mat m_dists(m_object.rows, 1, CV_32F);
- 
-    Mat dest_32f; m_destinations.convertTo(dest_32f,CV_32FC2);
-    Mat obj_32f; m_object.convertTo(obj_32f,CV_32FC2);
- 
-    assert(dest_32f.type() == CV_32F);
- 
-    cv::flann::Index flann_index(dest_32f, cv::flann::KDTreeIndexParams(2));  // using 2 randomized kdtrees
-    flann_index.knnSearch(obj_32f, m_indices, m_dists, 1, cv::flann::SearchParams(64) ); 
- 
-    int* indices_ptr = m_indices.ptr<int>(0);
-    //float* dists_ptr = m_dists.ptr<float>(0);
-    for (int i=0;i<m_indices.rows;++i) {
-        ptpairs.push_back(indices_ptr[i]);
-    }
- 
-    dists.resize(m_dists.rows);
-    m_dists.copyTo(Mat(dists));
- 
-    return cv::sum(m_dists)[0];
-}
+
 
 float rp() {
 	return (float)(rand() % 100);
 }
 
-Mat r3List2MatRows44(vector<R3> & inp)
-{
-	Mat ret = Mat::zeros(inp.size(), 4, CV_32FC1);
-	for(int i = 0; i < inp.size(); i++)
-	{
-		ret.at<float>(i,0) = inp[i].x;
-		ret.at<float>(i,1) = inp[i].y;
-		ret.at<float>(i,2) = inp[i].z;
-		ret.at<float>(i,3) = 1.0f;
-	}
-	return ret.clone();
-}
+
 
 void findBestReansformSVD(Mat& _m, Mat& _d) {
 	
@@ -195,12 +211,15 @@ void findBestReansformSVD(Mat& _m, Mat& _d) {
 	
 }
 
-Mat icp(vector<R3> & src, vector<R3> & dst, vector<R3> & out, double & error_out, double minError = -1.0, int maxIterations = -1)
+Mat icp(vector<R3> & src, vector<R3> & dst, vector<R3> & out, double & error_out, double & time, double minError = -1.0, int maxIterations = -1)
 {
+	time = 0.0;
+	LTimer clock; clock.start();
 	out.clear();
 	Mat ret = Mat::eye(Size(4,4), CV_32FC1);
 	vector<double> dl; vector<int> ind;
 	out = src;
+	
 
 	double best_distance = DBL_MAX;
 	error_out = best_distance;
@@ -211,7 +230,7 @@ Mat icp(vector<R3> & src, vector<R3> & dst, vector<R3> & out, double & error_out
 	while(true)
 	{
 		dl.clear(); ind.clear();
-		double current_distance = closestPoints(out, dst, ind, dl);
+		double current_distance = closestPointsf(out, dst, ind, dl);
 		if(current_distance >= best_distance) break; //cannot do any better
 		ret = T * ret;
 		error_out = current_distance;
@@ -222,16 +241,37 @@ Mat icp(vector<R3> & src, vector<R3> & dst, vector<R3> & out, double & error_out
 		for(int i = 0; i < out.size(); i++) Pixel3DSet::transform_point(T, out[i]);
 		iteration++;
 	}
+	clock.stop();
+	time = clock.getSeconds();
 	return ret.clone();
+}
+
+//add time measurement and then speedup
+
+template <class T>
+void randomize(vector<T> & ar)
+{
+	int s = ar.size();
+	auto rnum = [&s]() -> int {
+		return rand() % s;
+	};
+	for(int i = 0; i < s*2; i++)
+	{
+		int a = rnum();
+		int b = rnum();
+		T x = ar[a];
+		ar[a] = ar[b];
+		ar[b] = x;
+	}
 }
 
 int main(int argc, char * * argv)
 {
 	
 	vector<R3> p1, p2;
-	Mat km = VMat::transformation_matrix(100, 2.0f, 3.0f, 0.0f, 1.0f, 1.0f, 2.0f, 3.0f);
+	Mat km = VMat::transformation_matrix(100, 4.0f, 3.0f, 0.0f, 1.0f, 1.0f, 2.0f, 3.0f);
 
-	for (int i = 0; i < 5; i++)
+	for (int i = 0; i < 640 * 480; i++)
 	{
 		R3 point(rp(), rp(), rp());
 		p1.push_back(point);
@@ -240,7 +280,9 @@ int main(int argc, char * * argv)
 		p2.push_back(point2);
 	}
 
-	bool PRINT = true;
+	randomize(p1);
+
+	bool PRINT = false;
 
 	if(PRINT)
 	{
@@ -258,9 +300,25 @@ int main(int argc, char * * argv)
 
 	vector<R3> out = p1; vector<int> tmp; vector<double> dst;
 	double error = closestPoints(p1, p2, tmp, dst);
+
+	//cout << "ind-luk**********\n";
+	//for(int i = 0; i < tmp.size(); i++) cout << tmp[i] << endl;
+	//cout << endl;
+
+	cout << "ind-fas**********\n";
+	//Mat _a = r3List2MatRows44(p1);
+	//Mat _b = r3List2MatRows44(p2);
+	//vector<int> tmp2;
+	//float er = flann_knn(_b, _a, tmp2) / (float)(p1.size()*p1.size());
+	//cout << "error -> " << er << endl;
+	//for(int i = 0; i < tmp2.size(); i++) cout << tmp2[i] << endl;
+	//cout << endl;
+
 	cout << "error in: " << error << endl;
-	icp(p1, p2, out, error, -1.0, -1);
+	double seconds;
+	icp(p1, p2, out, error, seconds, -1.0, -1);
 	cout << "error: " << error << endl;
+	cout << "seconds: " << seconds << endl;
 	/*
 	while(true)
 	{
