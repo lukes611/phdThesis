@@ -98,7 +98,7 @@ double closestPointsf(vector<R3> & src, vector<R3> & dst, vector<int> & indexes,
 	vector<float> dists;
 	double error = (double)flann_knn(dstm, srcm, indexes, dists);
 	for(int i = 0; i < dists.size(); i++) distances.push_back((double)dists[i]);
-	double divisor = max(src.size(), dst.size()) > 0 ? (double)(src.size() * src.size()) : 1.0;
+	double divisor = src.size() > 0 ? (double)(src.size()) : 1.0;
 	return error / divisor;
 }
 
@@ -141,7 +141,7 @@ Mat leastSquaresTransform(vector<R3> & src, vector<R3> & dst, vector<int> & inde
 
 
 float rp() {
-	return (float)(rand() % 100);
+	return (float)(rand() % 384);
 }
 
 
@@ -209,20 +209,22 @@ void findBestReansformSVD(Mat& _m, Mat& _d) {
 	
 }
 
-Mat icp(vector<R3> & src, vector<R3> & dst, vector<R3> & out, double & error_out, double & time, double minError = -1.0, int maxIterations = -1)
+Mat icp(vector<R3> & src, vector<R3> & dst, vector<R3> & out, 
+		double & error_out, double & time, int & iterations, 
+		double minError = -1.0, int maxIterations = -1)
 {
 	time = 0.0;
 	LTimer clock; clock.start();
 	out.clear();
 	Mat ret = Mat::eye(Size(4,4), CV_32FC1);
-	vector<double> dl; vector<int> ind;
+	vector<double> dl;
+	vector<int> ind;
 	out = src;
+	iterations = 0;
 	
-
 	double best_distance = DBL_MAX;
 	error_out = best_distance;
-	int iteration = 0;
-
+	
 	Mat T = ret.clone();
 
 	while(true)
@@ -233,11 +235,71 @@ Mat icp(vector<R3> & src, vector<R3> & dst, vector<R3> & out, double & error_out
 		ret = T * ret;
 		error_out = current_distance;
 		if(minError > 0.0 && current_distance < minError) break;
-		if(maxIterations >= 0 && iteration >= maxIterations) break;
+		if(maxIterations >= 0 && iterations >= maxIterations) break;
 		best_distance = current_distance;
 		T = leastSquaresTransform(out, dst, ind);
 		for(int i = 0; i < out.size(); i++) Pixel3DSet::transform_point(T, out[i]);
-		iteration++;
+		iterations++;
+	}
+	clock.stop();
+	time = clock.getSeconds();
+	return ret.clone();
+}
+
+
+Mat icp_outlierRemoval(vector<R3> & src, vector<R3> & _dst, vector<R3> & out, 
+					   double & error_out, double & time, int & iterations, 
+					   double outlierRemovalTimesMean = 7.0, double minError = -1.0, 
+					   int maxIterations = -1)
+{
+	time = 0.0;
+	LTimer clock; clock.start();
+	out.clear();
+	Mat ret = Mat::eye(Size(4,4), CV_32FC1);
+	vector<double> dl;
+	vector<int> ind;
+	out = src;
+	vector<R3> dst = _dst;
+	iterations = 0;
+	
+	double best_distance = DBL_MAX;
+	error_out = best_distance;
+	
+	Mat T = ret.clone();
+
+	while(true)
+	{
+		dl.clear(); ind.clear();
+		double current_distance = closestPointsf(out, dst, ind, dl);
+		if(current_distance >= best_distance) break; //cannot do any better
+		ret = T * ret;
+		error_out = current_distance;
+		if(minError > 0.0 && current_distance < minError) break;
+		if(maxIterations >= 0 && iterations >= maxIterations) break;
+		best_distance = current_distance;
+		if(best_distance <= 0.0) break;
+
+		//outlier removal
+		//cout << current_distance << " is current, or is: " << outlierRemovalTimesMean << endl;
+		vector<R3> srcTest, dstTest;
+		vector<int> indTest;
+		for(int i = 0; i < dl.size(); i++)
+		{
+			double test = dl[i] / best_distance;
+			//cout << dl[i] << " : " << best_distance << " : " << test << " <= " << outlierRemovalTimesMean << endl;
+			if(dl[i]/best_distance < outlierRemovalTimesMean)
+			{
+				srcTest.push_back(out[i]);
+				dstTest.push_back(dst[ind[i]]);
+				indTest.push_back(i);
+			}
+		}
+		
+		//cout << "i/o(" << out.size() << "/" << srcTest.size() << ")\n";
+
+		T = leastSquaresTransform(srcTest, dstTest, indTest);
+		for(int i = 0; i < out.size(); i++) Pixel3DSet::transform_point(T, out[i]);
+		iterations++;
 	}
 	clock.stop();
 	time = clock.getSeconds();
@@ -245,6 +307,7 @@ Mat icp(vector<R3> & src, vector<R3> & dst, vector<R3> & out, double & error_out
 }
 
 //add time measurement and then speedup
+//add outlier removal
 
 template <class T>
 void randomize(vector<T> & ar)
@@ -267,9 +330,13 @@ int main(int argc, char * * argv)
 {
 	
 	vector<R3> p1, p2;
-	Mat km = VMat::transformation_matrix(100, 4.0f, 3.0f, 0.0f, 1.0f, 1.0f, 2.0f, 3.0f);
+	int imSize = 256;
 
-	for (int i = 0; i < 640 * 480; i++)
+	Mat km = VMat::transformation_matrix(384, 2.0f, 1.0f, 0.0f, 1.0f, 1.0f, 2.0f, 1.0f);
+
+	
+
+	for (int i = 0; i < imSize * imSize; i++)
 	{
 		R3 point(rp(), rp(), rp());
 		p1.push_back(point);
@@ -313,9 +380,10 @@ int main(int argc, char * * argv)
 	//cout << endl;
 
 	cout << "error in: " << error << endl;
-	double seconds;
-	icp(p1, p2, out, error, seconds, -1.0, -1);
+	double seconds; int iters;
+	icp_outlierRemoval(p1, p2, out, error, seconds, iters);
 	cout << "error: " << error << endl;
+	cout << "number of iterations: " << iters << endl;
 	cout << "seconds: " << seconds << endl;
 	/*
 	while(true)
