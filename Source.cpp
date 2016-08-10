@@ -140,8 +140,6 @@ Mat leastSquaresTransform(vector<R3> & src, vector<R3> & dst, vector<int> & inde
 }
 
 
-
-
 float rp() {
 	return (float)(rand() % 100);
 }
