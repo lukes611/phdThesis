@@ -329,7 +329,28 @@ void randomize(vector<T> & ar)
 int main(int argc, char * * argv)
 {
 	
-	vector<R3> p1, p2;
+	SIObj ob; ob.open_obj("C:/lcppdata/obj/bunny_simplified2.obj");
+
+	Pixel3DSet p1(ob._points);
+
+	p1.normalize(256);
+
+	Pixel3DSet p2 = p1;
+
+	p2.transform_set(0.0f, 3.0f, 1.0f, 1.0f, 2.0f, 0.0f, 0.0f, R3(1.0f, 1.0f, 1.0f) * 0.5f * 256.0f);
+
+	cout << "opened object bunny with : " << ob._points.size() << " no. points\n";
+
+	double error, seconds;
+	vector<R3> out;
+	int iterations;
+	vector<int> ii; vector<double> dd;
+	error = closestPointsf(p1.points, p2.points, ii, dd);
+	printf("error-in: %lf\n", error);
+	icp(p1.points, p2.points, out, error, seconds, iterations);
+	printf("error-out: %lf\n", error);
+
+	/*vector<R3> p1, p2;
 	int imSize = 256;
 
 	Mat km = VMat::transformation_matrix(384, 2.0f, 1.0f, 0.0f, 1.0f, 1.0f, 2.0f, 1.0f);
@@ -366,18 +387,10 @@ int main(int argc, char * * argv)
 	vector<R3> out = p1; vector<int> tmp; vector<double> dst;
 	double error = closestPoints(p1, p2, tmp, dst);
 
-	//cout << "ind-luk**********\n";
-	//for(int i = 0; i < tmp.size(); i++) cout << tmp[i] << endl;
-	//cout << endl;
+	
 
 	cout << "ind-fas**********\n";
-	//Mat _a = r3List2MatRows44(p1);
-	//Mat _b = r3List2MatRows44(p2);
-	//vector<int> tmp2;
-	//float er = flann_knn(_b, _a, tmp2) / (float)(p1.size()*p1.size());
-	//cout << "error -> " << er << endl;
-	//for(int i = 0; i < tmp2.size(); i++) cout << tmp2[i] << endl;
-	//cout << endl;
+	
 
 	cout << "error in: " << error << endl;
 	double seconds; int iters;
@@ -385,22 +398,7 @@ int main(int argc, char * * argv)
 	cout << "error: " << error << endl;
 	cout << "number of iterations: " << iters << endl;
 	cout << "seconds: " << seconds << endl;
-	/*
-	while(true)
-	{
-		vector<double> dl; vector<int> ind;
-		double nd = closestPoints(out, p2, ind, dl);
-		cout << "old distance: " << dist << endl;
-		cout << "new distance: " << nd << endl;
-		system("pause");
-		if(nd >= dist) break; //cannot do any better
-		dist = nd;
-		Mat transform = leastSquaresTransform(out, p2, ind);
-		for(int i = 0; i < out.size(); i++) Pixel3DSet::transform_point(transform, out[i]);
-		
-	}
-
-	*/
+	
 	if(PRINT)
 	{
 		cout << "out:" << endl;
@@ -412,95 +410,7 @@ int main(int argc, char * * argv)
 		for(int i = 0; i < p2.size(); i++) cout << p2[i] << endl;
 	}
 
-	/*Mat a = r3List2MatRows44(p1);
-	Mat b = r3List2MatRows44(p2);
-
-	cout << a << endl;
-	cout << b << endl;
-*/
-	//vector<int> pairs;
-	//vector<float> dists;
-	//cout << (flann_knn(a, b, pairs, dists) / (double)(a.rows * a.rows)) << endl;
-
-	//for(int i = 0; i < pairs.size(); i++) cout << pairs[i] << endl;
-	/*
-	Mat destination = a.clone();
-	Mat X = b.clone();
-	vector<int> pair;
-	double lastDist = DBL_MAX;
-
-	Mat lastGood = X.clone();
-
-	while(true) {
-		pair.clear(); dists.clear();
-		double dist = flann_knn(destination, X, pair, dists);
-		cout << pair.size() << " " << p1.size() << endl; 
-		//cout << "dist: " << dist << endl;
-		if(lastDist <= dist) {
-			X = lastGood;
-			break;  //converged?
-		}
-		lastDist = dist;
-		X.copyTo(lastGood);
- 
-		cout << "distance: " << dist << endl;
- 
-		Mat X_bar(X.size(),X.type());
-		for(int i=0;i<X.rows;i++) {
-			Point p = destination.at<Point>(pair[i],0);
-			X_bar.at<Point>(i,0) = p;
-		}
- 
-		cout << "h a " << endl;
-		
- 
-
-		X = X.reshape(2);
-		cout << "x now " << X << endl;
-		X_bar = X_bar.reshape(2);
-		cout << X_bar << " is xbar" << endl;
-		findBestReansformSVD(X,X_bar);
-		break;
-		X = X.reshape(1); // back to 1-channel
-	}
-
-	cout << destination << endl;
-	cout << X << endl;
-
-
-	/*for (int i = 0; i < p1.size(); i++)
-		cout << p1[i] << " -> " << p2[i] << endl;
-
-
-	vector<int> matches; vector<double> dists;
-	double d1= closestPoints(p1, p2, matches, dists);
-	cout << "average distance is: " << d1 << endl;
-	cout << "cpts:**********\n";
-	for(int i = 0; i < matches.size(); i++)
-		cout << i << " matched with " << matches[i] << " with distance: " << dists[i] << endl;
 	
-
-	Mat m = leastSquaresTransform(p1, p2, matches);
-
-
-	cout << "computed m: " << m << endl;
-
-	//transform p1:
-	cout << "transforming p1 set\n";
-	for(int i = 0; i < p1.size(); i++)
-	{
-		Pixel3DSet::transform_point(m, p1[i]);
-	}
-	matches.clear(); dists.clear();
-	double d2 = closestPoints(p1, p2, matches, dists);
-	cout << "average distance is now: " << d2 << endl;
-	cout << "aligned cpts:**********\n";
-	for(int i = 0; i < matches.size(); i++)
-		cout << i << " matched with " << matches[i] << " with distance: " << dists[i] << endl;
-	
-	
-	for (int i = 0; i < p1.size(); i++)
-		cout << p1[i] << " -> " << p2[i] << endl;
 	*/
 
 	return 0;
