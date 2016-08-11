@@ -88,7 +88,7 @@ int main(int argc, char * * argv)
 	Mat km = VMat::transformation_matrix(384, 2.0f, 1.0f, 0.0f, 1.0f, 1.0f, 2.0f, 1.0f);
 
 	
-
+	
 	for (int i = 0; i < imSize * imSize; i++)
 	{
 		R3 point(rp(), rp(), rp());

@@ -4,10 +4,6 @@ today:
 		fm   : 
 		pc   :
 		mode : 
-	measurements:
-		hammond error : v<R3>
-		mse : v<R3>
-		% match v<R3>
 	1. setup my phd project:
 		RGB-D data comes from my Pix3D class and corresponding files
 		VMat/vector<R3> data can be computed from a variety of places
