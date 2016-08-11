@@ -8,15 +8,25 @@
 #include "code\basics\VMatF.h"
 #include "code\basics\LTimer.h"
 #include "code\phd\Licp.h"
+#include "code\phd\measurements.h"
 
 using namespace std;
 using namespace ll_R3;
 using namespace ll_cam;
+using namespace ll_measure;
 //using namespace cv;
 
 //proto-type for experiments: VMat pc(VMat a, VMat b, double & time, Mat & transform, double & mse);
 //to-do:= pc, ipc, 
 
+/*
+
+pc [almost]
+icp [almost]
+fm [ - ]
+
+
+*/
 
 
 
@@ -53,7 +63,7 @@ int main(int argc, char * * argv)
 
 	randomize(p2.points);
 
-	p2.transform_set(0.0f, 3.0f, 1.0f, 1.0f, 2.0f, 0.0f, 0.0f, R3(1.0f, 1.0f, 1.0f) * 0.5f * 256.0f);
+	p2.transform_set(5.0f, 6.0f, 1.0f, 1.0f, 2.0f, 5.0f, 0.0f, R3(1.0f, 1.0f, 1.0f) * 0.5f * 256.0f);
 
 	cout << "opened object bunny with : " << ob._points.size() << " no. points\n";
 
@@ -63,9 +73,15 @@ int main(int argc, char * * argv)
 	vector<int> ii; vector<double> dd;
 	error = Licp::closestPointsf(p1.points, p2.points, ii, dd);
 	printf("error-in: %lf\n", error);
+	printf("hausdorff %lf\n", hausdorff(p1.points, p2.points));
+	printf("mse %lf\n", mse(p1.points, p2.points));
+	printf("% match %lf\n", percentMatch(p1.points, p2.points));
+
 	Licp::icp_outlierRemoval(p1.points, p2.points, out, error, seconds, iterations, 10.0);
 	printf("error-out: %lf\n", error);
-
+	printf("hausdorff %lf\n", hausdorff(out, p2.points));
+	printf("mse %lf\n", mse(out, p2.points));
+	printf("% match %lf\n", percentMatch(out, p2.points));
 	/*vector<R3> p1, p2;
 	int imSize = 256;
 

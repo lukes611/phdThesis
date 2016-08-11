@@ -1,16 +1,21 @@
 today:
+	algorithm implementation:
+		icp  : v<R3>, 
+		fm   : 
+		pc   :
+		mode : 
+	measurements:
+		hammond error : v<R3>
+		mse : v<R3>
+		% match v<R3>
 	1. setup my phd project:
 		RGB-D data comes from my Pix3D class and corresponding files
-		VMat data can be computed from a variety of places
-		VMat with Pic - used by the feature matching methods
-	2. setup my algorithm
-	3. write the other algorithms
-	4. setup test environment
-	5. gather data
-	6. do tests
+		VMat/vector<R3> data can be computed from a variety of places
+		VMat with Pix3D - used by the feature matching methods
+		
+	
 
-
-todo:
+to do:
 	1. implement an evaluation system: 
 		input:
 			RGB-D data
@@ -28,10 +33,10 @@ todo:
 			ICP
 			PC & friends
 			MODE (FM)
-		testing env:
+		testing environment:
 			add noise
 			skip more frames
-			difference ammounts of rote,scale,trans
+			difference amounts of rote,scale,translation
 	2. Thesis:
 		experiments:
 		Literature Review:
