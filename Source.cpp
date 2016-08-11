@@ -7,7 +7,7 @@
 #include "code\basics\llCamera.h"
 #include "code\basics\VMatF.h"
 #include "code\basics\LTimer.h"
-
+#include "code\phd\Licp.h"
 
 using namespace std;
 using namespace ll_R3;
@@ -17,18 +17,7 @@ using namespace ll_cam;
 //proto-type for experiments: VMat pc(VMat a, VMat b, double & time, Mat & transform, double & mse);
 //to-do:= pc, ipc, 
 
-Mat r3List2MatRows44(vector<R3> & inp)
-{
-	Mat ret = Mat::zeros(inp.size(), 4, CV_32FC1);
-	for(int i = 0; i < inp.size(); i++)
-	{
-		ret.at<float>(i,0) = inp[i].x;
-		ret.at<float>(i,1) = inp[i].y;
-		ret.at<float>(i,2) = inp[i].z;
-		ret.at<float>(i,3) = 1.0f;
-	}
-	return ret.clone();
-}
+
 
 float flann_knn(Mat& m_destinations, Mat& m_object, vector<int>& ptpairs, vector<float>& dists = vector<float>()) {
     // find nearest neighbors using FLANN
@@ -94,7 +83,7 @@ double closestPointsf(vector<R3> & src, vector<R3> & dst, vector<int> & indexes,
 {
 	distances.clear();
 	indexes.clear();
-	Mat srcm = r3List2MatRows44(src), dstm = r3List2MatRows44(dst);
+	Mat srcm = Licp::asMatRows(src), dstm = Licp::asMatRows(dst);
 	vector<float> dists;
 	double error = (double)flann_knn(dstm, srcm, indexes, dists);
 	for(int i = 0; i < dists.size(); i++) distances.push_back((double)dists[i]);
@@ -102,13 +91,6 @@ double closestPointsf(vector<R3> & src, vector<R3> & dst, vector<int> & indexes,
 	return error / divisor;
 }
 
-//returns x from equation Mx = y
-Mat least_squares(Mat M, Mat y){
-	Mat mt = M.t();
-	Mat pre = mt * M;
-	pre = pre.inv();
-	return pre * mt * y;
-}
 
 //part two: get matrix from the two point sets using least squares
 Mat leastSquaresTransform(vector<R3> & src, vector<R3> & dst, vector<int> & indexes)

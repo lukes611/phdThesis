@@ -1434,3 +1434,11 @@ void ll_pad(Mat & input, Mat & output, Size s)
 	input.copyTo(padded(Rect(difx/2, dify/2, input.cols, input.rows)));
 	output = padded.clone();
 }
+
+Mat least_squares(Mat M, Mat y)
+{
+	Mat mt = M.t();
+	Mat pre = mt * M;
+	pre = pre.inv();
+	return pre * mt * y;
+}

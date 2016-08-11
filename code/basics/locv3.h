@@ -242,3 +242,5 @@ public:
 };
 
 void ll_pad(Mat & image, Mat & output, Size size);
+
+Mat least_squares(Mat M, Mat y); //returns x from equation Mx = y
