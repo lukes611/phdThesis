@@ -21,11 +21,13 @@ namespace ll_measure
 double hausdorff(std::vector<ll_R3::R3> & a, std::vector<ll_R3::R3> & b);
 //average error 
 double avg(std::vector<ll_R3::R3> & a, std::vector<ll_R3::R3> & b);
+double avg(VMat & a, VMat & b, float threshold = 0.05f);
 //mse
 double mse(std::vector<ll_R3::R3> & a, std::vector<ll_R3::R3> & b);
 double mse_1way(std::vector<ll_R3::R3> & a, std::vector<ll_R3::R3> & b);
+double mse(VMat & a, VMat & b, float threshold = 0.05f);
 //% matches
 double percentMatch(std::vector<ll_R3::R3> & a, std::vector<ll_R3::R3> & b, double minError = 0.5f);
 double percentMatch_1way(std::vector<ll_R3::R3> & a, std::vector<ll_R3::R3> & b, double minError = 0.5f);
-
+double percentMatch(VMat & a, VMat & b, float threshold = 0.05f);
 }

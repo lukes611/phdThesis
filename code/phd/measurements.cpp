@@ -6,6 +6,7 @@ using namespace Licp;
 namespace ll_measure
 {
 
+//v<R3> error metrics
 double hausdorff(std::vector<ll_R3::R3> & a, std::vector<ll_R3::R3> & b)
 {
 	vector<int> i1;
@@ -54,6 +55,56 @@ double percentMatch_1way(std::vector<ll_R3::R3> & a, std::vector<ll_R3::R3> & b,
 	}
 
 	return ret;
+}
+
+//VMat error metrics
+double avg(VMat & a, VMat & b, float threshold)
+{
+	int count = 0;
+	double ret = 0.0;
+	for(int z = 0; z < a.s; z++)
+		for(int y = 0; y < a.s; y++)
+			for(int x = 0; x < a.s; x++)
+				if(a.at(x,y,z) > threshold || b.at(x,y,z) > threshold)
+				{
+					double d = abs(a.at(x,y,z) - b.at(x,y,z));
+					ret += d;
+					count++;
+				}
+	if(count <= 0) return -1.0;
+	return ret / (double) count;
+}
+double mse(VMat & a, VMat & b, float threshold)
+{
+	int count = 0;
+	double ret = 0.0;
+	for(int z = 0; z < a.s; z++)
+		for(int y = 0; y < a.s; y++)
+			for(int x = 0; x < a.s; x++)
+				if(a.at(x,y,z) > threshold || b.at(x,y,z) > threshold)
+				{
+					double d = a.at(x,y,z) - b.at(x,y,z);
+					ret += d*d;
+					count++;
+				}
+	if(count <= 0) return -1.0;
+	return ret / (double) count;
+}
+double percentMatch(VMat & a, VMat & b, float threshold)
+{
+	int count = 0;
+	for(int z = 0; z < a.s; z++)
+		for(int y = 0; y < a.s; y++)
+			for(int x = 0; x < a.s; x++)
+			{
+				double d = abs(a.at(x,y,z) - b.at(x,y,z));
+				if(d <= threshold)
+				{
+					count++;
+				}
+			}
+	return count / (double) a.s3;
+
 }
 
 
