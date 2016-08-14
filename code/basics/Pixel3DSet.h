@@ -80,6 +80,7 @@ namespace ll_pix3d
 		bool empty() const;
 		bool colorImage(Mat & m);
 		bool depthImage(Mat & m);
+		bool vdImage(Mat & m);
 
 		Pix3D withoutWarping(int margin = 20);
 		

@@ -15,6 +15,7 @@ namespace ll_R3
 	namespace ll_R3_C
 	{
 		const float ll_R3_rad2deg = (float)57.295779513082320876798154814105;
+		const float ll_R3_deg2rad = (float)0.017453292519943295;
 	}
 	
 	
@@ -48,20 +49,20 @@ namespace ll_R3
 		}
 
 		//functions
-		inline R3 operator+(const R3 & r2) const; //element wise add : returns [this.x+r2.x,this.y+r2.y,this.z+r2.z]
-		inline R3 & operator+=(const R3 & r2); //this += r2
+		R3 operator+(const R3 & r2) const; //element wise add : returns [this.x+r2.x,this.y+r2.y,this.z+r2.z]
+		R3 & operator+=(const R3 & r2); //this += r2
 		
 		
-		inline R3 & operator-=(const R3 & r2); //this -= r2
+		R3 & operator-=(const R3 & r2); //this -= r2
 		
-		inline float operator*(const R3 & r2) const; // dot product : returns this.x*r2.x + this.y*r2.y + this.z*r2.z
+		float operator*(const R3 & r2) const; // dot product : returns this.x*r2.x + this.y*r2.y + this.z*r2.z
 		
-		inline R3 operator^(const R3 & r2) const; // cross product : returns a vector orthogonal to *this and r2
-		inline R3 & operator^=(const R3 & r2); //this = cross(this,r2)
+		R3 operator^(const R3 & r2) const; // cross product : returns a vector orthogonal to *this and r2
+		R3 & operator^=(const R3 & r2); //this = cross(this,r2)
 		
 		
-		inline R3 operator*(float scalar) const; // scale
-		inline R3 & operator*=(float scalar); //this *= scalar
+		R3 operator*(float scalar) const; // scale
+		R3 & operator*=(float scalar); //this *= scalar
 
 		R3 operator/(float scalar) const; // attenuate
 		R3 & operator/=(float scalar); //this /= scalar
@@ -70,11 +71,12 @@ namespace ll_R3
 		R3 operator-() const; //return the inverse
 		
 		//equality testing
-		inline bool operator==(const R3 & r2) const ; //tests for equality
-		inline bool operator<(const R3 & r2) const ; //tests for scanline lt
-		inline bool operator>(const R3 & r2) const ; //tests for scanline gt
-		inline bool operator<=(const R3 & r2) const ; //tests for scanline le
-		inline bool operator>=(const R3 & r2) const ; //tests for scanline ge
+		bool operator==(const R3 & r2) const ; //tests for equality
+		bool operator!=(const R3 & r2) const ; //tests for inequality
+		bool operator<(const R3 & r2) const ; //tests for scanline lt
+		bool operator>(const R3 & r2) const ; //tests for scanline gt
+		bool operator<=(const R3 & r2) const ; //tests for scanline le
+		bool operator>=(const R3 & r2) const ; //tests for scanline ge
 		
 		inline float & operator[](int index); //return &Array(x,y,z)[index]
 		
@@ -83,7 +85,7 @@ namespace ll_R3
 		R3 & normalize(); //normalizes this
 
 		//more functions
-		inline float mag() const; //computes the magnitude of this
+		float mag() const; //computes the magnitude of this
 		R3 unit() const; //grabs the unit version of this
 		R3 cp(const R3 & r2) const; //a safe version of the cross product
 		
@@ -95,7 +97,7 @@ namespace ll_R3
 		static void GetUnitPointFromAngle(float angle, float& x, float& y);
 		static float getAngle(float x, float y);
 
-		static inline float precompute_d(const R3 & point_on_plane, const R3 & plane_normal);
+		static float precompute_d(const R3 & point_on_plane, const R3 & plane_normal);
 
 		static bool ray_plane_intersection(const R3 & point_from, const R3 & ray_vector, const R3 & point_on_plane, const R3 & plane_normal, float & t, R3 * point_of_intersection = NULL);
 		/*

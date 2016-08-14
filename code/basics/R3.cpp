@@ -40,19 +40,19 @@ namespace ll_R3
 	}
 	
 	//algebra
-	inline R3 R3::operator+(const R3 & r2) const { return R3(x+r2.x, y+r2.y, z+r2.z); }
-	inline R3 & R3::operator+=(const R3 & r2) { x+=r2.x; y+=r2.y; z+=r2.z; return *this; }
+	R3 R3::operator+(const R3 & r2) const { return R3(x+r2.x, y+r2.y, z+r2.z); }
+	R3 & R3::operator+=(const R3 & r2) { x+=r2.x; y+=r2.y; z+=r2.z; return *this; }
 	
 	R3 R3::operator-(const R3 & r2) const { return R3(x-r2.x, y-r2.y, z-r2.z); }
-	inline R3 & R3::operator-=(const R3 & r2) { x-=r2.x; y-=r2.y; z-=r2.z; return *this; }
+	R3 & R3::operator-=(const R3 & r2) { x-=r2.x; y-=r2.y; z-=r2.z; return *this; }
 
-	inline float R3::operator*(const R3 & r2) const { return x*r2.x + y*r2.y + z*r2.z; }
+	float R3::operator*(const R3 & r2) const { return x*r2.x + y*r2.y + z*r2.z; }
 
-	inline R3 R3::operator^(const R3 & r2) const { return R3(y*r2.z - z*r2.y, z*r2.x - x*r2.z, x*r2.y - y*r2.x); }
-	inline R3 & R3::operator^=(const R3 & r2) { *this = R3(y*r2.z - z*r2.y, z*r2.x - x*r2.z, x*r2.y - y*r2.x); return *this; }
+	R3 R3::operator^(const R3 & r2) const { return R3(y*r2.z - z*r2.y, z*r2.x - x*r2.z, x*r2.y - y*r2.x); }
+	R3 & R3::operator^=(const R3 & r2) { *this = R3(y*r2.z - z*r2.y, z*r2.x - x*r2.z, x*r2.y - y*r2.x); return *this; }
 
-	inline R3 R3::operator*(float scalar) const { return R3(x*scalar, y*scalar, z*scalar); }
-	inline R3 & R3::operator*=(float scalar) { x*=scalar; y*=scalar; z*=scalar; return *this; }
+	R3 R3::operator*(float scalar) const { return R3(x*scalar, y*scalar, z*scalar); }
+	R3 & R3::operator*=(float scalar) { x*=scalar; y*=scalar; z*=scalar; return *this; }
 
 	R3 R3::operator/(float scalar) const { return R3(x/scalar, y/scalar, z/scalar); }
 	R3 & R3::operator/=(float scalar) { x/=scalar; y/=scalar; z/=scalar; return *this; }
@@ -60,8 +60,9 @@ namespace ll_R3
 	R3 R3::operator-() const { return R3(-x,-y,-z); }
 
 	//equality testing
-	inline bool R3::operator==(const R3 & r2) const { return x==r2.x&&y==r2.y&&z==r2.z; }
-	inline bool R3::operator<(const R3 & r2) const
+	bool R3::operator==(const R3 & r2) const { return x==r2.x && y==r2.y && z==r2.z; }
+	bool R3::operator!=(const R3 & r2) const { return x!=r2.x || y!=r2.y || z!=r2.z; }
+	bool R3::operator<(const R3 & r2) const
 	{
 		if(x < r2.x) return true;
 		if(x > r2.x) return false;
@@ -70,7 +71,7 @@ namespace ll_R3
 		if(z < r2.z) return true;
 		return false;
 	}
-	inline bool R3::operator>(const R3 & r2) const
+	bool R3::operator>(const R3 & r2) const
 	{
 		if(x > r2.x) return true;
 		if(x < r2.x) return false;
@@ -79,8 +80,8 @@ namespace ll_R3
 		if(z > r2.z) return true;
 		return false;
 	}
-	inline bool R3::operator<=(const R3 & r2) const { return *this<r2 || *this==r2;  }
-	inline bool R3::operator>=(const R3 & r2) const { return *this>r2 || *this==r2;  }
+	bool R3::operator<=(const R3 & r2) const { return *this<r2 || *this==r2;  }
+	bool R3::operator>=(const R3 & r2) const { return *this>r2 || *this==r2;  }
 
 	float& R3::operator[](int index)
 	{
@@ -102,7 +103,7 @@ namespace ll_R3
 		z /= m;
 		return *this;
 	}
-	inline float R3::mag() const { return sqrt(x*x + y*y + z*z); }
+	float R3::mag() const { return sqrt(x*x + y*y + z*z); }
 	R3 R3::unit() const { float m = mag(); return R3(x/m, y/m, z/m); }
 	R3 R3::cp(const R3 & r2) const { return unit() ^ r2.unit(); }
 
@@ -120,7 +121,7 @@ namespace ll_R3
 		y = sin(angle);
 	}
 
-	inline float R3::precompute_d(const R3 & point_on_plane, const R3 & plane_normal)
+	float R3::precompute_d(const R3 & point_on_plane, const R3 & plane_normal)
 	{
 		return -(plane_normal * point_on_plane);
 	}
@@ -132,6 +133,7 @@ namespace ll_R3
 		float d = precompute_d(point_on_plane, plane_normal);
 		t = -(((plane_normal * point_from) + d) / denominator);
 		if(point_of_intersection) *point_of_intersection = point_from + ray_vector * t;
+		return true;
 	}
 
 	bool R3::ray_plane_intersection(const R3 & point_from, const R3 & ray_vector, const R3 & point_on_plane, const R3 & plane_normal, float d, float & t, R3 * point_of_intersection)
@@ -140,13 +142,16 @@ namespace ll_R3
 		if(denominator == 0.0f) return false; 
 		t = -(((plane_normal * point_from) + d) / denominator);
 		if(point_of_intersection) *point_of_intersection = point_from + ray_vector * t;
+		return true;
 	}
 
 	bool R3::point_within_triangle(const R3 & point, const R3 & triangle_normal, const R3 & a, const R3 & b, const R3 & c)
 	{
 		R3 Ns[3];
-		R3 normal = triangle_normal;
 		float chq[3];
+
+		R3 normal = triangle_normal;
+		
 		normal = normal.unit();
 		Ns[0] = ((b - a) ^ normal);
 		chq[0] = (point * Ns[0]) - (Ns[0] * a);
@@ -158,13 +163,10 @@ namespace ll_R3
 		Ns[2] = ((a - c) ^ normal);
 		chq[2] = (point * Ns[2]) - (Ns[2] * c);
 
-		if ((chq[0] >= 0.0f && chq[1] >= 0.0f && chq[2] >= 0.0f) ||
-			(chq[0] <= 0.0f && chq[1] <= 0.0f && chq[2] <= 0.0f))
-		{
-			return true;
-		}
-
-		return false;
+		return	(	
+					(chq[0] >= 0.0f && chq[1] >= 0.0f && chq[2] >= 0.0f) ||
+					(chq[0] <= 0.0f && chq[1] <= 0.0f && chq[2] <= 0.0f)
+				);
 	}
 
 

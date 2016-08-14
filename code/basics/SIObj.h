@@ -43,13 +43,13 @@ namespace ll_siobj
 		SI_FullTriangle& operator=(const SI_FullTriangle& t2);
 		void setAs(ll_R3::R3 ina, ll_R3::R3 inb, ll_R3::R3 inc);
 		float RayIntersectsTriangle(const ll_R3::R3 & S,const ll_R3::R3 & V, const ll_R3::R3 & N, ll_R3::R3 & intersectionPoint, bool & hit);
-		ll_R3::R3 normal() const;
 		/*
 		checks whether a ray, from S, to S + V, intersects the triangle
 		returns the scalar t for which S + V*t lies within the triangle
 		intersectionPoint is the point of intersection
 		hit is false if there is no intersection at all
 		*/
+		ll_R3::R3 normal() const;
 	};
 
 	class SI_Quad
@@ -161,7 +161,9 @@ namespace ll_siobj
 		void add_points(std::vector<ll_R3::R3> & pts);
 		void mutate_points(std::function<ll_R3::R3(ll_R3::R3&)> f);
 		void mutate_normals(std::function<ll_R3::R3(ll_R3::R3&)> f);
-		
+		bool operator == (const SIObj & o2);
+
+		void clear();
 	};
 
 

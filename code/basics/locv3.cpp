@@ -1224,7 +1224,7 @@ double SuperFast2DPC::lukeDimentionReduce1D(Mat & im, Mat & ret, float thresh, f
 
 double SuperFast2DPC::FastPCR(Mat & a, Mat & b, double & rotation, float thresh, float minRad)
 {
-	assert(a1.size() == b1.size());
+	assert(a.size() == b.size());
 	LTimer timer;
 	timer.start();
 

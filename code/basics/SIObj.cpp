@@ -120,28 +120,21 @@ namespace ll_siobj
 	}
 	SI_FullTriangle& SI_FullTriangle::operator=(const SI_FullTriangle & t2)
 	{
+		if(this == &t2) return *this;
 		a = t2.a; b = t2.b; c = t2.c;
-		return (*this);
+		return *this;
 	}
 	
 	float SI_FullTriangle::RayIntersectsTriangle(const R3 & S, const R3 & V, const R3 & N, R3 & intersectionPoint, bool & hit){
 
 		float t = 0.0f;
+		hit = false;
+		intersectionPoint = R3();
 		hit = R3::ray_plane_intersection(S, V, a, N, t, &intersectionPoint);
 		if(!hit) return t;
 		
-		if (R3::point_within_triangle(intersectionPoint, N, a, b, c))
-		{
-			hit = true;
-			return t;
-		}
-		else
-		{
-			hit = false;
-			return t;
-
-		}
-
+		hit = R3::point_within_triangle(intersectionPoint, N, a, b, c);
+		return t;
 	}
 
 	// basic quad object
@@ -426,6 +419,7 @@ namespace ll_siobj
 
 	SIObj::SIObj()
 	{
+
 	}
 
 	SIObj::SIObj(int npoints, int ntriangles)
@@ -516,7 +510,7 @@ namespace ll_siobj
 	{
 	}
 
-	void SIObj::open_obj(string fname)
+	void SIObj::clear()
 	{
 		_points.clear();
 		_triangles.clear();
@@ -524,8 +518,13 @@ namespace ll_siobj
 		_normal_ind.clear();
 		_uvs.clear();
 		_uv_ind.clear();
+	}
+
+	void SIObj::open_obj(string fname)
+	{
+		clear();
 		ifstream fi(fname.c_str(), ios::in);
-		string line;
+		string line = "";
 
 		function<vector<string>(string, char)> split = [](string s, char d)->vector<string>
 		{
@@ -1305,4 +1304,14 @@ namespace ll_siobj
 		for(int i = 0; i < s; i++) _normals[i] = f(_normals[i]);
 	}
 	
+	bool SIObj::operator == (const SIObj & o2)
+	{
+		if(_points.size() != o2._points.size()) return false;
+		if(_triangles.size() != o2._triangles.size()) return false;
+		for(int i = 0; i < _points.size(); i++)
+			if(_points[i] != o2._points[i]) return false;
+		for(int i = 0; i < _triangles.size(); i++)
+			if(_triangles[i].a != o2._triangles[i].a || _triangles[i].b != o2._triangles[i].b || _triangles[i].c != o2._triangles[i].c) return false;
+		return true;
+	}
 }

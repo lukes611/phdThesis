@@ -1315,6 +1315,14 @@ namespace ll_pix3d
 		m /= 384.0f;
 		return true;
 	}
+	bool Pix3D::vdImage(Mat & m)
+	{
+		if(type != ImageType) return false;
+		m = Mat::zeros(Size(640, 480), CV_8UC1);
+		unsigned char * ptr = (unsigned char *) m.data;
+		for(unsigned int i = 0; i < count; i++, ptr++) *ptr = validDepth[i] ? 0xFF : 0x00;
+		return true;
+	}
 	Pix3D Pix3D::withoutWarping(int margin)
 	{
 		if(!hasVd()) return *this;
