@@ -5,7 +5,7 @@
 implementation of the iterative closest point algorithm
 author : luke lincoln @ lukes611@gmail.com
 
-requires: locv, R3
+requires: locv, R3, ll_pix3d
 
 */
 
