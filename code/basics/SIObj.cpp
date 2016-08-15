@@ -137,6 +137,11 @@ namespace ll_siobj
 		return t;
 	}
 
+	ll_R3::R3 SI_FullTriangle::normal() const
+	{
+		return (((b - a).unit()) ^ ((c - a).unit())).unit();
+	}
+
 	// basic quad object
 	SI_Quad::SI_Quad()
 	{
@@ -173,10 +178,7 @@ namespace ll_siobj
 	{
 		return R3::ray_plane_intersection(from_point, direction, a, normal, distance, time_hit, &position_hit);
 	}
-	ll_R3::R3 SI_FullTriangle::normal() const
-	{
-		return (b-a).unit() ^ (c-a).unit();
-	}
+	
 
 	//a cube object
 	SI_Cube::SI_Cube()
@@ -419,14 +421,17 @@ namespace ll_siobj
 
 	SIObj::SIObj()
 	{
-
+		clear();
 	}
 
 	SIObj::SIObj(int npoints, int ntriangles)
 	{
+		clear();
 		_points = vector<R3>(npoints);
 		_triangles = vector<SI_Triangle>(ntriangles);
-		compute_normals();
+		//compute_normals();
+		_normals = vector<R3>(_triangles.size());
+		_normal_ind = vector<SI_Triangle>(_triangles.size());
 	}
 	
 	SIObj::SIObj(std::vector<R3> pointList)
@@ -1119,7 +1124,6 @@ namespace ll_siobj
 		}
 		for(int i = 0; i < _triangles.size(); i++)
 		{
-
 			SI_FullTriangle t = getTriangle(i);
 			_normals[i] = t.normal();
 			_normal_ind[i] = SI_Triangle(i,i,i);
@@ -1257,6 +1261,14 @@ namespace ll_siobj
 		mutate_subtract(mini);
 		return mini;
 	}
+
+	void SIObj::centerNormalize(float volwidth)
+	{
+		normalize(volwidth);
+		mutate_subtract((maximal_vertex_dimensions() - minimal_vertex_dimensions()) * 0.5f);
+		mutate_add(R3(0.5f, 0.5f, 0.5f) * volwidth);
+	}
+
 	R3 SIObj::ew_normalize(float largestDist)
 	{
 		toOrigin();

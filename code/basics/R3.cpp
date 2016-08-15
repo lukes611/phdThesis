@@ -40,19 +40,19 @@ namespace ll_R3
 	}
 	
 	//algebra
-	R3 R3::operator+(const R3 & r2) const { return R3(x+r2.x, y+r2.y, z+r2.z); }
-	R3 & R3::operator+=(const R3 & r2) { x+=r2.x; y+=r2.y; z+=r2.z; return *this; }
+	inline R3 R3::operator+(const R3 & r2) const { return R3(x+r2.x, y+r2.y, z+r2.z); }
+	inline R3 & R3::operator+=(const R3 & r2) { x+=r2.x; y+=r2.y; z+=r2.z; return *this; }
 	
-	R3 R3::operator-(const R3 & r2) const { return R3(x-r2.x, y-r2.y, z-r2.z); }
-	R3 & R3::operator-=(const R3 & r2) { x-=r2.x; y-=r2.y; z-=r2.z; return *this; }
+	inline R3 R3::operator-(const R3 & r2) const { return R3(x-r2.x, y-r2.y, z-r2.z); }
+	inline R3 & R3::operator-=(const R3 & r2) { x-=r2.x; y-=r2.y; z-=r2.z; return *this; }
 
-	float R3::operator*(const R3 & r2) const { return x*r2.x + y*r2.y + z*r2.z; }
+	inline float R3::operator*(const R3 & r2) const { return x*r2.x + y*r2.y + z*r2.z; }
 
-	R3 R3::operator^(const R3 & r2) const { return R3(y*r2.z - z*r2.y, z*r2.x - x*r2.z, x*r2.y - y*r2.x); }
-	R3 & R3::operator^=(const R3 & r2) { *this = R3(y*r2.z - z*r2.y, z*r2.x - x*r2.z, x*r2.y - y*r2.x); return *this; }
+	inline R3 R3::operator^(const R3 & r2) const { return R3(y*r2.z - z*r2.y, z*r2.x - x*r2.z, x*r2.y - y*r2.x); }
+	inline R3 & R3::operator^=(const R3 & r2) { *this = R3(y*r2.z - z*r2.y, z*r2.x - x*r2.z, x*r2.y - y*r2.x); return *this; }
 
-	R3 R3::operator*(float scalar) const { return R3(x*scalar, y*scalar, z*scalar); }
-	R3 & R3::operator*=(float scalar) { x*=scalar; y*=scalar; z*=scalar; return *this; }
+	inline R3 R3::operator*(float scalar) const { return R3(x*scalar, y*scalar, z*scalar); }
+	inline R3 & R3::operator*=(float scalar) { x*=scalar; y*=scalar; z*=scalar; return *this; }
 
 	R3 R3::operator/(float scalar) const { return R3(x/scalar, y/scalar, z/scalar); }
 	R3 & R3::operator/=(float scalar) { x/=scalar; y/=scalar; z/=scalar; return *this; }
@@ -60,9 +60,9 @@ namespace ll_R3
 	R3 R3::operator-() const { return R3(-x,-y,-z); }
 
 	//equality testing
-	bool R3::operator==(const R3 & r2) const { return x==r2.x && y==r2.y && z==r2.z; }
+	inline bool R3::operator==(const R3 & r2) const { return x==r2.x && y==r2.y && z==r2.z; }
 	bool R3::operator!=(const R3 & r2) const { return x!=r2.x || y!=r2.y || z!=r2.z; }
-	bool R3::operator<(const R3 & r2) const
+	inline bool R3::operator<(const R3 & r2) const
 	{
 		if(x < r2.x) return true;
 		if(x > r2.x) return false;
@@ -71,7 +71,7 @@ namespace ll_R3
 		if(z < r2.z) return true;
 		return false;
 	}
-	bool R3::operator>(const R3 & r2) const
+	inline bool R3::operator>(const R3 & r2) const
 	{
 		if(x > r2.x) return true;
 		if(x < r2.x) return false;
@@ -80,10 +80,10 @@ namespace ll_R3
 		if(z > r2.z) return true;
 		return false;
 	}
-	bool R3::operator<=(const R3 & r2) const { return *this<r2 || *this==r2;  }
-	bool R3::operator>=(const R3 & r2) const { return *this>r2 || *this==r2;  }
+	inline bool R3::operator<=(const R3 & r2) const { return *this<r2 || *this==r2;  }
+	inline bool R3::operator>=(const R3 & r2) const { return *this>r2 || *this==r2;  }
 
-	float& R3::operator[](int index)
+	inline float& R3::operator[](int index)
 	{
 		switch (index)
 		{
@@ -103,7 +103,7 @@ namespace ll_R3
 		z /= m;
 		return *this;
 	}
-	float R3::mag() const { return sqrt(x*x + y*y + z*z); }
+	inline float R3::mag() const { return sqrt(x*x + y*y + z*z); }
 	R3 R3::unit() const { float m = mag(); return R3(x/m, y/m, z/m); }
 	R3 R3::cp(const R3 & r2) const { return unit() ^ r2.unit(); }
 
@@ -279,6 +279,17 @@ namespace ll_R3
 	float R3::dist(const R3 & r2) const
 	{
 		return ((*this)-r2).mag();
+	}
+
+	float R3::projScalar(const R3 & b) const
+	{
+		return *this * b.unit();
+	}
+	R3 R3::project(const R3 & b) const
+	{
+		R3 bu = b.unit();
+		float scalar = (*this) * b.unit();
+		return bu * scalar;
 	}
 }
 

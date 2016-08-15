@@ -49,34 +49,34 @@ namespace ll_R3
 		}
 
 		//functions
-		R3 operator+(const R3 & r2) const; //element wise add : returns [this.x+r2.x,this.y+r2.y,this.z+r2.z]
-		R3 & operator+=(const R3 & r2); //this += r2
+		inline R3 operator+(const R3 & r2) const; //element wise add : returns [this.x+r2.x,this.y+r2.y,this.z+r2.z]
+		inline R3 & operator+=(const R3 & r2); //this += r2
+		
+		inline R3 operator-(const R3 & r2) const; //element wise subtract : returns [this.x-r2.x,this.y-r2.y,this.z-r2.z]
+		inline R3 & operator-=(const R3 & r2); //this -= r2
+		
+		inline float operator*(const R3 & r2) const; // dot product : returns this.x*r2.x + this.y*r2.y + this.z*r2.z
+		
+		inline R3 operator^(const R3 & r2) const; // cross product : returns a vector orthogonal to *this and r2
+		inline R3 & operator^=(const R3 & r2); //this = cross(this,r2)
 		
 		
-		R3 & operator-=(const R3 & r2); //this -= r2
-		
-		float operator*(const R3 & r2) const; // dot product : returns this.x*r2.x + this.y*r2.y + this.z*r2.z
-		
-		R3 operator^(const R3 & r2) const; // cross product : returns a vector orthogonal to *this and r2
-		R3 & operator^=(const R3 & r2); //this = cross(this,r2)
-		
-		
-		R3 operator*(float scalar) const; // scale
-		R3 & operator*=(float scalar); //this *= scalar
+		inline R3 operator*(float scalar) const; // scale
+		inline R3 & operator*=(float scalar); //this *= scalar
 
 		R3 operator/(float scalar) const; // attenuate
 		R3 & operator/=(float scalar); //this /= scalar
 		
-		R3 operator-(const R3 & r2) const; //element wise subtract : returns [this.x-r2.x,this.y-r2.y,this.z-r2.z]
+		
 		R3 operator-() const; //return the inverse
 		
 		//equality testing
-		bool operator==(const R3 & r2) const ; //tests for equality
+		inline bool operator==(const R3 & r2) const ; //tests for equality
 		bool operator!=(const R3 & r2) const ; //tests for inequality
-		bool operator<(const R3 & r2) const ; //tests for scanline lt
-		bool operator>(const R3 & r2) const ; //tests for scanline gt
-		bool operator<=(const R3 & r2) const ; //tests for scanline le
-		bool operator>=(const R3 & r2) const ; //tests for scanline ge
+		inline bool operator<(const R3 & r2) const ; //tests for scanline lt
+		inline bool operator>(const R3 & r2) const ; //tests for scanline gt
+		inline bool operator<=(const R3 & r2) const ; //tests for scanline le
+		inline bool operator>=(const R3 & r2) const ; //tests for scanline ge
 		
 		inline float & operator[](int index); //return &Array(x,y,z)[index]
 		
@@ -85,7 +85,7 @@ namespace ll_R3
 		R3 & normalize(); //normalizes this
 
 		//more functions
-		float mag() const; //computes the magnitude of this
+		inline float mag() const; //computes the magnitude of this
 		R3 unit() const; //grabs the unit version of this
 		R3 cp(const R3 & r2) const; //a safe version of the cross product
 		
@@ -130,6 +130,9 @@ namespace ll_R3
 
 		float dist(const R3 & r2) const; //computes the euclidean distance between two points
 		
+		float projScalar(const R3 & b) const; //returns the scalar of the projection of this onto b
+		R3 project(const R3 & b) const; //returns the projection of this onto b
+
 	};
 
 	

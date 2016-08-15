@@ -152,6 +152,8 @@ namespace ll_siobj
 		float normalize(float largestDist);
 		void unnormalize(float undo);
 
+		void centerNormalize(float volwidth);
+
 		ll_R3::R3 toOrigin();
 		ll_R3::R3 ew_normalize(float largestDist);
 		void ew_unnormalize(ll_R3::R3 undo);
