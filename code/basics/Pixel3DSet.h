@@ -115,6 +115,7 @@ namespace ll_pix3d
 		Pix3D pix3d() const;
 		
 
+		void clear();
 		void copyFrom(const Pixel3DSet & a);
 		Pixel3DSet clone();
 		inline int size();

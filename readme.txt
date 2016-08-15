@@ -1,5 +1,17 @@
 today:
+
+	review my input data, :D
+	redo icp with this :D
+	do a Pixel3dSet to Pix3d converter called render :D
+	do error metrics with this too :D
+	
+	
+	do my methods
+	do fm : surf & sift (slowly coming together)
+	3d fm?
+
 	algorithm implementation:
+		
 		icp  : v<R3>, 
 		fm   : 
 		pc   :

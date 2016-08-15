@@ -19,6 +19,7 @@ requires: locv, R3
 
 #include "../basics/locv3.h"
 #include "../basics/R3.h"
+#include "../basics/Pixel3DSet.h"
 
 namespace Licp
 {
@@ -36,6 +37,7 @@ namespace Licp
 		[xn, yn, zn, 1]
 	*/
 	Mat asMatRows(vector<ll_R3::R3> & inp);
+	Mat asMatRows(ll_pix3d::Pixel3DSet & inp);
 
 	//for each point in src: find the corresponding nearest neighbour in dst
 	//returns a float representing the average distance from each closest point from src to dst
@@ -57,6 +59,7 @@ namespace Licp
 	//distances represents the distance between src[i] and its match dst[ptpairs[i]]
 	//algorithm : O(n log n) k-d tree based algorithm
 	double closestPointsf(vector<ll_R3::R3> & src, vector<ll_R3::R3> & dst, vector<int> & indexes, vector<double> & distances);
+	double closestPointsf(ll_pix3d::Pixel3DSet & src, ll_pix3d::Pixel3DSet & dst, vector<int> & indexes, vector<double> & distances);
 
 	//performs least squares to find the transform from all the points in src to all the points in dst
 	//here: src[i] is matched with dst[indexes[i]] for a given index i, 
@@ -75,11 +78,31 @@ namespace Licp
 				int maxIterations = -1  //the maximum number of iterations
 			);
 
+	Mat icp(	ll_pix3d::Pixel3DSet & src,		//source points
+				ll_pix3d::Pixel3DSet & dst,		//destination points
+				ll_pix3d::Pixel3DSet & out,		//registered points
+				double & error_out,		//error between registered points and destination points
+				double & time,			//the amount of time in seconds required to run this algorithm
+				int & iterations,		//the number of iterations used
+				double minError = -1.0, //the minimum error we want to achieve
+				int maxIterations = -1  //the maximum number of iterations
+			);
+
 	//implementation of the iterative cloesest point algorithm
 	//remove's outliers
 	Mat icp_outlierRemoval(	vector<ll_R3::R3> & src,			//source points
 				vector<ll_R3::R3> & dst,						//destination points
 				vector<ll_R3::R3> & out,						//registered points
+				double & error_out,								//error between registered points and destination points
+				double & time,									//the amount of time in seconds required to run this algorithm
+				int & iterations,								//the number of iterations used
+				double outlierRemovalTimesMean,					//a value: matches are not outliers if: |match| <= ortm * |average|
+				double minError = -1.0,							//the minimum error we want to achieve
+				int maxIterations = -1							//the maximum number of iterations
+			);
+	Mat icp_outlierRemoval(	ll_pix3d::Pixel3DSet & src,			//source points
+				ll_pix3d::Pixel3DSet & dst,						//destination points
+				ll_pix3d::Pixel3DSet & out,						//registered points
 				double & error_out,								//error between registered points and destination points
 				double & time,									//the amount of time in seconds required to run this algorithm
 				int & iterations,								//the number of iterations used

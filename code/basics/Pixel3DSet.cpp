@@ -57,8 +57,11 @@ namespace ll_pix3d
 		colors.clear();
 		for(int i = 0; i < p.count; i++)
 		{
-			points.push_back(p.points[i]);
-			colors.push_back(p.colors[i]);
+			if(!p.hasVd() || p.validDepth[i])
+			{
+				points.push_back(p.points[i]);
+				colors.push_back(p.colors[i]);
+			}
 		}
 	}
 
@@ -106,6 +109,12 @@ namespace ll_pix3d
 		return Pix3D(points, colors);
 	}
 
+
+	void Pixel3DSet::clear()
+	{
+		colors.clear();
+		points.clear();
+	}
 	void Pixel3DSet::save(string fn)
 	{
 		Pix3DC t = pix3d().compress();

@@ -2,12 +2,24 @@
 #include "../basics/LTimer.h"
 #include "../basics/Pixel3DSet.h"
 using namespace ll_R3;
-
+using namespace ll_pix3d;
 namespace Licp
 {
 
 
 Mat asMatRows(vector<R3> & inp)
+{
+	Mat ret = Mat::zeros(inp.size(), 3, CV_32FC1);
+	for(int i = 0; i < inp.size(); i++)
+	{
+		ret.at<float>(i,0) = inp[i].x;
+		ret.at<float>(i,1) = inp[i].y;
+		ret.at<float>(i,2) = inp[i].z;
+	}
+	return ret.clone();
+}
+
+Mat asMatRows(Pixel3DSet & inp)
 {
 	Mat ret = Mat::zeros(inp.size(), 4, CV_32FC1);
 	for(int i = 0; i < inp.size(); i++)
@@ -15,7 +27,7 @@ Mat asMatRows(vector<R3> & inp)
 		ret.at<float>(i,0) = inp[i].x;
 		ret.at<float>(i,1) = inp[i].y;
 		ret.at<float>(i,2) = inp[i].z;
-		ret.at<float>(i,3) = 1.0f;
+		ret.at<float>(i,3) = inp.gsNPixel(i) * 255.0f;
 	}
 	return ret.clone();
 }
@@ -87,6 +99,17 @@ double closestPointsf(vector<R3> & src, vector<R3> & dst, vector<int> & indexes,
 	return error / divisor;
 }
 
+double closestPointsf(Pixel3DSet & src, Pixel3DSet & dst, vector<int> & indexes, vector<double> & distances)
+{
+	distances.clear();
+	indexes.clear();
+	Mat srcm = asMatRows(src), dstm = asMatRows(dst);
+	vector<float> dists;
+	double error = (double) knn(dstm, srcm, indexes, dists);
+	for(int i = 0; i < dists.size(); i++) distances.push_back((double)dists[i]);
+	double divisor = src.size() > 0 ? (double)(src.size()) : 1.0;
+	return error / divisor;
+}
 
 Mat leastSquaresTransform(vector<R3> & src, vector<R3> & dst, vector<int> & indexes)
 {
@@ -145,6 +168,44 @@ Mat icp(vector<R3> & src, vector<R3> & dst, vector<R3> & out,
 		if(maxIterations >= 0 && iterations >= maxIterations) break;
 		best_distance = current_distance;
 		T = leastSquaresTransform(out, dst, ind);
+		for(int i = 0; i < out.size(); i++) ll_pix3d::Pixel3DSet::transform_point(T, out[i]);
+		iterations++;
+	}
+	clock.stop();
+	time = clock.getSeconds();
+	return ret.clone();
+}
+
+
+Mat icp(Pixel3DSet & src, Pixel3DSet & dst, Pixel3DSet & out, 
+		double & error_out, double & time, int & iterations, 
+		double minError, int maxIterations)
+{
+	time = 0.0;
+	LTimer clock; clock.start();
+	out.clear();
+	Mat ret = Mat::eye(Size(4,4), CV_32FC1);
+	vector<double> dl;
+	vector<int> ind;
+	out = src;
+	iterations = 0;
+	
+	double best_distance = DBL_MAX;
+	error_out = best_distance;
+	
+	Mat T = ret.clone();
+
+	while(true)
+	{
+		dl.clear(); ind.clear();
+		double current_distance = closestPointsf(out, dst, ind, dl);
+		if(current_distance >= best_distance) break; //cannot do any better
+		ret = T * ret;
+		error_out = current_distance;
+		if(minError > 0.0 && current_distance < minError) break;
+		if(maxIterations >= 0 && iterations >= maxIterations) break;
+		best_distance = current_distance;
+		T = leastSquaresTransform(out.points, dst.points, ind);
 		for(int i = 0; i < out.size(); i++) ll_pix3d::Pixel3DSet::transform_point(T, out[i]);
 		iterations++;
 	}
@@ -213,6 +274,65 @@ Mat icp_outlierRemoval(vector<R3> & src, vector<R3> & _dst, vector<R3> & out,
 	return ret.clone();
 }
 
+
+Mat icp_outlierRemoval(Pixel3DSet & src, Pixel3DSet & _dst, Pixel3DSet & out, 
+					   double & error_out, double & time, int & iterations, 
+					   double outlierRemovalTimesMean, double minError, 
+					   int maxIterations)
+{
+	time = 0.0;
+	LTimer clock; clock.start();
+	out.clear();
+	Mat ret = Mat::eye(Size(4,4), CV_32FC1);
+	vector<double> dl;
+	vector<int> ind;
+	out = src;
+	Pixel3DSet dst = _dst;
+	iterations = 0;
+	
+	double best_distance = DBL_MAX;
+	error_out = best_distance;
+	
+	Mat T = ret.clone();
+
+	while(true)
+	{
+		dl.clear(); ind.clear();
+		double current_distance = Licp::closestPointsf(out, dst, ind, dl);
+		if(current_distance >= best_distance) break; //cannot do any better
+		ret = T * ret;
+		error_out = current_distance;
+		if(minError > 0.0 && current_distance < minError) break;
+		if(maxIterations >= 0 && iterations >= maxIterations) break;
+		best_distance = current_distance;
+		if(best_distance <= 0.0) break;
+
+		//outlier removal
+		//cout << current_distance << " is current, or is: " << outlierRemovalTimesMean << endl;
+		vector<R3> srcTest, dstTest;
+		vector<int> indTest;
+		for(int i = 0; i < dl.size(); i++)
+		{
+			double test = dl[i] / best_distance;
+			//cout << dl[i] << " : " << best_distance << " : " << test << " <= " << outlierRemovalTimesMean << endl;
+			if(dl[i]/best_distance < outlierRemovalTimesMean)
+			{
+				srcTest.push_back(out[i]);
+				dstTest.push_back(dst[ind[i]]);
+				indTest.push_back(i);
+			}
+		}
+		
+		//cout << "i/o(" << out.size() << "/" << srcTest.size() << ")\n";
+
+		T = Licp::leastSquaresTransform(srcTest, dstTest, indTest);
+		for(int i = 0; i < out.size(); i++) ll_pix3d::Pixel3DSet::transform_point(T, out[i]);
+		iterations++;
+	}
+	clock.stop();
+	time = clock.getSeconds();
+	return ret.clone();
+}
 
 
 }
