@@ -28,5 +28,5 @@ namespace ll_fmrsc
 					bool sort = false, //whether to sort the features by their match strength
 					int top = -1); //only use the top "top" matches
 
-	bool registerPix3D(string fm_algorithm, ll_pix3d::Pix3D & object1, ll_pix3d::Pix3D & object2, Mat & matrix, bool sort = false, int top = -1);
+	bool registerPix3D(string fm_algorithm, ll_pix3d::Pix3D & object1, ll_pix3d::Pix3D & object2, Mat & matrix, double & seconds, bool sort = false, int top = -1);
 }

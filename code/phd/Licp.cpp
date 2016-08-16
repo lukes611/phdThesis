@@ -42,10 +42,10 @@ float knn(Mat& m_destinations, Mat& m_object, vector<int>& ptpairs, vector<float
     Mat obj_32f; m_object.convertTo(obj_32f,CV_32FC2);
  
     assert(dest_32f.type() == CV_32F);
- 
+	//cout << "h" << endl;
     cv::flann::Index flann_index(dest_32f, cv::flann::KDTreeIndexParams(2));  // using 2 randomized kdtrees
     flann_index.knnSearch(obj_32f, m_indices, m_dists, 1, cv::flann::SearchParams(64) ); 
- 
+	//cout << "p" << endl;
     int* indices_ptr = m_indices.ptr<int>(0);
     //float* dists_ptr = m_dists.ptr<float>(0);
     for (int i=0;i<m_indices.rows;++i) {

@@ -1,4 +1,5 @@
 #include "fmRansac.h"
+#include "..\basics\LTimer.h"
 
 using namespace ll_pix3d;
 
@@ -27,8 +28,10 @@ namespace ll_fmrsc
 		return p1.size();
 	}
 
-	bool registerPix3D(string fm_algorithm, Pix3D & object1, Pix3D & object2, Mat & matrix, bool sort, int top)
+	bool registerPix3D(string fm_algorithm, Pix3D & object1, Pix3D & object2, Mat & matrix, double & seconds, bool sort, int top)
 	{
+		seconds = 0.0;
+		LTimer t; t.start();
 		vector<Point2i> points1, points2;
 		int numPoints = featureMatch(fm_algorithm, object1, object2, points1, points2, sort, top);
 		vector<Point3f> src, dst;
@@ -52,6 +55,8 @@ namespace ll_fmrsc
 				matrix.at<double>(y,x) = ret.at<double>(y,x);
 			}
 		}
+		t.stop();
+		seconds = t.getSeconds();
 		return rv == 1;
 	}
 
