@@ -17,9 +17,10 @@
 
 #define TheVolumePhaseCorrelator_H
 
-#include "ExternGPUPrograms.h"
-#include "VMatF.h"
-#include "locv_algorithms.h"
+#include "..\gpu\ExternGPUPrograms.h"
+#include "..\basics\VMatF.h"
+#include "..\basics\locv_algorithms.h"
+
 
 namespace ll_volume_gpu
 {

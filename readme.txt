@@ -1,6 +1,8 @@
 today:
-	capture or salvage test data
-	test out algorithms
+	1. do pc
+	2. capture or salvage test data [note it]
+	3. test out algorithms
+	4. do mode?
 	
 	do my methods
 	do fm : surf & sift
