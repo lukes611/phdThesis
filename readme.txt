@@ -2,17 +2,13 @@ today:
 	
 	2. capture or salvage test data [note it]
 	3. test out algorithms
-	4. do mode?
-	
-	do my methods
 	
 algorithm implementation:
 	
 	icp  	: Pix3D 
-	fm   	: Pix3D [add time measurement]
+	fm   	: Pix3D
 	pc   	: Pix3D
 	pca_pc  : Pix3D
-	mode : 
 	1. setup my phd project:
 		RGB-D data comes from my Pix3D class and corresponding files
 		VMat/vector<R3> data can be computed from a variety of places
