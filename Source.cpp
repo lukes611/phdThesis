@@ -31,32 +31,53 @@ get knn working with 4d data
 
 
 
-Mat pc_register(Pixel3DSet & object1, Pixel3DSet & object2, int volumeSize = 256)
+Mat pc_register(Pixel3DSet & object1, Pixel3DSet & object2, double & seconds, bool isScaled = true, int volumeSize = 256)
 {
+	LTimer t; t.start();
 	VMat VA(volumeSize, object1, 0.0f, true);
 	VMat VB(volumeSize, object2, 0.0f, true);
-	//Mat ret = ll_volume_gpu::phase_correlate_rst(VA, VB);
-	Mat ret; float r, s; R3 t;
-	ll_volume_gpu::phase_correlate_rst(VA, VB, r, s, t);
-	cout << Point2f(r,s) << " | " << t << endl;
-	ret = VMat::transformation_matrix(volumeSize, 0.0f, r, 0.0f, s, t.x, t.y, t.z);
+	Mat ret = ll_volume_gpu::phase_correlate_rst(VA, VB);
+	t.stop();
+	seconds = t.getSeconds();
 	return ret.clone();
 }
 
 
-Mat pc_registerPCA(Pixel3DSet & object1, Pixel3DSet & object2, int volumeSize = 256)
+Mat pc_register_pca(Pixel3DSet & object1, Pixel3DSet & object2, double & seconds, bool isScaled = true, int volumeSize = 256)
 {
-	VMat VA(volumeSize, object1, 0.0f, true);
-	VMat VB(volumeSize, object2, 0.0f, true);
+	LTimer t; t.start();
+	VMat VA(volumeSize, object1, 0.0f, isScaled);
+	VMat VB(volumeSize, object2, 0.0f, isScaled);
 	Mat ret = ll_volume_gpu::pca_phase_correlate_rst(VA, VB);
+	t.stop();
+	seconds = t.getSeconds();
 	return ret.clone();
 }
 
-Mat _PCA(Pixel3DSet & object1, Pixel3DSet & object2, int volumeSize = 256)
+Mat register_pca(Pixel3DSet & object1, Pixel3DSet & object2, double & seconds, int volumeSize = 256)
 {
+	LTimer t; t.start();
 	VMat VA(volumeSize, object1, 0.0f, true);
 	VMat VB(volumeSize, object2, 0.0f, true);
 	Mat ret = VMat::pca(VA, VB);
+	t.stop();
+	seconds = t.getSeconds();
+	return ret.clone();
+}
+
+Mat pc_register_pca_i(Pixel3DSet & object1, Pixel3DSet & object2, double & seconds, int count = 2, int volumeSize = 256)
+{
+	Mat ret = Mat::eye(Size(4,4), CV_32FC1);
+	Pixel3DSet src = object1;
+	seconds = 0.0;
+	for(int i = 0; i < count; i++)
+	{
+		double secs = 0.0;
+		Mat _m = pc_register_pca(src, object2, secs, volumeSize);	
+		seconds += secs;
+		src.transform_set(_m);
+		ret *= _m;
+	}
 	return ret.clone();
 }
 
@@ -71,17 +92,18 @@ int main(int argc, char * * argv)
 
 	cap.read_frame(p1, 0);
 
-	//p1.normalize(256);
+	p1.normalize(256);
 	cap.read_frame(p2, 5);
 	
-	//p2 = p1.clone();
+	p2 = p1.clone();
 	p3 = p1.clone();
 
-	//p2.transform_set(0.0f, 30.0f, 30.0f, 1.0f, 5.0f, 10.0f, -5.0f, R3(256/2,256/2,256/2));
-
-	Mat m = pc_registerPCA(p1, p2, 256);
+	p2.transform_set(0.0f, 30.0f, 30.0f, 1.0f, 5.0f, 10.0f, -5.0f, R3(256/2,256/2,256/2));
+	double s;
+	Mat m = register_pca(p1, p2, s, 256);
 	p1.transform_set(m);
 
+	cout << "seconds: " << s << endl;
 	//Mat m2 = pc_registerPCA(p1, p2);
 
 	//p1.transform_set(m2);
