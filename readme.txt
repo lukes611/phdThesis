@@ -1,20 +1,16 @@
 today:
-
-	review my input data, :D
-	redo icp with this :D
-	do a Pixel3dSet to Pix3d converter called render :D
-	do error metrics with this too :D
-	
+	capture or salvage test data
+	test out algorithms
 	
 	do my methods
-	do fm : surf & sift (slowly coming together)
+	do fm : surf & sift
 	3d fm?
 
 	algorithm implementation:
 		
-		icp  : v<R3>, 
-		fm   : 
-		pc   :
+		icp  : v<R3>, Pix3D 
+		fm   : Pix3D
+		pc   : 
 		mode : 
 	1. setup my phd project:
 		RGB-D data comes from my Pix3D class and corresponding files
