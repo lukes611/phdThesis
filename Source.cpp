@@ -12,6 +12,7 @@
 #include "code\phd\fmRansac.h"
 #include "code\pc\TheVolumePhaseCorrelator.h"
 #include "code\phd\Lpcr.h"
+#include "code\script\LScript.h"
 
 using namespace std;
 using namespace ll_R3;
@@ -28,6 +29,8 @@ read in 1 x Pixel3DSets
 mutate points slightly
 get knn working with 4d data
 
+string askPython(string data)
+
 */
 
 
@@ -36,65 +39,58 @@ get knn working with 4d data
 
 
 
+void viewVideo(string name, bool viewColor = true, bool viewDepth = false, bool viewVD = false, int wks = -1)
+{
+	CapturePixel3DSet video (name, 80);
+	Pix3D p;
+	Mat color, depth, vd;
+	for(int i = 0; i < video.size(); i++)
+	{
+		video.read(p);
+		
+		if(viewColor)
+		{
+			p.colorImage(color);
+			imshow("color", color);
+		}
 
+		if(viewDepth)
+		{
+			p.depthImage(depth);
+			imshow("depth", depth);
+		}
+
+		if(viewVD)
+		{
+			p.vdImage(vd);
+			imshow("vd",vd);
+		}
+		
+		if(viewColor || viewDepth || viewVD)
+		{
+			if (wks > 0) waitKey(wks);
+			else waitKey();
+		}
+	}
+}
 
 
 
 int main(int argc, char * * argv)
 {
-	CapturePixel3DSet cap("Apartment.Texture.rotate", 8);
+	//cout << ll_script::askPython("ls.py") << endl;
 
-	Pixel3DSet p1, p2, p3;
+	string d = "C:/lcppdata/pix3dc/films";
 
-	Pix3D p1_, p2_;
-	cap.read_frame(p1_, 0);
-	cap.read_frame(p2_, 6);
+	vector<string> files = ll_split(ll_script::askPython("ls.py -d " + d), ',');
+
+
+	for(int j = 0; j < files.size(); j++)
+	{
+		cout << files[j] << endl;
+		viewVideo(files[j], true, true, false, 30);
+
+	}
 	
-	p1 = Pixel3DSet(p1_);
-	p2 = Pixel3DSet(p2_);
-
-
-	//p2 = p1.clone();
-	p3 = p1.clone();
-
-	//p2.transform_set(0.0f, 30.0f, 0.0f, 1.0f, 5.0f, 10.0f, -5.0f, R3(256/2,256/2,256/2));
-	double s;
-	//Mat m = ll_pc::pc_register(p1, p2, s);
-	int its; double eo; Pixel3DSet o;
-	//Mat m = Licp::icp(p1, p2, o, eo, s, its);
-	Mat m;ll_fmrsc::registerPix3D("surf", p1_, p2_, m, s);
-	m.convertTo(m, CV_32FC1);
-	p1.transform_set(m);
-
-	cout << "seconds: " << s << endl;
-	//Mat m2 = pc_registerPCA(p1, p2);
-
-	//p1.transform_set(m2);
-
-	
-	Pixel3DSet t1 = p3 + p2;
-	Pixel3DSet t2 = p1 + p2;
-	Mat a, b;
-	cout << "rendering\n";
-	Pix3D A = render(t1, 256, 500.0f); cout << "r1";
-	Pix3D B = render(t2, 256, 500.0f); cout << "r2\n";
-	
-	A.colorImage(a);
-	B.colorImage(b);
-	
-	imshow("before", a);
-	imshow("after", b);
-
-	waitKey(90);
-	cout << p1.size() << " : " << p2.size() << " : " << p3.size() << endl;
-	cout << "computing avg: " << endl;
-	cout << "before/after avg: " << avg(p3, p2);
-
-	
-
-	cout << " / " << avg(p1, p2) << endl;
-	//cout << "before/after % m: " << percentMatch(p3, p2, 2.0f) << " / " << percentMatch(p1, p2, 2.0f) << endl;
-
-	waitKey();
 	return 0;
 }

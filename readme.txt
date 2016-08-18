@@ -1,7 +1,8 @@
 today:
 	
-	2. capture or salvage test data [note it]
-	3. test out algorithms
+	1. capture or salvage test data [note it]
+	2. test out algorithms
+	3. setup experiments
 	
 algorithm implementation:
 	
@@ -9,10 +10,6 @@ algorithm implementation:
 	fm   	: Pix3D
 	pc   	: Pix3D
 	pca_pc  : Pix3D
-	1. setup my phd project:
-		RGB-D data comes from my Pix3D class and corresponding files
-		VMat/vector<R3> data can be computed from a variety of places
-		VMat with Pix3D - used by the feature matching methods
 		
 	
 
@@ -25,12 +22,12 @@ to do:
 		output:
 			reconstructed scene
 			results:
-				error (MSE, PSNR)
+				error (MSE)
 				qualitative
 				speed / performance
 				camera angle difference
 		algorithms:
-			feature matching (with Fundamental Matrix calculation)
+			feature matching w ransac
 			ICP
 			PC & friends
 			MODE (FM)
