@@ -3,6 +3,9 @@
 #include "LTimer.h"
 #include <functional>
 
+using namespace std;
+using namespace cv;
+
 string ll_type(int type)
 {
 	string r;

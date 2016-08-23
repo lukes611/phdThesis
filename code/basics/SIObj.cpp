@@ -6,10 +6,8 @@ using namespace std;
 
 namespace ll_siobj
 {
-
 	using namespace ll_R3;
-
-
+	
 	//basic triangle indexing object
 	SI_Triangle::SI_Triangle()
 	{

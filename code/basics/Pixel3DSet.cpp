@@ -3,6 +3,7 @@
 #include <fstream>
 #include "BitReaderWriter.h"
 using namespace std;
+using namespace cv;
 using namespace ll_R3;
 using namespace ll_siobj;
 
@@ -1020,10 +1021,11 @@ namespace ll_pix3d
 
 		while(index < length)
 		{
-			int numToRead = index + bytesPerRead;
-			numToRead = numToRead > length ? length : numToRead;
-			fi.read((char *)&data[index], numToRead);
-			index += numToRead;
+
+			//read in that many bytes, increment index by gcount (the number of bytes read
+			fi.read((char *) data + index, bytesPerRead);
+			int numBytesRead = fi.gcount();
+			index += numBytesRead;
 		}
 		fi.close();
 	}

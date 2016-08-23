@@ -4,7 +4,8 @@
 #include "../pc/TheVolumePhaseCorrelator.h"
 
 using namespace ll_pix3d;
-
+using namespace cv;
+using namespace std;
 
 
 namespace ll_pc
@@ -40,7 +41,7 @@ Mat pc_register_pca_i(Pixel3DSet & object1, Pixel3DSet & object2, double & secon
 	for(int i = 0; i < count; i++)
 	{
 		double secs = 0.0;
-		Mat _m = pc_register_pca(src, object2, secs, volumeSize);	
+		Mat _m = pc_register_pca(src, object2, secs, true, volumeSize);	
 		seconds += secs;
 		src.transform_set(_m);
 		ret *= _m;

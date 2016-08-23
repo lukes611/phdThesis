@@ -10,8 +10,10 @@
 */
 #pragma once
 
-#include "libs\glut.h"
-#include "libs\freeglut.h"
+
+#include <libs\glut.h>
+#include <libs\freeglut.h>
+
 #include "SIObj.h"
 #include "llCamera.h"
 #include <string>

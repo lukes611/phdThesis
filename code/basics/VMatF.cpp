@@ -17,7 +17,7 @@
 #include <functional>
 #include <complex>
 using namespace std;
-
+using namespace cv;
 
 VMat::VMat(int sIn)
 {
