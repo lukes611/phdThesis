@@ -75,9 +75,9 @@ void exp1(string name, vector<int> frames)
 
 		cout << "matching " << currentIndex << " with " << frames[_i-1] << endl;
 		//cout << "worked " << ll_fmrsc::registerPix3D("surf", frame2, frame1, _m, seconds, true, 150) << endl;;
-		_m = ll_pc::pc_register_pca_i(b, a, seconds);
+		//_m = ll_pc::pc_register_pca_i(b, a, seconds);
 		//_m.convertTo(_m, CV_32FC1);
-		//_m = Licp::icp(b, a, _, error, seconds, iters);
+		_m = Licp::icp(b, a, _, error, seconds, iters);
 		
 		//_m.convertTo(_m, CV_32FC1);
 		cout << "error: " << error << endl;
@@ -101,7 +101,7 @@ void exp1(string name, vector<int> frames)
 	}
 	cout << "saving" << endl;
 	//output.reduce(256);
-	SIObj(output.points).saveOBJ("C:/Users/luke/Desktop/result2.obj");
+	SIObj(output.points).saveOBJ("C:/lcppdata/obj/result2.obj");
 
 }
 
@@ -113,7 +113,7 @@ int main(int argc, char * * argv)
 	//cout << ll_script::askPython("ls.py") << endl;
 
 	//string d = "C:/lcppdata/pix3dc/films";
-	string testData = "home.testA";
+	string testData = "Apartment.texture.rotate";
 	//viewVideo(testData, true, true, false);
 	exp1(testData, rng(5,8));
 	//vector<string> files = ll_split(ll_script::askPython("ls.py -d " + d), ',');
