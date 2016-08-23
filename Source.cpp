@@ -16,6 +16,7 @@
 #include "code\phd\experiments.h"
 
 using namespace std;
+using namespace cv;
 using namespace ll_R3;
 using namespace ll_cam;
 using namespace ll_measure;
@@ -42,7 +43,7 @@ from -256 + 512
 */
 
 
-
+#include "code\basics\BitReaderWriter.h"
 
 
 
@@ -75,9 +76,9 @@ void exp1(string name, vector<int> frames)
 
 		cout << "matching " << currentIndex << " with " << frames[_i-1] << endl;
 		//cout << "worked " << ll_fmrsc::registerPix3D("surf", frame2, frame1, _m, seconds, true, 150) << endl;;
-		_m = ll_pc::pc_register_pca_i(b, a, seconds);
+		//_m = ll_pc::pc_register_pca_i(b, a, seconds);
 		//_m.convertTo(_m, CV_32FC1);
-		//_m = Licp::icp(b, a, _, error, seconds, iters);
+		_m = Licp::icp(b, a, _, error, seconds, iters);
 		
 		//_m.convertTo(_m, CV_32FC1);
 		cout << "error: " << error << endl;
@@ -101,29 +102,25 @@ void exp1(string name, vector<int> frames)
 	}
 	cout << "saving" << endl;
 	//output.reduce(256);
-	SIObj(output.points).saveOBJ("C:/Users/luke/Desktop/result2.obj");
+	//SIObj(output.points).saveOBJ("C:/Users/luke/Desktop/result2.obj");
+	LLPointers::setPtr("object", &output);
+	ll_experiments::viewPixel3DSet();
 
 }
 
 
 
 
+int add(int a){
+	if(LLPointers::has("b")) return a + LLPointers::get<int>("b");
+	return a;
+}
+
+
+
 int main(int argc, char * * argv)
 {
-	//cout << ll_script::askPython("ls.py") << endl;
-
-	//string d = "C:/lcppdata/pix3dc/films";
-	string testData = "home.testA";
-	//viewVideo(testData, true, true, false);
-	exp1(testData, rng(5,8));
-	//vector<string> files = ll_split(ll_script::askPython("ls.py -d " + d), ',');
-
-
-	//for(int j = 0; j < files.size(); j++)
-	//{
-		//cout << files[j] << endl;
-		
-	//}
+	exp1("Apartment.Texture.rotate", ll_experiments::rng(40));
 	
 	return 0;
 }

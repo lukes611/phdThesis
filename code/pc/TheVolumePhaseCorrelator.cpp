@@ -1,6 +1,8 @@
 #include "TheVolumePhaseCorrelator.h"
 #include <math.h>
 
+using namespace cv;
+
 namespace ll_volume_gpu
 {
 	

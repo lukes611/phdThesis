@@ -2,11 +2,27 @@
 
 using namespace std;
 #include "../basics/Pixel3DSet.h"
+#include "../basics/ll_gl.h"
+#include "../basics/R3.h"
+#include "../basics/llCamera.h"
 
 using namespace ll_pix3d;
+using namespace ll_R3;
+using namespace ll_cam;
+using namespace cv;
 
 namespace ll_experiments
 {
+
+map<string, void *> * LLPointers::access(){
+	static map<string, void *> mp;
+	return &mp;
+}
+
+bool LLPointers::has(string key){
+	map<string, void*> * ptr = LLPointers::access();
+	return ptr->find(key) != ptr->end();
+}
 
 void viewVideo(string name, bool viewColor, bool viewDepth, bool viewVD, int wks)
 {
@@ -57,6 +73,64 @@ vector<int> rng(int from, int to, int inc)
 	return ret;
 }
 
+
+void viewPixel3DSet()
+{
+	ll_gl::default_glut_main("lukes phd project", 640, 480);
+	
+	Cad_cam * camera = new Cad_cam;
+	LLPointers::setPtr("camera", camera);
+
+	glutDisplayFunc([]()->void
+	{
+		
+
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		Cad_cam * camera = LLPointers::getPtr<Cad_cam>("camera");
+		ll_gl::default_viewing(*camera);
+		
+		ll_gl::default_lighting();
+		ll_gl::turn_off_lights();
+
+		if(LLPointers::has("object"))
+		{
+			Pixel3DSet * obj = LLPointers::getPtr<Pixel3DSet>("object");
+			glBegin(GL_POINTS);
+			for(int i = 0; i < obj->points.size(); i++)
+			{
+				R3 col = obj->color_as_r3(i) / 255.0f;
+				swap(col.x, col.z);
+				ll_gl::set_color(col);
+				ll_gl::glR3(obj->points[i]);
+			}
+			glEnd();
+		}
+
+		glutSwapBuffers();
+		glutPostRedisplay();
+	});
+
+	glutKeyboardFunc([](unsigned char key, int x, int y)->void{
+		Cad_cam * camera = LLPointers::getPtr<Cad_cam>("camera");
+		camera->keyboard(key, x,y);
+		if(key == '5')
+		{
+			cout << camera->to_string() << endl;
+		}
+	});
+	glutReshapeFunc([](int wi, int he)->void{
+		
+	}); 
+	glutMotionFunc([](int x, int y)->void{
+		Cad_cam * camera = LLPointers::getPtr<Cad_cam>("camera");
+		camera->mouse(x,y);
+	});
+	glutMouseFunc([](int button, int state, int x, int y)->void{
+		Cad_cam * camera = LLPointers::getPtr<Cad_cam>("camera");
+		ll_gl::camera_mouse_click(*camera, button, state, x, y);
+	});
+	glutMainLoop();
+}
 
 }
 

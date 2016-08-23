@@ -22,19 +22,21 @@
 #include "..\basics\locv_algorithms.h"
 
 
+
+
 namespace ll_volume_gpu
 {
 	//performs the transform based on m!
-	void transform(VMat & vol, Mat & m);
+	void transform(VMat & vol, cv::Mat & m);
 
 	//performs the transform based on m.inv()!
 	void transform_volume(VMat & vol, float rx, float ry, float rz, float sc, float tx, float ty, float tz);
 
 	void phase_correlate_rst(VMat & v1, VMat & v2, float & rotation, float & scale, R3 & translation, bool normalize_color = false);
 
-	Mat phase_correlate_rst(VMat & v1, VMat & v2, bool normalize_color = false);
+	cv::Mat phase_correlate_rst(VMat & v1, VMat & v2, bool normalize_color = false);
 	
-	Mat pca_phase_correlate_rst(VMat & v1, VMat & v2);
+	cv::Mat pca_phase_correlate_rst(VMat & v1, VMat & v2);
 
 	//performs basic phase correlation giving translation params
 	R3 phase_correlate(VMat & v1, VMat & v2);
@@ -48,10 +50,10 @@ namespace ll_volume_gpu
 	//performs log polar transform to s on the gpu
 	void log_polar(VMat & s);
 
-	Mat pca_phase_correlate_rst(VMat & v1, VMat & v2);
+	cv::Mat pca_phase_correlate_rst(VMat & v1, VMat & v2);
 
 	//use two registered points along with phase correlation to align two volumes according to scale, translation and rotation
-	Mat phase_correlate_rst_two_points(VMat & v1_in, VMat & v2_in, ll_R3::R3 match_1[2], ll_R3::R3 match_2[2]);
+	cv::Mat phase_correlate_rst_two_points(VMat & v1_in, VMat & v2_in, ll_R3::R3 match_1[2], ll_R3::R3 match_2[2]);
 
 }
 
@@ -66,7 +68,7 @@ namespace ll_volume_partial
 
 	//my rotation estimation procedure, this procedure estimated the y-axis rotation between v1 and v2
 	//despite the fact they can also be seperated by scale and translation
-	float luke_rotation_estimation_method(VMat & v1, VMat & v2, Size s = Size(512, 512));
+	float luke_rotation_estimation_method(VMat & v1, VMat & v2, cv::Size s = cv::Size(512, 512));
 
 	
 
@@ -76,12 +78,12 @@ namespace ll_volume_partial
 	//same as above function but works with rotation, translation AND scale
 	void phase_correlate_rst_lrem(VMat & v1, VMat & v2, float & rotation, float & scale, R3 & translation);
 
-	void phase_correlate_rt_luke(VMat & v1, VMat & v2, float & rotation, R3 & translation, Size s = Size(512, 512));
+	void phase_correlate_rt_luke(VMat & v1, VMat & v2, float & rotation, R3 & translation, cv::Size s = cv::Size(512, 512));
 
-	Mat phase_correlate_rt_luke(VMat & v1, VMat & v2, Size s = Size(512, 512));
+	cv::Mat phase_correlate_rt_luke(VMat & v1, VMat & v2, cv::Size s = cv::Size(512, 512));
 
 	//coputes the registration matrix between v1 and v2 using my method and pca
-	Mat pca_lukes_pc_rt(VMat & v1, VMat & v2, Size s = Size(512, 512));
+	cv::Mat pca_lukes_pc_rt(VMat & v1, VMat & v2, cv::Size s = cv::Size(512, 512));
 
 }
 

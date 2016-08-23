@@ -4,6 +4,8 @@
 using namespace ll_R3;
 using namespace Licp;
 using namespace ll_pix3d;
+using namespace cv;
+using namespace std;
 
 namespace ll_measure
 {

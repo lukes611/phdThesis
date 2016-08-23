@@ -15,6 +15,7 @@
 using namespace ll_R3;
 using namespace ll_pix3d;
 using namespace std;
+using namespace cv;
 
 namespace ll_algorithms
 {

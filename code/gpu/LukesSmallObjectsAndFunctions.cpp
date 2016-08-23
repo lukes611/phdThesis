@@ -4,6 +4,8 @@
 using namespace BIT_MANIPULATOR;
 using namespace ll_pix3d;
 using namespace ll_R3;
+using namespace cv;
+using namespace std;
 
 //LT object:
 LT::LT()

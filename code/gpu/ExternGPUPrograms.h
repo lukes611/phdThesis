@@ -23,11 +23,11 @@ bool LLGPU_fft3d_mag_swap_quads(VMat & v, VMat & output);
 extern
 bool LLGPU_transform(VMat & v, ll_R3::R3 rotation, float scale, ll_R3::R3 translation);
 extern
-bool LLGPU_transform(VMat & v, Mat & transformation_matrix);
+bool LLGPU_transform(VMat & v, cv::Mat & transformation_matrix);
 extern
-bool LLGPU_phase_correlate(VMat & v1, VMat & v2, Point3i & rv);
+bool LLGPU_phase_correlate(VMat & v1, VMat & v2, cv::Point3i & rv);
 extern
-bool LLGPU_phase_correlate_rst(VMat vol1, VMat vol2, float & rotation, float & scale, Point3i & translation, bool hanning_window_on = false);
+bool LLGPU_phase_correlate_rst(VMat vol1, VMat vol2, float & rotation, float & scale, cv::Point3i & translation, bool hanning_window_on = false);
 extern
 bool LLGPU_log(VMat & v);
 extern

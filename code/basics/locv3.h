@@ -32,7 +32,7 @@
 #include <opencv2\core\cuda.hpp>
 #include <opencv2\highgui.hpp>
 
-using namespace cv;
+
 #include <stdio.h>
 #include <cmath>
 #include <math.h>
@@ -41,7 +41,7 @@ using namespace cv;
 
 #define LL_DEFAULT_LOG_TRANSFORM_SCALAR 3.56
 
-using namespace std;
+
 const double ll_rad2deg = 57.295779513082320876798154814105;
 const double ll_pi = 3.14159265358979323846;
 double ll_lp_scalar(int w, double possibleScale = LL_DEFAULT_LOG_TRANSFORM_SCALAR);
@@ -55,9 +55,9 @@ namespace std
 	}
 }
 
-string ll_type(int type); //gets the type as a string from opencv::Mat.type()
+std::string ll_type(int type); //gets the type as a string from opencv::Mat.type()
 
-int ll_error(string error_name = "an ll_error occurred", bool ll_pause = true, bool ll_exit = true, int return_value = -1); //signal an error
+int ll_error(std::string error_name = "an ll_error occurred", bool ll_pause = true, bool ll_exit = true, int return_value = -1); //signal an error
 
 //compute the 2d distance between two points
 template <class T>
@@ -66,79 +66,79 @@ double ll_distance(T x1, T y1, T x2, T y2)
 	return sqrt(static_cast<double>((x1-x2)*(x1-x2)) + static_cast<double>((y1-y2)*(y1-y2)));
 }
 
-Vec3b ll_color_blend(Vec3b color1, Vec3b color2, double scalar1, double scalar2);// interpolates from color1 to color2 using scalars scalar1 and scalar2
+cv::Vec3b ll_color_blend(cv::Vec3b color1, cv::Vec3b color2, double scalar1, double scalar2);// interpolates from color1 to color2 using scalars scalar1 and scalar2
 //return value = color1 * scalar1 + color2 * scalar2
 
-void ll_sift(Mat & im1, Mat & im2, vector<Point2i> & p1, vector<Point2i> & p2, bool sort = false, int top = -1);//performs sift
+void ll_sift(cv::Mat & im1, cv::Mat & im2, std::vector<cv::Point2i> & p1, std::vector<cv::Point2i> & p2, bool sort = false, int top = -1);//performs sift
 //feature matching on two images
 
-void ll_surf(Mat & im1, Mat & im2, vector<Point2i> & p1, vector<Point2i> & p2, bool sort = false, int top = -1);//performs sift
+void ll_surf(cv::Mat & im1, cv::Mat & im2, std::vector<cv::Point2i> & p1, std::vector<cv::Point2i> & p2, bool sort = false, int top = -1);//performs sift
 //feature matching on two images
 
 
-void ll_surf_FastTopX(Mat & im1, Mat & im2, vector<Point2i> & p1, vector<Point2i> & p2, int top);
+void ll_surf_FastTopX(cv::Mat & im1, cv::Mat & im2, std::vector<cv::Point2i> & p1, std::vector<cv::Point2i> & p2, int top);
 
-void ll_sift_FastTopX(Mat & im1, Mat & im2, vector<Point2i> & p1, vector<Point2i> & p2, int top);
+void ll_sift_FastTopX(cv::Mat & im1, cv::Mat & im2, std::vector<cv::Point2i> & p1, std::vector<cv::Point2i> & p2, int top);
 //performs surf
 //feature matching on two images
 
-Mat ll_combine_images(Mat & im1, Mat & im2, bool horizontal = true); /*creates a new image, which is im1 and im2 next to eachother*/
+cv::Mat ll_combine_images(cv::Mat & im1, cv::Mat & im2, bool horizontal = true); /*creates a new image, which is im1 and im2 next to eachother*/
 
-void ll_draw_matches(Mat & im, Size & left_offset, vector<Point2i> & p1, vector<Point2i> & p2, int limit = -1);// draws matches on 
+void ll_draw_matches(cv::Mat & im, cv::Size & left_offset, std::vector<cv::Point2i> & p1, std::vector<cv::Point2i> & p2, int limit = -1);// draws matches on 
 //a combined image
 
-Mat ll_view_matches(Mat & im1, Mat & im2, vector<Point2i> & p1, vector<Point2i> & p2, int limit = -1); //view feature matches
+cv::Mat ll_view_matches(cv::Mat & im1, cv::Mat & im2, std::vector<cv::Point2i> & p1, std::vector<cv::Point2i> & p2, int limit = -1); //view feature matches
 
-Mat ll_draw_horizontal_lines(Mat & im1, int number, Scalar color = Scalar(255,255,255)); //draws number of horizontal lines
+cv::Mat ll_draw_horizontal_lines(cv::Mat & im1, int number, cv::Scalar color = cv::Scalar(255,255,255)); //draws number of horizontal lines
 
-Mat ll_draw_vertical_lines(Mat & im1, int number, Scalar color = Scalar(255,255,255)); //draws number of vertical lines
+cv::Mat ll_draw_vertical_lines(cv::Mat & im1, int number, cv::Scalar color = cv::Scalar(255,255,255)); //draws number of vertical lines
 
-Mat ll_fundamental_matrix(vector<Point2i> & p1, vector<Point2i> & p2); //basic version to find the fundamental matrix
+cv::Mat ll_fundamental_matrix(std::vector<cv::Point2i> & p1, std::vector<cv::Point2i> & p2); //basic version to find the fundamental matrix
 
-bool ll_stereo_rectify(Mat & im1, Mat & im2, int mod = 1, int feature_limit = 100, bool use_surf = false); //0-mods im1, 1 mods im2, 2 mods both
+bool ll_stereo_rectify(cv::Mat & im1, cv::Mat & im2, int mod = 1, int feature_limit = 100, bool use_surf = false); //0-mods im1, 1 mods im2, 2 mods both
 //set feature limit to -1 to include all features
 
 //some stereo disparity mapping functions
-Mat ll_depthbm(Mat & iml, Mat & imr, int ndisparities = 80, int sad_size = 21); //block matching depth mapping
-Mat ll_depthsgbm(Mat & iml, Mat & imr, int ndisparities = 80, int sad_size = 21); //semi-global block matching depth mapping
-Mat ll_depth2dbm(Mat & iml, Mat & imr, int ndisparities = 80, int sad_size = 21); //2d block matching disparity image generation
-Mat ll_depth2dbm_both_sides(Mat & iml, Mat & imr, int ndisparities = 80, int sad_size = 21); //2d block matching disparity image generation (search both sides of window)
+cv::Mat ll_depthbm(cv::Mat & iml, cv::Mat & imr, int ndisparities = 80, int sad_size = 21); //block matching depth mapping
+cv::Mat ll_depthsgbm(cv::Mat & iml, cv::Mat & imr, int ndisparities = 80, int sad_size = 21); //semi-global block matching depth mapping
+cv::Mat ll_depth2dbm(cv::Mat & iml, cv::Mat & imr, int ndisparities = 80, int sad_size = 21); //2d block matching disparity image generation
+cv::Mat ll_depth2dbm_both_sides(cv::Mat & iml, cv::Mat & imr, int ndisparities = 80, int sad_size = 21); //2d block matching disparity image generation (search both sides of window)
 
-Mat ll_getColoredDepthMap(Mat & inputDepth);
+cv::Mat ll_getColoredDepthMap(cv::Mat & inputDepth);
 
 double ll_get_angle(double x, double y); //compute the angle given a 2d vector
 
-void ll_UCF1_to_32F1(Mat & im); //convert an image from unsigned char single channel to float single channel
-void ll_32F1_to_UCF1(Mat & im); //convert an image from float single channel to unsiged char single channel
-void ll_normalize(Mat & inp); //normalize an image so pixels are within [0,1]
-void ll_normalize(Mat & inp, Mat & mask, float defaultValue = 0.0f); //normalize an image so pixels are within [0,1], set all pixels which 
+void ll_UCF1_to_32F1(cv::Mat & im); //convert an image from unsigned char single channel to float single channel
+void ll_32F1_to_UCF1(cv::Mat & im); //convert an image from float single channel to unsiged char single channel
+void ll_normalize(cv::Mat & inp); //normalize an image so pixels are within [0,1]
+void ll_normalize(cv::Mat & inp, cv::Mat & mask, float defaultValue = 0.0f); //normalize an image so pixels are within [0,1], set all pixels which 
 //register as 0 in the mask to the defaultValue
 
-Mat ll_scale_matrix(double scx, double scy); //generate 2d scale matrix
-Mat ll_rotation_matrix(double angle_degrees); //generate a 2d rotation matrix
-Mat ll_translation_matrix(double tx, double ty); //generate a 2d translation matrix
-Mat ll_scale_center_matrix(double scaleSize, Size imSize); //generate a 2d scale matrix which performs 
-Mat ll_transformation_matrix(Size s, double rotation, double scale, double transX, double transY);
-void ll_transform_image(Mat & inp, Mat & outp, double rotation, double scale, double transX, double transY); //transforms the image by some rst values
-void ll_transform_image(Mat & inp, Mat & outp, Mat & transform); //transforms the image by some transformation matrix
-void ll_swap_quadrants(Mat & inp); //swaps the quadrants (used for fft visualization and processing
-void ll_log_polar_v2(Mat & img, Mat & out); //a version of ruben's log polar transform
+cv::Mat ll_scale_matrix(double scx, double scy); //generate 2d scale matrix
+cv::Mat ll_rotation_matrix(double angle_degrees); //generate a 2d rotation matrix
+cv::Mat ll_translation_matrix(double tx, double ty); //generate a 2d translation matrix
+cv::Mat ll_scale_center_matrix(double scaleSize, cv::Size imSize); //generate a 2d scale matrix which performs 
+cv::Mat ll_transformation_matrix(cv::Size s, double rotation, double scale, double transX, double transY);
+void ll_transform_image(cv::Mat & inp, cv::Mat & outp, double rotation, double scale, double transX, double transY); //transforms the image by some rst values
+void ll_transform_image(cv::Mat & inp, cv::Mat & outp, cv::Mat & transform); //transforms the image by some transformation matrix
+void ll_swap_quadrants(cv::Mat & inp); //swaps the quadrants (used for fft visualization and processing
+void ll_log_polar_v2(cv::Mat & img, cv::Mat & out); //a version of ruben's log polar transform
 
 
 //for performing ffts
 namespace ll_fft
 {
-	Mat fft_image(Mat & gsc);
-	void fft_real_imag(Mat & inp, Mat & outRe, Mat & outIm, bool swap_quads = true);
-	Mat fft_reim_cplx(Mat & inp, bool swap_quads = false);
-	Mat ifft_reim_cplx(Mat & fdIn, bool swap_quads = false);
-	void fft_magnitude_phase(Mat & inp, Mat & outMag, Mat & outPha, bool swap_quads = true);
-	void ifft_magnitude_phase(Mat & magI, Mat & phaI, Mat & outp, bool swap_quads = true);
-	void ifft_real_imag(Mat & re, Mat & im, Mat & outp, bool swap_quads = true);
+	cv::Mat fft_image(cv::Mat & gsc);
+	void fft_real_imag(cv::Mat & inp, cv::Mat & outRe, cv::Mat & outIm, bool swap_quads = true);
+	cv::Mat fft_reim_cplx(cv::Mat & inp, bool swap_quads = false);
+	cv::Mat ifft_reim_cplx(cv::Mat & fdIn, bool swap_quads = false);
+	void fft_magnitude_phase(cv::Mat & inp, cv::Mat & outMag, cv::Mat & outPha, bool swap_quads = true);
+	void ifft_magnitude_phase(cv::Mat & magI, cv::Mat & phaI, cv::Mat & outp, bool swap_quads = true);
+	void ifft_real_imag(cv::Mat & re, cv::Mat & im, cv::Mat & outp, bool swap_quads = true);
 }
 
 template <class T>
-T ll_lirp_at(Mat & im, T xf, T yf)
+T ll_lirp_at(cv::Mat & im, T xf, T yf)
 {
 	int width = im.size().width;
 	int height = im.size().height;
@@ -170,14 +170,14 @@ T ll_lirp_at(Mat & im, T xf, T yf)
 	return rv;
 }
 
-void ll_log_polar(Mat & imIn, Mat & outp, double scalar = LL_DEFAULT_LOG_TRANSFORM_SCALAR);
+void ll_log_polar(cv::Mat & imIn, cv::Mat & outp, double scalar = LL_DEFAULT_LOG_TRANSFORM_SCALAR);
 
 template <class PixelType>
-double ll_mse(Mat & im1, Mat & im2)
+double ll_mse(cv::Mat & im1, cv::Mat & im2)
 	{
 		if(im1.size() != im2.size()) -1.0;
 		double rv = 0.0, tmp = 0.0;
-		Point2i p(0,0);
+		cv::Point2i p(0,0);
 		unsigned int w = static_cast<unsigned int>(im1.size().width);
 		unsigned int h = static_cast<unsigned int>(im1.size().height);
 		for(unsigned int y = 0; y < h; y++)
@@ -195,52 +195,53 @@ double ll_mse(Mat & im1, Mat & im2)
 	}
 
 template <class T>
-T & ll_center_pixel(Mat & im)
+T & ll_center_pixel(cv::Mat & im)
 {
-	Point2i p(static_cast<int>(im.size().width)/2, static_cast<int>(im.size().height)/2);
+	cv::Point2i p(static_cast<int>(im.size().width)/2, static_cast<int>(im.size().height)/2);
 	return im.at<T>(p);
 }
 
-Mat ll_hamming_window(Size s);
-Mat ll_hanning_window(Size s);
-void ll_imshow_32FC1(string name, Mat & im);
+cv::Mat ll_hamming_window(cv::Size s);
+cv::Mat ll_hanning_window(cv::Size s);
+void ll_imshow_32FC1(std::string name, cv::Mat & im);
 
-Point2d ll_phase_correlate(Mat & im1, Mat & im2);
-void ll_phase_correlate_rst(Mat & im1i, Mat & im2i, double & rotation, double & scale, double & transX, double & transY, double logTransformScalar = LL_DEFAULT_LOG_TRANSFORM_SCALAR, int filter = 1, bool showIms = false);
-void ll_phase_correlate_rs(Mat & im1i, Mat & im2i, double & rotation, double & scale, double logTransformScalar = LL_DEFAULT_LOG_TRANSFORM_SCALAR, int filter = 1);
-void ll_phase_correlate_rst(Mat & im1, Mat im2);
-bool ll_phase_correlate_rst_rectify(Mat & im1, Mat im2); //returns whether images should be flipped!
+cv::Point2d ll_phase_correlate(cv::Mat & im1, cv::Mat & im2);
+void ll_phase_correlate_rst(cv::Mat & im1i, cv::Mat & im2i, double & rotation, double & scale, double & transX, double & transY, double logTransformScalar = LL_DEFAULT_LOG_TRANSFORM_SCALAR, int filter = 1, bool showIms = false);
+void ll_phase_correlate_rs(cv::Mat & im1i, cv::Mat & im2i, double & rotation, double & scale, double logTransformScalar = LL_DEFAULT_LOG_TRANSFORM_SCALAR, int filter = 1);
+void ll_phase_correlate_rst(cv::Mat & im1, cv::Mat im2);
+bool ll_phase_correlate_rst_rectify(cv::Mat & im1, cv::Mat im2); //returns whether images should be flipped!
 
-void ll_pad2(Mat & input, Mat & output);
+void ll_pad2(cv::Mat & input, cv::Mat & output);
 
-void ll_find_image_intersection(Point2d p, Point2d v, Size image_size, Point2d & p1, Point2d & p2);
+void ll_find_image_intersection(cv::Point2d p, cv::Point2d v, cv::Size image_size, cv::Point2d & p1, cv::Point2d & p2);
 
-Mat ll_edgeDetection(Mat & im);
+cv::Mat ll_edgeDetection(cv::Mat & im);
 
-vector<string> ll_split(string & s, char delim = ' ');
+std::vector<std::string> ll_split(std::string & s, char delim = ' ');
 
-Mat ll_surfRegister(Mat & im1, Mat & im2, bool sort = true, int getTopXFeatures = 50, double allowedError = 0.1);
+cv::Mat ll_surfRegister(cv::Mat & im1, cv::Mat & im2, bool sort = true, int getTopXFeatures = 50, double allowedError = 0.1);
 
-Mat ll_siftRegister(Mat & im1, Mat & im2, bool sort = true, int getTopXFeatures = 50, double allowedError = 0.1);
+cv::Mat ll_siftRegister(cv::Mat & im1, cv::Mat & im2, bool sort = true, int getTopXFeatures = 50, double allowedError = 0.1);
 
 class SuperFast2DPC
 {
 public:
-	static double FastPC(Mat & im1, Mat & im2, Point2d & translation);
+	static double FastPC(cv::Mat & im1, cv::Mat & im2, cv::Point2d & translation);
 
-	static double lukeDimentionReduce1D(Mat & im, Mat & ret, float thresh = 0.1f, float minRad = 10.0f);
+	static double lukeDimentionReduce1D(cv::Mat & im, cv::Mat & ret, float thresh = 0.1f, float minRad = 10.0f);
 
-	static double FastPCR(Mat & a, Mat & b, double & rotation, float thresh = 0.01f, float minRad = 10.0f);
+	static double FastPCR(cv::Mat & a, cv::Mat & b, double & rotation, float thresh = 0.01f, float minRad = 10.0f);
 
-	static double phase_correlate_rt(Mat & a, Mat & b, double & rotation, Point2d & translation);
+	static double phase_correlate_rt(cv::Mat & a, cv::Mat & b, double & rotation, cv::Point2d & translation);
 
-	static double phase_correlate_rt2(Mat & a, Mat & b, double & rotation, Point2d & translation);
+	static double phase_correlate_rt2(cv::Mat & a, cv::Mat & b, double & rotation, cv::Point2d & translation);
 
-	static double phase_correlate_rtOptimal(Mat & a, Mat & b, double & rotation, Point2d & translation);
-	static double phase_correlate_rtOptimal_ed(Mat & a, Mat & b, double & rotation, Point2d & translation);
-	static double PC1D(Mat & n, Mat & n2);
+	static double phase_correlate_rtOptimal(cv::Mat & a, cv::Mat & b, double & rotation, cv::Point2d & translation);
+	static double phase_correlate_rtOptimal_ed(cv::Mat & a, cv::Mat & b, double & rotation, cv::Point2d & translation);
+	static double PC1D(cv::Mat & n, cv::Mat & n2);
 };
 
-void ll_pad(Mat & image, Mat & output, Size size);
+void ll_pad(cv::Mat & image, cv::Mat & output, cv::Size size);
 
-Mat least_squares(Mat M, Mat y); //returns x from equation Mx = y
+cv::Mat least_squares(cv::Mat M, cv::Mat y); //returns x from equation Mx = y
+
