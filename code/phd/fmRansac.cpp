@@ -49,12 +49,12 @@ namespace ll_fmrsc
 			dst.push_back( pointB );
 		}
 		int rv = estimateAffine3D(src, dst, ret, inliers, 0.01, 0.999);
-		matrix = Mat::eye(Size(4,4), CV_64FC1);
+		matrix = Mat::eye(Size(4,4), CV_32FC1);
 		for(int y = 0; y < 3; y++)
 		{
 			for(int x = 0; x < 4; x++)
 			{
-				matrix.at<double>(y,x) = ret.at<double>(y,x);
+				matrix.at<float>(y,x) = (float)ret.at<double>(y,x);
 			}
 		}
 		t.stop();

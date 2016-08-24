@@ -39,6 +39,25 @@ PixCompressor api:
 range representation __from __to
 from -256 + 512
 
+plan: experiment api:
+	algorithm name
+	data name
+	vector<int> frameIndexes
+
+	write:
+		input:
+			algorithm
+			data
+			description
+			vector<indexes> frames
+			error added
+		output:
+			alg, data, description, error added
+			errors, seconds per experiment
+
+
+	writes error to csv format file: data name, algorithm errorx, error y, error z times. description
+
 
 */
 
@@ -75,11 +94,12 @@ void exp1(string name, vector<int> frames)
 		Mat _m = Mat::eye(Size(4,4) , CV_32FC1);
 
 		cout << "matching " << currentIndex << " with " << frames[_i-1] << endl;
-		//cout << "worked " << ll_fmrsc::registerPix3D("surf", frame2, frame1, _m, seconds) << endl;;
+		cout << "worked " << ll_fmrsc::registerPix3D("surf", frame2, frame1, _m, seconds, true, 50 ) << endl;;
 		//_m = ll_pc::pc_register_pca_i(b, a, seconds);
+		//_m = ll_pc::pc_register(b, a, seconds);
 		//_m = ll_pc::pc_register_pca(b, a, seconds, true, 256);
-		//_m.convertTo(_m, CV_32FC1);
-		_m = Licp::icp(b, a, _, error, seconds, iters);
+		_m.convertTo(_m, CV_32FC1);
+		//_m = Licp::icp(b, a, _, error, seconds, iters);
 
 		//_m = ll_pca::register_pca(b, a, seconds, 256);
 		
@@ -91,10 +111,10 @@ void exp1(string name, vector<int> frames)
 
 		//optionally measure the error here
 
-		if (error >= 1.0) continue;
+		//if (error >= 1.0) continue;
 		//m = m * _m : either is fine
-		//accMatrix = accMatrix * _m;
-		accMatrix = _m * accMatrix;
+		accMatrix = accMatrix * _m;
+		//accMatrix = _m * accMatrix;
 		//multiply i by m and add to output
 		//cout << nm.size() << " -> " << ll_type(nm.type()) << endl;
 		
@@ -112,6 +132,79 @@ void exp1(string name, vector<int> frames)
 
 }
 
+void quantitativeExperiment(string algorithm_name,
+							string data_name,
+							string description,
+							vector<int> frames,
+							float error_added)
+{
+	CapturePixel3DSet video(data_name, 10);
+	Pix3D frame1, frame2;
+	Pixel3DSet a, b;
+
+	vector<double> times, errors, mses, pmes; //times, errors, mse errors, percent matches
+
+	//add first frame to the output
+	video.read_frame(frame1, frames[0]);
+	
+	for(int _i = 1; _i < frames.size(); _i++)
+	{
+		int currentIndex = frames[_i];
+		//get match _m from i+1 to i
+		double seconds = 0.0;
+		double hde, msee, pme;
+		int iters = 0;
+		Pixel3DSet _;
+
+		video.read_frame(frame2, currentIndex);
+
+		a = frame1; b = frame2;
+
+		Mat _m = Mat::eye(Size(4,4) , CV_32FC1);
+
+		//algorithms here:
+		if(algorithm_name == "none"){
+		}
+		
+		else if(algorithm_name == "pc"){
+			_m = ll_pc::pc_register(b, a, seconds);	
+		}
+
+		else if(algorithm_name == "pc2"){
+			_m = ll_pc::pc_register_pca_i(b, a, seconds);
+		}
+
+		else if(algorithm_name == "icp"){
+			_m = Licp::icp(b, a, _, hde, seconds, iters);
+		}
+
+		else if(algorithm_name == "icp2"){
+			_m = Licp::icp_outlierRemoval(b, a, _, hde, seconds, iters, 10.0);
+		}
+
+		else if(algorithm_name == "fm"){
+			ll_fmrsc::registerPix3D("surf", frame2, frame1, _m, seconds, true, 150);
+		}
+
+		//:end
+		
+		//compute the errors
+		b.transform_set(_m);
+		ll_measure::error_metrics(a, b, hde, msee, pme);
+
+		//append data to lists
+		pmes.push_back(pme);
+		mses.push_back(msee);
+		errors.push_back(hde);
+		times.push_back(seconds);
+		
+
+		frame1 = frame2;
+	}
+
+
+	
+}
 
 
 
@@ -122,7 +215,9 @@ int add(int a){
 
 int main(int argc, char * * argv)
 {
-	exp1("Apartment.Texture.rotate", ll_experiments::rng(0, 12, 2));
+	exp1("Apartment.Texture.rotate", ll_experiments::rng(8, 14, 1));
+
+	
 	
 	return 0;
 }

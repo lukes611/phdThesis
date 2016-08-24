@@ -164,6 +164,35 @@ double percentMatch(VMat & a, VMat & b, float threshold)
 }
 
 
+void error_metrics(Pixel3DSet & a, Pixel3DSet & b, double & hausdorff_error, double & mse_error, double & percent_match, double minError)
+{
+	double hd1, hd2, ms1, ms2, pm1, pm2;
+	error_metrics_1way(a, b, hd1, ms1, pm1);
+	error_metrics_1way(a, b, hd2, ms2, pm2);
+
+	hausdorff_error = (hd1 + hd2) * 0.5;
+	mse_error = (ms1 + ms2) * 0.5;
+	percent_match = (pm1 + pm2) * 0.5;
+}
+void error_metrics_1way(Pixel3DSet & a, Pixel3DSet & b, double & hausdorff_error, double & mse_error, double & percent_match, double minError)
+{
+	vector<int> i1;
+	vector<double> d1;
+	hausdorff_error = closestPointsf(a, b, i1, d1);
+
+	double scalar = 1.0 / (double) a.size();
+	
+	percent_match = 0.0;
+	mse_error = 0.0;
+
+	for(int i = 0; i < d1.size(); i++)
+	{
+		if(d1[i] <= minError) percent_match += scalar;
+		mse_error += d1[i] * d1[i] * scalar;
+	}
+}
+
+
 Pix3D render(SIObj & objectIn, int volumeWidth, float focalDistance)
 {
 	unsigned int S = 640 * 480; //image sizes for Pix3D are 640x480

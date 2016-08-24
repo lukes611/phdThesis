@@ -42,6 +42,10 @@ double percentMatch_1way(ll_pix3d::Pixel3DSet & a, ll_pix3d::Pixel3DSet & b, dou
 double percentMatch(VMat & a, VMat & b, float threshold = 0.05f);
 
 
+void error_metrics(ll_pix3d::Pixel3DSet & a, ll_pix3d::Pixel3DSet & b, double & hausdorff_error, double & mse_error, double & percent_match, double minError = 0.5f);
+void error_metrics_1way(ll_pix3d::Pixel3DSet & a, ll_pix3d::Pixel3DSet & b, double & hausdorff_error, double & mse_error, double & percent_match, double minError = 0.5f);
+
+
 Pix3D render(SIObj & objectIn, int volumeWidth, float focalDistance = 500.0f);
 Pix3D render(ll_pix3d::Pixel3DSet & objectIn, int volumeWidth, float focalDistance);
 
