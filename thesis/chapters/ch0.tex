@@ -1,0 +1,24 @@
+\begin{savequote}[8cm]
+  ``It is not knowledge, but the act of learning, not possession but the act of getting there, which grants the greatest enjoyment''
+  \qauthor{Carl Friedrich Gauss}
+\end{savequote}
+\makeatletter
+\chapter{Introduction}
+
+\section{Introduction}
+
+Efficient processing, storage and transmission of 3D data is important in many areas. For example: a remote robot may be required to scan 3D structures and transmit data back to a receiver, an engineer might want to store many 3D designs on a single memory device or a video-gamer may want to download additional maps to give a game more variation. In these situations, compressing the 3D data would decrease storage requirements and transmission time. It can also improve processing efficiency by rearranging the data and removing redundancy. Without compression, storing the Stanford bunny requires over 2700 kilobytes and the dragon model requires over 35 megabytes. 
+
+Simplification is a process which trades model detail for storage space. It does so by performing a set of simplification operations  on the mesh. This is orthogonal to compression because each simplified model can be further compressed. Compression is more ideal since it can provide a more efficient representation for any simplified model. There are a wide variety of 3D model representations and each requires a separate compression scheme. Different representations are used because each has certain advantages and disadvantages in terms of storage, transmission, processing and visualization. It is possible to transform a model from one representation to another, although some of the original information may be lost.
+
+In the past few decades, transform and wavelet methods have dominated image compression. Lately, novel hierarchical methods have provided state of the art compression performance with reduced complexity. These techniques have not been extended to 3D model compression, which raises the question of how well these techniques may work if applied to 3D data. 
+
+\section{Research Aims \& Contributions}
+
+The primary aim of this research is to improve the storage, quantitative quality and perceptual quality of 3D models. To this end, hierarchical image compression schemes were investigated. This led to a new image codec called the Interpolating Leaf Quadtree (ILQT) \cite{Lincoln13Interpolating} which outperforms JPEG at low bit rates, another codec called the ShadeTree (ST) was also investigated. The techniques explored by the ST and ILQT were fundamentally different from wavelet and transform based codecs, yet still led to good results. This motivated the research question, ``Do hierarchical techniques bring state of the art compression performance to 3D data?'' The Shade-Octree 3D model codec was developed to answer this question and to accomplish the primary aim of this research. 
+
+\section{Overview}
+
+Chapter two presents a survey of 3D model representation and compression methods. Following this, chapter three introduces the SOT, which is used to answer the research question and accomplish the primary aim of this project. The fourth chapter details the experiments performed, then presents and analyses the results of these experiments. Finally, the sixth chapter concludes the thesis and discusses the results in terms of the primary aim and research question. 
+
+

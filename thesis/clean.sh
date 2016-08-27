@@ -1,0 +1,14 @@
+rm *.log
+rm *.out
+rm *.lof
+rm *.lot
+rm *.synctex.*
+rm *.aux
+rm *.blg
+rm *.brf
+rm *.toc
+rm *.bak
+rm *.bbl
+rm *.pdf
+rm *.dvi
+rm *.zip

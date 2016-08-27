@@ -1,0 +1,56 @@
+\documentclass[12pt]{book}
+\usepackage[twoside,margin=1in,bindingoffset=0.5in]{geometry}
+%\usepackage[round,authoryear]{natbib}
+\usepackage{amssymb}
+%\usepackage{tocbibind}
+\usepackage{graphicx}
+
+\usepackage{listings}
+\usepackage[breaklinks = true, linktocpage, pagebackref,
+colorlinks = true, hyperindex = true, hyperfigures] {hyperref}
+\usepackage[grey]{quotchap}
+\usepackage{pdfpages}
+
+\hypersetup{
+    colorlinks=false,
+    pdfborder={0 0 0},
+}
+
+\usepackage{pdflscape}
+\usepackage{afterpage}
+
+
+\renewcommand{\bibname}{Reference List}
+
+\begin{document}
+\raggedbottom
+%\openup .60em
+% Set equal margins on book style
+\setlength{\oddsidemargin}{53pt}
+\setlength{\evensidemargin}{53pt}
+\setlength{\marginparwidth}{57pt}
+\setlength{\footskip}{30pt}
+\openup 1em
+\input{chapters/title}
+\frontmatter
+%\includepdf[pages={2}]{titlePDF2}
+\input{chapters/abs} % Abstract
+\input{chapters/Ack}
+\tableofcontents
+\listoffigures
+\listoftables
+\mainmatter
+\input{chapters/ch0} % The Introductory Chapter
+\input{chapters/ch1} % The Literature Review
+%\input{ch2} % Methodology
+%\input{ch3} % Experiments &
+%\input{ch4} % Results
+%\input{ch5} % Conclusion
+\appendix
+\input{chapters/apA} % Appendix A
+\backmatter
+\openup -0.5em
+%\bibliographystyle{plain}
+\bibliographystyle{IEEEtran}
+\bibliography{ref1,ref2}
+\end{document}

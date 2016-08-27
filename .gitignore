@@ -4,3 +4,17 @@ Debug
 *.filters
 *.user
 x64/
+*.log
+*.out
+*.lof
+*.lot
+*.synctex.*
+*.aux
+*.blg
+*.brf
+*.toc
+*.bak
+*.bbl
+*.pdf
+*.dvi
+*.zip
