@@ -1,8 +1,9 @@
 PhD Thesis:
+    0: abstract
 	1: Introduction
 		1.1: Background
-			1.1.1 3D Reconstruction
-			1.1.2 Compression
+			1.1.1 3D Reconstruction 
+            1.1.2 Compression
 			1.1.3 how these fit in
 		1.2: Problem:
 			1.2.1: Issues (add: different types of features to match)
@@ -10,7 +11,10 @@ PhD Thesis:
 				issues:
 					fails if not enough features
 					feature confusion
+                    large baselines
 					time depends on number of features
+                    can not handle large amounts of noise
+                    object motion becomes a problem
 					limited use in outdoor and complex environments
 					
 			1.2.2: 
