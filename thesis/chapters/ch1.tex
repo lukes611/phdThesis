@@ -14,6 +14,70 @@ hi there
 Monocular Feature based SLAM systems use feature matches to estimate camera pose and location changes across frames \cite{Davison02Simultaneous}. Variations of this method use different features including: corners and lines \cite{Jeong06Visual}, image patches \cite{Silveira08Efficient} and exemplar feature matching \cite{Chekhlov07Robust}. SIFT features are used most often in SLAM \cite{Jensfelt06Framework,Pollefeys08Detailed,Beall11Bundle,Eudes10Fast}, in addition FAST features have been explored \cite{Kundu10Realtime,Leelasawassuk133d,Konolige10View,Konolige08Frameslam}. Beall et al \cite{Beall11Bundle} made use of both SIFT and SURF features in their underwater SLAM system. Real-time monocular SLAM systems based on this approach have also been proposed \cite{Chekhlov07Robust,Pollefeys08Detailed}. RANSAC is often used in monocular SLAM \cite{Eudes10Fast,Kundu10Realtime,Konolige10View,Konolige08Frameslam,Pradeep13Monofusion} to remove outliers which cause incorrect camera parameter estimates. Bundle adjustment is also used as an additional step to refine camera parameter estimation \cite{Eudes10Fast}. 
 \subsection{Stereo Camera Feature Based Systems}
 Stereo based SLAM systems also use features to estimate camera parameters. However, stereo based systems are capable of generating dense depth data more easily using stereo algorithms. Miro et al \cite{Miro06Towards} proposed a stereo based method which uses SIFT and the extended Kalman filter. The method by Van Gool et al \cite{Pollefeys04Visual} works with un-calibrated stereo pairs. It uses Harris corner features and a multi-view stereo algorithm. Sim et al \cite{Sim05Vision} and Gil et al \cite{Gil06Improving} both presented stereo based SLAM systems which use SIFT.
+
+\subsection{Kinect Fusion}
+
+accurate, realtime, complex indoor environments
+
+in variable lighting conditions
+
+fuses depth data into a global surface model
+
+uses a coarse to fine ICP method
+
+uses all of the depth data available
+
+global rather than frame-to-frame based
+
+commodity sensor and GPU hardware
+
+area promises new augmented reality and mixed reality applications
+
+SFM and MVS (multi view stereo) has given good results : camera tracking  and sparse reconstructions [10], [24]
+
+SLAM has focused on real time markerless tracking and live scene reconstruction based on a single sensor RGB eg. MonoSLAM[8] which is less accurate than PTAM [17] but these only produce sparse reconstructions
+
+some methods have grown to combine PTAM's camera tracking ability with MVS-style reconstructions [19/26]
+
+recently: iterative image alignment has been used to replace features in tracking [20]
+
+this scene is promising: but monocular based dense 3D reconstruction is difficult and requires suitable camera motion and scene illumination
+
+camera technologies have also been evolving: enter the world of new depth cameras or rgb-d cameras,
+these have become availbable to consumers and may soon be found in mobile technologies [cite goog]
+
+first real-time rgb-d depth sensor : with this system users can wave around the device to generate smooth, continuously updating, fully reconstructed data: using only depth, 6dof are tracked
+
+works in full darkness : mitigating issues for passive cameras: [17/19/26] and other rgb systems [14]
+
+kw : dense volumetric reconstruction
+
+GPGPU kw: is one of their design keys, their system can perform in real time at above these frame rates
+
+they perform qualitative analysis
+
+Kinect: incorporates a structured light based depth sensor, uses an on board ASIC generating an 11-bit 640x480 depth map at 30hz
+
+depth images often contain holes : this is an issue (caused by no structured light could be read on the surface, certain materials, which do not reflect infra-red light (very thin structures or surfaces at incendence angles
+
+when moving fast, the device can also experience motion blur, this leads to missing data
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\ref{Newcombe11Kinectfusion}
+
 \subsection{RGB-D Sensor Feature Based Systems}
 RGB-D SLAM systems use both depth and image data and are capable of generating dense 3D reconstructions. Many of these methods rely on feature matching techniques \cite{Engelhard11Real,Henry10Rgb,Endres12Evaluation}. RANSAC is often used to filter outliers for the estimation of camera parameters\cite{Engelhard11Real,Henry10Rgb,Endres12Evaluation}. Another method which has also been used extensively in the area is Iterative Closest Point (ICP) \cite{Engelhard11Real,Henry10Rgb,Bylow13Real,Newcombe11Kinectfusion,Stuckler12Robust,Izadi11Kinectfusion}. ICP iteratively registers point cloud data, and is used to refine camera parameter estimates. A method named KinectFusion was proposed by Newcombe et al \cite{Newcombe11Kinectfusion} which uses RANSAC and a GPU implementation of IPC. Whelan et al \cite{Whelan12Kintinuous} extended this method allowing it to map larger areas using Fast Odometry From Vision (FOVIS) over ICP. Bylow et al \cite{Bylow13Real} improved the ICP approach by registering data using a signed distance function.
 \subsection{Non-Feature Based Methods}
