@@ -21,7 +21,7 @@ namespace ll_fmrsc
 			ll_surf(colA, colB, pts1, pts2, sort, top);
 		for(int i = 0; i < pts1.size() && i < pts2.size(); i++)
 		{
-			if(vdA.at<unsigned char>(pts1[i]) == 0xFF && vdB.at<unsigned char>(pts2[i]))
+			if(vdA.at<unsigned char>(pts1[i]) != 0x00 && vdB.at<unsigned char>(pts2[i]) != 0x00)
 			{
 				p1.push_back(pts1[i]);
 				p2.push_back(pts2[i]);
@@ -48,7 +48,7 @@ namespace ll_fmrsc
 			src.push_back( pointA );
 			dst.push_back( pointB );
 		}
-		int rv = estimateAffine3D(src, dst, ret, inliers, 0.01, 0.999);
+		int rv = estimateAffine3D(src, dst, ret, inliers, 1.0, 0.999999999999);
 		matrix = Mat::eye(Size(4,4), CV_32FC1);
 		for(int y = 0; y < 3; y++)
 		{
