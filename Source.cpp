@@ -2,6 +2,8 @@
 #include <string>
 #include <vector>
 
+//#define USINGGPU 
+
 #include "code\basics\locv3.h"
 #include "code\basics\R3.h"
 #include "code\basics\llCamera.h"
@@ -98,7 +100,7 @@ void exp1(string name, vector<int> frames)
 		//_m = ll_pc::pc_register_pca_i(b, a, seconds);
 		//_m = ll_pc::pc_register(b, a, seconds);
 		//_m = ll_pc::pc_register_pca(b, a, seconds, true, 256);
-		_m.convertTo(_m, CV_32FC1);
+		//_m.convertTo(_m, CV_32FC1);
 		//_m = Licp::icp(b, a, _, error, seconds, iters);
 
 		//_m = ll_pca::register_pca(b, a, seconds, 256);
@@ -121,9 +123,19 @@ void exp1(string name, vector<int> frames)
 		b.transform_set(accMatrix);
 		
 		output += b;
+
+		
+		
+		if (_i % 4 == 0)
+		{
+			cout << "output size: " << output.size() << endl;
+			output.basicMinFilter(0.5f);
+			cout << "output size reduced to : " << output.size() << endl;
+		}
 		frame1 = frame2;
 	}
 	cout << "saving" << endl;
+	
 	//output.reduce(256);
 	//SIObj(output.points).saveOBJ("C:/Users/luke/Desktop/result2.obj");
 	LLPointers::setPtr("object", &output);
@@ -165,7 +177,7 @@ void quantitativeExperiment(string algorithm_name,
 		//algorithms here:
 		if(algorithm_name == "none"){
 		}
-		
+#ifdef USINGGPU
 		else if(algorithm_name == "pc"){
 			_m = ll_pc::pc_register(b, a, seconds);	
 		}
@@ -173,7 +185,7 @@ void quantitativeExperiment(string algorithm_name,
 		else if(algorithm_name == "pc2"){
 			_m = ll_pc::pc_register_pca_i(b, a, seconds);
 		}
-
+#endif
 		else if(algorithm_name == "icp"){
 			_m = Licp::icp(b, a, _, hde, seconds, iters);
 		}
@@ -215,7 +227,7 @@ int add(int a){
 
 int main(int argc, char * * argv)
 {
-	exp1("Apartment.Texture.rotate", ll_experiments::rng(8, 14, 1));
+	exp1("Apartment.Texture.rotate", ll_experiments::rng(0, 85, 4));
 
 	
 	

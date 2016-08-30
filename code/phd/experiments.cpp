@@ -78,7 +78,7 @@ void viewPixel3DSet()
 {
 	ll_gl::default_glut_main("lukes phd project", 640, 480);
 	
-	Cad_cam * camera = new Cad_cam;
+	Fps_cam * camera = new Fps_cam(R3(40,40,-60), 90.0f, 90.0f);
 	LLPointers::setPtr("camera", camera);
 
 	glutDisplayFunc([]()->void
@@ -86,7 +86,7 @@ void viewPixel3DSet()
 		
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		Cad_cam * camera = LLPointers::getPtr<Cad_cam>("camera");
+		Fps_cam * camera = LLPointers::getPtr<Fps_cam>("camera");
 		ll_gl::default_viewing(*camera);
 		
 		ll_gl::default_lighting();
@@ -111,7 +111,7 @@ void viewPixel3DSet()
 	});
 
 	glutKeyboardFunc([](unsigned char key, int x, int y)->void{
-		Cad_cam * camera = LLPointers::getPtr<Cad_cam>("camera");
+		Fps_cam * camera = LLPointers::getPtr<Fps_cam>("camera");
 		camera->keyboard(key, x,y);
 		if(key == '5')
 		{
@@ -122,11 +122,11 @@ void viewPixel3DSet()
 		
 	}); 
 	glutMotionFunc([](int x, int y)->void{
-		Cad_cam * camera = LLPointers::getPtr<Cad_cam>("camera");
+		Fps_cam * camera = LLPointers::getPtr<Fps_cam>("camera");
 		camera->mouse(x,y);
 	});
 	glutMouseFunc([](int button, int state, int x, int y)->void{
-		Cad_cam * camera = LLPointers::getPtr<Cad_cam>("camera");
+		Fps_cam * camera = LLPointers::getPtr<Fps_cam>("camera");
 		ll_gl::camera_mouse_click(*camera, button, state, x, y);
 	});
 	glutMainLoop();
