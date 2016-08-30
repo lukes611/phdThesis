@@ -497,6 +497,74 @@ namespace ll_pix3d
 		for(int i = 0; i < points.size(); i++) f(points[i]);
 	}
 
+	void Pixel3DSet::basicMinFilter(float distanceThreshold, float colorDifferenceThreshold)
+	{
+		int count = size();
+		bool * keepers = new bool[count];
+		//float * _colors = new float[count];
+
+		vector<R3> npoints;
+		vector<Vec3b> ncolors;
+		
+		for (int i = 0; i < count; i++)
+		{
+			keepers[i] = true;
+			//_colors[i] = gsNPixel(i);
+		}
+
+		for (int i = 0; i < count; i++)
+		{
+			if (!keepers[i]) continue;
+			//float icol = _colors[i];
+			R3 ip = points[i];
+			for (int j = i+1; j < count; j++)
+			{
+				if (!keepers[j]) continue;
+				float dist = ip.dist(points[j]);
+				//float cdist = abs(icol - _colors[j]);
+				if (dist < distanceThreshold)// && cdist < colorDifferenceThreshold)
+				{
+					keepers[j] = false;
+				}
+			}
+			npoints.push_back(ip);
+			ncolors.push_back(colors[i]);
+		}
+
+		
+
+		delete[] keepers;
+		//delete[] _colors;
+
+		*this = Pixel3DSet(npoints, ncolors);
+	}
+
+	void Pixel3DSet::unionFilter(Pixel3DSet & o, float distThreshold)
+	{
+		auto hashFunction = [distThreshold](R3 & p) -> int {
+			R3 x = p / distThreshold * 4.0f;
+			return ((int)(x.x)) + ((int)(x.y)) * 2000 + ((int)(x.z)) * 4000000;
+		};
+		int count = size();
+		int count2 = o.size();
+
+		map<int, vector<R3>> mp;
+
+		for (int i = 0; i < count; i++)
+		{
+			bool keep = true;
+			for (int j = 0; j < count2; j++)
+			{
+				float dist = points[i].dist(o.points[j]);
+				if (dist < distThreshold)
+				{
+					keep = false;
+					break;
+				}
+			}
+		}
+	}
+
 	Pixel3DSet Pixel3DSet::openDepthMap(Mat & depthImage, float maxDepth, float cutOff)
 	{
 		/*

@@ -123,9 +123,19 @@ void exp1(string name, vector<int> frames)
 		b.transform_set(accMatrix);
 		
 		output += b;
+
+		
+		
+		if (_i % 4 == 0)
+		{
+			cout << "output size: " << output.size() << endl;
+			output.basicMinFilter(0.5f);
+			cout << "output size reduced to : " << output.size() << endl;
+		}
 		frame1 = frame2;
 	}
 	cout << "saving" << endl;
+	
 	//output.reduce(256);
 	//SIObj(output.points).saveOBJ("C:/Users/luke/Desktop/result2.obj");
 	LLPointers::setPtr("object", &output);
@@ -217,7 +227,7 @@ int add(int a){
 
 int main(int argc, char * * argv)
 {
-	exp1("Apartment.Texture.rotate", ll_experiments::rng(0, 50, 2));
+	exp1("Apartment.Texture.rotate", ll_experiments::rng(0, 85, 4));
 
 	
 	

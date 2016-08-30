@@ -162,9 +162,14 @@ namespace ll_pix3d
 
 		void mutate_points(std::function<void(ll_R3::R3&)> f);
 
+		void basicMinFilter(float distanceThreshold = 0.6f, float colorDifferenceThreshold = 0.6f);
+		void unionFilter(Pixel3DSet & o, float distThreshold = 0.6f);
+
 		static Pixel3DSet openDepthMap(cv::Mat & depthImage, float maxDepth, float cutOff = 0.1f);
 		static Pixel3DSet openDepthMap(cv::Mat & colorImage, cv::Mat & depthImage, float maxDepth, float cutOff = 0.1f, float offset = 0.4f, float range = 0.7f);
 		static Pixel3DSet DirectProject(cv::Mat & colorImage, cv::Mat depthImage, float size, float threshold);
+
+		
 	};
 
 
