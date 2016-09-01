@@ -542,27 +542,50 @@ namespace ll_pix3d
 	void Pixel3DSet::unionFilter(Pixel3DSet & o, float distThreshold)
 	{
 		auto hashFunction = [distThreshold](R3 & p) -> int {
-			R3 x = p / distThreshold * 4.0f;
-			return ((int)(x.x)) + ((int)(x.y)) * 2000 + ((int)(x.z)) * 4000000;
+			R3 x = p / (distThreshold * 10.0f);
+			return ((int)(x.x)) + ((int)(x.y))*1024 + ((int)(x.z))*1024*1024;
 		};
 		int count = size();
 		int count2 = o.size();
 
-		map<int, vector<R3>> mp;
-
+		int hmSize = 5000;
+		vector<int> * hashmap = new vector<int>[hmSize];
+		
+		//add this.points to hash map
+		cout << "hashing...";
 		for (int i = 0; i < count; i++)
 		{
-			bool keep = true;
-			for (int j = 0; j < count2; j++)
+			int index = hashFunction(points[i]) % hmSize;
+			hashmap[index].push_back(i);
+		}
+		cout << "done\n";
+		//for each point in other, if not in hash map -> add this
+		int _numKept = 0;
+		for (int i = 0; i < count2; i++)
+		{
+			R3 p = o[i];
+			int index = hashFunction(p) % hmSize;
+			bool inHm = false;
+			for (int j = 0; j < hashmap[index].size(); j++)
 			{
-				float dist = points[i].dist(o.points[j]);
-				if (dist < distThreshold)
+				float dist = p.dist(points[hashmap[index][j]]);
+				if (dist < distThreshold) //if already a close by point there: do not add
 				{
-					keep = false;
+					inHm = true;
 					break;
 				}
 			}
+			if (!inHm) //if no similar point : unionize!
+			{
+				points.push_back(p);
+				colors.push_back(o.colors[i]);
+				_numKept++;
+			}
+			
 		}
+		delete[] hashmap;
+		cout << "keeping " << _numKept << " out of " << o.size() << endl;
+		
 	}
 
 	Pixel3DSet Pixel3DSet::openDepthMap(Mat & depthImage, float maxDepth, float cutOff)

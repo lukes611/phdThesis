@@ -123,13 +123,14 @@ void exp1(string name, vector<int> frames)
 		b.transform_set(accMatrix);
 		
 		output += b;
-
+		cout << "output size: " << output.size() << endl;
+		//output.unionFilter(b, 1.0f);
+		cout << "output size reduced to : " << output.size() << endl;
 		
-		
-		if (_i % 4 == 0)
+		if (_i % 3 == 0)
 		{
 			cout << "output size: " << output.size() << endl;
-			output.basicMinFilter(0.5f);
+			//output.basicMinFilter(0.5f);
 			cout << "output size reduced to : " << output.size() << endl;
 		}
 		frame1 = frame2;
@@ -227,7 +228,7 @@ int add(int a){
 
 int main(int argc, char * * argv)
 {
-	exp1("Apartment.Texture.rotate", ll_experiments::rng(0, 85, 4));
+	exp1("Apartment.Texture.rotate", ll_experiments::rng(0, 50, 2));
 
 	
 	
