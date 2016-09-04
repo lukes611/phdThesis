@@ -44,7 +44,7 @@ recently: iterative image alignment has been used to replace features in trackin
 this scene is promising: but monocular based dense 3D reconstruction is difficult and requires suitable camera motion and scene illumination
 
 camera technologies have also been evolving: enter the world of new depth cameras or rgb-d cameras,
-these have become availbable to consumers and may soon be found in mobile technologies [cite goog]
+these have become available to consumers and may soon be found in mobile technologies [cite goog]
 
 first real-time rgb-d depth sensor : with this system users can wave around the device to generate smooth, continuously updating, fully reconstructed data: using only depth, 6dof are tracked
 
@@ -65,6 +65,114 @@ when moving fast, the device can also experience motion blur, this leads to miss
 then they do  reviews on:
 	slam, dense tracking, surface representations, previous work with joint tracking and modelling using depth sensors
 	
+early sfm algorithms: either accumulated drift (computing motion) [2] or performed loop-closure using off-line optimization 
+
+The first monocular slam system [8] was capable of producing globally consistent maps in real time with hand-held camera used probabilistic filtering of camera and scene feature estimates
+
+limited to in-door office environments because it requires large state vectors which grow with scene size
+sparse feature maps lead to poor accuracy
+
+then systems which split tracking and mapping (global optimization) -> approach by PTAM system [17]
+: real time mono slam in work spaces -> basically it is just bundle adjustment (which is the least squares solution to camera and feature optimization (theirs chooses features dynamically over the frame range)
+
+their tracking system runs in parallel at frame-rate speeds, and performs robust n-point pose estimation with feature matching
+
+compared to filters much more features can be packed into the map[25]
+
+PTAM = realtime results as accurate as off-line ones
+
+PTAM produces sparse maps - not like our project
+
+some algorithms can use PTAM tracking in conjunction with dense reconstruction computing module based on multi-view stereo
+
+[19] uses dense optical flow with PTAM like tracking for dense recon
+
+this relies on camera poses coming from PTAM
+
+[26] do the same with near real time depth map calculation
+
+DENSE TRACKING AND MAPPING by Scan Alignment
+
+dense sensor based 3d reconstruction research has continued using lasers and depth sensors
+
+typically : minimize distance measures between all data rather than feature extraction and matching
+
+6dof camera alignment and 3d surface reconstruction techniques developed in the graphics domain, here ICP is the most important
+ICP @ [3]
+
+ICP is a non-linear optimization problem where approximations are found using the closest points currently for each
+set
+
+distance metrics have been researched using the point-plane metric [5]
+
+[5] improves convergence rates, used for surface reconstructions which have normal data
+
+computing closest points using ICP is expensive, there is projective data association algorithm [4]
+
+can be used for data in projective form (2d image where each image is a 3d point)
+
+can reduce icp set to possible set of points or with a coarse to fine scheme
+
+SLAM may use ICP to estimate camera changes
+
+Dense 3D scene representations:
+
+occupancy mapping : use a grid to store data
+
+[9] uses a Bayesian probability of occupancy to measure whether should be added to the grid
+
+also can used signed distance functions [9] (SDF), it can be used to fuse partial depth scans, whilst mitigating
+issues relating mesh-based reconstruction algorithms
+
+SDF represents : surface interfaces as 0, positive values that increase with distance from the nearest surface
+and occupied space using a negative value
+
+more robust to noise version of SDF -> 30
+
+SDF can be visualized by first converting to mesh and rendering ( use marching cubes [18]) or it can be directly ray cast [21]
+
+[23] used frame-by-frame ICP with occupancy grid, users can scan in small objects by rotating the objects with their hand
+works @ 10hz, issue: does not do global optimization, cannot do large scenes . final models are optimized using [7]
+sdf fusion in real time may be possible
+
+sdf can be used for globally satisfying reconstruction
+
+small scale reconstructions:
+	[28] -> produces high quality scans using a fixed ToF sensor
+	[6] demonstrate a moving handheld ToF scanner
+
+Octomap [29] -> 3d reconstruction using occupancy grid style 
+
+[14] uses rgb-d with kinect by frame by frame icp : feature matching is used with graph optimization for loop closure and global consistency -> global fusion presents better performance
+
+Method by Kinect Fusion
+
+1. measurement : 			dense vertex map and normal map pyramids are produced
+2. pose estimation: 		multi-level ICP used to compute pose
+3. update reconstruction:	new frames are fused into global model using a truncated signed distance function (tsdf) representation
+4. rather than use loop closure: map the frame into the global model using tsdf representation
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
