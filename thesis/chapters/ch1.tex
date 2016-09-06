@@ -37,7 +37,166 @@ After estimating camera pose relating to the globally fused model, each frame mu
 
 As mentioned, Kinect fusion uses pose prediction and fuses each depth map into the TSDF representation. In this way, they align and fuse each depth map to the global 3d reconstruction. In this way, a global loop closure method is not required. This may have a negative side effect by which some frames which have larger resolutions may be heavily quantized in order to fuse with the SDF, especially very thin surfaces/objects. These features may also be advantageous for ICP in estimating pose. 
 
-[Background]
+
+\subsection{Accurate SDF Method \cite{Bylow13Real}}
+
+novel method
+real-time camera tracking and 3d reconstruction
+of static rgb indoor environments
+geometry represented with a signed distance function
+using sdf -> camera pose is efficiently estimated by minimizing the error of depth images projected onto the sdf, because sdf contains distances from each voxel to actual surface, optimization may be extremely fast
+
+they iteratively estimate the camera pose and integrate 3d rgbd data into a voxel grid
+
+more accurate and robust compared with icp (Kinect Fusion)
+yields comparable accuracy at higher speed to feature-based bundle adjustment methods for up to medium sized scenes
+
+has good intro and use cases for this tech
+
+Asus Xtion Pro Live sensor and laptop with GPU from NVIDIA
+
+1000 image reconstruction
+
+bundle adjustment using features over many views with [13 \cite{Klein07Parallel} , 2 \cite{Agarwal09Building}] with sparse 3d models generated
+
+algorithms to compute dense depth maps from image data [10 \cite{Hirschmuller05Accurate} , 21 \cite{Stuhmer10Real}]
+
+newcombe [18 \cite{Newcombe11Kinectfusion} ] -> impressive results using sdfs to represent reconstruction, and icp for camera tracking
+
+whelan [24 \cite{Whelan13Robust}] estended with rolling reconstruction volume and color fusion, evaluated alternative methods for visual odometry estimation
+
+pure visual odometry induces significant drift, so matching with global model is their preference
+
+novel method of estimating camera motion directly based on the SDF, key insight : sdf encodes distance to surface
+
+do not need downsampling in case of icp to achieve real time performance
+
+comparable to the feature based rgb-d slam [8 \cite{Endres12Evaluation}]
+
+icp[4 \cite{Besl92Method}]
+
+graph slam use motion estimates as input to construct and optimiza a pose graph[15 \cite{Kummerle11G}] these methods render a joint map only after pose graph optimization
+
+this map is generally not used for further optimization
+
+the resulting maps are often represented as occupancy grid maps or octrees [25 \cite{Wurm10Octomap}]
+
+henry [9 \cite{Henry10Rgb}], applied graph slam to rgb-d data, using visual features + icp combo [8] also did a similar system, on benchmark [22 \cite{Sturm12Benchmark}]
+
+[18 \cite{Newcombe11Kinectfusion} dense 3d recon possible with realtime, 
+
+sdf[7 \cite{Curless96Volumetric}]
+
+KF: for each image:
+it renders a point cloud from the sdf at the previous pose using ray tracing and aligns this with the depth image
+
+
+point correspondences are found using projective data association [5 \cite{Blais95Registering}] and the point to plane distance
+
+Kin-Fu open source implementation available in the PCL library
+
+(icp only minimizes error on point clouds, some other approaches minimize photometric error [20 \cite{Steinbrucker11Real}, 12 \cite{Kerl13Robust}]
+
+or combinations of both [23 \cite{Tykkala11Direct}]) -> these did not perform 3d reconstruction
+
+whelan integrated these methods with kinect fusion [24 \cite{Whelan13Robust}]
+
+Canelhas [6 \cite{Canelhas12Scene}] did masters thesis an approach for camera tracking, similar to this
+his focus concentrates on object detection and recognition in an sdf and no thorough evaluation was performed
+
+Kubacki [14 \cite{Kubacki12Registration}] showed how an sdf can be used to estimate camera pose, only on synthetic data without a comparative evaluation
+
+[19 \cite{Ren12Unified}] demonstrated sdf based object tracking, based on known models
+
+presented by Bylow: direct approach to camera tracking on sdfs
+
+
+stable enough for use with quadcopter
+
+METHOD:
+
+represent geometry using a signed distance function stored in a voxel grid
+iterative approach
+1st : estimate camera pose given previous sdf and then update the sdf based on the newly computed camera pose
+optimizes the camera pose directly on sdf 
+
+but kinect fusion generates synthetic depth images which are aligned to the current depth image using icp
+
+given sdf and depth image: how to compute camera motion?
+assume previous depth frame is in sdf
+
+try to find the rotation R and translation T such that all the points in the depth map are mapped onto zero crossing parts of the sdf
+
+the likelihood of observing depth image Id from camera pose R, T becomes: eq (7)
+
+more simplistic error function is in eq 9 (sum sq errors)
+
+due to noise and missing depth info, error may never be zero
+
+to minimize the error function, they use Lie algebra representation of rigid-body motion [17 \cite{Ma12Invitation}]
+
+here, motion is described as the 6 dimensional vectors named twist coords
+
+(w1,w2,w3,v1,v2,v2) -> v is trans, w is rotation
+
+minimal representation,
+
+notation 9 is rewritten to 11
+
+they use Gauss-Newton method for non-linear minimization
+
+sdf representation:
+sdf [7 \cite{Curless96Volumetric} ]
+
+one stores average distances, the other stores sum of all weights, keeping track of weight allows to handle occulision and sensor uncertainty
+uses tri-linear interpolation between eight neighbours to handle floating point to voxel conversion
+
+they project each voxel onto image plane [18 \cite{Newcombe11Kinectfusion}] rather than ray-cast from the center,
+
+then, each voxel is visited just once, which is not ensured in the ray-casting approach -> done on gpu
+
+must compute the distance for each voxel of sdf, even fast marching [3 \cite{Baerentzen01Implementation}] is too slow for realtime,
+
+studies 6 different weighting functions, weights may be smaller for voxels not in projection range
+
+uses marching cubes [16 \cite{Lorensen87Marching} ] to generate from sdf the visualization
+
+color estimation similar to [24 \cite{Whelan13Robust}]
+
+TUM TGB-D benchmark
+
+uses volume sizes 256 n 512
+
+fails in cases where only co-planar surfaces are visible,
+
+also independent of illumination,
+
+they could exploit color information during tracking [12 \cite{Kerl13Robust}]?
+
+interesting to apply with [11 \cite{Kaess11Isam2}, 15 \cite{Kummerle11G}] to reconstruct larger scales
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+[Background from KF]
 
 area promises new augmented reality and mixed reality applications
 
