@@ -55,6 +55,56 @@ but kinect fusion generates synthetic depth images which are aligned to the curr
 
 \subsection{Sturm}
 
+approach to SLAM for RGB-D cameras (eg. kinect)
+computes dense 3d environment + computes camera pose
+evaluated at different illuminations + camera speed conditions
+evaluates 3 different features SIFT, ORB and SURF
+system can deal with difficult data in common indoor scenarios and is fast enough for online operation
+1st : extract features from color image data, match with previous frames
+this gives point-wise 3d matches
+then - RANSAC may be used to compute the transform between 3d frames
+because frame-by-frame is not globally consistent
+optimize the pose graph in a fourth step using the g2o solver [11] optimizes non-linear error functions
+uses octomap [33] to generate a volumetric representation of the environment
+uses datasets [29]
+handles up to 50 deg per sec / ,43 meters per sec
+voxelizes using octomap, uses 3d occupancy grid for output
+
+SLAM used in robotics [30,22,10,6,15,9,23]
+modern systems use ICP [2, 26, 27]
+vslam [5, 16, 28, 14, 21] => get sparse keypoints,  
+these simplify data association
+sift[20, surf[1], orb[25]], sift gpu[32]
+
+
+
+in monocular setting, the scale of the map cannot be  determined
+
+stereo slam [17, 24] -> does not suffer from this
+only accurate for textured surfaces, non-textured surfaces cannot be estimated with depth
+
+Fioraio [7] presented a system which uses bunfle adjustment to align rgb-d data
+
+henry [12] is similar to this work
+
+uses sparse keypoint matches between color images as initialization to icp
+
+icp often not necessary and expensive
+icp only used if no keypoint matches found...
+
+henry used sparse bundle adjustment [19], here 3d pose graph using [18] framework is used
+
+henry put resulting into surfel representation, here volumetric voxel representation is used [33], can be used for robot localization, path planning and navigation [13]
+
+figure 2 has a picture
+
+front-end: keypoint det, match, sensor pose from ransac
+back-end: optimizes poses with non-linear error function
+
+
+
+
+
 
 
 
