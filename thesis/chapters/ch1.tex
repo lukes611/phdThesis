@@ -77,7 +77,6 @@ these simplify data association
 sift[20, surf[1], orb[25]], sift gpu[32]
 
 
-
 in monocular setting, the scale of the map cannot be  determined
 
 stereo slam [17, 24] -> does not suffer from this
@@ -100,6 +99,36 @@ figure 2 has a picture
 
 front-end: keypoint det, match, sensor pose from ransac
 back-end: optimizes poses with non-linear error function
+	computes optimal sensor positions using a graph-based routine -> then the occupancy voxel grid map is computed
+	
+front-end details: 
+uses opencv [3] for detection, description and matching of features SURF, SIFT and ORB [25], for SIFT: GPUSIFT[32]
+
+ORB is based on FAST [25] and BRIEF[4]
+
+ORB computes orientation from FAST corners and uses for descriptor extraction -> so it is more robust to viewpoint changes (faster than both sift and surf)
+
+sets the hessian threshold to keep number of keypoints constant, too few keypoints and there may be not enough matches, too many and there may be too many false positives
+
+then the transformation of camera pose can be computed from these correspondences [31]
+
+
+because of synchronization at the shutters of infrared and color camera and due to interpolation at depth jumps
+plus because features often lie at object borders, 3d features positions are prone to be at a wrong depth making robust estimation of transformations highly non-trivial
+
+RANSAC known to cope with noise data [8]
+points considered inliers if after transformation their distance is < 3cm
+
+then, the inliers are used to compute a finer representation, these steps are repeated where most inliers are kept
+
+
+
+
+
+
+
+
+
 
 
 
