@@ -121,9 +121,25 @@ points considered inliers if after transformation their distance is < 3cm
 
 then, the inliers are used to compute a finer representation, these steps are repeated where most inliers are kept
 
+this method is fast, but timewise is dependent on the number of features and outlier percentage
 
+computes relations with sub set of 20 last frames in parallel (including the 3 most recent frames) to compute the transformations in parallel using threads
 
+if a frame can be matched to a predecessor: it is added as a node to the pose graph in the backend
 
+if node cannot be matched is is added in with assumption of constant motion
+
+back-end:
+the initial poses are not globally correct
+to do this G^2o framework is used [18]
+g2o can be used to solve many problems including SLAM and bundle adjustment
+
+it minimizes a non-linear error function which can be represented as a graph, essentially minimizes an error function made up of the vector of pose estimations, 
+
+more details of the error function in [18]
+also prunes edges in pose graph in order to benefit the optimization procedure
+
+using the final trajectory, the original data can be used 
 
 
 
