@@ -38,24 +38,27 @@ After estimating camera pose relating to the globally fused model, each frame mu
 As mentioned, Kinect fusion uses pose prediction and fuses each depth map into the TSDF representation. In this way, they align and fuse each depth map to the global 3d reconstruction. In this way, a global loop closure method is not required. This may have a negative side effect by which some frames which have larger resolutions may be heavily quantized in order to fuse with the SDF, especially very thin surfaces/objects. These features may also be advantageous for ICP in estimating pose. 
 
 
-\subsection{Accurate SDF Method \cite{Bylow13Real}}
 
-novel method
-real-time camera tracking and 3d reconstruction
-of static rgb indoor environments
-geometry represented with a signed distance function
-using sdf -> camera pose is efficiently estimated by minimizing the error of depth images projected onto the sdf, because sdf contains distances from each voxel to actual surface, optimization may be extremely fast
+\subsection{3D Reconstruction by Optimizing directly in the SDF}
 
-they iteratively estimate the camera pose and integrate 3d rgbd data into a voxel grid
+In 2013, Bylow et al \cite{Bylow13Real} presented a novel method which reconstructs static indoor environments in real time using RGB-D data captured using the Asus Xtion Pro Live sensor. Their system is able to generate accurate 3D RGB coloured models of the environment in real-time by optimizing for 6 degrees of freedom in terms of accurate projection of new depth map frames into an existing global signed distance function model of the scene. Their method uses several Gauss Newton optimization with a signed distance function representation, these techniques are represented and processed using a laptop with an NVIDIA GPU. Unlike Kinect Fusion \cite{Newcombe11Kinectfusion}, this method optimizes directly in the signed distance representation, in which camera pose is computed by finding a rotation and translation (6-DoF) which minimizes the error of projecting depth images into the SDF. Compared with the ICP based method used by Kinect Fusion, this technique is shown to be more robust and accurate. It compares favourably to bundle adjustment but is much faster for small to mid sized scenes. Results are generated using the TUM RGB-D benchmark and SDF volume sizes $256^3$ and $512^3$ are used in evaluations. The authors note the algorithm may be able to handle large scale scenes if used in conjunction with other techniques \cite{Kaess11Isam2,Kummerle11G}. \\
 
-more accurate and robust compared with icp (Kinect Fusion)
-yields comparable accuracy at higher speed to feature-based bundle adjustment methods for up to medium sized scenes
+This technique is efficient because the error to minimize can be checked using several look-ups since the SDF itself contains the distances from each voxel to the global model's actual surface. Because of this, the algorithm is classified as working within global space rather than frame-by-frame. Using the SDF to lookup depth map projection error, the camera pose is iteratively estimated and then the depth map is integrated into the SDF and colour information is stored in another volume. The pose estimation procedure begins by storing the first frame as a volumetric signed distance function. Then for each new depth frame, camera pose is computed, and based on this pose the frame is projected into the scene. Using a lie algebra based 6-DoF model \cite{Ma12Invitation} envisioned as a vector in $R^6$ representing camera pose, the error for a given pose may be computed as the squared error of the depth map transformed by the pose and projected into the signed distance function. Due to noise or missing data within the depth frame, this error may never be reduced completely, instead the best pose is iteratively computed using this model and the Gauss Newton non-linear optimization algorithm. \\
 
-has good intro and use cases for this tech
+The SDF representation uses two volumes as in \cite{Curless96Volumetric}, one volume stores the average distances, the other stores the cumulative weights for each voxel. Bylow et al use these weights to handle occlusion and sensor uncertainty. When integrating a point into the SDF, tri-linear interpolation is used between eight neighbours to handle point coordinated made up of floating point numbers. During integration, each voxel is projected onto the image plane rather than ray case from the center of projection as in \cite{Newcombe11Kinectfusion}. This ensures that each voxel is visited once when updating the SDF, whereas in the ray casting approach, this may not necessarily be the case. \\
 
-Asus Xtion Pro Live sensor and laptop with GPU from NVIDIA
+In computing the SDF for a given depth map, the exhaustive marching cubes algorithm is too slow, even the fast marching algorithm \cite{Baerentzen01Implementation} is not suited for real time discrete SDF generation. Instead, the SDF is approximated with either the point to point distance or point to plane distance functions. For final visualization, marching cubes is used \cite{Lorensen87Marching} on the final SDF. Colour is computed from the colour volume using a technique found used by Whelan et al \cite{Whelan13Robust}. Since the method by Bylow et al is based on optimizing the projection error using the SDF and only uses locations in its pose estimation procedure, it is independent to illumination. Given this, it will also fail in cases where only co-planar surfaces are visible, they mention that using colour information during tracking \cite{Kerl13Robust} may mitigate these concerns.
 
-1000 image reconstruction
+
+but kinect fusion generates synthetic depth images which are aligned to the current depth image using icp
+
+
+\subsection{Sturm}
+
+
+
+
+[BG Bylow]
 
 bundle adjustment using features over many views with [13 \cite{Klein07Parallel} , 2 \cite{Agarwal09Building}] with sparse 3d models generated
 
@@ -113,67 +116,6 @@ presented by Bylow: direct approach to camera tracking on sdfs
 
 stable enough for use with quadcopter
 
-METHOD:
-
-represent geometry using a signed distance function stored in a voxel grid
-iterative approach
-1st : estimate camera pose given previous sdf and then update the sdf based on the newly computed camera pose
-optimizes the camera pose directly on sdf 
-
-but kinect fusion generates synthetic depth images which are aligned to the current depth image using icp
-
-given sdf and depth image: how to compute camera motion?
-assume previous depth frame is in sdf
-
-try to find the rotation R and translation T such that all the points in the depth map are mapped onto zero crossing parts of the sdf
-
-the likelihood of observing depth image Id from camera pose R, T becomes: eq (7)
-
-more simplistic error function is in eq 9 (sum sq errors)
-
-due to noise and missing depth info, error may never be zero
-
-to minimize the error function, they use Lie algebra representation of rigid-body motion [17 \cite{Ma12Invitation}]
-
-here, motion is described as the 6 dimensional vectors named twist coords
-
-(w1,w2,w3,v1,v2,v2) -> v is trans, w is rotation
-
-minimal representation,
-
-notation 9 is rewritten to 11
-
-they use Gauss-Newton method for non-linear minimization
-
-sdf representation:
-sdf [7 \cite{Curless96Volumetric} ]
-
-one stores average distances, the other stores sum of all weights, keeping track of weight allows to handle occulision and sensor uncertainty
-uses tri-linear interpolation between eight neighbours to handle floating point to voxel conversion
-
-they project each voxel onto image plane [18 \cite{Newcombe11Kinectfusion}] rather than ray-cast from the center,
-
-then, each voxel is visited just once, which is not ensured in the ray-casting approach -> done on gpu
-
-must compute the distance for each voxel of sdf, even fast marching [3 \cite{Baerentzen01Implementation}] is too slow for realtime,
-
-studies 6 different weighting functions, weights may be smaller for voxels not in projection range
-
-uses marching cubes [16 \cite{Lorensen87Marching} ] to generate from sdf the visualization
-
-color estimation similar to [24 \cite{Whelan13Robust}]
-
-TUM TGB-D benchmark
-
-uses volume sizes 256 n 512
-
-fails in cases where only co-planar surfaces are visible,
-
-also independent of illumination,
-
-they could exploit color information during tracking [12 \cite{Kerl13Robust}]?
-
-interesting to apply with [11 \cite{Kaess11Isam2}, 15 \cite{Kummerle11G}] to reconstruct larger scales
 
 
 
