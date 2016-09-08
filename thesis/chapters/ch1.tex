@@ -65,35 +65,35 @@ this gives point-wise 3d matches
 then - RANSAC may be used to compute the transform between 3d frames
 because frame-by-frame is not globally consistent
 optimize the pose graph in a fourth step using the g2o solver [11] optimizes non-linear error functions
-uses octomap [33] to generate a volumetric representation of the environment
-uses datasets [29]
+uses octomap [33 \cite{Wurm10Octomap}] to generate a volumetric representation of the environment
+uses datasets [29 \cite{Sturm11Towards}]
 handles up to 50 deg per sec / ,43 meters per sec
 voxelizes using octomap, uses 3d occupancy grid for output
 
-SLAM used in robotics [30,22,10,6,15,9,23]
-modern systems use ICP [2, 26, 27]
-vslam [5, 16, 28, 14, 21] => get sparse keypoints,  
+SLAM used in robotics [30 \cite{Thrun02Robotic},22 \cite{Nuchter056d},10 \cite{Grisetti07Efficient}, 6 \cite{Dellaert06Square},15 \cite{Kaess08Isam},9 \cite{Frese05Multilevel},23 \cite{Olson06Fast}]
+modern systems use ICP [2 \cite{Besl92Method}, 26 \cite{Rusinkiewicz01Efficient}, 27 \cite{Segal09Generalized}]
+vslam [5 \cite{Davison03Real} , 16 \cite{Klein07Parallel}, 28 \cite{Strasdat10Real}, 14 \cite{Jin00Real}, 21 \cite{Nister05Preemptive}] => get sparse keypoints,  
 these simplify data association
-sift[20, surf[1], orb[25]], sift gpu[32]
+sift[20 \cite{Lowe04Distinctive}, surf[1 \cite{Bay06Surf,Bay08Speeded}], orb[25 \cite{Rublee11Orb}]], sift gpu[32 \cite{Wu07Siftgpu}]
 
 
 in monocular setting, the scale of the map cannot be  determined
 
-stereo slam [17, 24] -> does not suffer from this
+stereo slam [17 \cite{Konolige08Outdoor}, 24 \cite{Paz08Large}] -> does not suffer from this
 only accurate for textured surfaces, non-textured surfaces cannot be estimated with depth
 
-Fioraio [7] presented a system which uses bunfle adjustment to align rgb-d data
+Fioraio [7 \cite{Fioraio11Realtime}] presented a system which uses bunfle adjustment to align rgb-d data
 
-henry [12] is similar to this work
+henry [12 \cite{Henry10Rgb,Henry14Rgb}] is similar to this work
 
 uses sparse keypoint matches between color images as initialization to icp
 
 icp often not necessary and expensive
 icp only used if no keypoint matches found...
 
-henry used sparse bundle adjustment [19], here 3d pose graph using [18] framework is used
+henry used sparse bundle adjustment [19 \cite{Lourakis09Sba} ], here 3d pose graph using [18 \cite{Kummerle11G}] framework is used
 
-henry put resulting into surfel representation, here volumetric voxel representation is used [33], can be used for robot localization, path planning and navigation [13]
+henry put resulting into surfel representation, here volumetric voxel representation is used [33], can be used for robot localization, path planning and navigation [13 \cite{Hornung10Humanoid}]
 
 figure 2 has a picture
 
@@ -102,21 +102,21 @@ back-end: optimizes poses with non-linear error function
 	computes optimal sensor positions using a graph-based routine -> then the occupancy voxel grid map is computed
 	
 front-end details: 
-uses opencv [3] for detection, description and matching of features SURF, SIFT and ORB [25], for SIFT: GPUSIFT[32]
+uses opencv [3 \cite{Bradski08Learning}] for detection, description and matching of features SURF, SIFT and ORB [25 \cite{Rublee11Orb} ], for SIFT: GPUSIFT[32 \cite{Wu07Siftgpu}]
 
-ORB is based on FAST [25] and BRIEF[4]
+ORB is based on FAST [25 \cite{Rosten06Machine}] and BRIEF[4 \cite{Calonder10Brief}]
 
 ORB computes orientation from FAST corners and uses for descriptor extraction -> so it is more robust to viewpoint changes (faster than both sift and surf)
 
 sets the hessian threshold to keep number of keypoints constant, too few keypoints and there may be not enough matches, too many and there may be too many false positives
 
-then the transformation of camera pose can be computed from these correspondences [31]
+then the transformation of camera pose can be computed from these correspondences [31 \cite{Umeyama91Least}]
 
 
 because of synchronization at the shutters of infrared and color camera and due to interpolation at depth jumps
 plus because features often lie at object borders, 3d features positions are prone to be at a wrong depth making robust estimation of transformations highly non-trivial
 
-RANSAC known to cope with noise data [8]
+RANSAC known to cope with noise data [8 \cite{Fischler81Random}]
 points considered inliers if after transformation their distance is < 3cm
 
 then, the inliers are used to compute a finer representation, these steps are repeated where most inliers are kept
@@ -131,15 +131,24 @@ if node cannot be matched is is added in with assumption of constant motion
 
 back-end:
 the initial poses are not globally correct
-to do this G^2o framework is used [18]
+to do this G2o framework is used [18 \cite{Kummerle11G}]
 g2o can be used to solve many problems including SLAM and bundle adjustment
 
 it minimizes a non-linear error function which can be represented as a graph, essentially minimizes an error function made up of the vector of pose estimations, 
 
-more details of the error function in [18]
+more details of the error function in [18 \cite{Kummerle11G}]
 also prunes edges in pose graph in order to benefit the optimization procedure
 
 using the final trajectory, the original data can be used 
+uses a 3d occupancy grid to represent the final model
+
+uses the octomap [33 \cite{Wurm10Octomap}] framework
+
+uses rgb-d benchmark [29 \cite{Sturm11Towards}]
+
+sift and surf are better and outperform ORB
+
+
 
 
 
