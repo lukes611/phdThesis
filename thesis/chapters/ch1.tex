@@ -10,6 +10,40 @@
 \section{3D Reconstruction and Simultaneous Localization and Mapping}
 \subsection{Introduction}
 hi there
+
+structure:
+	Signal Registration:
+		feature matching
+		Phase Correlation
+		Fourier based Registration
+	3D Representation Techniques:
+		mesh representation
+		octree representation
+		volumes
+		signed distance functions
+	Depth generation technique:
+		Sensors
+		stereo cameras
+		fundamental matrix techniques
+		sfm and optical flow
+		Wide-baseline stereo
+	Pose estimation techniques:
+		2D techniques:
+			fundamental and essential matrices
+			Stereo based techniques
+		3D techniques:
+			feature matching + RANSAC
+			ICP
+			Optimizers
+			3D features
+	Global Optimization techniques:
+		g2o
+		bundle adjustment
+		
+		
+	
+
+
 \subsection{Monocular Camera Feature Based Systems}
 Monocular Feature based SLAM systems use feature matches to estimate camera pose and location changes across frames \cite{Davison02Simultaneous}. Variations of this method use different features including: corners and lines \cite{Jeong06Visual}, image patches \cite{Silveira08Efficient} and exemplar feature matching \cite{Chekhlov07Robust}. SIFT features are used most often in SLAM \cite{Jensfelt06Framework,Pollefeys08Detailed,Beall11Bundle,Eudes10Fast}, in addition FAST features have been explored \cite{Kundu10Realtime,Leelasawassuk133d,Konolige10View,Konolige08Frameslam}. Beall et al \cite{Beall11Bundle} made use of both SIFT and SURF features in their underwater SLAM system. Real-time monocular SLAM systems based on this approach have also been proposed \cite{Chekhlov07Robust,Pollefeys08Detailed}. RANSAC is often used in monocular SLAM \cite{Eudes10Fast,Kundu10Realtime,Konolige10View,Konolige08Frameslam,Pradeep13Monofusion} to remove outliers which cause incorrect camera parameter estimates. Bundle adjustment is also used as an additional step to refine camera parameter estimation \cite{Eudes10Fast}. 
 \subsection{Stereo Camera Feature Based Systems}
