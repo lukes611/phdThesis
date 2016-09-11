@@ -471,8 +471,6 @@ namespace ll_siobj
 
 		fi = fopen(fname.c_str(), "r"); //removed windows specific fopen_s
 		//fopen_s(&fi, fname.c_str(), "r");
-
-
 		int numVerts = 0, numTriangles = 0; //setup initial numbers as 0
 
 		if (fi == NULL) //if could not open file, let the programmer know!
@@ -625,7 +623,11 @@ namespace ll_siobj
 
 		fi = fopen(fname.c_str(), "w");
 		//fopen_s(&fi, fname.c_str(), "w"); //removed windows specific fopen_s
+<<<<<<< ec1ddb668f64931fdefec49fb0594b95f1124661
 
+=======
+
+>>>>>>> bug fixes and runs on linux now
 		int num_points = _points.size();
 		int num_triangles = _triangles.size();
 		fprintf(fi, "%i\n%i\n", num_points, num_triangles);
