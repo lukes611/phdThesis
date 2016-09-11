@@ -3,7 +3,7 @@
 //depends on ll_R3 library
 
 #include "R3.h"
-#include <math.h>
+#include <cmath>
 #include <vector>
 #include <functional>
 
