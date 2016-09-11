@@ -1,5 +1,6 @@
 #pragma once
 
+//linux&win32
 //depends on ll_R3 library
 
 #include "R3.h"

@@ -1,5 +1,7 @@
 #pragma once
 
+//linux&win32
+
 #include <iostream>
 #include <sstream>
 #include <string>
