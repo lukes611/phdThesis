@@ -1,6 +1,7 @@
 #pragma once
 #include <chrono>
 
+//linux&win32
 //depends on modern c++
 
 class LTimer {
