@@ -1,7 +1,11 @@
 #include "SIObj.h"
-#include <stdio.h>
-#include <stdlib.h>
 #include <fstream>
+#include <sstream>
+#include <cstring>
+#include <string>
+#include <cstdio>
+#include <cstdlib>
+
 using namespace std;
 
 namespace ll_siobj
@@ -463,7 +467,11 @@ namespace ll_siobj
 	SIObj::SIObj(string fname)
 	{
 		FILE * fi;
+		
+		
 		fopen_s(&fi, fname.c_str(), "r");
+		
+		
 		int numVerts = 0, numTriangles = 0; //setup initial numbers as 0
 
 		if (fi == NULL) //if could not open file, let the programmer know!
@@ -1007,10 +1015,10 @@ namespace ll_siobj
 
 		v.normalize();
 		int min_index = 0;
-		float min = abs(acos(v * tl[0]));
+		float min = (float)std::abs((double)acos(v * tl[0]));
 		for(int i = 1; i < 6; i++)
 		{
-			float tmp = abs(acos(v * tl[i]));
+			float tmp = (float)std::abs((double)acos(v * tl[i]));
 			if(tmp < min)
 			{
 				min = tmp;
