@@ -239,6 +239,7 @@ namespace ll_siobj
 				return false;
 			}
 		}
+		return false;
 	}
 	SI_Quad SI_Cube::getQuad(int index)
 	{
@@ -542,7 +543,7 @@ namespace ll_siobj
 			string tmp = "";
 			vector<string> rv;
 			bool last_added = false;
-			for(int i = 0; i < s.size(); i++)
+			for(unsigned int i = 0; i < s.size(); i++)
 			{
 				if(s[i] == d)
 				{
@@ -562,7 +563,7 @@ namespace ll_siobj
 		function<int(string, char)> contains = [](string s, char c) -> int
 		{
 			int count = 0;
-			for(int i = 0; i < s.size(); i++) if(s[i] == c) count++;
+			for(unsigned int i = 0; i < s.size(); i++) if(s[i] == c) count++;
 			return count;
 		};
 		
@@ -589,7 +590,7 @@ namespace ll_siobj
 				if(contains(line, '/') == (sp.size()-1)*2)
 				{
 					vector<string> pi, pi1, p1 = split(sp[1], '/');
-					for(int i = 2; i < sp.size()-1; i++)
+					for(unsigned int i = 2; i < sp.size()-1; i++)
 					{
 						pi = split(sp[i],'/');
 						pi1 = split(sp[i+1],'/');
@@ -602,7 +603,7 @@ namespace ll_siobj
 				}else if(contains(line, '/') >= 3)
 				{
 					vector<string> pi, pi1, p1 = split(sp[1], '/');
-					for(int i = 2; i < sp.size()-1; i++)
+					for(unsigned int i = 2; i < sp.size()-1; i++)
 					{
 						pi = split(sp[i],'/');
 						pi1 = split(sp[i+1],'/');
@@ -611,7 +612,7 @@ namespace ll_siobj
 					}
 				}else
 				{
-					for(int i = 2; i < sp.size()-1; i++)
+					for(unsigned int i = 2; i < sp.size()-1; i++)
 						_triangles.push_back(SI_Triangle(stoi(sp[1])-1, stoi(sp[i])-1, stoi(sp[i+1])-1));
 				}
 			}
@@ -1038,7 +1039,7 @@ namespace ll_siobj
 
 	void SIObj::addTriangles(const vector<SI_FullTriangle> & triList)
 	{
-		for(int i = 0; i < triList.size(); i++)
+		for(unsigned int i = 0; i < triList.size(); i++)
 		{
 			_points.push_back(triList[i].a);
 			int ind_1 = ((int)_points.size())-1;
@@ -1053,7 +1054,7 @@ namespace ll_siobj
 	vector<SI_FullTriangle> SIObj::getTriangles()
 	{
 		vector<SI_FullTriangle> rv;
-		for(int i = 0; i < _triangles.size(); i++)
+		for(unsigned int i = 0; i < _triangles.size(); i++)
 			rv.push_back(getTriangle(i));
 		return rv;
 	}
@@ -1077,7 +1078,7 @@ namespace ll_siobj
 
 		fwrite(headBuffer, 1, strlen(headBuffer), fi);
 
-		for(int i = 0; i < _points.size(); i++)
+		for(unsigned int i = 0; i < _points.size(); i++)
 		{
 			fwrite((void*)&_points[i].x, sizeof(float), 1, fi);
 			fwrite((void*)&_points[i].y, sizeof(float), 1, fi);
@@ -1085,7 +1086,7 @@ namespace ll_siobj
 			fwrite((void*)&vertFiller, sizeof(float), 1, fi);
 		}
 		unsigned char numPointsInTri = 0x03;
-		for(int i = 0; i < _triangles.size(); i++)
+		for(unsigned int i = 0; i < _triangles.size(); i++)
 		{
 			fwrite((void*)&numPointsInTri, 1, 1, fi);
 			fwrite((void*)&_triangles[i].a, sizeof(int), 1, fi);
@@ -1128,7 +1129,7 @@ namespace ll_siobj
 			_normals = vector<R3>(_triangles.size());
 			_normal_ind = vector<SI_Triangle>(_triangles.size());
 		}
-		for(int i = 0; i < _triangles.size(); i++)
+		for(unsigned int i = 0; i < _triangles.size(); i++)
 		{
 			SI_FullTriangle t = getTriangle(i);
 			_normals[i] = t.normal();
@@ -1305,7 +1306,7 @@ namespace ll_siobj
 
 	void SIObj::add_points(std::vector<ll_R3::R3> & pts)
 	{
-		for(int i = 0; i < pts.size(); i++)
+		for(unsigned int i = 0; i < pts.size(); i++)
 			_points.push_back(pts[i]);
 	}
 
@@ -1326,9 +1327,9 @@ namespace ll_siobj
 	{
 		if(_points.size() != o2._points.size()) return false;
 		if(_triangles.size() != o2._triangles.size()) return false;
-		for(int i = 0; i < _points.size(); i++)
+		for(unsigned int i = 0; i < _points.size(); i++)
 			if(_points[i] != o2._points[i]) return false;
-		for(int i = 0; i < _triangles.size(); i++)
+		for(unsigned int i = 0; i < _triangles.size(); i++)
 			if(_triangles[i].a != o2._triangles[i].a || _triangles[i].b != o2._triangles[i].b || _triangles[i].c != o2._triangles[i].c) return false;
 		return true;
 	}
