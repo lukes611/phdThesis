@@ -3,7 +3,7 @@
 #include <iostream>
 #include <sstream>
 #include <string>
-#include <math.h>
+#include <cmath>
 
 //forward declaration
 namespace ll_R3 { class R3; }
