@@ -9,9 +9,25 @@
 
 \section{3D Reconstruction and Simultaneous Localization and Mapping}
 
+SLAM used in robotics [30 \cite{Thrun02Robotic},22 \cite{Nuchter056d},10 \cite{Grisetti07Efficient}, 6 \cite{Dellaert06Square},15 \cite{Kaess08Isam},9 \cite{Frese05Multilevel},23 \cite{Olson06Fast}]
+
+
+vslam [5 \cite{Davison03Real} , 16 \cite{Klein07Parallel}, 28 \cite{Strasdat10Real}, 14 \cite{Jin00Real}, 21 \cite{Nister05Preemptive}] => get sparse keypoints,  
+these simplify data association
+
+
 \section{Signal Registration}
 
 \subsection{feature matching}
+
+ORB is based on FAST [25 \cite{Rosten06Machine}] and BRIEF[4 \cite{Calonder10Brief}]
+
+ORB computes orientation from FAST corners and uses for descriptor extraction -> so it is more robust to viewpoint changes (faster than both sift and surf)
+
+sift[20 \cite{Lowe04Distinctive}, surf[1 \cite{Bay06Surf,Bay08Speeded}], orb[25 \cite{Rublee11Orb}]], sift gpu[32 \cite{Wu07Siftgpu}]
+
+
+
 \subsection{phase correlation}
 \subsection{Fourier based Registration}
 
@@ -31,18 +47,44 @@
 \subsection{Wide-baseline Stereo}
 
 \section{Pose Estimation Techniques}
+
+
 \subsection{Fundamental Matrix}
 
 Monocular Feature based SLAM systems use feature matches to estimate camera pose and location changes across frames \cite{Davison02Simultaneous}. Variations of this method use different features including: corners and lines \cite{Jeong06Visual}, image patches \cite{Silveira08Efficient} and exemplar feature matching \cite{Chekhlov07Robust}. SIFT features are used most often in SLAM \cite{Jensfelt06Framework,Pollefeys08Detailed,Beall11Bundle,Eudes10Fast}, in addition FAST features have been explored \cite{Kundu10Realtime,Leelasawassuk133d,Konolige10View,Konolige08Frameslam}. Beall et al \cite{Beall11Bundle} made use of both SIFT and SURF features in their underwater SLAM system. Real-time monocular SLAM systems based on this approach have also been proposed \cite{Chekhlov07Robust,Pollefeys08Detailed}. RANSAC is often used in monocular SLAM \cite{Eudes10Fast,Kundu10Realtime,Konolige10View,Konolige08Frameslam,Pradeep13Monofusion} to remove outliers which cause incorrect camera parameter estimates. Bundle adjustment is also used as an additional step to refine camera parameter estimation \cite{Eudes10Fast}. 
 
 
+in monocular setting, the scale of the map cannot be  determined \cite{Endres12Evaluation}
+
 \subsection{Stereo based}
 
 Stereo based SLAM systems also use features to estimate camera parameters. However, stereo based systems are capable of generating dense depth data more easily using stereo algorithms. Miro et al \cite{Miro06Towards} proposed a stereo based method which uses SIFT and the extended Kalman filter. The method by Van Gool et al \cite{Pollefeys04Visual} works with un-calibrated stereo pairs. It uses Harris corner features and a multi-view stereo algorithm. Sim et al \cite{Sim05Vision} and Gil et al \cite{Gil06Improving} both presented stereo based SLAM systems which use SIFT.
 
+\cite{Endres12Evaluation}(
+in monocular setting, the scale of the map cannot be  determined 
+stereo slam [17 \cite{Konolige08Outdoor}, 24 \cite{Paz08Large}] -> does not suffer from this
+only accurate for textured surfaces, non-textured surfaces cannot be estimated with depth );
+
 
 \subsection{Feature Matching and RANSAC}
+
+icp often not necessary and expensive
+icp only used if no keypoint matches found... \cite{Endres12Evaluation}
+
+
+
+
 \subsection{ICP}
+
+\subsubsection{Henry10Rgb}
+
+henry [12 \cite{Henry10Rgb,Henry14Rgb}] is similar to this work \cite{Endres12Evaluation}
+uses sparse keypoint matches between color images as initialization to icp
+henry used sparse bundle adjustment [19 \cite{Lourakis09Sba} ], here 3d pose graph using [18 \cite{Kummerle11G}] framework is used
+henry put resulting into surfel representation, here volumetric voxel representation is used [33], can be used for robot localization, path planning and navigation [13 \cite{Hornung10Humanoid}]
+
+
+ICP [2 \cite{Besl92Method}, 26 \cite{Rusinkiewicz01Efficient}, 27 \cite{Segal09Generalized}]
 
 \subsubsection{Kinect Fusion}
 
@@ -54,7 +96,7 @@ The method works by computing camera pose, transforming depth data by a computed
 \centering
 \includegraphics[width=12cm]{images/ch1/Newcombe11KinectFusion1}
 \caption{Kinect Fusion Algorithm Pipeline \cite{Newcombe11Kinectfusion}}
-\label{KFusionPipeline}
+\label{KFusionPipeliciteHne}
 \end{figure}
 
 Kinect Fusion has four main steps as illustrated in figure \ref{KFusionPipeline}. The first step named measurement, performs pre-processing on the depth data as well as generation of additional information for use by Kinect Fusion. Each depth map frame is first passed through a bilateral filter. From this, a dense vertex map (map of 3D points projected using a known projection matrix associated with the Kinect) is generated, as well as a normal map. For both the vertex and normal maps, a 3 level image pyramid is constructed. This makes the coarse to fine grain ICP technique possible. \\
@@ -64,6 +106,9 @@ Next, dense coarse to fine grain ICP is used to compute pose between the fused f
 After estimating camera pose relating to the globally fused model, each frame must be integrated into that model. The Kinect Fusion algorithm uses a truncated signed distance function (TSDF) representation. This is a signed distance function volume where the distances for each voxel are capped by some value. The TSDF uses a volume resolution of $512\times 512\times 512$. They use the TSDF, rather than relying on a linear but accurate discrete SDF transform \cite{Rasch09Remarks} because of the computational complexity of calculating the discrete SDF of large scale volumes. \\
 
 As mentioned, Kinect fusion uses pose prediction and fuses each depth map into the TSDF representation. In this way, they align and fuse each depth map to the global 3d reconstruction. In this way, a global loop closure method is not required. This may have a negative side effect by which some frames which have larger resolutions may be heavily quantized in order to fuse with the SDF, especially very thin surfaces/objects. These features may also be advantageous for ICP in estimating pose. 
+
+
+but kinect fusion generates synthetic depth images which are aligned to the current depth image using icp
 
 
 
@@ -84,8 +129,14 @@ In computing the SDF for a given depth map, the exhaustive marching cubes algori
 
 \section{Global Optimization}
 \subsection{$G^2$o}
+
+\cite{Wurm10Octomap}
+
 \subsection{Bundle Adjustment}
 
+Fioraio [7 \cite{Fioraio11Realtime}] presented a system which uses bundle adjustment to align rgb-d data
+
+[END BUNDLE ADJUSTMENT]
 
 
 
@@ -93,63 +144,43 @@ In computing the SDF for a given depth map, the exhaustive marching cubes algori
 
 
 
-but kinect fusion generates synthetic depth images which are aligned to the current depth image using icp
 
 
-\subsection{Sturm}
+\subsubsection{RGB-D SLAM}
 
-approach to SLAM for RGB-D cameras (eg. kinect)
-computes dense 3d environment + computes camera pose
-evaluated at different illuminations + camera speed conditions
-evaluates 3 different features SIFT, ORB and SURF
-system can deal with difficult data in common indoor scenarios and is fast enough for online operation
-1st : extract features from color image data, match with previous frames
-this gives point-wise 3d matches
-then - RANSAC may be used to compute the transform between 3d frames
-because frame-by-frame is not globally consistent
-optimize the pose graph in a fourth step using the g2o solver [11] optimizes non-linear error functions
-uses octomap [33 \cite{Wurm10Octomap}] to generate a volumetric representation of the environment
-uses datasets [29 \cite{Sturm11Towards}]
-handles up to 50 deg per sec / ,43 meters per sec
-voxelizes using octomap, uses 3d occupancy grid for output
-
-SLAM used in robotics [30 \cite{Thrun02Robotic},22 \cite{Nuchter056d},10 \cite{Grisetti07Efficient}, 6 \cite{Dellaert06Square},15 \cite{Kaess08Isam},9 \cite{Frese05Multilevel},23 \cite{Olson06Fast}]
-modern systems use ICP [2 \cite{Besl92Method}, 26 \cite{Rusinkiewicz01Efficient}, 27 \cite{Segal09Generalized}]
-vslam [5 \cite{Davison03Real} , 16 \cite{Klein07Parallel}, 28 \cite{Strasdat10Real}, 14 \cite{Jin00Real}, 21 \cite{Nister05Preemptive}] => get sparse keypoints,  
-these simplify data association
-sift[20 \cite{Lowe04Distinctive}, surf[1 \cite{Bay06Surf,Bay08Speeded}], orb[25 \cite{Rublee11Orb}]], sift gpu[32 \cite{Wu07Siftgpu}]
+Endres et al \cite{Endres12Evaluation} presented a dense 3D reconstruction technique using RGB-D data from the Kinect sensor based on feature matching and RANSAC. They also evaluated their technique under different illumination and camera movement speed conditions. It is able to operate at near real time speeds in small in-door environments. This method begins by feature matching RGB images across frames. Using the projected 3D points available for each pixel in the depth map, RANSAC \cite{Fischler81Random} is used to compute the camera pose across frames. These poses are optimized globally using the $g^2$o graph optimizer, the Octomap representation \cite{Wurm10Octomap} is used to store the reconstructed environment. Since this system is based on feature matching, Endres et al evaluate 3 different feature matching techniques: SIFT \cite{Lowe04Distinctive} , SURF \cite{Bay06Surf,Bay08Speeded} and ORB \cite{Rublee11Orb}. ORB feature matching is tested because it is faster than SIFT and SURF with slightly less accuracy, the authors also evaluate a GPU implementation of SIFT \cite{Wu07Siftgpu}. Endres et al evaluate their algorithm using their own benchmark \cite{Sturm11Towards}. Results show it can handle up to 50 degrees of rotation per second, and speeds of up to 43 centimetres per second.  \\
 
 
-in monocular setting, the scale of the map cannot be  determined
+This system is divided into a front-end and a back-end. The front-end performs feature detection, matching and sensor pose estimation via the RANSAC method whereas the back-end performs non-linear pose optimization using the $g^2o$ optimization procedure   and integrates these results into an occupancy grid based on the Octomap. A diagram of the combined front-end and back-end systems is given in figure \ref{Endres12EvaluationPipeline}.
 
-stereo slam [17 \cite{Konolige08Outdoor}, 24 \cite{Paz08Large}] -> does not suffer from this
-only accurate for textured surfaces, non-textured surfaces cannot be estimated with depth
 
-Fioraio [7 \cite{Fioraio11Realtime}] presented a system which uses bunfle adjustment to align rgb-d data
+\begin{figure}[!h]
+\centering
+\includegraphics[width=12cm]{images/ch1/Endres12EvaluationPipeline}
+\caption{RGB-D SLAM Pipeline used by Endres et al \cite{Endres12Evaluation}}
+\label{Endres12EvaluationPipeline}
+\end{figure}
 
-henry [12 \cite{Henry10Rgb,Henry14Rgb}] is similar to this work
 
-uses sparse keypoint matches between color images as initialization to icp
+\subsection{Endres}
 
-icp often not necessary and expensive
-icp only used if no keypoint matches found...
 
-henry used sparse bundle adjustment [19 \cite{Lourakis09Sba} ], here 3d pose graph using [18 \cite{Kummerle11G}] framework is used
 
-henry put resulting into surfel representation, here volumetric voxel representation is used [33], can be used for robot localization, path planning and navigation [13 \cite{Hornung10Humanoid}]
+
+
+
+
+
+
+
+
 
 figure 2 has a picture
 
-front-end: keypoint det, match, sensor pose from ransac
-back-end: optimizes poses with non-linear error function
-	computes optimal sensor positions using a graph-based routine -> then the occupancy voxel grid map is computed
 	
 front-end details: 
 uses opencv [3 \cite{Bradski08Learning}] for detection, description and matching of features SURF, SIFT and ORB [25 \cite{Rublee11Orb} ], for SIFT: GPUSIFT[32 \cite{Wu07Siftgpu}]
 
-ORB is based on FAST [25 \cite{Rosten06Machine}] and BRIEF[4 \cite{Calonder10Brief}]
-
-ORB computes orientation from FAST corners and uses for descriptor extraction -> so it is more robust to viewpoint changes (faster than both sift and surf)
 
 sets the hessian threshold to keep number of keypoints constant, too few keypoints and there may be not enough matches, too many and there may be too many false positives
 
