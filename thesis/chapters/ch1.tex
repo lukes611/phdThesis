@@ -8,49 +8,43 @@
 \section{Introduction}
 
 \section{3D Reconstruction and Simultaneous Localization and Mapping}
-\subsection{Introduction}
-hi there
 
-structure:
-	Signal Registration:
-		feature matching
-		Phase Correlation
-		Fourier based Registration
-	3D Representation Techniques:
-		mesh representation
-		octree representation
-		volumes
-		signed distance functions
-	Depth generation technique:
-		Sensors
-		stereo cameras
-		fundamental matrix techniques
-		sfm and optical flow
-		Wide-baseline stereo
-	Pose estimation techniques:
-		2D techniques:
-			fundamental and essential matrices
-			Stereo based techniques
-		3D techniques:
-			feature matching + RANSAC
-			ICP
-			Optimizers
-			3D features
-	Global Optimization techniques:
-		g2o
-		bundle adjustment
-		
-		
-	
+\section{Signal Registration}
+
+\subsection{feature matching}
+\subsection{phase correlation}
+\subsection{Fourier based Registration}
+
+\section{3D Reconstruction Data Representations}
+
+\subsection{Mesh}
+\subsection{Octree}
+\subsection{Volume}
+\subsection{Signed Distance Functions}
 
 
-\subsection{Monocular Camera Feature Based Systems}
+\section{Depth Data Generation}
+\subsection{Sensors}
+\subsection{Stereo Cameras}
+\subsection{Fundamental Matrix Techniques}
+\subsection{Structure from Motion}
+\subsection{Wide-baseline Stereo}
+
+\section{Pose Estimation Techniques}
+\subsection{Fundamental Matrix}
+
 Monocular Feature based SLAM systems use feature matches to estimate camera pose and location changes across frames \cite{Davison02Simultaneous}. Variations of this method use different features including: corners and lines \cite{Jeong06Visual}, image patches \cite{Silveira08Efficient} and exemplar feature matching \cite{Chekhlov07Robust}. SIFT features are used most often in SLAM \cite{Jensfelt06Framework,Pollefeys08Detailed,Beall11Bundle,Eudes10Fast}, in addition FAST features have been explored \cite{Kundu10Realtime,Leelasawassuk133d,Konolige10View,Konolige08Frameslam}. Beall et al \cite{Beall11Bundle} made use of both SIFT and SURF features in their underwater SLAM system. Real-time monocular SLAM systems based on this approach have also been proposed \cite{Chekhlov07Robust,Pollefeys08Detailed}. RANSAC is often used in monocular SLAM \cite{Eudes10Fast,Kundu10Realtime,Konolige10View,Konolige08Frameslam,Pradeep13Monofusion} to remove outliers which cause incorrect camera parameter estimates. Bundle adjustment is also used as an additional step to refine camera parameter estimation \cite{Eudes10Fast}. 
-\subsection{Stereo Camera Feature Based Systems}
+
+
+\subsection{Stereo based}
+
 Stereo based SLAM systems also use features to estimate camera parameters. However, stereo based systems are capable of generating dense depth data more easily using stereo algorithms. Miro et al \cite{Miro06Towards} proposed a stereo based method which uses SIFT and the extended Kalman filter. The method by Van Gool et al \cite{Pollefeys04Visual} works with un-calibrated stereo pairs. It uses Harris corner features and a multi-view stereo algorithm. Sim et al \cite{Sim05Vision} and Gil et al \cite{Gil06Improving} both presented stereo based SLAM systems which use SIFT.
 
 
-\subsection{Kinect Fusion}
+\subsection{Feature Matching and RANSAC}
+\subsection{ICP}
+
+\subsubsection{Kinect Fusion}
 
 Newcombe et al \cite{Newcombe11Kinectfusion} proposed an accurate, real-time dense 3d reconstruction algorithm which works well on complex indoor environments. This algorithm computes relationships between depth map frames generated using the Microsoft Kinect \cite{Zhang12Microsoft} sensor. By aligning depth maps this method is capable of tracking both camera pose and location as well as generating dense 3d reconstructions. Only depth data is used in alignment computations thus, consequently because the Kinect is a structured light based depth sensor Kinect Fusion works under any lighting condition, including complete darkness. Since they use the Kinect and GPU (both considered commodity hardware these days) the technique may be considered inexpensive. \\
 
@@ -73,7 +67,9 @@ As mentioned, Kinect fusion uses pose prediction and fuses each depth map into t
 
 
 
-\subsection{3D Reconstruction by Optimizing directly in the SDF}
+\subsection{Optimizers}
+
+\subsubsection{3D Reconstruction by Optimizing directly in the SDF}
 
 In 2013, Bylow et al \cite{Bylow13Real} presented a novel method which reconstructs static indoor environments in real time using RGB-D data captured using the Asus Xtion Pro Live sensor. Their system is able to generate accurate 3D RGB coloured models of the environment in real-time by optimizing for 6 degrees of freedom in terms of accurate projection of new depth map frames into an existing global signed distance function model of the scene. Their method uses several Gauss Newton optimization with a signed distance function representation, these techniques are represented and processed using a laptop with an NVIDIA GPU. Unlike Kinect Fusion \cite{Newcombe11Kinectfusion}, this method optimizes directly in the signed distance representation, in which camera pose is computed by finding a rotation and translation (6-DoF) which minimizes the error of projecting depth images into the SDF. Compared with the ICP based method used by Kinect Fusion, this technique is shown to be more robust and accurate. It compares favourably to bundle adjustment but is much faster for small to mid sized scenes. Results are generated using the TUM RGB-D benchmark and SDF volume sizes $256^3$ and $512^3$ are used in evaluations. The authors note the algorithm may be able to handle large scale scenes if used in conjunction with other techniques \cite{Kaess11Isam2,Kummerle11G}. \\
 
@@ -82,6 +78,19 @@ This technique is efficient because the error to minimize can be checked using s
 The SDF representation uses two volumes as in \cite{Curless96Volumetric}, one volume stores the average distances, the other stores the cumulative weights for each voxel. Bylow et al use these weights to handle occlusion and sensor uncertainty. When integrating a point into the SDF, tri-linear interpolation is used between eight neighbours to handle point coordinated made up of floating point numbers. During integration, each voxel is projected onto the image plane rather than ray case from the center of projection as in \cite{Newcombe11Kinectfusion}. This ensures that each voxel is visited once when updating the SDF, whereas in the ray casting approach, this may not necessarily be the case. \\
 
 In computing the SDF for a given depth map, the exhaustive marching cubes algorithm is too slow, even the fast marching algorithm \cite{Baerentzen01Implementation} is not suited for real time discrete SDF generation. Instead, the SDF is approximated with either the point to point distance or point to plane distance functions. For final visualization, marching cubes is used \cite{Lorensen87Marching} on the final SDF. Colour is computed from the colour volume using a technique found used by Whelan et al \cite{Whelan13Robust}. Since the method by Bylow et al is based on optimizing the projection error using the SDF and only uses locations in its pose estimation procedure, it is independent to illumination. Given this, it will also fail in cases where only co-planar surfaces are visible, they mention that using colour information during tracking \cite{Kerl13Robust} may mitigate these concerns.
+
+
+\subsection{3D Features}
+
+\section{Global Optimization}
+\subsection{$G^2$o}
+\subsection{Bundle Adjustment}
+
+
+
+
+
+
 
 
 but kinect fusion generates synthetic depth images which are aligned to the current depth image using icp
