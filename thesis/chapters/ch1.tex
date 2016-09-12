@@ -71,6 +71,16 @@ only accurate for textured surfaces, non-textured surfaces cannot be estimated w
 icp often not necessary and expensive
 icp only used if no keypoint matches found... \cite{Endres12Evaluation}
 
+The computation of pose without ICP, purely from feature matching is non-trivial because in reality, the system may suffer from the following:
+
+\begin{itemize}
+\item Synchronization problems between the RGB camera and Infrared camera shutters
+\item depth jump interpolation - the interpolation of computed depth at object boundaries
+\item feature matches often occur at depth jumps
+\end{itemize}
+
+RANSAC \cite{Fischler81Random} is able to deal with noisy data by filtering out points considered to be outliers.
+
 
 
 
@@ -148,10 +158,10 @@ Fioraio [7 \cite{Fioraio11Realtime}] presented a system which uses bundle adjust
 
 \subsubsection{RGB-D SLAM}
 
-Endres et al \cite{Endres12Evaluation} presented a dense 3D reconstruction technique using RGB-D data from the Kinect sensor based on feature matching and RANSAC. They also evaluated their technique under different illumination and camera movement speed conditions. It is able to operate at near real time speeds in small in-door environments. This method begins by feature matching RGB images across frames. Using the projected 3D points available for each pixel in the depth map, RANSAC \cite{Fischler81Random} is used to compute the camera pose across frames. These poses are optimized globally using the $g^2$o graph optimizer, the Octomap representation \cite{Wurm10Octomap} is used to store the reconstructed environment. Since this system is based on feature matching, Endres et al evaluate 3 different feature matching techniques: SIFT \cite{Lowe04Distinctive} , SURF \cite{Bay06Surf,Bay08Speeded} and ORB \cite{Rublee11Orb}. ORB feature matching is tested because it is faster than SIFT and SURF with slightly less accuracy, the authors also evaluate a GPU implementation of SIFT \cite{Wu07Siftgpu}. Endres et al evaluate their algorithm using their own benchmark \cite{Sturm11Towards}. Results show it can handle up to 50 degrees of rotation per second, and speeds of up to 43 centimetres per second.  \\
+Endres et al \cite{Endres12Evaluation} presented a dense 3D reconstruction technique using RGB-D data from the Kinect sensor based on feature matching and RANSAC. They also evaluated their technique under different illumination and camera movement speed conditions. It is able to operate at near real time speeds in small in-door environments. This method begins by feature matching RGB images across frames. Using the projected 3D points available for each pixel in the depth map, RANSAC \cite{Fischler81Random} is used to compute the camera pose across frames. These poses are optimized globally using the $g^2$o graph optimizer, the Octomap representation \cite{Wurm10Octomap} is used to voxelize the 3d points before storing them in a volumetric occupancy map. Since this system is based on feature matching, Endres et al evaluate 3 different feature matching techniques: SIFT \cite{Lowe04Distinctive} , SURF \cite{Bay06Surf,Bay08Speeded} and ORB \cite{Rublee11Orb}. ORB feature matching is tested because it is faster than SIFT and SURF with slightly less accuracy, the authors also evaluate a GPU implementation of SIFT \cite{Wu07Siftgpu}. Endres et al evaluate their algorithm using their own benchmark \cite{Sturm11Towards}. Results show it can handle up to 50 degrees of rotation per second, and speeds of up to 43 centimetres per second.  \\
 
 
-This system is divided into a front-end and a back-end. The front-end performs feature detection, matching and sensor pose estimation via the RANSAC method whereas the back-end performs non-linear pose optimization using the $g^2o$ optimization procedure   and integrates these results into an occupancy grid based on the Octomap. A diagram of the combined front-end and back-end systems is given in figure \ref{Endres12EvaluationPipeline}.
+This system is divided into a front-end and a back-end. The front-end performs feature detection, matching and sensor pose estimation via the RANSAC method whereas the back-end performs non-linear pose optimization using the $g^2o$ optimization procedure   and integrates these results into an occupancy grid based on the Octomap. A diagram of the combined front-end and back-end systems is given in figure \ref{Endres12EvaluationPipeline}. 
 
 
 \begin{figure}[!h]
@@ -162,77 +172,7 @@ This system is divided into a front-end and a back-end. The front-end performs f
 \end{figure}
 
 
-\subsection{Endres}
-
-
-
-
-
-
-
-
-
-
-
-
-figure 2 has a picture
-
-	
-front-end details: 
-uses opencv [3 \cite{Bradski08Learning}] for detection, description and matching of features SURF, SIFT and ORB [25 \cite{Rublee11Orb} ], for SIFT: GPUSIFT[32 \cite{Wu07Siftgpu}]
-
-
-sets the hessian threshold to keep number of keypoints constant, too few keypoints and there may be not enough matches, too many and there may be too many false positives
-
-then the transformation of camera pose can be computed from these correspondences [31 \cite{Umeyama91Least}]
-
-
-because of synchronization at the shutters of infrared and color camera and due to interpolation at depth jumps
-plus because features often lie at object borders, 3d features positions are prone to be at a wrong depth making robust estimation of transformations highly non-trivial
-
-RANSAC known to cope with noise data [8 \cite{Fischler81Random}]
-points considered inliers if after transformation their distance is < 3cm
-
-then, the inliers are used to compute a finer representation, these steps are repeated where most inliers are kept
-
-this method is fast, but timewise is dependent on the number of features and outlier percentage
-
-computes relations with sub set of 20 last frames in parallel (including the 3 most recent frames) to compute the transformations in parallel using threads
-
-if a frame can be matched to a predecessor: it is added as a node to the pose graph in the backend
-
-if node cannot be matched is is added in with assumption of constant motion
-
-back-end:
-the initial poses are not globally correct
-to do this G2o framework is used [18 \cite{Kummerle11G}]
-g2o can be used to solve many problems including SLAM and bundle adjustment
-
-it minimizes a non-linear error function which can be represented as a graph, essentially minimizes an error function made up of the vector of pose estimations, 
-
-more details of the error function in [18 \cite{Kummerle11G}]
-also prunes edges in pose graph in order to benefit the optimization procedure
-
-using the final trajectory, the original data can be used 
-uses a 3d occupancy grid to represent the final model
-
-uses the octomap [33 \cite{Wurm10Octomap}] framework
-
-uses rgb-d benchmark [29 \cite{Sturm11Towards}]
-
-sift and surf are better and outperform ORB
-
-
-
-
-
-
-
-
-
-
-
-
+The front-end uses OpenCV \cite{Bradski08Learning} for feature matching. During the feature detection process, the Hessian threshold is used to keep the total number of features constant. This is required because pose may not be able to be computed if there aren't enough features, but on the other hand, too many features typically lead to many false positives in the feature matching schema. As mentioned, these matched features (and thus matched 3d points) are used with RANSAC to compute pose \cite{Umeyama91Least}. During the RANSAC process, corresponding points with distances below 3cm are considered inliers. The inliers are then used exclusively to compute a finer pose. This method of pose estimation is fast but computational complexity depends on the number of features computed. For each frame, the pose relationship with 20 previous frames (including the most recent 3) is computed in parallel on the GPU. Then the final computed pose is given to the back-end. If accurate pose cannot be compute, constant motion is assumed. \\
 
 
 
