@@ -463,6 +463,58 @@ In computing the SDF for a given depth map, the exhaustive marching cubes algori
 
 \cite{Aiger084}
 
+4pcs - 4 points congruent sets for robust pairwise surface registration
+fast and robust registration of wide base 3d data
+resilient to noise and outliers
+data can be raw, noisy and full of outliers
+no need for pre-filtering or de-noising
+significantly reduces the number of trials required to get registration, has no assumption of prior alignment
+novel technique:
+extracts all co-planar 4 points sets from a 3D point set which are approximately congruent under rigid transformation to a given set of co-planar 4-points
+complexity O(n^2 + k), n is number of points, k is number of 4 point sets
+in practice: when not too much noise and overlap is significant,
+using local descriptors allows for complexity O(n+k)
+an extension to perform affine transforms too
+demonstrates robustness over multiple range scans with varying levels of noise, outliers and overlap
+
+
+methods of 3d alignment under rigid transformation with 3d scans
+ns [Callieri et al. 2004, Gelfand et al. 2005, Li and Guskov
+2005]
+
+non-rigid alignments:
+t [Pauly et al. 2005, Brown and
+Rusinkiewicz 2007].
+
+
+local descriptor 3d features : ors [Li and Guskov 2005] can be used to define an approximate transformation, then use ICP to align further ([Besl and McKay 1992, Chen and Medioni 1992])
+
+only need to know 3 point pairs
+
+local descriptors (invarient to rigid transformations) can be used to extract these 3 points
+
+geometric hashing may be used: [Wolfson and Rigoutsos 1997]
+
+RANSAC can be used with the set of matches to find the best transform [Fischler and Bolles 1981], 
+these have been improved in by Chen and co-authors [1999] which tradeoff speed for robustness
+
+PCA can be used to compute bases but in the case of partial overlap, this quickly breaks down
+
+local descriptors: [Johnson 1997, Li
+and Guskov 2005],: 
+
+under noisy conditions this may also be used : [Pottmann et al. 2007],
+
+
+
+
+
+
+
+
+
+
+
 \section{Global Optimization}
 \subsection{$G^2$o}
 
