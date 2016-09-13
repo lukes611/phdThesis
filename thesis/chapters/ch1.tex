@@ -7,6 +7,8 @@
 
 \section{Introduction}
 
+area promises new augmented reality and mixed reality applications
+
 \section{3D Reconstruction and Simultaneous Localization and Mapping}
 
 SLAM used in robotics [30 \cite{Thrun02Robotic},22 \cite{Nuchter056d},10 \cite{Grisetti07Efficient}, 6 \cite{Dellaert06Square},15 \cite{Kaess08Isam},9 \cite{Frese05Multilevel},23 \cite{Olson06Fast}]
@@ -26,35 +28,300 @@ ORB computes orientation from FAST corners and uses for descriptor extraction ->
 
 sift[20 \cite{Lowe04Distinctive}, surf[1 \cite{Bay06Surf,Bay08Speeded}], orb[25 \cite{Rublee11Orb}]], sift gpu[32 \cite{Wu07Siftgpu}]
 
+Harris and Stephens \cite{Harris88Combined} invented the Harris corner detector. This detector uses a variable sized window around each pixel, in which a Harris matrix is formed from the x, y and xy gradients. The Harris response is calculated using the determinant and trace of this matrix. Several years later, Smith and Brady \cite{Smith97Susan, Smith92New} presented a feature detector called SUSAN. SUSAN is an alternative to second order methods for corner detection and uses a non-linear filter to find corners and edges. SUSAN also naturally provides feature vectors. It works by surrounding each pixel with a circular non-linear kernel for filtering. The kernel's response is defined as the area within the kernel having the same or similar value to the nucleus (center of the kernel). Walker et al \cite{Walker98Locating} used a classification (machine learning) method to find salient places in images.\\
+
+
+Trajkovic \& Hedley \cite{Trajkovic98Fast} presented a fast yet simple corner detection algorithm. This method computes the minimum intensity changes in all directions. It is fast as it only uses a 3x3 window for the corner response function. This method is compared to the Harris and Susan corner detectors. It is faster than both these methods whilst also being more robust than the Susan corner detector. Harris is the more accurate corner detector in terms of repeatability and detection.\\
+
+
+Lowe's \cite{Lowe04Distinctive,Lowe99Object} method, SIFT (Scale Invariant Feature Transform) is a popular method for feature extraction and description. The method computes features at different scales using an image pyramid and difference of Gaussian to approximate the Laplacian of Gaussian. Features are represented using a vector of weighted gradients surrounding the feature. The descriptor is invariant to scale because of each descriptor is found at some scale within the multi-resolution pyramid. SIFT is rotationally invariant if the window is chosen so that its angle of origin is based on the angles surrounding the feature. It is invariant to luminance because of the use of gradients, and since features are described by the surrounding window of the feature, they are invariant to translation. This method is said to be robust to 3D viewing transforms and affine transforms.\\
+
+
+Tuytelaars \& Van Gool \cite{Tuytelaars00Wide} developed a method for detecting and describing affine invariant regions. These regions are computed directly from intensity values in the image using rays extending from the center of regions. Feature vectors made up from statistical moments within the regions, then nearest neighbour matching is used to match features. Boykov \& Jolly \cite{Boykov01Interactive} presented a method for region based feature extraction. This method uses graph cuts to find which regions are adequate features. This method requires some soft constraints performed by humans so is not good for automatic detection of features, also because features are not very localized their size and shape is not viewpoint invariant.\\
+
+
+Itti \& Koch \cite{Itti01Computational} presented a biologically inspired bottom up image saliency detector. Schaffalizky and Zisserman \cite{Schaffalitzky01Viewpoint} developed a texture based region descriptor. It is invariant to photometric and affine transformations. It is also insensitive to the shape of the region and can be used to compute epipolar geometry. This method makes use of the second order matrix. Mikolajczyk and Schmid \cite{Mikolajczyk01Indexing} presented a new feature point detector and descriptor. Their detector is based on multi-scale Harris in which they then use to filter the points by the value of the surrounding Laplace. For feature description they use Gaussian derivatives. \\
+
+
+Carson et al \cite{Carson02Blobworld} developed a method for image feature classification and matching called Blobworld. This method segments an image before using region vectors for image querying and feature matching. This technique begins by defining a pixel neighbourhood size, it then groups pixels together based on the texture and colour data within one of these neighbourhoods. Finally, vectors describing colour and texture are formed for each region and these are used in image queries. Sebe et al \cite{Sebe03Evaluation} compared local based feature detectors, their proposed method uses a wavelet saliency extractor, making use of textures and colour in order to obtain invariance in its descriptor. \\
+
+
+Kadir et al \cite{Kadir04Affine} developed a saliency based method for feature detection. This method is scale, viewpoint and perturbation invariant. Carbonetto et al. \cite{Carbonetto04Statistical} presented a method which segments images, labelling them with feature vectors made up of descriptive words. Image region mapping can be performed by statistically comparing feature description vectors. Matas et al \cite{Matas04Robust} developed a new feature detection and description method called MSER. This algorithm uses small regions as features instead of a single point and surrounding window. These regions are calculated by taking the foreground blobs of an image at every possible binary threshold. MSER detection and representation is invariant to scale (3.5 x), illumination, out-of-plane rotation, occlusion, locally anisotropic scale change and 3D translation of viewpoint. \\
+
+Mikolajczyk and Schmid \cite{Mikolajczyk05Performance} performed an evaluation of local feature descriptors. They performed a comparison between shape-context, PCA-SIFT, differential invariants, spin images, SIFT, complex filters, moment invariants and cross correlation. They also present their method called GLOH, which is an extension of the SIFT descriptor. Results indicate that GLOH and SIFT perform the best. Rosten \& Drummond \cite{Rosten06Machine,Rosten05Fusing} aimed to improve the speed of feature detection over SIFT and SUSAN. They developed a technique called FAST (Features from Accelerated Segment Test), this method tests the difference between the center pixel and its surrounding pixels within the surrounding circle. They also improved this approach by first extracting FAST corners, then classifying these corners using a decision tree to extract better feature points, whilst retaining speed. Both FAST and FAST-ML (FAST with Machine Learning) methods are shown to be faster than SIFT and SUSAN whilst FAST-ML is also shown to be more reliable at classifying the same features from different viewpoints.  \\ 
+
+
+Bay et al \cite{Bay06Surf} improved the speed and accuracy of feature matching compared with SIFT using their method named SURF (Speeded Up Robust Features). In SURF, a Hessian matrix is used for the detection of features whilst Haar wavelet components are used as descriptors. A non rotation invariant version was also analysed and proved to be faster. This version is suitable if rotation invariance is not required for a particular application. Lepetit and Fua \cite{Lepetit06Keypoint} turn the wide stereo baseline matching problem into a classification problem. This method is stated to be robust, accurate and real-time. The training phase attempts to classify repeatable corners. The training set is built from many different rasterizations (which affect illumination) of only a few images. Key-points are extracted at multiple octaves and scales at the surrounding image patch. The authors report randomized trees as being the optimal machine learning method for their technique. \\
+
+
+Cabani \& MacLean \cite{Cabani07Implementation} presented a feature detector based on the Harris point operator. This method detects affine invariant features using the speed of an FPGA. It can process images of 640 x 480 at up to 30 frames per second. This technique is compared to C and Matlab versions of the same process. Finally, Tuytelaars and Mikolajczyk \cite{Tuytelaars08Local} presented a survey on feature detectors. They provided a detailed introduction to the subject and categorize different feature types and techniques. \\
 
 
 \subsection{phase correlation}
-\subsection{Fourier based Registration}
+
+The goal we want to achieve with phase correlation is to register two images (or 3D volumes). To do this, phase correlation can be used to compute the transform parameters between two such images. In this way, DMF can be performed directly without the need for least squares approximations or the use of ICP (which cannot recover scaling parameters). To understand this method, digital signal processing is first introduced. \\ 
+
+Digital signal processing is the scientific area concerned with the acquisition, filtering, processing and understanding of digital signals using computer technology. Digital signals are simply an array of numbers, digital images are 2D signals. One of the fundamental ideas behind this research area is that digital signals can be processed using a set of common techniques regardless of where or how they were generated. There are two fundamental techniques used in digital signal processing. One is the use of correlation and convolution, the other is the use of alternative representations (eg. the Fourier transform). For in depth details of these concepts read \cite{Smith97Scientist}. Convolution is the process by which one signal is used to filter another whilst correlation is used to measure the similarity between one signal and another at different phases. The Fourier transform is used to transform signals (in the time domain) into the frequency domain. The frequency domain represents the original signal using a set of sine and cosine waves at different frequencies. The time domain is the name given to the original domain of the signal. This transform is performed by correlating the signal with sine and cosine waves at varying frequencies. A transform called the inverse Fourier transform can be used to transform a signal from the frequency domain back to the time domain. \\
+
+The inputs and outputs of the Fourier transform are digital signals made up of complex numbers. Most of the time, the input signal is not complex (as in the case of a photographed scene). In this case imaginary value scalars of zero are augmented to the signal to make it complex. The frequency domain can be visualized easily using the polar representation of these complex numbered signals. The polar representation represents the signal using the magnitude and phase of sine waves at different frequencies and directions (in the case of 2D). This can be visualized in figure \ref{fig:PCSecA}, here the magnitude represents the height of the sine waves, the phase represents the translation from the origin in which these waves occur and the 2D position within the image represents the direction the waves travel in 2D. The most useful aspect of the Fourier transform is that when signals are represented in the frequency domain, their point-wise multiplication is equivalent to convolution in the time domain. This is important because convolution is a computationally intensive process, especially in image processing where there is a lot of data to process. \\
+
+\begin{figure*}[t!] 
+        \centering
+        \begin{subfigure}[b]{2.0in}
+                \includegraphics[width=1.5in]{images/pc/original}
+                \caption{original}
+                \label{fig:PCSecOrig1}
+        \end{subfigure}%
+        \begin{subfigure}[b]{2.0in}
+                \includegraphics[width=1.5in]{images/pc/magnitude}
+                \caption{magnitude}
+                \label{fig:PCSecMag}
+        \end{subfigure}%
+                \begin{subfigure}[b]{2.0in}
+                \includegraphics[width=1.5in]{images/pc/phase}
+                \caption{phase}
+                \label{fig:PCSecPhase}
+        \end{subfigure}%        
+       \caption{The polar representation of the Discrete Fourier transform on an input image.}\label{fig:PCSecA}
+\end{figure*}
+
+Phase correlation is the process of using the frequency domain representation to perform image registration using correlation. In image processing, this allows us to find the translation parameters between two images (does not work if rotation or scaling is introduced) efficiently. This can be performed by flipping one image before transforming both into the frequency domain. Since point-wise multiplication in the frequency domain causes convolution in the time domain, flipping one image causes correlation in the frequency domain which is what is required. Once this correlation is performed, the inverse Fourier transform is performed, the output image contains a peak which is used to compute the translation different between the two images. This can be visualized in figure \ref{fig:PCSecCC}. Here, the original image is translated from figure \ref{fig:PCSecORY} to figure \ref{fig:PCSectrans} and the two are phase correlated producing the peak in figure \ref{fig:PCSecCCPC} which represents the translation between the two. \\
+
+
+\begin{figure*}[t!] 
+        \centering
+        \begin{subfigure}[b]{2.0in}
+                \includegraphics[width=1.5in]{images/pc/original}
+                \caption{original}
+                \label{fig:PCSecORY}
+        \end{subfigure}%
+        \begin{subfigure}[b]{2.0in}
+                \includegraphics[width=1.5in]{images/pc/translated}
+                \caption{(a) translated}
+                \label{fig:PCSectrans}
+        \end{subfigure}%
+                \begin{subfigure}[b]{2.0in}
+                \includegraphics[width=1.5in]{images/pc/phasecorrelation1}
+                \caption{correlation}
+                \label{fig:PCSecCCPC}
+        \end{subfigure}%        
+       \caption{Phase correlation used to align two images seperated by a translation.}\label{fig:PCSecCC}
+\end{figure*}
+
+The other parameters we wish to estimate for registration are the scale and rotation parameters, however another type of transform is introduced first. This image transform is called the log-polar transform. This transform re-arranges the pixels from euclidean 2D space $[x,y]$ to the polar space $[log(sqrt(x^2+y^2)),atan(y/x)]$ where rotation about the center is turned into y-axis translation and scaling about the center is turned into x-axis translation. This representation changes any rotation and scaling performed on the image into translation. Translation parameters can be easily found using phase correlation. This process can be visualized with the help of figure \ref{fig:PCSecB}. The problem is, the rotation and scaling has to be about the center of the image, which is an issue if the images contain a translation added to them. Luckily, in the magnitude of the polar representation of the frequency domain the effects of translation are not present. On top of this, any sort of rotation or scaling (whether translation is present or not) occurs about the center of the image. \\
+
+\begin{figure*}[t!] 
+        \centering
+        \begin{subfigure}[b]{1.5in}
+                \includegraphics[width=1.4in]{images/pc/original}
+                \caption{original}
+                \label{fig:PCSecOrig2}
+        \end{subfigure}%
+        \begin{subfigure}[b]{1.5in}
+                \includegraphics[width=1.4in]{images/pc/logpolar}
+                \caption{log-polar of (a)}
+                \label{fig:PCSecLP}
+        \end{subfigure}%
+         \begin{subfigure}[b]{1.5in}
+                \includegraphics[width=1.4in]{images/pc/rotation}
+                \caption{rotation by -45 ${}^{\circ}$}
+                \label{fig:PCSecRot}
+        \end{subfigure}%
+        \begin{subfigure}[b]{1.5in}
+                \includegraphics[width=1.4in]{images/pc/logpolarRotation}
+                \caption{log-polar of (b)}
+                \label{fig:PCSecLPR}
+        \end{subfigure}
+         \begin{subfigure}[b]{1.5in}
+                \includegraphics[width=1.4in]{images/pc/scaled}
+                \caption{scaled by 0.5}
+                \label{fig:PCSecOrig2}
+        \end{subfigure}%
+        \begin{subfigure}[b]{1.5in}
+                \includegraphics[width=1.4in]{images/pc/logpolarScale}
+                \caption{log-polar of (c)}
+                \label{fig:PCSecLP}
+        \end{subfigure}%
+                \begin{subfigure}[b]{1.5in}
+                \includegraphics[width=1.4in]{images/pc/rotationscale}
+                \caption{rotation + scaling}
+                \label{fig:PCSecRot}
+        \end{subfigure}%
+        \begin{subfigure}[b]{1.5in}
+                \includegraphics[width=1.4in]{images/pc/logpolarRotationScale}
+                \caption{log-polar of (d)}
+                \label{fig:PCSecLPR}
+        \end{subfigure}%        
+       \caption{The effects of the log polar transform.}\label{fig:PCSecB}
+\end{figure*}
+
+This allows the phase correlation method to recover the translation, scaling and rotational information between two images. First, the magnitude of the polar representation of both the images is computed. Then both magnitudes are log-polar transformed and phase correlated. This finds the scaling and rotational parameters. Both of the original images have their rotation and scaling reversed, then both images are phase correlated to undo the effects of translation, which is the final parameter to compute. In this way, translation, scaling and rotational parameters can be computed directly without the need for feature matching and least-squares estimation of the transformation matrix. \\
+
 
 \section{3D Reconstruction Data Representations}
 
 \subsection{Mesh}
 \subsection{Octree}
+
+\cite{Wurm10Octomap}
+Octomap [29 \cite{Wurm10Octomap}] -> 3d reconstruction using occupancy grid style 
+
 \subsection{Volume}
+
 \subsection{Signed Distance Functions}
+
+sdf[7 \cite{Curless96Volumetric}]
+
+Canelhas [6 \cite{Canelhas12Scene}] did masters thesis an approach for camera tracking, similar to this
+his focus concentrates on object detection and recognition in an sdf and no thorough evaluation was performed
+
+Kubacki [14 \cite{Kubacki12Registration}] showed how an sdf can be used to estimate camera pose, only on synthetic data without a comparative evaluation
+[19 \cite{Ren12Unified}] demonstrated sdf based object tracking, based on known models
+
+Dense 3D scene representations:
+occupancy mapping : use a grid to store data
+[9 \cite{Elfes87Sensor}] uses a Bayesian probability of occupancy to measure whether should be added to the grid
+also can used signed distance functions [9 \cite{Elfes87Sensor}] (SDF), it can be used to fuse partial depth scans, whilst mitigating
+issues relating mesh-based reconstruction algorithms
+SDF represents : surface interfaces as 0, positive values that increase with distance from the nearest surface
+and occupied space using a negative value
+more robust to noise version of SDF -> [30 \cite{Zach07Globally} ]
+SDF can be visualized by first converting to mesh and rendering ( use marching cubes [18 \cite{Cubes87High}]) or it can be directly ray cast [21 \cite{Parker98Interactive}]
+[23 \cite{Rusinkiewicz02Real}] used frame-by-frame ICP with occupancy grid, users can scan in small objects by rotating the objects with their hand
+works @ 10hz, issue: does not do global optimization, cannot do large scenes . final models are optimized using [7 \cite{Curless96Volumetric}]
+sdf fusion in real time may be possible
+sdf can be used for globally satisfying reconstruction
+small scale reconstructions:
+	[28 \cite{Weise09Hand}] -> produces high quality scans using a fixed ToF sensor
+	[6 \cite{Cui103d} ] demonstrate a moving handheld ToF scanner
+
 
 
 \section{Depth Data Generation}
+
 \subsection{Sensors}
+
+camera technologies have also been evolving: enter the world of new depth cameras or rgb-d cameras,
+these have become available to consumers and may soon be found in mobile technologies \cite{Zhang12Microsoft}
+first real-time rgb-d depth sensor : with this system users can wave around the device to generate smooth, continuously updating, fully reconstructed data: using only depth, 6dof are tracked
+
+works in full darkness : mitigating issues for passive cameras: [17 \cite{Klein07Parallel} /19 \cite{Newcombe10Live} /26 \cite{Stuhmer10Real}] and other rgb systems [14 \cite{Henry10Rgb}]
+
+Kinect: incorporates a structured light based depth sensor, uses an on board ASIC generating an 11-bit 640x480 depth map at 30hz
+
+depth images often contain holes : this is an issue (caused by no structured light could be read on the surface, certain materials, which do not reflect infra-red light (very thin structures or surfaces at incendence angles
+
+when moving fast, the device can also experience motion blur, this leads to missing data
+
+
+DENSE TRACKING AND MAPPING by Scan Alignment
+dense sensor based 3d reconstruction research has continued using lasers and depth sensors
+typically : minimize distance measures between all data rather than feature extraction and matching
+
+
+
 \subsection{Stereo Cameras}
+
+algorithms to compute dense depth maps from image data [10 \cite{Hirschmuller05Accurate} , 21 \cite{Stuhmer10Real}]
+
+
+Scharstein and Szeliski \cite{Scharstein02Taxonomy} presented a survey and comparison technique for stereo matching research. For more details on methods prior to 2002, readers are encouraged to read this work. Sun et al \cite{Sun05Symmetric} presented an occlusion handling stereo matching algorithm. Their method incorporates a visibility constraint into the energy function for the belief propagation global optimisation method. Klaus et al \cite{Klaus06Segment} devised a stereo correspondence algorithm which uses colour segmentation combined with a self adapting matching score which minimizes the number of reliable occurrences. This method uses belief propagation to assign a single disparity to each segmented region.\\
+
+
+Yoon \cite{Yoon06Adaptive} presented work on their local stereo variation. In this method, the window is weighted based on geometric proximity and colour similarity. Darabiha et al \cite{Darabiha06Reconfigurable} presented an FPGA based local window stereo algorithm. This method obtains sub-pixel accuracy for 256$\times$360 images at 30 frames per second. Their window matching method uses correlation. Klaus et al. \cite{Klaus06Segment} devised a stereo method which segments the image before fitting regions with disparities. This fitting is based on interpolating depth values along each region. A self adapting matching score for segments is also used to maximize correspondences. Belief propagation is then used to optimize depth among the regions. \\
+
+
+Yang et al \cite{Yang07Spatial} came up with a method which uses super pixel resolution to improve disparity images. First a depth map is computed at a lower resolution, it is then up-sampled to the same resolution as the corresponding colour image. The depth map is then used as a hypothesis to compute a cost volume, which is bilateral filtered. Then, a winner take all and a sub pixel estimation procedure are performed to estimate the full resolution depth map. This method is shown to improve sub-pixel resolution by up to 100 times.\\
+
+
+Sarkis et al \cite{Sarkis07Fast} improved the efficiency of the graph cut global optimisation based disparity algorithm whilst maintaining similar accuracy. Their method involves splitting the global space up using a quad-tree. Each space has an adapted energy function which is minimized using the graph cuts algorithm. Results show this method improves efficiency by up to 3 times over similar works. Wang and Zheng \cite{Wang08Region} came up with an inter-regional cooperative optimization based stereo correspondence technique. This method uses a local adaptive window based approach to compute an initial depth map. The original image is also segmented using a colour based mean shift technique. The segmented image and the initial depth map are then input into a region based optimization method.  \\
+
+
+Yang et al. \cite{Yang08Near} attempted to solve the problem of stereo mapping for texture-less image regions. These regions are known to be difficult because there is less texture to correlate with. They use colour segmentation and plane-fitting with loopy belief propagation for error correction. Wang and Zheng \cite{Wang08Region} used a stereo method which uses image regions, plane fitting and segmentation as well as a novel region stereo optimization method. Ernst and Hirshmuller \cite{Ernst08Mutual} presented a GPU implementation of the semi-global matching technique (scan-line optimization) for stereo correspondence. Bleyer et al \cite{Bleyer09Stereo} devised a method which extracts disparities and alpha matting information at the same time. Alpha matting is used to generate artificial views for viewpoint effects. This method divides the image up into segments and computes the depth and alpha value for each of these segments. \\
+
+
+Bleyer and Gelautz \cite{Bleyer09Temporally} presented a method for generating stereo disparity information from an un-calibrated stereo video. First, the video is segmented into scenes. Next, the two camera shots are calibrated before dynamic programming is used to optimize the disparity calculation. Then the disparity estimates are smoothed temporally in order to achieve robustness to disparity flickering. Hirschmuller and Sharstein \cite{Hirschmuller09Evaluation} presented a survey on stereo depth mapping with respect to radiometric differences. They investigated different metrics used in local matching methods as well as their relationship with radiometric variations. Also investigated were the effects of different filters: LOG, bilateral background subtraction, rank, SoftRan, census and ordinal. \\
+
+
+In his masters thesis, Olofsson \cite{Olofsson10Modern} presented a survey and evaluation of various global and local stereo vision methods. He also presented a novel and efficient local method. This technique is shown to achieve state of the art results with some datasets. Bleyer et al \cite{Bleyer10Surface} introduced a method which models stereo images using smooth surfaces. This technique is based on the assumption that the entire scene is composed of a few smooth surfaces, and each pixel is a part of a surface. Colour segmentation is used to estimate different surfaces. Bleyer et al \cite{Bleyer11Patchmatch} presented a variation on the Patchmatch algorithm (PMA). Patchmatch is a global optimisation method which models each pixel as a plane in 3D space. Each pixel is set to a random value within a larger region, as long as there is at least one close guess for the planes of one of the pixels, this information can be propagated. The default PMA performs spatial propagation, and uses adaptive support weighting to improve correspondence around the border. The method by Bleyer et al introduced view and temporal propagation to the original PMA. \\
+
+
+Bleyer et al \cite{Bleyer11Object} later presented a joint stereo matching and segmentation algorithm. This method models segmented regions as objects having colour and a disparity distribution, they also use a novel 3D connectivity property for each object region. Lu et al \cite{Lu11Revisit} presented a method for increasing depth map quality given a colour original of the same scene at higher resolution. This allows disparity maps to be computed quickly by computing a lower resolution depth map before scaling-back the resolution. This method makes use of markov random fields and is unique in applying the technique to super pixel resolution in terms of depth mapping. This method is also uses state of the art disparity computation algorithms and so improves efficiency whilst retaining accuracy. \\ 
+
+
+De-Maeztu et al \cite{De11Linear} presented a novel cost aggregation step for computing disparity images from a stereo pair. Their method works similarly to weighted pixel and scalable window routines but has complexity independent of window size. Unlike other cost aggregation methods, this one can be used with colour and includes a novel disparity refinement pipeline. This method effectively filters the image so the pixels are weighted prior to performing some local disparity cost computation. Mei et al \cite{Mei11Building} presented a GPU based stereo correspondence algorithm which makes use of cost aggregation followed by scan-line optimization. Results show this GPU based algorithm is among the state of the art. \\
+
+
+Mizukami et al \cite{Mizukami12Sub} described a novel method to reliably compute disparity cost volumes for sub-pixel depth mapping. It uses a combination of interpolation and an edge preserving filter. First a sub-pixel cost volume is computed, then this volume is filtered. Finally a two step sub-pixel disparity search is performed. Later, Zhu et al \cite{Zhu12Locally} presented a novel regularization method for stereo matching. This regularization method overcomes noise and captures general disparity at higher octaves and between regions. Lee et al \cite{Lee13Local} introduced a non-iterative one pass method for improving local stereo methods. To this end, a novel three mode cross census transform with a noise buffer is introduced. This method is used for both stereo image and video calculation. Stereo Video computation also makes use of optical flow. \\
+
+
+Chen et al \cite{Chen13Novel} presented a local windowing based method which uses an adaptive support weight to achieve state of the art local method results. This method uses a novel trilateral filter as a weighting function. The trilateral filter extends the bilateral filter by adding in a component measuring boundary strength. Lu et al \cite{Lu13Patch} presented a super pixel variation of the Patchmatch stereo correspondence technique. Patchmatch filters cost volumes and can also be used for other multi-label problems such as optical flow. Mei et al \cite{Mei13Segment} proposed a tree based approach for optimizing cost volumes. Their method first segments the image based on colour, instead of forming a graph between segments, and calculating the minimal spanning tree. A tree graph is created for each segment, then these graphs are linked with the optimization algorithm.\\
+
+
+Tan et al \cite{Tan14Stereo} made an improvement to segmentation for use in disparity mapping. Since under-segmented regions contain disparity discontinuities (many methods assume regions have a global or planar based disparity value) and over-segmented regions contain noise, Tan et al proposed a new segmentation based stereo algorithm. This method makes use of a cost volume watershed algorithm and a new region merging strategy. It detects when regions are under-segmented and fixes the situation accordingly. Their method first computes information from an arbitrary segmentation method as well as an arbitrary local windowing disparity algorithm. This information is fed forward into their cost volume watershed. Using discontinuities in the cost volume, they further segment the regions, then a novel region merging method is performed, this final segmentation information is used for the global belief propagation disparity mapping method. \\
+
+
+Yang \cite{Yang14Pattern} first developed a non-local disparity calculation algorithm based on using the minimal spanning tree to find an optimal solution using the cost volume. This method is supposedly improved upon by Vu et al \cite{Vu14Efficient}. This other method was designed for robustness to texture-less regions. It formulates the cost volume as a minimal spanning tree search problem. Yang et al also contributed some software for interactive depth of field effects called scribble2focus. Tan et al \cite{Tan14Soft} devised a multi-resolution based approach to disparity selection using cost aggregation over a cost volume. Results show this method performs close to global methods for reduced complexity. Lie et al \cite{Liu143d} posed the stereo correspondence problem in terms of interacting 3D entities. Their solution is aimed at curved feature depth estimation, and so they formulate their cost functions according to this constraint. \\
+
+
+
 \subsection{Fundamental Matrix Techniques}
+
+The first monocular slam system [8 \cite{Davison03Real} ] was capable of producing globally consistent maps in real time with hand-held camera used probabilistic filtering of camera and scene feature estimates
+limited to in-door office environments because it requires large state vectors which grow with scene size
+sparse feature maps lead to poor accuracy
+
+then systems which split tracking and mapping (global optimization) -> approach by PTAM system [17 \cite{Klein07Parallel}]
+: real time mono slam in work spaces -> basically it is just bundle adjustment (which is the least squares solution to camera and feature optimization (theirs chooses features dynamically over the frame range)
+their tracking system runs in parallel at frame-rate speeds, and performs robust n-point pose estimation with feature matching
+compared to filters much more features can be packed into the map[25 \cite{Strasdat10Real} ]
+PTAM = realtime results as accurate as off-line ones
+PTAM produces sparse maps - not like our project
+some algorithms can use PTAM tracking in conjunction with dense reconstruction computing module based on multi-view stereo
+
+
+
 \subsection{Structure from Motion}
-\subsection{Wide-baseline Stereo}
+
+early sfm algorithms: either accumulated drift (computing motion) [2 \cite{Beardsley97Sequential} ] or performed loop-closure using off-line optimization 
+
 
 \section{Pose Estimation Techniques}
 
 
 \subsection{Fundamental Matrix}
 
+In order to describe this technique, linear algebra is used. Firstly, all of the transforms required to represent imaging systems can be represented using $4 \times 4$ matrices and homogeneous vectors (with four rows and a single column). These important transforms include: 3D rotation, scaling, shearing/skewing, mirroring, translation and perspective. Rather than describing camera capture using projecting rays, we can use linear algebra which provides further capabilities and allows us to estimate the fundamental matrix. 
+
+In figure \ref{fig:INTRO_FMA1} there are two camera systems, for this part of the discussion we focus on the left camera $C_{1}$ and the left frame. Next we will describe how point $Q$ is projected from 3D onto the 2D point $Q_{1}$. First, $C_{1}$ is translated to the origin (later this allows rotation and perspective transforms to more easily be performed). In order to do this, $C_{1}$ can be subtracted from itself (to become the origin) and so it is also subtracted from $Q$ as well. Rather than performing this directly though, we will use a $4 \times 4$ translation matrix T instead. Next, rotation is performed in order to align the camera's axes with the x, y and z axes. The camera's axes can be defined using three vectors. One pointing directly ahead where the camera is facing (piercing the center of the projection frame), another points directly to the right perpendicularly (orthogonal to the first), the final points above the camera, aligned orthogonally with the previous two vectors. \\
+
+These three axes can be placed into the columns of a four by four homogeneous matrix. This forms a matrix which rotates an aligned camera's axes to face the direction where $C_1$ currently points to. In other words, it performs the exact opposite of what is needed. Since this matrix is orthogonal (known because the column vectors are all perpendicular) the inverse transform is simply the transpose of this matrix. This rotation matrix will be named R. Next, there may be a lateral alignment, this is a translation which further aligns the points to the center of the frame. This is performed using another $4 \times 4$ matrix, L. Finally, another $4 \times 4$ matrix, P is used to project the point $Q$ to the 2D point, $Q_1$. The entire projection can be performed by multiplying these matrices together, $Projection = P * L * R * T$. Here, $P * L$ are known as the intrinsic parameters whilst $R * T$ are called the extrinsic parameters. Due to the imperfect nature of the camera lens, the intrinsic camera matrix often has distortion, this becomes important later when we define the difference between the fundamental matrix and another matrix introduced, the essential matrix.
+
+\begin{figure*}[t!]
+	\includegraphics[width=5.0in]{images/introfm1}
+	\caption{A pair of cameras viewing two points. This figure is a reconstruction of the figure on page 492 in Computer and machine vision: theory, algorithms, practicalities \cite{Davies12Computer}.}
+	\label{fig:INTRO_FMA1}
+\end{figure*}  
+
+Using the steps described and looking at figure \ref{fig:INTRO_FMA1}, we now know how 3D point $P$ can be mapped to both of the frames with cameras $C_1$ and $C_2$. Projecting point $P$ onto the two frames gives points $P_1$ and $P_2$ respectively. Next, we describe the relation between vectors, $V_1$, formed by normalising the vector from $C_1$ to $P$, and $V_2$ (normalizing $(P - C_1)$. Skipping past the mathematical proof, which is detailed in Computer and Machine Vision \cite{Davies12Computer}, the relation between between these vectors is the essential matrix, $E$. This relation is $V_2^{T} * E * V_1 = 0$. Unfortunately we may not know the depth of $P$ and unless an investigation is performed on the particular camera system in use, we do not know the precise perspective transform and associated distortion. Fortunately, both the depth and the perspective are cancelled in this matrix formulation, and so we can specify the relation using only the 2D points, $P_1^T * E * P_2 = 0$. \\
+
+This formula is based on the assumption that no distortion present in the camera system. In this case, both of the cameras may have distortion. We represent this distortion here using matrices $G_1$ and $G_2$. If both shots are taken with the same camera, we may assume $G_1 = G_2$. We therefore relate the theoretically precise $P_1$ and $P_2$ with their real world equivalents (which have distortion) $D_1$ and $D_2$ by $P_1 = Q_1^{-1} * D_1$ and $P_2 = Q_2^{-1} * D_2$. Inserting this into the essential matrix formulation we have, $(Q_1^{-1} * D_1)^T * E * Q_2^{-1} * D_2 = D_{1}^{T} * {Q_1^{-1}}^{T} * E * Q_2^{-1} * D_2 = 0$. The presence of this distortion is the difference between the essential and fundamental matrices with the fundamental matrix being $F = {Q_1^{-1}}^{T} * E * Q_2^{-1}$. If no distortion is present, the fundamental matrix is equivalent to the essential matrix. \\
+
+Looking at figure \ref{fig:INTRO_FMA1} again, line $E_1$ represents something called an epipolar line, this line lies on the plane in which both cameras and point $P$ sit on. Line $E_1$ is the epipolar line of the left frame and $E_2$ is the epipolar line of the right frame. Point $e_1$ is the epipole of the left frame and point $e_2$ is the epipole of the right frame. Epipoles are the projection of one camera's location onto the frame of another camera. The projection of $C_2$ onto the left frame by camera $C_1$ is the epipole $e_1$. If the fundamental matrix is multiplied by a particular point it produces a vector in $R^3$ which represents the epipolar line as $[a b c]^T$ in which $a,b$ and $c$ represent the line equation $ax^2 + bx + c$. We can see that the epipolar line corresponding to $Q$ and $Q_1$ passes through a common point with the other epipolar line $E_1$. In fact, all epipolar lines intersect at the epipole. Therefore, if the fundamental matrix can be computed, so can the epipolar lines and the epipoles. \\
+
+The fundamental matrix can be computed using around 8 point matches between images. Using the fundamental matrix, image rectification can be performed as well as 3D reconstruction. Using point $P$ in figure \ref{fig:INTRO_FMA1}, we already know the fundamental matrix, epipolar lines and epipoles can be computed from the point correspondences. If the epipoles are known, then we know the direction in which the other camera resides, in that case, all that is left is to triangulate the point correspondences in order to solve for the extrinsic camera parameters. The basic pipeline for the fundamental matrix method begins with feature matching, followed by fundamental matrix estimation. Then the extrinsic camera information is estimated and images are rectified and so that disparity information can be computed. Then depth maps can be projected through any of the two cameras and aligned. \\
+
+
 Monocular Feature based SLAM systems use feature matches to estimate camera pose and location changes across frames \cite{Davison02Simultaneous}. Variations of this method use different features including: corners and lines \cite{Jeong06Visual}, image patches \cite{Silveira08Efficient} and exemplar feature matching \cite{Chekhlov07Robust}. SIFT features are used most often in SLAM \cite{Jensfelt06Framework,Pollefeys08Detailed,Beall11Bundle,Eudes10Fast}, in addition FAST features have been explored \cite{Kundu10Realtime,Leelasawassuk133d,Konolige10View,Konolige08Frameslam}. Beall et al \cite{Beall11Bundle} made use of both SIFT and SURF features in their underwater SLAM system. Real-time monocular SLAM systems based on this approach have also been proposed \cite{Chekhlov07Robust,Pollefeys08Detailed}. RANSAC is often used in monocular SLAM \cite{Eudes10Fast,Kundu10Realtime,Konolige10View,Konolige08Frameslam,Pradeep13Monofusion} to remove outliers which cause incorrect camera parameter estimates. Bundle adjustment is also used as an additional step to refine camera parameter estimation \cite{Eudes10Fast}. 
 
 
 in monocular setting, the scale of the map cannot be  determined \cite{Endres12Evaluation}
+
+SLAM has focused on real time markerless tracking and live scene reconstruction based on a single sensor RGB eg. MonoSLAM[8] \cite{Davison03Real} which is less accurate than PTAM [17] \cite{Klein07Parallel}  but these only produce sparse reconstructions
+some methods have grown to combine PTAM's camera tracking ability with MVS-style reconstructions [19/26] (\cite{Newcombe10Live}/\cite{Stuhmer10Real})
+recently: iterative image alignment has been used to replace features in tracking [20] \cite{Newcombe11Dtam}
+this scene is promising: but monocular based dense 3D reconstruction is difficult and requires suitable camera motion and scene illumination
+
 
 \subsection{Stereo based}
 
@@ -64,6 +331,13 @@ Stereo based SLAM systems also use features to estimate camera parameters. Howev
 in monocular setting, the scale of the map cannot be  determined 
 stereo slam [17 \cite{Konolige08Outdoor}, 24 \cite{Paz08Large}] -> does not suffer from this
 only accurate for textured surfaces, non-textured surfaces cannot be estimated with depth );
+
+SFM and MVS (multi view stereo) has given good results : camera tracking  and sparse reconstructions [10] \cite{Fitzgibbon98Automatic}, \cite{Seitz06Comparison} [24] 
+
+
+[19 \cite{Newcombe10Live}] uses dense optical flow with PTAM like tracking for dense recon
+this relies on camera poses coming from PTAM
+[26 \cite{Stuhmer10Real}] do the same with near real time depth map calculation
 
 
 \subsection{Feature Matching and RANSAC}
@@ -80,80 +354,6 @@ The computation of pose without ICP, purely from feature matching is non-trivial
 \end{itemize}
 
 RANSAC \cite{Fischler81Random} is able to deal with noisy data by filtering out points considered to be outliers.
-
-
-
-
-\subsection{ICP}
-
-\subsubsection{Henry10Rgb}
-
-henry [12 \cite{Henry10Rgb,Henry14Rgb}] is similar to this work \cite{Endres12Evaluation}
-uses sparse keypoint matches between color images as initialization to icp
-henry used sparse bundle adjustment [19 \cite{Lourakis09Sba} ], here 3d pose graph using [18 \cite{Kummerle11G}] framework is used
-henry put resulting into surfel representation, here volumetric voxel representation is used [33], can be used for robot localization, path planning and navigation [13 \cite{Hornung10Humanoid}]
-
-
-ICP [2 \cite{Besl92Method}, 26 \cite{Rusinkiewicz01Efficient}, 27 \cite{Segal09Generalized}]
-
-\subsubsection{Kinect Fusion}
-
-Newcombe et al \cite{Newcombe11Kinectfusion} proposed an accurate, real-time dense 3d reconstruction algorithm which works well on complex indoor environments. This algorithm computes relationships between depth map frames generated using the Microsoft Kinect \cite{Zhang12Microsoft} sensor. By aligning depth maps this method is capable of tracking both camera pose and location as well as generating dense 3d reconstructions. Only depth data is used in alignment computations thus, consequently because the Kinect is a structured light based depth sensor Kinect Fusion works under any lighting condition, including complete darkness. Since they use the Kinect and GPU (both considered commodity hardware these days) the technique may be considered inexpensive. \\
-
-The method works by computing camera pose, transforming depth data by a computed pose (frame-by-frame) and fusing this data into a global surface volume. It uses a coarse to fine grain iterative closest point (ICP) algorithm to compute camera pose. During the ICP phase, the target points come from the entire globally matched previous frames. Therefore this method is considered global rather than frame-to-frame based. Such a method has direct advantages over frame-by-frame feature matching, since all data is used to compute pose. The downside, is that this method fails to find global solutions due to the nature of ICP. This may occur when some frames must be skipped due to motion blur, or the camera passing over surfaces which do not reflect infra-red light. \\
-
-\begin{figure}[!h]
-\centering
-\includegraphics[width=12cm]{images/ch1/Newcombe11KinectFusion1}
-\caption{Kinect Fusion Algorithm Pipeline \cite{Newcombe11Kinectfusion}}
-\label{KFusionPipeliciteHne}
-\end{figure}
-
-Kinect Fusion has four main steps as illustrated in figure \ref{KFusionPipeline}. The first step named measurement, performs pre-processing on the depth data as well as generation of additional information for use by Kinect Fusion. Each depth map frame is first passed through a bilateral filter. From this, a dense vertex map (map of 3D points projected using a known projection matrix associated with the Kinect) is generated, as well as a normal map. For both the vertex and normal maps, a 3 level image pyramid is constructed. This makes the coarse to fine grain ICP technique possible. \\
-
-Next, dense coarse to fine grain ICP is used to compute pose between the fused frames and the current frame. The authors exploit the fact that the transformation between frames is small because camera motion is slow when computing against every frame. With coarse-to-fine grain ICP they use the point-plane metric for pose optimization \cite{Rusinkiewicz02Real}. The ICP based pose estimation computes pose given both a predicted and measured depth map. \\
-
-After estimating camera pose relating to the globally fused model, each frame must be integrated into that model. The Kinect Fusion algorithm uses a truncated signed distance function (TSDF) representation. This is a signed distance function volume where the distances for each voxel are capped by some value. The TSDF uses a volume resolution of $512\times 512\times 512$. They use the TSDF, rather than relying on a linear but accurate discrete SDF transform \cite{Rasch09Remarks} because of the computational complexity of calculating the discrete SDF of large scale volumes. \\
-
-As mentioned, Kinect fusion uses pose prediction and fuses each depth map into the TSDF representation. In this way, they align and fuse each depth map to the global 3d reconstruction. In this way, a global loop closure method is not required. This may have a negative side effect by which some frames which have larger resolutions may be heavily quantized in order to fuse with the SDF, especially very thin surfaces/objects. These features may also be advantageous for ICP in estimating pose. 
-
-
-but kinect fusion generates synthetic depth images which are aligned to the current depth image using icp
-
-
-
-\subsection{Optimizers}
-
-\subsubsection{3D Reconstruction by Optimizing directly in the SDF}
-
-In 2013, Bylow et al \cite{Bylow13Real} presented a novel method which reconstructs static indoor environments in real time using RGB-D data captured using the Asus Xtion Pro Live sensor. Their system is able to generate accurate 3D RGB coloured models of the environment in real-time by optimizing for 6 degrees of freedom in terms of accurate projection of new depth map frames into an existing global signed distance function model of the scene. Their method uses several Gauss Newton optimization with a signed distance function representation, these techniques are represented and processed using a laptop with an NVIDIA GPU. Unlike Kinect Fusion \cite{Newcombe11Kinectfusion}, this method optimizes directly in the signed distance representation, in which camera pose is computed by finding a rotation and translation (6-DoF) which minimizes the error of projecting depth images into the SDF. Compared with the ICP based method used by Kinect Fusion, this technique is shown to be more robust and accurate. It compares favourably to bundle adjustment but is much faster for small to mid sized scenes. Results are generated using the TUM RGB-D benchmark and SDF volume sizes $256^3$ and $512^3$ are used in evaluations. The authors note the algorithm may be able to handle large scale scenes if used in conjunction with other techniques \cite{Kaess11Isam2,Kummerle11G}. \\
-
-This technique is efficient because the error to minimize can be checked using several look-ups since the SDF itself contains the distances from each voxel to the global model's actual surface. Because of this, the algorithm is classified as working within global space rather than frame-by-frame. Using the SDF to lookup depth map projection error, the camera pose is iteratively estimated and then the depth map is integrated into the SDF and colour information is stored in another volume. The pose estimation procedure begins by storing the first frame as a volumetric signed distance function. Then for each new depth frame, camera pose is computed, and based on this pose the frame is projected into the scene. Using a lie algebra based 6-DoF model \cite{Ma12Invitation} envisioned as a vector in $R^6$ representing camera pose, the error for a given pose may be computed as the squared error of the depth map transformed by the pose and projected into the signed distance function. Due to noise or missing data within the depth frame, this error may never be reduced completely, instead the best pose is iteratively computed using this model and the Gauss Newton non-linear optimization algorithm. \\
-
-The SDF representation uses two volumes as in \cite{Curless96Volumetric}, one volume stores the average distances, the other stores the cumulative weights for each voxel. Bylow et al use these weights to handle occlusion and sensor uncertainty. When integrating a point into the SDF, tri-linear interpolation is used between eight neighbours to handle point coordinated made up of floating point numbers. During integration, each voxel is projected onto the image plane rather than ray case from the center of projection as in \cite{Newcombe11Kinectfusion}. This ensures that each voxel is visited once when updating the SDF, whereas in the ray casting approach, this may not necessarily be the case. \\
-
-In computing the SDF for a given depth map, the exhaustive marching cubes algorithm is too slow, even the fast marching algorithm \cite{Baerentzen01Implementation} is not suited for real time discrete SDF generation. Instead, the SDF is approximated with either the point to point distance or point to plane distance functions. For final visualization, marching cubes is used \cite{Lorensen87Marching} on the final SDF. Colour is computed from the colour volume using a technique found used by Whelan et al \cite{Whelan13Robust}. Since the method by Bylow et al is based on optimizing the projection error using the SDF and only uses locations in its pose estimation procedure, it is independent to illumination. Given this, it will also fail in cases where only co-planar surfaces are visible, they mention that using colour information during tracking \cite{Kerl13Robust} may mitigate these concerns.
-
-
-\subsection{3D Features}
-
-\section{Global Optimization}
-\subsection{$G^2$o}
-
-\cite{Wurm10Octomap}
-
-\subsection{Bundle Adjustment}
-
-Fioraio [7 \cite{Fioraio11Realtime}] presented a system which uses bundle adjustment to align rgb-d data
-
-[END BUNDLE ADJUSTMENT]
-
-
-
-
-
-
-
 
 
 \subsubsection{RGB-D SLAM}
@@ -174,241 +374,123 @@ This system is divided into a front-end and a back-end. The front-end performs f
 
 The front-end uses OpenCV \cite{Bradski08Learning} for feature matching. During the feature detection process, the Hessian threshold is used to keep the total number of features constant. This is required because pose may not be able to be computed if there aren't enough features, but on the other hand, too many features typically lead to many false positives in the feature matching schema. As mentioned, these matched features (and thus matched 3d points) are used with RANSAC to compute pose \cite{Umeyama91Least}. During the RANSAC process, corresponding points with distances below 3cm are considered inliers. The inliers are then used exclusively to compute a finer pose. This method of pose estimation is fast but computational complexity depends on the number of features computed. For each frame, the pose relationship with 20 previous frames (including the most recent 3) is computed in parallel on the GPU. Then the final computed pose is given to the back-end. If accurate pose cannot be compute, constant motion is assumed. \\
 
-
-
-[BG Bylow]
-
-bundle adjustment using features over many views with [13 \cite{Klein07Parallel} , 2 \cite{Agarwal09Building}] with sparse 3d models generated
-
-algorithms to compute dense depth maps from image data [10 \cite{Hirschmuller05Accurate} , 21 \cite{Stuhmer10Real}]
-
-newcombe [18 \cite{Newcombe11Kinectfusion} ] -> impressive results using sdfs to represent reconstruction, and icp for camera tracking
-
-whelan [24 \cite{Whelan13Robust}] estended with rolling reconstruction volume and color fusion, evaluated alternative methods for visual odometry estimation
-
-pure visual odometry induces significant drift, so matching with global model is their preference
-
-novel method of estimating camera motion directly based on the SDF, key insight : sdf encodes distance to surface
-
-do not need downsampling in case of icp to achieve real time performance
-
 comparable to the feature based rgb-d slam [8 \cite{Endres12Evaluation}]
+
+\subsection{ICP}
 
 icp[4 \cite{Besl92Method}]
 
-graph slam use motion estimates as input to construct and optimiza a pose graph[15 \cite{Kummerle11G}] these methods render a joint map only after pose graph optimization
-
-this map is generally not used for further optimization
-
-the resulting maps are often represented as occupancy grid maps or octrees [25 \cite{Wurm10Octomap}]
-
-henry [9 \cite{Henry10Rgb}], applied graph slam to rgb-d data, using visual features + icp combo [8] also did a similar system, on benchmark [22 \cite{Sturm12Benchmark}]
-
-[18 \cite{Newcombe11Kinectfusion} dense 3d recon possible with realtime, 
-
-sdf[7 \cite{Curless96Volumetric}]
-
-KF: for each image:
-it renders a point cloud from the sdf at the previous pose using ray tracing and aligns this with the depth image
-
-
-point correspondences are found using projective data association [5 \cite{Blais95Registering}] and the point to plane distance
-
-Kin-Fu open source implementation available in the PCL library
-
-(icp only minimizes error on point clouds, some other approaches minimize photometric error [20 \cite{Steinbrucker11Real}, 12 \cite{Kerl13Robust}]
-
-or combinations of both [23 \cite{Tykkala11Direct}]) -> these did not perform 3d reconstruction
-
-whelan integrated these methods with kinect fusion [24 \cite{Whelan13Robust}]
-
-Canelhas [6 \cite{Canelhas12Scene}] did masters thesis an approach for camera tracking, similar to this
-his focus concentrates on object detection and recognition in an sdf and no thorough evaluation was performed
-
-Kubacki [14 \cite{Kubacki12Registration}] showed how an sdf can be used to estimate camera pose, only on synthetic data without a comparative evaluation
-
-[19 \cite{Ren12Unified}] demonstrated sdf based object tracking, based on known models
-
-presented by Bylow: direct approach to camera tracking on sdfs
-
-
-stable enough for use with quadcopter
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-[Background from KF]
-
-area promises new augmented reality and mixed reality applications
-
-SFM and MVS (multi view stereo) has given good results : camera tracking  and sparse reconstructions [10] \cite{Fitzgibbon98Automatic}, \cite{Seitz06Comparison} [24] 
-
-SLAM has focused on real time markerless tracking and live scene reconstruction based on a single sensor RGB eg. MonoSLAM[8] \cite{Davison03Real} which is less accurate than PTAM [17] \cite{Klein07Parallel}  but these only produce sparse reconstructions
-
-some methods have grown to combine PTAM's camera tracking ability with MVS-style reconstructions [19/26] (\cite{Newcombe10Live}/\cite{Stuhmer10Real})
-
-recently: iterative image alignment has been used to replace features in tracking [20] \cite{Newcombe11Dtam}
-
-this scene is promising: but monocular based dense 3D reconstruction is difficult and requires suitable camera motion and scene illumination
-
-camera technologies have also been evolving: enter the world of new depth cameras or rgb-d cameras,
-these have become available to consumers and may soon be found in mobile technologies \cite{Zhang12Microsoft}
-
-first real-time rgb-d depth sensor : with this system users can wave around the device to generate smooth, continuously updating, fully reconstructed data: using only depth, 6dof are tracked
-
-works in full darkness : mitigating issues for passive cameras: [17 \cite{Klein07Parallel} /19 \cite{Newcombe10Live} /26 \cite{Stuhmer10Real}] and other rgb systems [14 \cite{Henry10Rgb}]
-
-[XYZ]
-
-kw : dense volumetric reconstruction
-
-GPGPU kw: is one of their design keys, their system can perform in real time at above these frame rates
-
-they perform qualitative analysis
-
-Kinect: incorporates a structured light based depth sensor, uses an on board ASIC generating an 11-bit 640x480 depth map at 30hz
-
-depth images often contain holes : this is an issue (caused by no structured light could be read on the surface, certain materials, which do not reflect infra-red light (very thin structures or surfaces at incendence angles
-
-when moving fast, the device can also experience motion blur, this leads to missing data
-
-then they do  reviews on:
-	slam, dense tracking, surface representations, previous work with joint tracking and modelling using depth sensors
-
-[Background]
-
-early sfm algorithms: either accumulated drift (computing motion) [2 \cite{Beardsley97Sequential} ] or performed loop-closure using off-line optimization 
-
-The first monocular slam system [8 \cite{Davison03Real} ] was capable of producing globally consistent maps in real time with hand-held camera used probabilistic filtering of camera and scene feature estimates
-
-limited to in-door office environments because it requires large state vectors which grow with scene size
-sparse feature maps lead to poor accuracy
-
-then systems which split tracking and mapping (global optimization) -> approach by PTAM system [17 \cite{Klein07Parallel}]
-: real time mono slam in work spaces -> basically it is just bundle adjustment (which is the least squares solution to camera and feature optimization (theirs chooses features dynamically over the frame range)
-
-their tracking system runs in parallel at frame-rate speeds, and performs robust n-point pose estimation with feature matching
-
-compared to filters much more features can be packed into the map[25 \cite{Strasdat10Real} ]
-
-PTAM = realtime results as accurate as off-line ones
-
-PTAM produces sparse maps - not like our project
-
-some algorithms can use PTAM tracking in conjunction with dense reconstruction computing module based on multi-view stereo
-
-[19 \cite{Newcombe10Live}] uses dense optical flow with PTAM like tracking for dense recon
-
-this relies on camera poses coming from PTAM
-
-[26 \cite{Stuhmer10Real}] do the same with near real time depth map calculation
-
-DENSE TRACKING AND MAPPING by Scan Alignment
-
-dense sensor based 3d reconstruction research has continued using lasers and depth sensors
-
-typically : minimize distance measures between all data rather than feature extraction and matching
+(icp only minimizes error on point clouds, some other approaches minimize photometric error [20 \cite{Steinbrucker11Real}, 12 \cite{Kerl13Robust}] or combinations of both [23 \cite{Tykkala11Direct}]) -> these did not perform 3d reconstruction
 
 6dof camera alignment and 3d surface reconstruction techniques developed in the graphics domain, here ICP is the most important
 ICP @ [3 \cite{Besl92Method} ]
-
 ICP is a non-linear optimization problem where approximations are found using the closest points currently for each
 set
-
 distance metrics have been researched using the point-plane metric [5 \cite{Chen92Object}]
-
 [\cite{Chen92Object} 5] improves convergence rates, used for surface reconstructions which have normal data
-
 computing closest points using ICP is expensive, there is projective data association algorithm [4 \cite{Blais95Registering}]
-
 can be used for data in projective form (2d image where each image is a 3d point)
-
 can reduce icp set to possible set of points or with a coarse to fine scheme
-
 SLAM may use ICP to estimate camera changes
 
-Dense 3D scene representations:
 
-occupancy mapping : use a grid to store data
 
-[9 \cite{Elfes87Sensor}] uses a Bayesian probability of occupancy to measure whether should be added to the grid
 
-also can used signed distance functions [9 \cite{Elfes87Sensor}] (SDF), it can be used to fuse partial depth scans, whilst mitigating
-issues relating mesh-based reconstruction algorithms
 
-SDF represents : surface interfaces as 0, positive values that increase with distance from the nearest surface
-and occupied space using a negative value
+\subsubsection{Henry10Rgb}
 
-more robust to noise version of SDF -> [30 \cite{Zach07Globally} ]
+henry [12 \cite{Henry10Rgb,Henry14Rgb}] is similar to this work \cite{Endres12Evaluation}
+uses sparse keypoint matches between color images as initialization to icp
+henry used sparse bundle adjustment [19 \cite{Lourakis09Sba} ], here 3d pose graph using [18 \cite{Kummerle11G}] framework is used
+henry put resulting into surfel representation, here volumetric voxel representation is used [33], can be used for robot localization, path planning and navigation [13 \cite{Hornung10Humanoid}]
 
-SDF can be visualized by first converting to mesh and rendering ( use marching cubes [18 \cite{Cubes87High}]) or it can be directly ray cast [21 \cite{Parker98Interactive}]
+henry [9 \cite{Henry10Rgb}], applied graph slam to rgb-d data, using visual features + icp combo [8 \cite{Endres11Evaluation} ] also did a similar system, on benchmark [22 \cite{Sturm12Benchmark}]
 
-[23 \cite{Rusinkiewicz02Real}] used frame-by-frame ICP with occupancy grid, users can scan in small objects by rotating the objects with their hand
-works @ 10hz, issue: does not do global optimization, cannot do large scenes . final models are optimized using [7 \cite{Curless96Volumetric}]
-sdf fusion in real time may be possible
-
-sdf can be used for globally satisfying reconstruction
-
-small scale reconstructions:
-	[28 \cite{Weise09Hand}] -> produces high quality scans using a fixed ToF sensor
-	[6 \cite{Cui103d} ] demonstrate a moving handheld ToF scanner
-
-Octomap [29 \cite{Wurm10Octomap}] -> 3d reconstruction using occupancy grid style 
 
 [14 \cite{Henry10Rgb}] uses rgb-d with kinect by frame by frame icp : feature matching is used with graph optimization for loop closure and global consistency -> global fusion presents better performance
 
 
 
+ICP [2 \cite{Besl92Method}, 26 \cite{Rusinkiewicz01Efficient}, 27 \cite{Segal09Generalized}]
+
+\subsubsection{Kinect Fusion}
+
+Newcombe et al \cite{Newcombe11Kinectfusion} proposed an accurate, real-time dense 3d reconstruction algorithm which works well on complex indoor environments. This algorithm computes relationships between depth map frames generated using the Microsoft Kinect \cite{Zhang12Microsoft} sensor. By aligning depth maps this method is capable of tracking both camera pose and location as well as generating dense 3d reconstructions. Only depth data is used in alignment computations thus, consequently because the Kinect is a structured light based depth sensor Kinect Fusion works under any lighting condition, including complete darkness. Since they use the Kinect and GPU (both considered commodity hardware these days) the technique may be considered inexpensive. \\
+
+The method works by computing camera pose, transforming depth data by a computed pose (frame-by-frame) and fusing this data into a global surface volume. It uses a coarse to fine grain iterative closest point (ICP) algorithm to compute camera pose. During the ICP phase, the target points come from the entire globally matched previous frames. Therefore this method is considered global rather than frame-to-frame based. Such a method has direct advantages over frame-by-frame feature matching, since all data is used to compute pose. The downside, is that this method fails to find global solutions due to the nature of ICP. This may occur when some frames must be skipped due to motion blur, or the camera passing over surfaces which do not reflect infra-red light. \\
+
+\begin{figure}[!h]
+\centering
+\includegraphics[width=12cm]{images/ch1/Newcombe11KinectFusion1}
+\caption{Kinect Fusion Algorithm Pipeline \cite{Newcombe11Kinectfusion}}
+\label{KFusionPipeliciteHne}
+\end{figure}
+
+Kinect Fusion has four main steps as illustrated in figure \ref{KFusionPipeline}. The first step named measurement, performs pre-processing on the depth data as well as generation of additional information for use by Kinect Fusion. Each depth map frame is first passed through a bilateral filter. From this, a dense vertex map (map of 3D points projected using a known projection matrix associated with the Kinect) is generated, as well as a normal map. For both the vertex and normal maps, a 3 level image pyramid is constructed. This makes the coarse to fine grain ICP technique possible. \\
+
+Next, dense coarse to fine grain ICP is used to compute pose between the fused frames and the current frame. The authors exploit the fact that the transformation between frames is small because camera motion is slow when computing against every frame. With coarse-to-fine grain ICP they use projective data association \cite{Blais95Registering} and the point-plane metric for pose optimization \cite{Rusinkiewicz02Real}. The ICP based pose estimation computes pose given both a predicted and measured depth map. \\
+
+After estimating camera pose relating to the globally fused model, each frame must be integrated into that model. The Kinect Fusion algorithm uses a truncated signed distance function (TSDF) representation. This is a signed distance function volume where the distances for each voxel are capped by some value. The TSDF uses a volume resolution of $512\times 512\times 512$. They use the TSDF, rather than relying on a linear but accurate discrete SDF transform \cite{Rasch09Remarks} because of the computational complexity of calculating the discrete SDF of large scale volumes. \\
+
+As mentioned, Kinect fusion uses pose prediction and fuses each depth map into the TSDF representation. In this way, they align and fuse each depth map to the global 3d reconstruction. In this way, a global loop closure method is not required. This may have a negative side effect by which some frames which have larger resolutions may be heavily quantized in order to fuse with the SDF, especially very thin surfaces/objects. These features may also be advantageous for ICP in estimating pose. 
+
+
+but kinect fusion generates synthetic depth images which are aligned to the current depth image using icp
+
+newcombe [18 \cite{Newcombe11Kinectfusion} ] -> impressive results using sdfs to represent reconstruction, and icp for camera tracking
+
+KF: for each image:
+it renders a point cloud from the sdf at the previous pose using ray tracing and aligns this with the depth image
+
+
+
+\subsection{Optimizers}
+
+\subsubsection{3D Reconstruction by Optimizing directly in the SDF}
+
+In 2013, Bylow et al \cite{Bylow13Real} presented a novel method which reconstructs static indoor environments in real time using RGB-D data captured using the Asus Xtion Pro Live sensor. Their system is able to generate accurate 3D RGB coloured models of the environment in real-time by optimizing for 6 degrees of freedom in terms of accurate projection of new depth map frames into an existing global signed distance function model of the scene. Their method uses several Gauss Newton optimization with a signed distance function representation, these techniques are represented and processed using a laptop with an NVIDIA GPU. Unlike Kinect Fusion \cite{Newcombe11Kinectfusion}, this method optimizes directly in the signed distance representation, in which camera pose is computed by finding a rotation and translation (6-DoF) which minimizes the error of projecting depth images into the SDF. Compared with the ICP based method used by Kinect Fusion, this technique is shown to be more robust and accurate. It compares favourably to bundle adjustment but is much faster for small to mid sized scenes. Results are generated using the TUM RGB-D benchmark and SDF volume sizes $256^3$ and $512^3$ are used in evaluations. The authors note the algorithm may be able to handle large scale scenes if used in conjunction with other techniques \cite{Kaess11Isam2,Kummerle11G}. \\
+
+This technique is efficient because the error to minimize can be checked using several look-ups since the SDF itself contains the distances from each voxel to the global model's actual surface. Because of this, the algorithm is classified as working within global space rather than frame-by-frame. Using the SDF to lookup depth map projection error, the camera pose is iteratively estimated and then the depth map is integrated into the SDF and colour information is stored in another volume. The pose estimation procedure begins by storing the first frame as a volumetric signed distance function. Then for each new depth frame, camera pose is computed, and based on this pose the frame is projected into the scene. Using a lie algebra based 6-DoF model \cite{Ma12Invitation} envisioned as a vector in $R^6$ representing camera pose, the error for a given pose may be computed as the squared error of the depth map transformed by the pose and projected into the signed distance function. Due to noise or missing data within the depth frame, this error may never be reduced completely, instead the best pose is iteratively computed using this model and the Gauss Newton non-linear optimization algorithm. \\
+
+The SDF representation uses two volumes as in \cite{Curless96Volumetric}, one volume stores the average distances, the other stores the cumulative weights for each voxel. Bylow et al use these weights to handle occlusion and sensor uncertainty. When integrating a point into the SDF, tri-linear interpolation is used between eight neighbours to handle point coordinated made up of floating point numbers. During integration, each voxel is projected onto the image plane rather than ray case from the center of projection as in \cite{Newcombe11Kinectfusion}. This ensures that each voxel is visited once when updating the SDF, whereas in the ray casting approach, this may not necessarily be the case. \\
+
+In computing the SDF for a given depth map, the exhaustive marching cubes algorithm is too slow, even the fast marching algorithm \cite{Baerentzen01Implementation} is not suited for real time discrete SDF generation. Instead, the SDF is approximated with either the point to point distance or point to plane distance functions. For final visualization, marching cubes is used \cite{Lorensen87Marching} on the final SDF. Colour is computed from the colour volume using a technique found used by Whelan et al \cite{Whelan13Robust}. Since the method by Bylow et al is based on optimizing the projection error using the SDF and only uses locations in its pose estimation procedure, it is independent to illumination. Given this, it will also fail in cases where only co-planar surfaces are visible, they mention that using colour information during tracking \cite{Kerl13Robust} may mitigate these concerns.
 
 
 
 
+\subsection{3D Features}
+
+\cite{Aiger084}
+
+\section{Global Optimization}
+\subsection{$G^2$o}
+
+graph slam use motion estimates as input to construct and optimiza a pose graph[15 \cite{Kummerle11G}] these methods render a joint map only after pose graph optimization
+this map is generally not used for further optimization
+the resulting maps are often represented as occupancy grid maps or octrees [25 \cite{Wurm10Octomap}]
 
 
 
 
+\subsection{Bundle Adjustment}
+
+Fioraio [7 \cite{Fioraio11Realtime}] presented a system which uses bundle adjustment to align rgb-d data
+
+
+bundle adjustment using features over many views with [13 \cite{Klein07Parallel} , 2 \cite{Agarwal09Building}] with sparse 3d models generated
+
+[END BUNDLE ADJUSTMENT]
 
 
 
+[BG Bylow]
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+? not sure where to put this yet [maybe icp...]
+whelan [24 \cite{Whelan13Robust}] estended with rolling reconstruction volume and color fusion, evaluated alternative methods for visual odometry estimation
+pure visual odometry induces significant drift, so matching with global model is their preference
+whelan integrated photometric + icp methods for kinect fusion [24 \cite{Whelan13Robust}]
+?
 
 
 
@@ -449,6 +531,9 @@ Karni and Gotsman \cite{Karni00Spectral} proposed a lossy method which compresse
 A lossy wavelet based compression system was proposed by Khodakovsky et al \cite{Khodakovsky00Progressive}. This technique samples the mesh, and uses the wavelet transform to decorrelate the data. Coefficients are quantized and stored in a structure called a zero tree which increases compression performance. This method is shown to outperform the valence method. Other wavelet approaches \cite{Guskov00Normal,Khodakovsky04Normalmesh} also sample the mesh and use a multi-resolution representation in which the data is described using local normal directions on the mesh surface.
 
 Gu et al \cite{Gu02Geometry} devised a solution for representing 3D models as 2D images which are then compressed using state of the art image compression methods (based on wavelets). To form this representation, the mesh is cut along a network of edge paths, opening the mesh into a topological disk, which is then sampled onto a 2D grid. Each pixel in the image has a corresponding coordinate in the model, with pixel neighbourhoods describing connectivity. Comparisons with the method by Khodakovsky et al reveal the geometry image codec does not have as high compression performance.
+
+
+
 
 
 
