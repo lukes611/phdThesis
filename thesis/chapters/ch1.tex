@@ -505,7 +505,19 @@ and Guskov 2005],:
 
 under noisy conditions this may also be used : [Pottmann et al. 2007],
 
+an alternative is relying on the principal of large numbers
+aka solving the largest common pointset (LCP) problem 
+given point sets P and Q, LCP under δ-congruenc solves for a subset Pi of P
+having the largest cardinality such that the distance between T(Pi) and Q  is less than δ given an appropriate distance measure, given T is a rigid body transformation
 
+the basic concept is to optimize the selection of the 3 points used as a base, choosing 3 then trying this out, then moving on,
+this is O(m^3 x n^3) but can be reduced to:  O(mn^3 log n) [Irani and Raghavan 1996] and even O(n^3 log n) , but this is still expensive for large point sets
+
+this paper introduces:
+a novel 3d alignment scheme which does a rough alignment of surfaces which may have little overlap
+this alignment may be refined using ICP  (cf. [Rusinkiewicz and Levoy 2001]). 
+
+this method is based on the novel technique of extracting all co-planar 4 point from a 3D set
 
 
 
