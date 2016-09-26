@@ -517,7 +517,12 @@ this paper introduces:
 a novel 3d alignment scheme which does a rough alignment of surfaces which may have little overlap
 this alignment may be refined using ICP  (cf. [Rusinkiewicz and Levoy 2001]). 
 
-this method is based on the novel technique of extracting all co-planar 4 point from a 3D set
+this method is based on the novel technique of extracting all co-planar 4 point from a 3D set that are related by rigid transform to a given planar 4-points in O(n^2 + k) time
+
+n is the number of points in Q and k is the number of 4-point sets
+
+when simple reliable descriptors can be computed it is 
+
 
 
 
