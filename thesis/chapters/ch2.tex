@@ -46,7 +46,11 @@ The ShadeTree (ST), developed by Gonzalez \cite{Gonzalez07ShadeTree}, was design
 
 \subsection{The Quad-Binary-Tree}
 
-Kassim \textit{et al.} \cite{Kassim09Hierarchical} developed a novel hierarchical technique called the Quad-Binary tree (QBT). This scheme was designed to be efficient and free of visual artefacts which are often produced by transform based codecs. The QBT is a hybrid codec, which combines the QT, wedgelet and BSP tree. It uses three different structures to represent nodes. These structures include: a quadrant (QT leaf node), a boundary line in a quadrant (wedgelet leaf node) and a polygonal region (BSP leaf node). The QBT stores control bits to identify which structure is used by each node. Huffman coding is used to compress node and control bit data. This method is shown to outperform the BSP tree, wedgelets and JPEG2000 in terms of rate-distortion. An example of this technique is shown in figure \ref{QBExample}. This method produces state of the art performance but is computationally inefficient.
+Kassim \textit{et al.} \cite{Kassim09Hierarchical} developed a novel hierarchical technique called the Quad-Binary tree (QBT). This scheme was designed to be efficient and free of visual artefacts which are often produced by transform based codecs. The QBT is a hybrid codec, which combines the QT, wedgelet and BSP tree. It uses three different structures to represent nodes. These structures include: a quadrant (QT leaf node), a boundary line in a quadrant (wedgelet leaf node) and a polygonal region (BSP leaf node). The QBT stores control bits to identify which struct@extend .nonSelectable
+    &:hover
+        color : pink
+        border-color : pink
+    ure is used by each node. Huffman coding is used to compress node and control bit data. This method is shown to outperform the BSP tree, wedgelets and JPEG2000 in terms of rate-distortion. An example of this technique is shown in figure \ref{QBExample}. This method produces state of the art performance but is computationally inefficient.
 
 \begin{figure}[!h]
 \centering
