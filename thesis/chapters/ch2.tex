@@ -7,17 +7,253 @@
 
 \section{Introduction}
 
+start doing - grab from some of my papers
+
 \section{Volume Registration based Pose Estimation}
 
 \subsection{Fourier Volume Registration}
 
+\subsubsection{Volume Representation}
+
+\subsubsection{Phase Correlation and Recovery of Translation Values}
+
+\subsubsection{5-DoF Registration using FFT}
+
+Figure \ref{fig:PIPELINE} shows a functional block diagram of our method. The input data are two 3D volumes ($Volume_1$ and $Volume_2$) and the output is the transformation matrix required to register the two volumes. The volumes are first Hanning windowed. Next, a translation independent representation is obtained for each by taking the magnitude of their 3D FFTs. Then a log function is applied to the resulting magnitude values, improving scale and rotation estimation \cite{Gonzalez11Improving}. Following a log-spherical transformation, 3D phase correlation is performed to find the global rotation and scale relationship between $Volume_1$ and $Volume_2$. $Volume_1$ is then inversely transformed by the rotation and scale parameters, leaving only the translation to be resolved. This is found by applying phase correlation again between the transformed $Volume_1$ and $Volume_2$. 
+\subsection{Phase Correlation}
+Given a volume $V_1$ and a spatially shifted version of it $V_2$, the offset can be recovered using $PhaseCorrelation$ (Eq. \ref{eqn:PC_basic}). This function takes two volumes as input and returns the translation between them.
+\begin{equation} \label{eqn:PC_basic}
+(x, y, z) = PhaseCorrelation(V_m, V_n)
+\end{equation}
+The $PhaseCorrelation$ function first applies 3D FFTs to volumes, $V_1$ and $V_2$, converting them into the frequency domain, i.e. $F_{1_{x,y,z}} = FFT(V_1)$ and $F_{2_{x,y,z}} = FFT(V_2)$. Taking the normalised cross power spectrum using Eq. \ref{eqn:PHCOR_eq} completes the Phase correlation function. 
+\begin{equation} \label{eqn:PHCOR_eq}
+F_{3_{x,y,z}} = \frac{F_{1_{x,y,z}} \circ F_{2_{x,y,z}}^*}{ | F_{1_{x,y,z}} \circ F_{2_{x,y,z}}^* | }
+\end{equation}
+Here, $\circ$ is an element-wise multiplication and $|x|$ is the magnitude function. Taking the inverse FFT of $F_3$, gives the phase correlation volume $V_3$ ($V_3 = FFT^{-1}(F_3)$). The location of the peak value in $V_3$, $(x_1, y_1, z_1)$ gives the shift between the $V_1$ and $V_2$. The phase correlation volume is typically noisy making the peak difficult to locate. 
+\subsection{Recovering Scale, Rotation and Translation Parameters}
+If $V_1$ and $V_2$ are instead rotated and scaled versions of the same volume, such that they are related by some translation $(t_x, t_y, t_z)$, y-axis rotation $\theta$, and scale $\varphi$. Further action is required to recover translation parameters. The first step, given two volumes $V_1$ and $V_2$ of size $N^3$ is to apply a Hanning windowing function (Eq. \ref{eqn:Hann}). 
+\begin{equation} \label{eqn:Hann}
+\scriptstyle
+HW_{x,y,z} = \frac{1}{2}\left(
+1 - cos \left(
+\frac{2\pi
+\left(
+\sqrt{\left(\frac{N}{2}\right)^3} -
+\sqrt{
+\left(x-\frac{N}{2}\right)^2 + \left(y-\frac{N}{2}\right)^2 + \left(z-\frac{N}{2}\right)^2
+}
+\right)
+}
+{2\sqrt{\left(\frac{N}{2}\right)^3} - 1}
+\right)
+\right)
+\end{equation}
+The rotation and scale factors are recovered first using a translation independent representation of the volumes using the Fourier shift theory. For this, the magnitude of the FFT of the volumes is taken, $M_1 = |FFT(V_1)|$, $M_2 = |FFT(V_2)|$. The zero-frequency of both $M_1$ and $M_2$ is shifted to the center of the volume and the log of the result is taken $M'_1 = Log(M_1)$, $M'_2 = Log(M_2)$ which reduces noise on the phase correlation volume. A log-spherical transform is then used to turn rotation and scaling into translation for both $M'_1$ and $M'_2$. Eq. \ref{eqn:Log_Spherical} shows the corresponding log-spherical space coordinate $(X_{log-spherical}, Y_{log-spherical}, Z_{log-spherical})$ for a given $(x,y,z)$ euclidean space coordinate.
+\begin{equation} \label{eqn:Log_Spherical}
+\begin{split}
+X_{log-spherical} & = \frac{atan\left(
+\left(\frac{x-\frac{N}{2}}{\sqrt{x^2+y^2+z^2}}\right)
+\left(\frac{y-\frac{N}{2}}{\sqrt{x^2+y^2+z^2}}\right)^{-1}
+\right)N}{360}\\
+Y_{log-spherical} & = \frac{acos\left(
+\frac{y}{\sqrt{x^2+y^2+z^2}}
+\right)N}
+{180} \\
+Z_{log-spherical} & =\frac{log\left(\sqrt{x^2+y^2+z^2}\right)N}{log\left( \frac{N}{2.56} \right)} \\
+\end{split}
+\end{equation}
+The log-spherical transforms of $M'_1$ and $M'_2$ are then phase correlated to find the shift between them, $(x_{M'},y_{M'},z_{M'}) = PhaseCorrelation(M'_1, M'_2)$. The rotation $\theta$ and scale $\varphi$ factors between $V_1$ and $V_2$ can then be found from the shift parameters using Eq. \ref{eqn:ROTATIONSCALEFROMXM} . 
+\begin{equation} \label{eqn:ROTATIONSCALEFROMXM}
+\begin{split}
+\theta & = \frac{-360x_{M'}}{N}\\
+\varphi & = e^{
+-\left(
+2.56^{-1}N
+\right)z_{M'}N^{-1}
+}
+\end{split}
+\end{equation}
+Using $\theta$ and $\varphi$, $V_1$ can now be inverse transformed (using $(\frac{N}{2}, \frac{N}{2}, \frac{N}{2})$ as the origin). This aligns $V_1$ and $V_2$ with respect to scale and y-axis rotation. The translation parameters $(t_x, t_y, t_z)$ can then be found using phase correlation as given in Eq. \ref{eqn:FINALTRANS}.
+\begin{equation} \label{eqn:FINALTRANS}
+(t_x, t_y, t_z) = PhaseCorrelation(scale(rotate(V_1,\theta),\varphi), V_2)
+\end{equation}
+The complete function to recover translation, rotation and scaling, combining equations \ref{eqn:PHCOR_eq}-\ref{eqn:FINALTRANS} as is denoted in \ref{algorithm:PCSLAM} is \ref{eqn:FULLPC}.
+\begin{equation} \label{eqn:FULLPC}
+(\theta, \varphi, t_x, t_y, t_z) = PhaseCorrelation_{\theta \varphi t_x t_y t_z}(V_m, V_n)
+\end{equation}
+
+
+\subsubsection{Filtering Techniques in FFT based Volume Registration}
+
 \subsection{Fast Fourier Volume Registration}
+
+\subsubsection{Improving Speed : A 2D Case}
+
+\subsubsection{Improving Speed : A 3D Case}
+
+To reduce complexity we focus on areas which require the most computation time. In the earlier defined Fourier based reconstruction technique, this occurs in the two 3D phase correlations which need to be computed. We describe the method of reduction here; a block diagram for this technique is given in figure \ref{fig:PIPELINE3}. We refer to this method as fast volume registration (FVR) in reference general volume registration (VR). The speedup begins by computing the 3D DFT of both input volumes and taking the magnitude of these. Rather than directly performing a 3D log-spherical transform and a 3D phase correlation operation on these volumes, we use a novel transform we call a spherical-map transform (details in \ref{SMTransform}).\\
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=6.0in]{images/ch2/pipeline3}
+\caption{System Diagram for Fast Volume Registration}
+\label{fig:PIPELINE3}
+\end{figure*}
+
+This transform converts rotation into translation whilst simultaneously unfolding the 3D space down to 2-dimensions. After this, a 2D phase correlation that requires significantly less processing compared with the 3D counterpart is used to compute the rotation. Next, having obtained the rotation parameter, the rotation is eliminated from the transformation by rotating the first volume by this parameter. The two volumes are then passed through two orthogonal projection mapping functions. This also converts the volumes to 2D space. We use two transforms for both volumes, one projection along the x-axis, another along the z-axis. Once the x-axis projections of both volumes are complete, we can do another 2D phase correlation to give us the z-translation. The 2D phase correlation of the z-axis projections gives us the x and y axis translations separating the original volumes. The final output of this method gives the rotation and translational shifts between the input volumes. The projections add little complexity to the overall algorithm and since 2D phase correlation operations are used in place of 3D ones, much computation time is reduced.
+
+\subsection{Spherical-map transform}
+\label{SMTransform}
+The spherical map transform both reduces the 3D volume to a 2D image, and any rotation about the y-axis becomes x-axis translation in the output image. An example of the bunny model and the spherical-map transform of this model is given in figure \ref{fig:smtExample}, the mathematics are defined in equations \ref{eqn:invLPFuncs} and \ref{eqn:smtUpdate}. Given a coordinate in 2D Cartesian space x,y, we compute the ray $[Ray_x Ray_y Ray_z]^T$ from the volume center and sum up the voxel values along the ray (equation \ref{eqn:smtUpdate}). \\
+
+
+\begin{equation} \label{eqn:invLPFuncs}
+\begin{split}
+Ray_x(x,y) & = cos\left(\frac{360x}{N}\right)sin\left(\frac{180y}{N}\right)  + \frac{N}{2} \\
+Ray_y(y) & = cos\left(\frac{180y}{N}\right) + \frac{N}{2} \\
+Ray_z(x,y) & = 	sin\left(\frac{360x}{N}\right)sin\left(\frac{180y}{N}\right) + \frac{N}{2}
+\end{split}
+\end{equation}
+
+\begin{equation} \label{eqn:smtUpdate}
+Im_{x,y} = \sum_{r=1}^{(2^{-1}N)^{1.5}}{Vol(Ray_x(x,y)r, Ray_y(y)r, Ray_z(x,y)r)} 
+\end{equation}
+
+This is process essentially sums up the values along a given ray defined by scaling spherical coordinates and adding up the values intersecting the ray. The resulting image, maps 3D y-axis rotation to 2D x-axis translation.  \\
+
+\begin{figure*}[t] 
+        \centering
+        \begin{subfigure}[b]{2.6in}
+                \includegraphics[width=2.6in]{images/ch2/bunny}
+                \caption{original}
+                \label{fig:bunnyOrig}
+        \end{subfigure}%
+        \begin{subfigure}[b]{2.6in}
+                \includegraphics[width=2.6in]{images/ch2/spherical2DMap}
+                \caption{transform}
+                \label{fig:bunnySPTed}
+        \end{subfigure}%
+        \caption{The Spherical Map Transform.}
+       \label{fig:smtExample}
+\end{figure*}
+
+\subsection{Projection-map transform}
+
+The projection map transform is similar to an orthogonal projection of the volume along some given axis. For the projection map transform, given an output image $Im_a$ and an input volume $Vol_a$, each pixel in $Im_a$ is defined mathematically as the summation of values along a particular axis given the image coordinates. The x-axis transform and the z-axis transform are defined in equations \ref{eqn:xPMT} and \ref{eqn:zPMT} respectively. \\
+
+\begin{equation} \label{eqn:xPMT}
+Im(z,y) = \sum_{x=0}^{N}{Vol_a(x,y,z)}
+\end{equation}
+
+\begin{equation} \label{eqn:zPMT}
+Im(x,y) = \sum_{z=0}^{N}{Vol_a(x,y,z)}
+\end{equation}
+
+The process defined by equation \ref{eqn:xPMT} maps 3D z-axis translation to 2D x-axis translation, whilst equation \ref{eqn:zPMT} maps 3D x-axis and y-axis translation into 2D x-axis and y-axis translation.
+
+
+To assess the performance of our method, the size of the volumes being registered is defined as $N^3$ whilst each frame is sampled at a resolution of $W$ $\times$ $H$. The projection process requires $12WH$ operations whilst re-sampling the point cloud requires $2WH$ operations. The Volume Registration process, $VolumeRegister{\theta \varphi t_x t_y t_z}(V_1, V_2)$ consists of 2 $\times$ Hanning windowing processes, 2 $\times$ 3D FFTs, 2 $\times$ volume-logs, 2 $\times$ log-spherical transforms, 2 $\times$ phase correlation processes and 1 $\times$ linear transformation and peak finding. 
+
+The Hanning windowing function requires 26 operations. The 3D FFT has complexity of $3N^3\log{N}$, the log and log-spherical transform functions require 3 and 58 operations per voxel respectively. Multiplying two frequency spectra together and transforming a volume requires 15 and 30 operations per voxel respectively. Finding the peak value requires $2N^3$ operations. The complexity in terms of number of operations for the phase correlation process is given in Eq. \ref{eqn:PCFULLPERFORMANCE} This process requires 2 $\times$ 3D FFTs, 1 $\times$ frequency spectra multiplication, and 1 $\times$ peak finding operation. 
+\begin{equation} \label{eqn:PCFULLPERFORMANCE}
+6N^3\log{N} + 2N^3 + 15
+\end{equation}
+The total complexity can then be found by taking into account the projection and re-sampling totals as well as the total for $VolumeRegister{\theta \varphi t_x t_y t_z}(V_1, V_2)$. Tallying the number of operations for each process and multiplying them by number of times the process is performed gives us the number of operations as a function of $W$, $H$ and $N$ in Eq. \ref{eqn:FULLPERFORMANCE}.
+\begin{equation} \label{eqn:FULLPERFORMANCE}
+6N^3 + 28WH + 18(N^3\log{N}) + 230
+\end{equation}
+\begin{figure*}[t] 
+        \centering
+        \begin{subfigure}[b]{2.0in}
+                \includegraphics[width=2.0in]{images/ch2/unit21}
+                \caption{Apartment}
+                \label{fig:RECON_UNIT}
+        \end{subfigure}%
+        \begin{subfigure}[b]{2.0in}
+                \includegraphics[width=2.0in]{images/ch2/officeA}
+                \caption{Office}
+                \label{fig:RECON_OFFICE}
+        \end{subfigure}%
+        \begin{subfigure}[b]{2.0in}
+                \includegraphics[width=2.0in]{images/ch2/outdoorA}
+                \caption{Garden}
+                \label{fig:RECON_GARDEN}
+        \end{subfigure}
+       \caption{Reconstructed Scenes.}
+       \label{fig:RECONSTRUCTIONS}
+\end{figure*}
+
+
+
+To compare performance of the generic volume registration method with the speed up, we use the complexity defined in equation \ref{eqn:FULLPERFORMANCE}. Here, we ignore the cost of projecting the depth map. The 3D DFT has complexity $3N^3log(N)$. This is the first step (see figure \ref{fig:PIPELINE3}), the next is the spherical-map transform which is complexity $45N^3$. If processed on the GPU the performance becomes 45 operations per voxel assuming that one voxel is assigned to one unit of processing. A 3D transform is 30 operations per voxel, 2D phase correlation requires 15 operations to multiply the frequency spectra and $2N^2log(N)$ operations to do the 2D FFT. Finally a projection map transform requires 1 operation per voxel. \\
+
+In total, the proposed method requires $2 \times$ 3D FFTs, $2 \times$ spherical-map transforms, $1 \times$ 3D geometrical transformation, $3 \times$ 2D phase correlations and $4 \times$ projection map transforms. The total complexity is added up for all of these functions and given in equation \ref{eqn:FULLPERF2}. \\
+
+\begin{equation} \label{eqn:FULLPERF2}
+6log(N)\times (N^3 + N^2) + 169
+\end{equation}
+
+Figure \ref{fig:perfComp} provides a visualization of the performance improvement which the proposed method achieves over the original Fourier volume registration approach. It is clear that the proposed method is around 3 times faster
+than the original Fourier based volume registration approach. This is due to the reduction in the amount of data to process afforded by the novel spherical-map transform and orthogonal projection methods.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=3.0in]{images/ch2/perfcomp}
+\caption{Comparison of performance between volume registration and the proposed speed up for different volume sizes.}
+\label{fig:perfComp}
+\end{figure}
+
+
+
 
 \subsection{7-DoF Based Fourier Registration}
 
 \section{3D Reconstruction Data Representation}
 
+\subsection{3D ShadeTree Coding}
+
+\subsection{PlaneTree Coding}
+
 \section{Depth Sensor Based Reconstruction}
+
+\label{METHOD_SECLL}
+The proposed SLAM method consists of various steps. First each frame $f_i$ that is captured, consisting of a colour and depth image pair is projected into 3D space, forming colour point cloud $points_i$ and re-sampled into a volume $V_i$. Then, the transform parameters between pairs of volumes $V_i$ and $V_{i+1}$ are estimated using $VolumeRegister_{\theta \varphi t_x t_y t_z}$ shortened to $VR_{\theta \varphi t_x t_y t_z}$. These parameters are used to update transformation matrix $M$. The points corresponding to $f_2$ ($points_1$) are then transformed using the updated $M$ matrix and added to the cumulative $PointCloud$ database. Two lists, $Cameras$ and $Poses$, are also updated to track camera pose and location per frame. This basic procedure is given in listings \ref{algorithm:PCSLAM} and elaborated upon in subsequent subsections.
+\begin{figure}
+\begin{lstlisting}[language=c++,caption=Phase Correlation Based SLAM Algorithm,label=algorithm:PCSLAM,mathescape,basicstyle=\ttfamily]
+$f_1$ = ReadFrame();
+$PointCloud$ = project($f_1$);
+$M$ = IdentityMatrix();
+$Camera$ = $[0, 0, 0]^T$;
+$Pose$ = $[0, 0, 1]^T$;
+$Cameras$ = $\left[Camera\right]$, $Poses$ = $\left[Pose\right]$;
+while(more frames){
+	$f_2$ = ReadFrame();
+	$points_1$ = project($f_2$);
+	$points_2$ = project($f_1$);
+	$V_1$ = ResampleVolume($points_1$);
+	$V_2$ = ResampleVolume($points_2$);
+	$(\theta, \varphi, t_x, t_y, t_z) = VR_{\theta \varphi t_x t_y t_z}(V_1, V_2)$;
+	$M = M \times$TransformMat($(\theta, \varphi, t_x, t_y, t_z)$);
+	$points_1$ = Transform($points_1$, $M$);
+	$PointCloud$ = $PointCloud \cup points_1$;
+	$Camera$ = $M^{-1} \times Camera$;
+	$Pose$ = $M^{-1} \times Pose$;
+	$Cameras.add(Camera)$;
+	$Poses.add\left(\frac{Pose-Camera}{|Pose-Camera|}\right)$;
+	$f_1$ = $f_2$;
+}
+\end{lstlisting}
+\end{figure}
+\subsection{Sensor Input}
+The input to our method is a color and depth image pair, $f(u,v)$ and $g(u,v)$ obtained using an Asus Xtion PRO LIVE sensor at a resolution of $640 \times 480$. Each pixel is projected into 3D space using $X_{u,v} = \frac{(u - c_x)Z_{u,v}}{f}$, $Y_{u,v} = \frac{(v - c_y)Z_{u,v}}{f}$ and $Z_{u,v}$ = $g(u,v)$. 
+Here, $[c_x c_y]^T$ represent the center of the image whilst $f$ represents the focal length, defined as $525.0$. The point clouds generated by projecting these images are then quantized into image volumes. Results reported in this paper were obtained using volumes of $384^3$ voxels in size.
+\begin{figure*}[t]
+\centering
+\includegraphics[width=6.0in]{images/ch2/pipeline2}
+\caption{System Diagram for Registration Process}
+\label{fig:PIPELINE}
+\end{figure*}
+
 
 \section{Stereo Camera Based Reconstruction}
 
