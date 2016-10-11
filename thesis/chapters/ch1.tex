@@ -404,7 +404,7 @@ uses sparse keypoint matches between color images as initialization to icp
 henry used sparse bundle adjustment [19 \cite{Lourakis09Sba} ], here 3d pose graph using [18 \cite{Kummerle11G}] framework is used
 henry put resulting into surfel representation, here volumetric voxel representation is used [33], can be used for robot localization, path planning and navigation [13 \cite{Hornung10Humanoid}]
 
-henry [9 \cite{Henry10Rgb}], applied graph slam to rgb-d data, using visual features + icp combo [8 \cite{Endres11Evaluation} ] also did a similar system, on benchmark [22 \cite{Sturm12Benchmark}]
+henry [9 \cite{Henry10Rgb}], applied graph slam to rgb-d data, using visual features + icp combo [8 \cite{Endres12Evaluation} ] also did a similar system, on benchmark [22 \cite{Sturm12Benchmark}]
 
 
 [14 \cite{Henry10Rgb}] uses rgb-d with kinect by frame by frame icp : feature matching is used with graph optimization for loop closure and global consistency -> global fusion presents better performance
@@ -421,7 +421,7 @@ The method works by computing camera pose, transforming depth data by a computed
 
 \begin{figure}[!h]
 \centering
-\includegraphics[width=12cm]{images/ch1/Newcombe11KinectFusion1}
+%\includegraphics[width=12cm]{images/ch1/Newcombe11KinectFusion1}
 \caption{Kinect Fusion Algorithm Pipeline \cite{Newcombe11Kinectfusion}}
 \label{KFusionPipeliciteHne}
 \end{figure}
@@ -471,7 +471,7 @@ no need for pre-filtering or de-noising
 significantly reduces the number of trials required to get registration, has no assumption of prior alignment
 novel technique:
 extracts all co-planar 4 points sets from a 3D point set which are approximately congruent under rigid transformation to a given set of co-planar 4-points
-complexity O(n^2 + k), n is number of points, k is number of 4 point sets
+complexity O(n to power of 2 + k), n is number of points, k is number of 4 point sets
 in practice: when not too much noise and overlap is significant,
 using local descriptors allows for complexity O(n+k)
 an extension to perform affine transforms too
@@ -479,31 +479,31 @@ demonstrates robustness over multiple range scans with varying levels of noise, 
 
 
 methods of 3d alignment under rigid transformation with 3d scans
-ns [Callieri et al. 2004, Gelfand et al. 2005, Li and Guskov
-2005]
+ns [\cite{Callieri04Roboscan} Callieri et al. 2004, Gelfand et al. 2005 \cite{Gelfand04Shape}, Li and Guskov
+2005 \cite{Li05Multiscale}]
 
 non-rigid alignments:
-t [Pauly et al. 2005, Brown and
-Rusinkiewicz 2007].
+t [Pauly et al. 2005 \cite{Pauly05Example}, Brown and
+Rusinkiewicz 2007 \cite{Brown07Global}].
 
 
-local descriptor 3d features : ors [Li and Guskov 2005] can be used to define an approximate transformation, then use ICP to align further ([Besl and McKay 1992, Chen and Medioni 1992])
+local descriptor 3d features : ors [Li and Guskov 2005 \cite{Li05Multiscale}] can be used to define an approximate transformation, then use ICP to align further ([Besl and McKay 1992 \cite{Besl92Method}, Chen and Medioni 1992 \cite{Chen92Object}])
 
 only need to know 3 point pairs
 
 local descriptors (invariant to rigid transformations) can be used to extract these 3 points
 
-geometric hashing may be used: [Wolfson and Rigoutsos 1997]
+geometric hashing may be used: [Wolfson and Rigoutsos 1997 \cite{Wolfson97Geometric}]
 
-RANSAC can be used with the set of matches to find the best transform [Fischler and Bolles 1981], 
-these have been improved in by Chen and co-authors [1999] which tradeoff speed for robustness
+RANSAC can be used with the set of matches to find the best transform [Fischler and Bolles 1981 \cite{Fischler81Random}], 
+these have been improved in by Chen and co-authors [1999] \cite{Chen99Ransac} which tradeoff speed for robustness
 
 PCA can be used to compute bases but in the case of partial overlap, this quickly breaks down
 
-local descriptors: [Johnson 1997, Li
-and Guskov 2005],: 
+local descriptors: [Johnson 1997 \cite{Johnson97Spin}, Li
+and Guskov 2005 \cite{Li05Multiscale}],: 
 
-under noisy conditions this may also be used : [Pottmann et al. 2007],
+under noisy conditions this may also be used : [Pottmann et al. 2007 \cite{Pottmann07Principal}],
 
 an alternative is relying on the principal of large numbers
 aka solving the largest common pointset (LCP) problem 
@@ -511,17 +511,50 @@ given point sets P and Q, LCP under δ-congruency solves for a subset Pi of P
 having the largest cardinality such that the distance between T(Pi) and Q  is less than δ given an appropriate distance measure, given T is a rigid body transformation
 
 the basic concept is to optimize the selection of the 3 points used as a base, choosing 3 then trying this out, then moving on,
-this is O(m^3 x n^3) but can be reduced to:  O(mn^3 log n) [Irani and Raghavan 1996] and even O(n^3 log n) , but this is still expensive for large point sets
+this is O($m^3$ x $n^3$) but can be reduced to:  O($mn^3$ log n) [Irani and Raghavan \cite{Irani96Combinatorial} 1996] and even O($n^3$ log n) , but this is still expensive for large point sets
 
 this paper introduces:
 a novel 3d alignment scheme which does a rough alignment of surfaces which may have little overlap
-this alignment may be refined using ICP  (cf. [Rusinkiewicz and Levoy 2001]). 
+this alignment may be refined using ICP  (cf. [Rusinkiewicz and Levoy 2001 \cite{Rusinkiewicz01Efficient}]). 
 
-this method is based on the novel technique of extracting all co-planar 4 point from a 3D set that are related by rigid transform to a given planar 4-points in O(n^2 + k) time
+this method is based on the novel technique of extracting all co-planar 4 point from a 3D set that are related by rigid transform to a given planar 4-points in O($n^2$ + k) time
 
 n is the number of points in Q and k is the number of 4-point sets
 
 when simple reliable descriptors can be computed it is 
+O(n+k)
+
+can also be used to handle similarity transforms
+
+bg
+partial matching is fundamental task for registration and recognition of 3d objects [Frome et al 04 \cite{Frome04Recognizing}]
+
+typically based on matching local descriptors [Jonson 1997 \cite{Johnson97Spin}, Mori \cite{Mori05Efficient} et al 05]
+
+also integral invarients [Pottmann 07 \cite{Pottmann07Principal}]
+
+can be used to accelerate 3d scans aquired by range scanners [Li and Gusov 05 \cite{Li05Multiscale}]
+
+hough transform [ballard 97 \cite{Ballard81Generalizing}] ransac [fischler and bolles 81 \cite{Fischler81Random}]
+
+image based alignment : [Wolfson and Rigoutsos \cite{Wolfson97Geometric} 97]
+
+hashing based versions [Germain et al 97 \cite{Germain97Fingerprint}, Gal and Cohen-Or 06 \cite{Gal06Salient}, Mitra 06 \cite{Mitra04Registration}]
+
+steps: pick a base P where the number of points in the base is equal to the number of points required to uniquely compute the transformation,
+
+for each random base from Q, the corresponding alignment is vertified [Fischler and Bolles 81 \cite{Fischler81Random}, huttenlocher and ullman 90 \cite{Huttenlocher91Fast} ]
+
+or voted for [Ballard 87 \cite{Ballard91Generalizing}]
+
+variant of RANSAC , they use 4pcs for this step
+
+finds all 4point sets from p and matches with all 4 points from Q
+
+O($n^2$ + k) runtime to compute the 4 points
+
+
+icp was too far to converge on a solution [Mitra et al 04 \cite{Mitra04Registration}]
 
 
 
