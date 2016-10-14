@@ -28,67 +28,6 @@ intro about this section...
 \subsubsection{5-DoF Registration using FFT}
 
 Figure \ref{fig:PIPELINE} shows a functional block diagram of our method. The input data are two 3D volumes ($Volume_1$ and $Volume_2$) and the output is the transformation matrix required to register the two volumes. The volumes are first Hanning windowed. Next, a translation independent representation is obtained for each by taking the magnitude of their 3D FFTs. Then a log function is applied to the resulting magnitude values, improving scale and rotation estimation \cite{Gonzalez11Improving}. Following a log-spherical transformation, 3D phase correlation is performed to find the global rotation and scale relationship between $Volume_1$ and $Volume_2$. $Volume_1$ is then inversely transformed by the rotation and scale parameters, leaving only the translation to be resolved. This is found by applying phase correlation again between the transformed $Volume_1$ and $Volume_2$. 
-\subsection{Phase Correlation}
-Given a volume $V_1$ and a spatially shifted version of it $V_2$, the offset can be recovered using $PhaseCorrelation$ (Eq. \ref{eqn:PC_basic}). This function takes two volumes as input and returns the translation between them.
-\begin{equation} \label{eqn:PC_basic}
-(x, y, z) = PhaseCorrelation(V_m, V_n)
-\end{equation}
-The $PhaseCorrelation$ function first applies 3D FFTs to volumes, $V_1$ and $V_2$, converting them into the frequency domain, i.e. $F_{1_{x,y,z}} = FFT(V_1)$ and $F_{2_{x,y,z}} = FFT(V_2)$. Taking the normalised cross power spectrum using Eq. \ref{eqn:PHCOR_eq} completes the Phase correlation function. 
-\begin{equation} \label{eqn:PHCOR_eq}
-F_{3_{x,y,z}} = \frac{F_{1_{x,y,z}} \circ F_{2_{x,y,z}}^*}{ | F_{1_{x,y,z}} \circ F_{2_{x,y,z}}^* | }
-\end{equation}
-Here, $\circ$ is an element-wise multiplication and $|x|$ is the magnitude function. Taking the inverse FFT of $F_3$, gives the phase correlation volume $V_3$ ($V_3 = FFT^{-1}(F_3)$). The location of the peak value in $V_3$, $(x_1, y_1, z_1)$ gives the shift between the $V_1$ and $V_2$. The phase correlation volume is typically noisy making the peak difficult to locate. 
-\subsection{Recovering Scale, Rotation and Translation Parameters}
-If $V_1$ and $V_2$ are instead rotated and scaled versions of the same volume, such that they are related by some translation $(t_x, t_y, t_z)$, y-axis rotation $\theta$, and scale $\varphi$. Further action is required to recover translation parameters. The first step, given two volumes $V_1$ and $V_2$ of size $N^3$ is to apply a Hanning windowing function (Eq. \ref{eqn:Hann}). 
-\begin{equation} \label{eqn:Hann}
-\scriptstyle
-HW_{x,y,z} = \frac{1}{2}\left(
-1 - cos \left(
-\frac{2\pi
-\left(
-\sqrt{\left(\frac{N}{2}\right)^3} -
-\sqrt{
-\left(x-\frac{N}{2}\right)^2 + \left(y-\frac{N}{2}\right)^2 + \left(z-\frac{N}{2}\right)^2
-}
-\right)
-}
-{2\sqrt{\left(\frac{N}{2}\right)^3} - 1}
-\right)
-\right)
-\end{equation}
-The rotation and scale factors are recovered first using a translation independent representation of the volumes using the Fourier shift theory. For this, the magnitude of the FFT of the volumes is taken, $M_1 = |FFT(V_1)|$, $M_2 = |FFT(V_2)|$. The zero-frequency of both $M_1$ and $M_2$ is shifted to the center of the volume and the log of the result is taken $M'_1 = Log(M_1)$, $M'_2 = Log(M_2)$ which reduces noise on the phase correlation volume. A log-spherical transform is then used to turn rotation and scaling into translation for both $M'_1$ and $M'_2$. Eq. \ref{eqn:Log_Spherical} shows the corresponding log-spherical space coordinate $(X_{log-spherical}, Y_{log-spherical}, Z_{log-spherical})$ for a given $(x,y,z)$ euclidean space coordinate.
-\begin{equation} \label{eqn:Log_Spherical}
-\begin{split}
-X_{log-spherical} & = \frac{atan\left(
-\left(\frac{x-\frac{N}{2}}{\sqrt{x^2+y^2+z^2}}\right)
-\left(\frac{y-\frac{N}{2}}{\sqrt{x^2+y^2+z^2}}\right)^{-1}
-\right)N}{360}\\
-Y_{log-spherical} & = \frac{acos\left(
-\frac{y}{\sqrt{x^2+y^2+z^2}}
-\right)N}
-{180} \\
-Z_{log-spherical} & =\frac{log\left(\sqrt{x^2+y^2+z^2}\right)N}{log\left( \frac{N}{2.56} \right)} \\
-\end{split}
-\end{equation}
-The log-spherical transforms of $M'_1$ and $M'_2$ are then phase correlated to find the shift between them, $(x_{M'},y_{M'},z_{M'}) = PhaseCorrelation(M'_1, M'_2)$. The rotation $\theta$ and scale $\varphi$ factors between $V_1$ and $V_2$ can then be found from the shift parameters using Eq. \ref{eqn:ROTATIONSCALEFROMXM} . 
-\begin{equation} \label{eqn:ROTATIONSCALEFROMXM}
-\begin{split}
-\theta & = \frac{-360x_{M'}}{N}\\
-\varphi & = e^{
--\left(
-2.56^{-1}N
-\right)z_{M'}N^{-1}
-}
-\end{split}
-\end{equation}
-Using $\theta$ and $\varphi$, $V_1$ can now be inverse transformed (using $(\frac{N}{2}, \frac{N}{2}, \frac{N}{2})$ as the origin). This aligns $V_1$ and $V_2$ with respect to scale and y-axis rotation. The translation parameters $(t_x, t_y, t_z)$ can then be found using phase correlation as given in Eq. \ref{eqn:FINALTRANS}.
-\begin{equation} \label{eqn:FINALTRANS}
-(t_x, t_y, t_z) = PhaseCorrelation(scale(rotate(V_1,\theta),\varphi), V_2)
-\end{equation}
-The complete function to recover translation, rotation and scaling, combining equations \ref{eqn:PHCOR_eq}-\ref{eqn:FINALTRANS} as is denoted in \ref{algorithm:PCSLAM} is \ref{eqn:FULLPC}.
-\begin{equation} \label{eqn:FULLPC}
-(\theta, \varphi, t_x, t_y, t_z) = PhaseCorrelation_{\theta \varphi t_x t_y t_z}(V_m, V_n)
-\end{equation}
 
 
 \subsubsection{Filtering Techniques in FFT based Volume Registration}
