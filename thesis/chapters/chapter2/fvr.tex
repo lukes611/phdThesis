@@ -18,6 +18,8 @@ CrossCorrelate(Transform(V_1, x,y,z), V_2)
 
 Since we typically do not know the range of translation values $x,y,z$ to optimize for, we take into account the range from $[0,N]$ where $N$ is the width/height/depth of the volume. This gives a complexity of $N^6$. This is too computationally complex for practical volume sizes. Therefore, we use the properties of the Fourier Transform to reduce computational complexity.
  
+The 3D Fourier transform transforms a volume from the 3D spatial domain into the 3D frequency domain. The frequency domain is a complex valued volume made up of sinusoids where each value in the frequency domain represents the magnitude, phase and direction of a wave. 
+
 
  can be recovered using $PhaseCorrelation$ (Eq. \ref{eqn:PC_basic}). This function takes two volumes as input and returns the translation between them.
 \begin{equation} \label{eqn:PC_basic}
