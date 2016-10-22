@@ -16,24 +16,194 @@ Cross-correlation searches over a space of translation parameters and outputs th
 CrossCorrelate(Transform(V_1, x,y,z), V_2)
 \end{equation}
 
-Since we typically do not know the range of translation values $x,y,z$ to optimize for, we take into account the range from $[0,N]$ where $N$ is the width/height/depth of the volume. This gives a complexity of $N^6$. This is too computationally complex for practical volume sizes. Therefore, we use the properties of the Fourier Transform to reduce computational complexity.
+Since we typically do not know the range of translation values $x,y,z$ to optimize for, we take into account the range from $[0,N]$ where $N$ is the width/height/depth of the volume. This gives a complexity of $N^6$. This is too computationally complex for practical volume sizes. Therefore, we use the properties of the Fourier Transform to reduce computational complexity. \\
  
-The 3D Fourier transform transforms a volume from the 3D spatial domain into the 3D frequency domain. The frequency domain is a complex valued volume made up of sinusoids where each value in the frequency domain represents the magnitude, phase and direction of a wave. 
+The 3D Fourier transform transforms a volume from the 3D spatial domain into the 3D frequency domain. The frequency domain is a complex valued volume made up of sinusoids where each value in the frequency domain represents the magnitude, phase and direction of a wave.  \\
 
 
- can be recovered using $PhaseCorrelation$ (Eq. \ref{eqn:PC_basic}). This function takes two volumes as input and returns the translation between them.
+Using the properties of the Frequency domain, we can efficiently recover the optimal alignment translation parameters using a function called $PhaseCorrelation$ (Eq. \ref{eqn:PC_basic}). This function takes two volumes as input and returns the best alignment translation between them in terms of maximizing correlation.
 \begin{equation} \label{eqn:PC_basic}
-(x, y, z) = PhaseCorrelation(V_m, V_n)
+(x, y, z) = PhaseCorrelation(V_x, V_y)
 \end{equation}
-The $PhaseCorrelation$ function first applies 3D FFTs to volumes, $V_1$ and $V_2$, converting them into the frequency domain, i.e. $F_{1_{x,y,z}} = FFT(V_1)$ and $F_{2_{x,y,z}} = FFT(V_2)$. Taking the normalised cross power spectrum using Eq. \ref{eqn:PHCOR_eq} completes the Phase correlation function. 
+The $PhaseCorrelation$ function first applies 3D FFTs to volumes, $V_1$ and $V_2$, converting them into the frequency domain, i.e. $F_{1_{x,y,z}} = FFT(V_1)$ and $F_{2_{x,y,z}} = FFT(V_2)$. Taking the normalised cross power spectrum using Eq. \ref{eqn:PHCOR_eq} based on these frequency domain volumes computes the frequency domain of a new volume called the phase correlation volume. \\
+
+
 \begin{equation} \label{eqn:PHCOR_eq}
 F_{3_{x,y,z}} = \frac{F_{1_{x,y,z}} \circ F_{2_{x,y,z}}^*}{ | F_{1_{x,y,z}} \circ F_{2_{x,y,z}}^* | }
 \end{equation}
-Here, $\circ$ is an element-wise multiplication and $|x|$ is the magnitude function. Taking the inverse FFT of $F_3$, gives the phase correlation volume $V_3$ ($V_3 = FFT^{-1}(F_3)$). The location of the peak value in $V_3$, $(x_1, y_1, z_1)$ gives the shift between the $V_1$ and $V_2$. The phase correlation volume is typically noisy making the peak difficult to locate. 
+
+Here, $\circ$ is an element-wise multiplication and $|x|$ is the magnitude function. Taking the inverse FFT of the frequency domain of the phase correlation volume, $F_3$ gives the phase correlation volume itself, $V_3$ ($V_3 = FFT^{-1}(F_3)$). The location of the peak value in the phase correlation volume $V_3$, $(x_1, y_1, z_1)$ gives the shift between the $V_1$ and $V_2$. The phase correlation volume is typically noisy making the peak difficult to locate. Each in the phase correlation volume evaluates the correlation between $V_1$ (translated by the location of the peak) and $V_2$.
 
 
-\subsection{Recovery of Y-Axis Rotation}
+\subsection{Recovery of Y-Axis Rotation and Scale}
 
-\subsection{Recovery of Scale}
+Using the phase correlation procedure along with some spatial transformation functions allows the computation of a single axis of rotation (out of 3) along with the scale difference between two volumes. If $V_1$ and $V_2$ are translated, rotated and scaled versions of the same volume, such that they are related by some translation $(t_x, t_y, t_z)$, y-axis rotation $\theta$, and scale $\varphi$.\\
+
+
+Here we describe how to compute the rotation and scale parameters, further action is required to recover translation. The first step, given two volumes $V_1$ and $V_2$ of size $N^3$ is to apply a Hanning windowing function (Eq. \ref{eqn:Hann}). This function assists in filtering the volumes prior to a discrete Fourier transform being applied to them. Since the discrete Fourier transform relies on a continuous signal (volume) and this cannot be used in the calculation, by reducing the signal strength near the volume borders, we can improve the accuracy of the discrete Fourier transform.
+\begin{equation} \label{eqn:Hann}
+\scriptstyle
+HW_{x,y,z} = \frac{1}{2}\left(
+1 - cos \left(
+\frac{2\pi
+\left(
+\sqrt{\left(\frac{N}{2}\right)^3} -
+\sqrt{
+\left(x-\frac{N}{2}\right)^2 + \left(y-\frac{N}{2}\right)^2 + \left(z-\frac{N}{2}\right)^2
+}
+\right)
+}
+{2\sqrt{\left(\frac{N}{2}\right)^3} - 1}
+\right)
+\right)
+\end{equation}
+The rotation and scale factors can only be recovered if translation information is removed from the two volumes. Therefore we take the magnitude of the FFT of the volumes, $M_1 = |FFT(V_1)|$, $M_2 = |FFT(V_2)|$. Since the magnitude values do not contain phase information they do not, by nature, contain location information of the volume (translation information). The zero-frequency of both $M_1$ and $M_2$ is next shifted to the center of the volume and the log of the result is taken $M'_1 = Log(M_1)$, $M'_2 = Log(M_2)$. Like in phase correlation the log function spreads out the contribution of the frequencies so that high frequencies contribute as much as lower frequencies which have larger magnitudes. A log-spherical transform is then used to turn rotation and scaling into translation for both $M'_1$ and $M'_2$. Eq. \ref{eqn:Log_Spherical} shows the corresponding log-spherical space coordinate $(X_{log-spherical}, Y_{log-spherical}, Z_{log-spherical})$ for a given $(x,y,z)$ euclidean space coordinate.
+\begin{equation} \label{eqn:Log_Spherical}
+\begin{split}
+X_{log-spherical} & = \frac{atan\left(
+\left(\frac{x-\frac{N}{2}}{\sqrt{x^2+y^2+z^2}}\right)
+\left(\frac{y-\frac{N}{2}}{\sqrt{x^2+y^2+z^2}}\right)^{-1}
+\right)N}{360}\\
+Y_{log-spherical} & = \frac{acos\left(
+\frac{y}{\sqrt{x^2+y^2+z^2}}
+\right)N}
+{180} \\
+Z_{log-spherical} & =\frac{log\left(\sqrt{x^2+y^2+z^2}\right)N}{log\left( \frac{N}{2.56} \right)} \\
+\end{split}
+\end{equation}
+The log-spherical transforms of $M'_1$ and $M'_2$ are then phase correlated to find the shift between them, $(x_{M'},y_{M'},z_{M'}) = PhaseCorrelation(M'_1, M'_2)$. The rotation $\theta$ and scale $\varphi$ factors between $V_1$ and $V_2$ can then be found from the shift parameters using Eq. \ref{eqn:ROTATIONSCALEFROMXM} . 
+\begin{equation} \label{eqn:ROTATIONSCALEFROMXM}
+\begin{split}
+\theta & = \frac{-360x_{M'}}{N}\\
+\varphi & = e^{
+-\left(
+2.56^{-1}N
+\right)z_{M'}N^{-1}
+}
+\end{split}
+\end{equation}
+Using $\theta$ and $\varphi$, $V_1$ can now be inverse transformed (using $(\frac{N}{2}, \frac{N}{2}, \frac{N}{2})$ as the origin). This aligns $V_1$ and $V_2$ with respect to scale and y-axis rotation. The translation parameters $(t_x, t_y, t_z)$ can then be found using phase correlation as given in Eq. \ref{eqn:FINALTRANS}.
+\begin{equation} \label{eqn:FINALTRANS}
+(t_x, t_y, t_z) = PhaseCorrelation(scale(rotate(V_1,\theta),\varphi), V_2)
+\end{equation}
+The complete function to recover translation, rotation and scaling, combining equations \ref{eqn:PHCOR_eq}-\ref{eqn:FINALTRANS} as is denoted in \ref{algorithm:PCSLAM} is \ref{eqn:FULLPC}.
+\begin{equation} \label{eqn:FULLPC}
+(\theta, \varphi, t_x, t_y, t_z) = PhaseCorrelation_{\theta \varphi t_x t_y t_z}(V_m, V_n)
+\end{equation}
 
 \subsection{Full Recovery of 3D Rotation}
+
+In order to recover full 3D rotation (as well as scale and translation) the model must first be aligned by some common axis. PCA or Principals Component Analysis is a well known technique for recovering the primary axes of an N-dimensional signal. In this case, we can use the most accurate axis (the eigen-vector with the largest corresponding eigen-value) to align two volumes, then y-axis rotation, scale and translation values can be recovered by the described FFT based volume registration method. \\
+
+PCA is a capable registration technique on its own, but when faced with non-overlapping, missing or noisy data it typically fails on its own. The technique of alignment is discussed in the following sections. \\
+
+Given a 3-dimensional signal $A$ of length $N$, the co-variance of the signals between two of the dimensions ($x$ and $y$) is given as a function in equation \ref{eqn:Covariance3DSignal}.
+
+\begin{equation} \label{eqn:Covariance3DSignal}
+Cov(A_x,A_y) = \sum_{i=0}^{N}(A_{x_i} - A_{x_{mean}})(A_{y_i} - A_{y_{mean}})
+\end{equation}
+
+Here, $A_{x_{mean}}$ and $A_{y_{mean}}$ are the mean values of these x and y dimensions of $A$. 
+
+Using the voxel locations of volume $A$ we can generate the covariance matrix \ref{eqn:CovarMatrix}. This matrix describes the how each coordinate changes with respect to each other.
+
+\begin{equation} \label{eqn:CovarMatrix}
+\left[
+\begin{array}{ccc}
+Cov(A_x, B_x) & Cov(A_x, A_y) & Cov(A_x, A_z) \\
+Cov(A_y, B_x) & Cov(A_y, A_y) & Cov(A_y, A_z) \\
+Cov(A_z, B_x) & Cov(A_z, A_y) & Cov(A_z, A_z) \\
+\end{array}
+\right]
+\end{equation}
+
+The 3 eigen-vectors of the covariance matrix describe the primary axis of the signal $A$ and the 3 corresponding eigen-values describe the strength of these axes. The eigen-vector/axis with the largest corresponding eigen-value is the principal component. The principal component is used to align data to a common axis. Here we define the principal axis (component) of a 3D signal $A$ as $A_{pa}$. \\
+
+Given a 3D volume $V$, with a computed principal axis $V_{pa}$ and mean $V_{mean_location}$, we can construct a matrix to normalize the 3D data in terms of the principal axis. 
+
+Given $V_{pa}$ a vector pointing along the principal axis of $V$, we compute the forward vector as 
+
+
+\begin{equation} \label{eqn:fwdVector}
+Fwd = \left(\left[
+\begin{array}{c}
+V_{pa_{x}}\\
+V_{pa_{y}}\\
+V_{pa_{z}}\\
+\end{array}
+\right] \times \left(\left[
+\begin{array}{c}
+1\\
+0\\
+0\\
+\end{array}
+\right] \times \left[
+\begin{array}{c}
+V_{pa_{x}}\\
+V_{pa_{y}}\\
+V_{pa_{z}}\\
+\end{array}
+\right]\right)\right) \times \left[
+\begin{array}{c}
+V_{pa_{x}}\\
+V_{pa_{y}}\\
+V_{pa_{z}}\\
+\end{array}
+\right]
+\end{equation}
+
+Here, $\times$ is the cross-product of the vectors. The right pointing vector is computed as orthogonal to the forward vector and the common vertical axis $V_{pa}$,
+
+
+\begin{equation} \label{eqn:fwdVector}
+Rgt = \left[
+\begin{array}{c}
+V_{pa_{x}}\\
+V_{pa_{y}}\\
+V_{pa_{z}}\\
+\end{array}
+\right] \times \left[
+\begin{array}{c}
+Fwd_x\\
+Fwd_y\\
+Fwd_z\\
+\end{array}
+\right]
+\end{equation}
+
+Then the volume can be normalized to an axis based on the input data. This is done using a matrix which transforms the data to the origin, then corrects the vector $V_{pa}$ to be the new up axis, then transforms back. The matrix in equation \ref{eqn:CorrectUpMat} computes this,
+
+
+\begin{equation} \label{eqn:CorrectUpMat}
+CorrectMat(V) = \left[
+\begin{array}{cccc}
+1 & 0 & 0 & V_{mean_x} \\
+0 & 1 & 0 & V_{mean_y} \\
+0 & 0 & 1 & V_{mean_z} \\
+0 & 0 & 0 & 1 \\
+\end{array}
+\right] \left[
+\begin{array}{cccc}
+Rgt_x & Rgt_y & Rgt_z & 0 \\
+V_{pa_x} & V_{pa_y} & V_{pa_z} & 0 \\
+Fwd_x & Fwd_y & Fwd_z & 0 \\
+0 & 0 & 0 & 1 \\
+\end{array}
+\right] \left[
+\begin{array}{cccc}
+1 & 0 & 0 & -V_{mean_x} \\
+0 & 1 & 0 & -V_{mean_y} \\
+0 & 0 & 1 & -V_{mean_z} \\
+0 & 0 & 0 & 1 \\
+\end{array}
+\right]
+\end{equation}
+
+
+To recover a matrix for full 3D rotation, scale and translation for given volumes $Volume_A$ and $Volume_B$, we first compute the correction matrices using PCA and the technique described above for both $Volume_A$ and $Volume_B$ as $C_A = CorrectMat(Volume_A)$ and $C_B = CorrectMat(Volume_B)$. The transformation matrix relating $Transform(Volume_A, C_A)$ and $Transform(Volume_B, C_B)$ is computed as $RST$. The final transform then relating $Volume_A$ to $Volume_B$ is computed as,
+
+\begin{equation} \label{eqn:FullRSTTransform}
+R_{x,y,z}ST Matrix = C_{B}^{-1} \times RST \times C_A
+\end{equation}
+
+This technique is capable of extending Fourier registration to take into account full 3D rotation. The technique simply requires a single iteration over the data to compute the principal components then a rotation-scale-translation phase correlation technique is used to compute the scale, translation and y-axis rotation. 

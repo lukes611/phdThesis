@@ -9,3 +9,7 @@ computing camera pose, computing error
 integration into volumetric cube
 
 advantages / disadvantages
+
+
+
+Figure \ref{fig:PIPELINE} shows a functional block diagram of our method. The input data are two 3D volumes ($Volume_1$ and $Volume_2$) and the output is the transformation matrix required to register the two volumes. The volumes are first Hanning windowed. Next, a translation independent representation is obtained for each by taking the magnitude of their 3D FFTs. Then a log function is applied to the resulting magnitude values, improving scale and rotation estimation \cite{Gonzalez11Improving}. Following a log-spherical transformation, 3D phase correlation is performed to find the global rotation and scale relationship between $Volume_1$ and $Volume_2$. $Volume_1$ is then inversely transformed by the rotation and scale parameters, leaving only the translation to be resolved. This is found by applying phase correlation again between the transformed $Volume_1$ and $Volume_2$. 
