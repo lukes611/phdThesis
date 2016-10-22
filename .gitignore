@@ -15,8 +15,6 @@ x64/
 *.toc
 *.bak
 *.bbl
-*.pdf
 *.dvi
 *.zip
-*.png
-*.docx
+thesis/phdThesis.pdf
