@@ -3,7 +3,7 @@
 
 \subsection{Fast Fourier Volume Registration}
 
-To reduce complexity we focus on areas which require the most computation time. In the earlier defined Fourier based reconstruction technique, this occurs in the two 3D phase correlations which need to be computed. We describe the method of reduction here; a block diagram for this technique is given in figure \ref{fig:PIPELINE3}. We refer to this method as fast volume registration (FVR) in reference general volume registration (VR). The speedup begins by computing the 3D DFT of both input volumes and taking the magnitude of these. Rather than directly performing a 3D log-spherical transform and a 3D phase correlation operation on these volumes, we use a novel transform we call a spherical-map transform (details in \ref{SMTransform}).\\
+3D phase correlation is CPU and GPU intensive, so in order to reduce complexity we tried to minimize processing in areas which require the most computation time. In out Fourier based volume registration method defined in the previous section, this occurs in the two 3D phase correlations which need to be computed. We describe the method of reduction here; a block diagram for this technique is given in figure \ref{fig:PIPELINE3} WARNING:Given a picture for the sped up version too!. We refer to this method as fast volume registration (FVR) in reference to general volume registration (VR). The speedup begins by computing the 3D DFT of both input volumes and taking the magnitude of these. Rather than directly performing a 3D log-spherical transform and a 3D phase correlation operation on these volumes, we use a novel transform we call a spherical-map transform (details in \ref{SMTransform}).\\
 
 \begin{figure*}[t]
 \centering
@@ -31,17 +31,17 @@ Ray_z(x,y) & = 	sin\left(\frac{360x}{N}\right)sin\left(\frac{180y}{N}\right) + \
 Im_{x,y} = \sum_{r=1}^{(2^{-1}N)^{1.5}}{Vol(Ray_x(x,y)r, Ray_y(y)r, Ray_z(x,y)r)} 
 \end{equation}
 
-This is process essentially sums up the values along a given ray defined by scaling spherical coordinates and adding up the values intersecting the ray. The resulting image, maps 3D y-axis rotation to 2D x-axis translation.  \\
+This process essentially sums up the values along a given ray defined by scaling spherical coordinates and adding up the values intersecting the ray. The resulting image, maps 3D y-axis rotation to 2D x-axis translation.  \\
 
 \begin{figure*}[t] 
         \centering
-        \begin{subfigure}[b]{2.6in}
-                \includegraphics[width=2.6in]{images/ch2/bunny}
+        \begin{subfigure}[b]{4.2in}
+                \includegraphics[width=4.2in]{images/ch2/bunny}
                 \caption{original}
                 \label{fig:bunnyOrig}
-        \end{subfigure}%
-        \begin{subfigure}[b]{2.6in}
-                \includegraphics[width=2.6in]{images/ch2/spherical2DMap}
+        \end{subfigure}
+        \begin{subfigure}[b]{4.2in}
+                \includegraphics[width=4.2in]{images/ch2/spherical2DMap}
                 \caption{transform}
                 \label{fig:bunnySPTed}
         \end{subfigure}%
@@ -53,6 +53,8 @@ This is process essentially sums up the values along a given ray defined by scal
 \subsection{Projection-map transform}
 
 The projection map transform is similar to an orthogonal projection of the volume along some given axis. For the projection map transform, given an output image $Im_a$ and an input volume $Vol_a$, each pixel in $Im_a$ is defined mathematically as the summation of values along a particular axis given the image coordinates. The x-axis transform and the z-axis transform are defined in equations \ref{eqn:xPMT} and \ref{eqn:zPMT} respectively. \\
+
+WARNING: add in a picture here
 
 \begin{equation} \label{eqn:xPMT}
 Im(z,y) = \sum_{x=0}^{N}{Vol_a(x,y,z)}
@@ -75,26 +77,6 @@ The total complexity can then be found by taking into account the projection and
 \begin{equation} \label{eqn:FULLPERFORMANCE}
 6N^3 + 28WH + 18(N^3\log{N}) + 230
 \end{equation}
-\begin{figure*}[t] 
-        \centering
-        \begin{subfigure}[b]{2.0in}
-                \includegraphics[width=2.0in]{images/ch2/unit21}
-                \caption{Apartment}
-                \label{fig:RECON_UNIT}
-        \end{subfigure}%
-        \begin{subfigure}[b]{2.0in}
-                \includegraphics[width=2.0in]{images/ch2/officeA}
-                \caption{Office}
-                \label{fig:RECON_OFFICE}
-        \end{subfigure}%
-        \begin{subfigure}[b]{2.0in}
-                \includegraphics[width=2.0in]{images/ch2/outdoorA}
-                \caption{Garden}
-                \label{fig:RECON_GARDEN}
-        \end{subfigure}
-       \caption{Reconstructed Scenes.}
-       \label{fig:RECONSTRUCTIONS}
-\end{figure*}
 
 
 
@@ -111,7 +93,7 @@ than the original Fourier based volume registration approach. This is due to the
 
 \begin{figure}[t]
 \centering
-\includegraphics[width=3.0in]{images/ch2/perfcomp}
+\includegraphics[width=4.0in]{images/ch2/perfcomp}
 \caption{Comparison of performance between volume registration and the proposed speed up for different volume sizes.}
 \label{fig:perfComp}
 \end{figure}

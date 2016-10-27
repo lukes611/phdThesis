@@ -21,6 +21,10 @@ Since we typically do not know the range of translation values $x,y,z$ to optimi
 The 3D Fourier transform transforms a volume from the 3D spatial domain into the 3D frequency domain. The frequency domain is a complex valued volume made up of sinusoids where each value in the frequency domain represents the magnitude, phase and direction of a wave.  \\
 
 
+WARNING: show picture of 3D volume fft\\
+
+WARNING: show picture of 3D pc surface\\
+
 Using the properties of the Frequency domain, we can efficiently recover the optimal alignment translation parameters using a function called $PhaseCorrelation$ (Eq. \ref{eqn:PC_basic}). This function takes two volumes as input and returns the best alignment translation between them in terms of maximizing correlation.
 \begin{equation} \label{eqn:PC_basic}
 (x, y, z) = PhaseCorrelation(V_x, V_y)
@@ -39,6 +43,8 @@ Here, $\circ$ is an element-wise multiplication and $|x|$ is the magnitude funct
 
 Using the phase correlation procedure along with some spatial transformation functions allows the computation of a single axis of rotation (out of 3) along with the scale difference between two volumes. If $V_1$ and $V_2$ are translated, rotated and scaled versions of the same volume, such that they are related by some translation $(t_x, t_y, t_z)$, y-axis rotation $\theta$, and scale $\varphi$.\\
 
+
+WARNING: show picture of log-spherical transform\\
 
 Here we describe how to compute the rotation and scale parameters, further action is required to recover translation. The first step, given two volumes $V_1$ and $V_2$ of size $N^3$ is to apply a Hanning windowing function (Eq. \ref{eqn:Hann}). This function assists in filtering the volumes prior to a discrete Fourier transform being applied to them. Since the discrete Fourier transform relies on a continuous signal (volume) and this cannot be used in the calculation, by reducing the signal strength near the volume borders, we can improve the accuracy of the discrete Fourier transform.
 \begin{equation} \label{eqn:Hann}
@@ -95,6 +101,8 @@ The complete function to recover translation, rotation and scaling, combining eq
 
 In order to recover full 3D rotation (as well as scale and translation) the model must first be aligned by some common axis. PCA or Principals Component Analysis is a well known technique for recovering the primary axes of an N-dimensional signal. In this case, we can use the most accurate axis (the eigen-vector with the largest corresponding eigen-value) to align two volumes, then y-axis rotation, scale and translation values can be recovered by the described FFT based volume registration method. \\
 
+WARNING: SHOW picture of this PCA procedure
+
 PCA is a capable registration technique on its own, but when faced with non-overlapping, missing or noisy data it typically fails on its own. The technique of alignment is discussed in the following sections. \\
 
 Given a 3-dimensional signal $A$ of length $N$, the co-variance of the signals between two of the dimensions ($x$ and $y$) is given as a function in equation \ref{eqn:Covariance3DSignal}.
@@ -119,7 +127,7 @@ Cov(A_z, B_x) & Cov(A_z, A_y) & Cov(A_z, A_z) \\
 
 The 3 eigen-vectors of the covariance matrix describe the primary axis of the signal $A$ and the 3 corresponding eigen-values describe the strength of these axes. The eigen-vector/axis with the largest corresponding eigen-value is the principal component. The principal component is used to align data to a common axis. Here we define the principal axis (component) of a 3D signal $A$ as $A_{pa}$. \\
 
-Given a 3D volume $V$, with a computed principal axis $V_{pa}$ and mean $V_{mean_location}$, we can construct a matrix to normalize the 3D data in terms of the principal axis. 
+Given a 3D volume $V$, with a computed principal axis $V_{pa}$ and mean $V_{mean_location}$, we can construct a matrix to normalize the 3D data in terms of the principal axis.
 
 Given $V_{pa}$ a vector pointing along the principal axis of $V$, we compute the forward vector as 
 
@@ -207,3 +215,5 @@ R_{x,y,z}ST Matrix = C_{B}^{-1} \times RST \times C_A
 \end{equation}
 
 This technique is capable of extending Fourier registration to take into account full 3D rotation. The technique simply requires a single iteration over the data to compute the principal components then a rotation-scale-translation phase correlation technique is used to compute the scale, translation and y-axis rotation. 
+
+WARNING: show an example of this working
