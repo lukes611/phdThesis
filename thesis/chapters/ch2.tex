@@ -17,17 +17,37 @@ We also list notable speed-ups for volume registration which reduce the amount o
 
 \input{chapters/chapter2/fvr2}
 
-
-
 \section{Fourier Volume Registration based 3D Reconstruction}
 
 \input{chapters/chapter2/vrpe}
 
 \section{3D Reconstruction Data Representation}
 
+In this section we introduce two data representations for recording 3D reconstructions. These novel representations are based on the Octree method. The representations are both designed to compress the data. These methods are inspired by the Shade-Tree and Interpolated Leaf Quad-Tree representations \cite{Gonzalez07ShadeTree, Lincoln13Interpolating} which are used for image compression. These techniques make use of Quad-Tree decomposition and have been shown to outperform several transform based methods of compression. 
+
+\subsection{Octree Decomposition}
+
+In this section we explain Octree decomposition. This strategy forms a cube shaped space around some 3D volumetric data. A data representation is then computed using the location and size of the cube. A measurement system is used to decide if the current data representation fits the data within the cube well or not. If so, then the data representation is used instead of the data. If not, the cube is broken down into 8 sub-cubes and the process is repeated. At each level of decomposition, the data representation achieves finer detail, but more nodes must be stored which means less compression. An example of the Octree is illustrated in figure [INSERT IT HERE].
+
+
 \subsection{3D ShadeTree Coding}
 
+The Shade-Tree compression system CITE HERE, was designed for the compression of 2D image data. However, this method is easily extended to 3D Volumetric data. In this system, octants are decomposed in the same manner as with a regular octree but the leaf node representation is different. In the Shade-Tree, the corner values in the volume are sampled for each node. Figure XXXXFFG shows an example of these corners given an Octree. The corner values are stored instead of the data within the cube. \\
+
+
+The actual data representation is formed by interpolating between these 4 corner values to generate the data within the node. This representation saves space by storing 4 corner values only rather than the dense volumetric data. The method also boasts the ability for nodes to share data. For example, if two leaf nodes happen to share a corner we can simply encode the corner once using another data structure at the decompression stage at no cost to the representation. This is illustrated in figure FEFEEF. \\
+
+This data representation may also be used for 
+
 \subsection{PlaneTree Coding}
+
+overview of plane-tree
+
+PT - decomposition
+
+PT - PT leaf representation
+
+PT - representation of SDFs or volumes
 
 \section{Sensor Input Techniques}
 
