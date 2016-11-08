@@ -63,7 +63,23 @@ Here some one-way error functions are described. The one was Hausdorff error is 
 
 \subsection{Reconstruction Integration}
 
+Using the techniques of registration described in the above sections, there are several techniques which may be used to integrate these registered data. In most experiments we use the volume integration to combine the registered data in a single global model. We also propose several techniques for data representation and evaluate their abilities (see section \ref{sec:3DDataRepresentations}). As for the typical volume integration used, we create volumes with dimensions of $512\times 512\times 512$, although larger sizes may be used for increased accuracy. Once a frame is registered, it is projected into the volume. \\
+
+This projection follows the following formula
+
+
+\begin{equation} \label{eqn:volIntegration}
+\begin{split}
+x^{1} & = floor((x - frameCenter_x) \times scalar + volumeCenter_x) \\
+y^{1} & = floor((y - frameCenter_y) \times scalar + volumeCenter_y) \\
+z^{1} & = floor((z - frameCenter_z) \times scalar + volumeCenter_z)
+\end{split}
+\end{equation}
+
+$frameCenter$ is the center of the projected frame space and $volumeCenter$ is the center of the integration volume, typically scalar is set to 1 or is used to trade-off resolution and map size. An example of an integration process is illustrated in figure XFDF. 
 
 
 \subsection{Advantages and Disadvantages}
+
+
 
