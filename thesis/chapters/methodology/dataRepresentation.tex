@@ -1,29 +1,3 @@
-\begin{savequote}[8cm]
-  ``I have not failed. I've just found 10,000 ways that won't work.''
-  \qauthor{Thomas Edison}
-\end{savequote}
-\makeatletter
-\chapter{Methodology}
-
-\section{Introduction}
-
-Here we present several techniques used to extract dense 3D reconstruction from image/video data. In the first section we describe techniques in addition to Fourier volume registration. These include the recovery of translation, y-axis rotation and scale information as well as a technique for the recovery of a so called 7 degrees of freedom transform. \\
-
-We also list notable speed-ups for volume registration which reduce the amount of processing by over a third. After this, a full 3D reconstruction technique based on the principles of phase correlation is presented. Then we also present two novel reconstruction data representations which may be used to efficiently represent and fuse 3D reconstructions. Lastly, different sensor inputs are discussed and some conclusions are given about the usefulness of this technique in the context of these sensors is presented.
-
-\section{Fourier Volume Registration} 
-
-\input{chapters/chapter2/fvr}
-
-\input{chapters/chapter2/fvr2}
-
-\section{Fourier Volume Registration based 3D Reconstruction}
-
-\input{chapters/chapter2/vrpe}
-
-\section{3D Reconstruction Data Representation}
-\label{sec:3DDataRepresentations}
-
 In this section we introduce two data representations for recording 3D reconstructions. These novel representations are based on the Octree method. The representations are both designed to compress the data. These methods are inspired by the Shade-Tree and Interpolated Leaf Quad-Tree representations \cite{Gonzalez07ShadeTree, Lincoln13Interpolating} which are used for image compression. These techniques make use of Quad-Tree decomposition and have been shown to outperform several transform based methods of compression. 
 
 \subsection{Octree Decomposition}
@@ -83,10 +57,3 @@ Each cube has 12 edges in total, so 4 bits are used for the edge number, another
 In order to compress our data structure we iterate through the tree in depth first order. If we encounter a non-leaf node, we first store a single bit of $1_2$. Then the configuration of the sub-nodes (since not every sub-node intersects the object) is stored as a single byte. Each bit is labelled $1_2$ if a particular sub-node exists and $0_2$ if it does not. This is possible since we order our sub-nodes in a predefined order. If a leaf node is encountered, we store a $0_2$, then record our 20 bit leaf node representation in three other files. One for the normal data, the distance variables and edge numbers totalling 4 files (tree, normals, distances and edge numbers). After the entire structure is stored we employ entropy encoding on each of these files. \\
 
 In order to decompress our structure, we read the first bit of the output file. This checks if the current node is a leaf or not. If it is, we read out a 20 bit plane representation (from the three separate files) and generate a list of triangles representing where the plane intersects the node (explained in section \ref{NRep}). These triangles are then added to a final database which represents the decoded model. If we reach a non-leaf node, we read out the 8 bit sub-node configuration and repeat the process for each existing sub-nodes in the predefined order. \\  
-
-
-\section{Sensor Input Techniques}
-
-\input{chapters/chapter2/si}
-
-\section{Conclusion}
