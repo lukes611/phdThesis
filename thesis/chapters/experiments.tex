@@ -9,6 +9,28 @@
 
 This section discusses the types of experiments performed. First, a survey on codec evaluation and comparison techniques is presented, then those techniques used to evaluate the SOT are reported. Next, the experiment environment used is discussed, along with the data set used in experiments.
 
+\begin{figure*}[t] 
+        \centering
+        \begin{subfigure}[b]{2.0in}
+                \includegraphics[width=2.0in]{images/ch2/unit21}
+                \caption{Apartment}
+                \label{fig:RECON_UNIT}
+        \end{subfigure}%
+        \begin{subfigure}[b]{2.0in}
+                \includegraphics[width=2.0in]{images/ch2/officeA}
+                \caption{Office}
+                \label{fig:RECON_OFFICE}
+        \end{subfigure}%
+        \begin{subfigure}[b]{2.0in}
+                \includegraphics[width=2.0in]{images/ch2/outdoorA}
+                \caption{Garden}
+                \label{fig:RECON_GARDEN}
+        \end{subfigure}
+       \caption{Reconstructed Scenes.}
+       \label{fig:RECONSTRUCTIONS}
+\end{figure*}
+
+
 \subsection{Codec Evaluation \& Comparison Techniques}
 
 Codec evaluation involves comparing storage requirements between the original model and codec output. In the case of lossy codecs, a quantitative quality metric is also required. Compression metrics are easy to compute, quality metrics are more involved and there have been many proposed techniques. Quality metrics compare the distortion created by the codec relative to the original model. Two measurements are usually performed, the distance from the compressed model to the original and the distance from the original to the compressed model. Quality metrics are split into empirical and perceptual based metrics. Empirical metrics measure geometric error and perceptual metrics estimate human perception. Perception based metrics are a part of psychophysics research. For a more in-depth survey of these methods, see work by Bubill \textit{et al.} \cite{Bulbul11Assessing}.
@@ -121,12 +143,6 @@ All experiments were performed on an ASUS computer with an Intel i5 CPU and 4 GB
 
 Industry standard models are used to evaluate the SOT. Six widely used 3D models are used in experiments. These models contain relatively large amounts of geometric information making them a challenge for compression. Figure \ref{dataset} presents this data set. For each model the name, vertex and triangle count are given. With the exclusion of the ball model, these models are commonly used in compression and simplification research. This data set was obtained from the Georgia Institute of Technology's Large Geometric Models Archive \cite{LargeGeometricModelsArchive}. The ball model is included in experiments to provide insight into the compression of smaller 3D models. 
 
-\begin{figure}[!h]
-\centering
-\includegraphics[width=16cm]{images/ch3/DataSet}
-\caption{The data set used in experiments.}
-\label{dataset}
-\end{figure}
 
 \subsection{Shade-Octree Experiments}
 

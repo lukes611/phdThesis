@@ -1,0 +1,31 @@
+\begin{savequote}[8cm]
+  ``I have not failed. I've just found 10,000 ways that won't work.''
+  \qauthor{Thomas Edison}
+\end{savequote}
+\makeatletter
+\chapter{Methodology}
+
+\section{Introduction}
+
+Here we present several techniques used to extract dense 3D reconstruction from image/video data. In the first section we describe techniques in addition to Fourier volume registration. These include the recovery of translation, y-axis rotation and scale information as well as a technique for the recovery of a so called 7 degrees of freedom transform. \\
+
+We also list notable speed-ups for volume registration which reduce the amount of processing by over a third. After this, a full 3D reconstruction technique based on the principles of phase correlation is presented. Then we also present two novel reconstruction data representations which may be used to efficiently represent and fuse 3D reconstructions. Lastly, different sensor inputs are discussed and some conclusions are given about the usefulness of this technique in the context of these sensors is presented.
+
+\section{Fourier Volume Registration} 
+
+\input{chapters/methodology/fourierVolReg1}
+\input{chapters/methodology/fourierVolReg2}
+
+\section{Fourier Volume Registration based 3D Reconstruction}
+
+\input{chapters/methodology/volRegReconstruction}
+
+\section{3D Reconstruction Data Representation}
+\label{sec:3DDataRepresentations}
+\input{chapters/methodology/dataRepresentation}
+
+\section{Sensor Input Techniques}
+
+\input{chapters/methodology/sensors}
+
+\section{Conclusion}

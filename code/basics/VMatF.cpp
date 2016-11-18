@@ -1566,6 +1566,25 @@ Mat VMat::correction_matrix_up_axis(R3 p1a, R3 p1b, R3 p2a, R3 p2b)
 	return rv.clone();
 }
 
+/*
+
+r = up * fr * up
+u = up * (fr * up) * up
+
+100
+010
+
+010
+001
+
+r+up
+100
+010
+
+
+
+*/
+
 Mat VMat::correct_volume_up_vector_rotation_matrix(R3 p1a, R3 p1b)
 {
 	R3 up = (p1b - p1a).unit();

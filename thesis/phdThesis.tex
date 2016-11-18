@@ -5,7 +5,10 @@
 %\usepackage{tocbibind}
 \usepackage{graphicx}
 
+
+\usepackage{amsmath}
 \usepackage{listings}
+\usepackage{subcaption}
 \usepackage[breaklinks = true, linktocpage, pagebackref,
 colorlinks = true, hyperindex = true, hyperfigures] {hyperref}
 \usepackage[grey]{quotchap}
@@ -34,32 +37,44 @@ colorlinks = true, hyperindex = true, hyperfigures] {hyperref}
 \input{chapters/title}
 \frontmatter
 %\includepdf[pages={2}]{titlePDF2}
-\input{chapters/abs} % Abstract
-\input{chapters/Ack}
+\input{chapters/abstract} % Abstract
+\input{chapters/acknowledgements}
 \tableofcontents
 \listoffigures
 \listoftables
 \mainmatter
-item : num req : num done
+item : complete / required
 
-intro : 10 pages : 5
-lit-rev: 80 pages : 5
-meth : 60 pages : 0
-exps : 40 pages : 0
-conc : 10 pages : 0
+intro : 4/10\\
+lit-rev: 40/60\\
+meth : 28/60\\
+exps : 0/40\\
+conc : 0/10\\
 
-total: 200 pages : 25
-refs : 191 : 37
+total: 98/180\\
+refs : 176/200\\
 
-\input{chapters/ch0} % The Introductory Chapter
-\input{chapters/ch1} % The Literature Review
-%\input{ch2} % Methodology
-%\input{ch3} % Experiments &
-%\input{ch4} % Results
-%\input{ch5} % Conclusion
+
+
+todo:
+	finish methodology:
+		representations
+		sensors
+		integrations
+		
+	programming + write experiments
+	do pictures
+	re-write intro, results, concl 
+
+\input{chapters/introduction} % The Introductory Chapter
+\input{chapters/literature} % The Literature Review
+\input{chapters/methodology} % Methodology
+\input{chapters/experiments} % Experiments &
+\input{chapters/results} % Results
+\input{chapters/conclusion} % Conclusion
 \appendix
 none
-%\input{chapters/apA} % Appendix A
+%\input{chapters/appendix} % Appendix A
 \backmatter
 \openup -0.5em
 %\bibliographystyle{plain}

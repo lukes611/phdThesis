@@ -1,0 +1,117 @@
+
+paper title: 
+Multi-scale Features for Approximate Alignment of
+Point-based Surfaces
+
+
+can use scale space similar to 2d versions [wit83,lin94, low04]
+
+multi-scale analysis of surface curvature distribution for 3d face recognition
+
+[gwm01] extracts features from point clouds
+
+they want to compute and describe features which are stable for use in registration rather than visually salient
+
+[yf02] - uses a set of high curvature points at features
+
+[wg02] - uses bitangent points
+
+variety of surface descriptors used [jh97, yf02, wg02, fkh*04, sm92, slw02]
+
+features based on spin images and 3d shape contexts are robust to outliers and handle noise well
+
+their apporach uses local signatures related to the normal frield near the surface and are approximately invariant to rigid transformations
+
+multi-scale surface features:
+builds scale space representation and uses the locations of level difference extrema as the salient feature points (similar to finding the extrema of the scale-normalized laplacian of gaussian in the 2d case [Low04]).
+
+compute point clouds at different scales using technique paper describes
+
+salient features are described by their: minima and maxima of normal differences 
+
+
+//complex:
+
+
+P = [(p,n), (p2,n2), (p3, n3), ... (pn, nn)] //surface points
+h = number > 1
+
+errorF = function(x){
+	sum = 0
+	for(i=0;i<X;i++){
+		sum += b(i,x) * (k(x), x-p[i])^2
+	}
+	return sum
+}
+
+Proj = function(x){
+	return minimization(errorF)
+}
+
+k = function(x){
+	sum = 0
+	for(i=0;i<X;i++){
+		sum += b(x)*n[i]
+	}
+	return sum
+}
+
+b = function(i, x){
+	sum = 0
+	for(j=0;j<X;j++){
+		sum += A[j]*exp(-d^2 * (x, p[i])) / h^2
+	}
+	return	A[i] * exp(-d^2 * (x, p[i])/h^2) / sum
+	
+}
+
+//A[i] is 1
+
+
+//simplified
+
+
+
+P = [(p,n), (p2,n2), (p3, n3), ... (pn, nn)] //surface points
+h = number > 1
+
+errorF = function(x){
+	sum = 0
+	for(i=0;i<X;i++){
+		sum += b(i,x) * (k(x), x-p[i])^2
+	}
+	return sum
+}
+
+Proj = function(x){
+	return minimization(errorF)
+}
+
+k = function(x){
+	sum = 0
+	for(i=0;i<X;i++){
+		sum += b(x)*n[i]
+	}
+	return sum
+}
+
+b = function(i, x){
+	sum = 0
+	for(j=0;j<X;j++){
+		sum += exp(-d^2 * (x, p[i])/ h^2)
+	}
+	return	exp(-d^2 * (x, p[i])/h^2) / sum
+	
+}
+
+
+
+
+
+
+
+
+
+
+
+
