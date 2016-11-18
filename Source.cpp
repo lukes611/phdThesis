@@ -2,7 +2,7 @@
 #include <string>
 #include <vector>
 
-//#define USINGGPU 
+
 
 #include "code\basics\locv3.h"
 #include "code\basics\R3.h"
@@ -24,213 +24,308 @@ using namespace ll_cam;
 using namespace ll_measure;
 using namespace ll_fmrsc;
 using namespace ll_experiments;
-//using namespace cv;
-
-//proto-type for experiments: VMat pc(VMat a, VMat b, double & time, Mat & transform, double & mse);
-//to-do:= pc, ipc, 
-
-/*
-read in 1 x Pixel3DSets
-mutate points slightly
-get knn working with 4d data
-
-string askPython(string data)
-
-PixCompressor api:
-
-range representation __from __to
-from -256 + 512
-
-plan: experiment api:
-	algorithm name
-	data name
-	vector<int> frameIndexes
-
-	write:
-		input:
-			algorithm
-			data
-			description
-			vector<indexes> frames
-			error added
-		output:
-			alg, data, description, error added
-			errors, seconds per experiment
 
 
-	writes error to csv format file: data name, algorithm errorx, error y, error z times. description
 
-
-*/
 
 
 #include "code\basics\BitReaderWriter.h"
 
+class Surfel {
+public:
+	R3 point;
+	R3 normal;
+	Vec3b color;
+	Surfel(R3 p, R3 n, Vec3b c) {
+		color = c;
+		point = p;
+		normal = n;
+	}
+	Surfel(const Surfel & s) {
+		color = s.color;
+		point = s.point;
+		normal = s.normal;
+	}
+	Surfel & operator = (const Surfel & s) {
+		color = s.color;
+		point = s.point;
+		normal = s.normal;
+		return *this;
+	}
+};
 
-
-void exp1(string name, vector<int> frames)
-{
-	CapturePixel3DSet video(name, 10);
-
-	Pixel3DSet output;
-
-	Mat accMatrix = Mat::eye(Size(4,4), CV_32FC1);
-	Pix3D frame1, frame2;
-	Pixel3DSet a, b;
-
-	//add first frame to the output
-	video.read_frame(frame1, frames[0]);
-	output += Pixel3DSet(frame1);
-
-	for(int _i = 1; _i < frames.size(); _i++)
-	{
-		int currentIndex = frames[_i];
-		//get match _m from i+1 to i
-		double seconds = 0.0, error = 0.0; int iters = 0;
-		Pixel3DSet _;
-
-		video.read_frame(frame2, currentIndex);
-
-		a = frame1; b = frame2;
-
-		Mat _m = Mat::eye(Size(4,4) , CV_32FC1);
-
-		cout << "matching " << currentIndex << " with " << frames[_i-1] << endl;
-		cout << "worked " << ll_fmrsc::registerPix3D("surf", frame2, frame1, _m, seconds, true, 50 ) << endl;;
-		//_m = ll_pc::pc_register_pca_i(b, a, seconds);
-		//_m = ll_pc::pc_register(b, a, seconds);
-		//_m = ll_pc::pc_register_pca(b, a, seconds, true, 256);
-		//_m.convertTo(_m, CV_32FC1);
-		//_m = Licp::icp(b, a, _, error, seconds, iters);
-
-		//_m = ll_pca::register_pca(b, a, seconds, 256);
-		
-		//_m.convertTo(_m, CV_32FC1);
-		cout << "error: " << error << endl;
-		
-
-		//b.transform_set(_m);
-
-		//optionally measure the error here
-
-		//if (error >= 1.0) continue;
-		//m = m * _m : either is fine
-		accMatrix = accMatrix * _m;
-		//accMatrix = _m * accMatrix;
-		//multiply i by m and add to output
-		//cout << nm.size() << " -> " << ll_type(nm.type()) << endl;
-		
-		b.transform_set(accMatrix);
-		
-		output += b;
-		cout << "output size: " << output.size() << endl;
-		//output.unionFilter(b, 1.0f);
-		cout << "output size reduced to : " << output.size() << endl;
-		
-		if (_i % 3 == 0)
+class SurfelOTCube {
+public:
+	R3 corner;
+	float size;
+	vector<int> indices;
+	vector<SurfelOTCube> children;
+	SurfelOTCube() {}
+	SurfelOTCube(R3 corner, float size) { this->corner = corner; this->size = size; }
+	SurfelOTCube(vector<Surfel> & surfels) {
+		vector<R3> p; for (int i = 0; i < surfels.size(); i++)
 		{
-			cout << "output size: " << output.size() << endl;
-			//output.basicMinFilter(0.5f);
-			cout << "output size reduced to : " << output.size() << endl;
+			p.push_back(surfels[i].point);
+			indices.push_back(i);
 		}
-		frame1 = frame2;
+		Pixel3DSet p3ds(p);
+		R3 mn, mx;
+		p3ds.min_max_R3(mn, mx);
+		corner = mn;
+		size = mx.max();
+
 	}
-	cout << "saving" << endl;
-	
-	//output.reduce(256);
-	//SIObj(output.points).saveOBJ("C:/Users/luke/Desktop/result2.obj");
-	LLPointers::setPtr("object", &output);
-	ll_experiments::viewPixel3DSet();
 
+	SurfelOTCube(const SurfelOTCube & c) {
+		input(c);
+	}
+	SurfelOTCube & operator = (const SurfelOTCube & c) {
+		input(c); return *this;
+	}
+	void input(const SurfelOTCube & c) {
+		corner = c.corner;
+		size = c.size;
+		indices = c.indices;
+		children = c.children;
+	}
+	bool isLeaf() { return children.size() == 0; }
 
-}
+	float avgCount() {
+		stack<SurfelOTCube*> st;
+		float c = 0.0f;
+		float avg = 0.0f;
+		st.push(this);
+		while (!st.empty())
+		{
+			SurfelOTCube* that = st.top(); st.pop();
+			if (that->isLeaf())
+			{
+				c += 1.0f;
+				avg += (float)that->indices.size();
+			}
+			else
+			{
+				for (int i = 0; i < that->children.size(); i++)
+				{
+					st.push(&that->children[i]);
+				}
+			}
+		}
+		if (c == 0.0f) return -1.0f;
+		return avg / c;
+	}
 
-void quantitativeExperiment(string algorithm_name,
-							string data_name,
-							string description,
-							vector<int> frames,
-							float error_added)
-{
-	CapturePixel3DSet video(data_name, 10);
-	Pix3D frame1, frame2;
-	Pixel3DSet a, b;
+	bool couldContain(R3 & p) {
+		if (p.x < corner.x || p.x >= corner.x + size) return false;
+		if (p.y < corner.y || p.y >= corner.y + size) return false;
+		if (p.z < corner.z || p.z >= corner.z + size) return false;
+		return true;
+	}
 
-	vector<double> times, errors, mses, pmes; //times, errors, mse errors, percent matches
-
-	//add first frame to the output
-	video.read_frame(frame1, frames[0]);
-	
-	for(int _i = 1; _i < frames.size(); _i++)
+	bool sphereCollision(R3 & center, float radius)
 	{
-		int currentIndex = frames[_i];
-		//get match _m from i+1 to i
-		double seconds = 0.0;
-		double hde, msee, pme;
-		int iters = 0;
-		Pixel3DSet _;
+		if (center.x + radius < corner.x) return false;
+		if (center.x - radius > corner.x + size) return false;
 
-		video.read_frame(frame2, currentIndex);
+		if (center.y + radius < corner.y) return false;
+		if (center.y - radius > corner.y + size) return false;
 
-		a = frame1; b = frame2;
+		if (center.z + radius < corner.z) return false;
+		if (center.z - radius > corner.z + size) return false;
+		return true;
+	}
 
-		Mat _m = Mat::eye(Size(4,4) , CV_32FC1);
+	void split(vector<Surfel> * surfels, int depthLevels = 8) {
+		if (depthLevels < 1) return;
+		vector<SurfelOTCube> _children;
+		float hs = size / 2.0f;
 
-		//algorithms here:
-		if(algorithm_name == "none"){
-		}
-#ifdef USINGGPU
-		else if(algorithm_name == "pc"){
-			_m = ll_pc::pc_register(b, a, seconds);	
-		}
+		_children.push_back(SurfelOTCube(corner, hs));
+		_children.push_back(SurfelOTCube(corner + R3(0.0f, hs, 0.0f), hs));
+		_children.push_back(SurfelOTCube(corner + R3(hs, hs, 0.0f), hs));
+		_children.push_back(SurfelOTCube(corner + R3(hs, 0.0f, 0.0f), hs));
 
-		else if(algorithm_name == "pc2"){
-			_m = ll_pc::pc_register_pca_i(b, a, seconds);
-		}
-#endif
-		else if(algorithm_name == "icp"){
-			_m = Licp::icp(b, a, _, hde, seconds, iters);
+		for (int i = 0; i < 4; i++) {
+			SurfelOTCube _ = _children[i];
+			_.corner += R3(0.0f, 0.0f, hs);
+			_children.push_back(_);
 		}
 
-		else if(algorithm_name == "icp2"){
-			_m = Licp::icp_outlierRemoval(b, a, _, hde, seconds, iters, 10.0);
+		for (int i = 0; i < indices.size(); i++)
+		{
+			for (int j = 0; j < _children.size(); j++)
+			{
+				if (_children[j].couldContain(surfels->at(i).point)) {
+					_children[j].indices.push_back(i);
+					break;
+				}
+			}
 		}
 
-		else if(algorithm_name == "fm"){
-			ll_fmrsc::registerPix3D("surf", frame2, frame1, _m, seconds, true, 150);
+		int numChildrenAlive = 0; for (int i = 0; i < _children.size(); i++) numChildrenAlive += _children[i].indices.size() > 0 ? 1 : 0;
+		if (numChildrenAlive > 1)
+		{
+			for (int i = 0; i < _children.size(); i++)
+				if (_children[i].indices.size() > 0) children.push_back(_children[i]);
 		}
+		indices.clear();
+		for (int i = 0; i < children.size(); i++) children[i].split(surfels, depthLevels - 1);
 
-		//:end
-		
-		//compute the errors
-		b.transform_set(_m);
-		ll_measure::error_metrics(a, b, hde, msee, pme);
-
-		//append data to lists
-		pmes.push_back(pme);
-		mses.push_back(msee);
-		errors.push_back(hde);
-		times.push_back(seconds);
-		
-
-		frame1 = frame2;
 	}
 
 
-	
-}
+};
 
 
 
-int add(int a){
-	if(LLPointers::has("b")) return a + LLPointers::get<int>("b");
-	return a;
-}
+class Surfels {
+public:
+	vector<Surfel> points;
+	SurfelOTCube ot;
+	Surfels(Pix3D & p) {
+		for (int y = 1; y < 480 - 1; y++)
+		{
+			for (int x = 1; x < 640 - 1; x++)
+			{
+				/*
+				4 3 2
+				5 0 1
+				6 7 8
+				*/
+				R3 n[9] = {
+					p.points[index(x,y)],
+					p.points[index(x + 1,y)],
+					p.points[index(x + 1,y - 1)],
+					p.points[index(x,y - 1)],
+					p.points[index(x - 1,y - 1)],
+					p.points[index(x - 1,y)],
+					p.points[index(x - 1,y + 1)],
+					p.points[index(x,y + 1)],
+					p.points[index(x + 1,y + 1)],
+				};
+				bool ne[9] = {
+					p.validDepth[index(x,y)],
+					p.validDepth[index(x + 1,y)],
+					p.validDepth[index(x + 1,y - 1)],
+					p.validDepth[index(x,y - 1)],
+					p.validDepth[index(x - 1,y - 1)],
+					p.validDepth[index(x - 1,y)],
+					p.validDepth[index(x - 1,y + 1)],
+					p.validDepth[index(x,y + 1)],
+					p.validDepth[index(x + 1,y + 1)],
+				};
+				vector<SI_FullTriangle> tris;
+				//get quad points from all around
+				if (!ne[0]) continue;
+				if (ne[2]) {
+					if (ne[1]) tris.push_back(SI_FullTriangle(n[0], n[1], n[2]));
+					if (ne[3]) tris.push_back(SI_FullTriangle(n[0], n[2], n[3]));
+				}
+				if (ne[4]) {
+					if (ne[3]) tris.push_back(SI_FullTriangle(n[0], n[3], n[4]));
+					if (ne[5]) tris.push_back(SI_FullTriangle(n[0], n[4], n[5]));
+				}
+
+				if (ne[6]) {
+					if (ne[5]) tris.push_back(SI_FullTriangle(n[0], n[5], n[6]));
+					if (ne[7]) tris.push_back(SI_FullTriangle(n[0], n[6], n[7]));
+				}
+
+				if (ne[8]) {
+					if (ne[7]) tris.push_back(SI_FullTriangle(n[0], n[7], n[8]));
+					if (ne[1]) tris.push_back(SI_FullTriangle(n[0], n[8], n[1]));
+				}
+				if (tris.size() <= 0) continue;
+				R3 normal;
+				float trisizeI = 1.0f / (float)tris.size();
+				for (int i = 0; i < tris.size(); i++) normal += (tris[i].normal() * trisizeI);
+				normal.normalize();
+				//compute normals and get average for the current point
+				//set color, normal and point and add to list
+				//if (tris.size() > 0) cout << "got some...\n";
+				points.push_back(Surfel(n[0], normal, p.colors[index(x, y)]));
+			}
+		}
+		ot = SurfelOTCube(points);
+		ot.split(&points, 4);
+	}
+
+	vector<int> pointsWithinRadius(R3 & p, float radius)
+	{
+		vector<int> inds;
+		stack<SurfelOTCube*> st;
+		st.push(&ot);
+		while (!st.empty())
+		{
+			SurfelOTCube * that = st.top(); st.pop();
+			if (that->isLeaf())
+			{
+				inds.insert(inds.end(), that->indices.begin(), that->indices.end());
+			}
+			else
+			{
+				for (int i = 0; i < that->children.size(); i++)
+				{
+					bool collides = that->children[i].sphereCollision(p, radius);
+					if (collides) st.push(&that->children[i]);
+				}
+			}
+		}
+		return inds;
+	}
+
+	static int index(int x, int y) {
+		return y * 640 + x;
+	}
+
+	float errorF(R3 x, float h) {
+		float sum = 0.0f;
+		vector<int> subs = pointsWithinRadius(x, h);
+		for (int j = 0; j < subs.size(); j++) {
+			int i = subs[j];
+			float _ = ((_k(subs, x, h)) * (x - points[i].point));
+			sum += _b(subs, i, x, h) *  _*_;
+		}
+		return sum;
+	}
+
+	float _b(vector<int> & subs, int i, R3 x, float h) {
+		float sum = 0.0f;
+		float h2 = h*h;
+		for (int _ = 0; _ < subs.size(); _++) {
+			int j = subs[_];
+			float d = x.dist(points[j].point);
+			sum += exp(-d*d / h2);
+		}
+		float d = x.dist(points[i].point);
+		return	exp(-d*d / h2) / sum;
+
+	}
+
+	R3 _k(vector<int>& subs, R3 x, float h) {
+		R3 sum;
+		for (int j = 0; j < subs.size(); j++) {
+			int i = subs[j];
+			sum += points[i].normal * _b(subs, i, x, h);
+		}
+		return sum;
+	}
+
+};
 
 int main(int argc, char * * argv)
 {
-	exp1("Apartment.Texture.rotate", ll_experiments::rng(0, 50, 2));
+	CapturePixel3DSet video("Apartment.Texture.rotate", 3);
+	Pix3D p; video.read(p);
+	Surfels s = p;
 
-	
-	
+	cout << s.points.size() << endl;
+	cout << s.ot.avgCount() << endl;
+
+	LTimer t; t.start();
+	cout << s.errorF(s.points[154].point, 100.2f) << endl;
+	t.stop();
+	cout << t.getSeconds() << endl;
+
 	return 0;
 }
