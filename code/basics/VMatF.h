@@ -3,7 +3,7 @@
 
 	Author: Luke Lincoln
 
-	contents description: 
+	contents description:
 		The .h file for VMatF, which is a float, single channel only 3D version of opencv's Mat object
 
 	depends on: Pixel3DSet, R3
@@ -47,19 +47,19 @@ public:
 	//sets up everything once s is set, assumes no memory is allocated
 	void setup_init();
 	void free();
-	inline float & VMat::at(int x, int y, int z)
+	inline float & at(int x, int y, int z)
 	{
 		return data[z*s2 + y*s + x];
 	}
-	inline float & VMat::operator ()(int x, int y, int z)
+	inline float & operator ()(int x, int y, int z)
 	{
 		return data[z*s2 + y*s + x];
 	}
-	inline float VMat::at(R3 & r)
+	inline float at(R3 & r)
 	{
 		float pix1, pix2, tmp, tmp2;
 		cv::Point3i p1((int)r.x, (int)r.y, (int)r.z);
-		
+
 		float a = (inbounds(p1.x,p1.y, p1.z))? (float) at(p1.x, p1.y, p1.z): 0.0f;
 		float b = (inbounds(p1.x+1,p1.y, p1.z))? (float) at(p1.x+1, p1.y, p1.z): 0.0f;
 		float c = (inbounds(p1.x, p1.y+1, p1.z))? (float) at(p1.x, p1.y+1, p1.z): 0.0f;
@@ -85,7 +85,7 @@ public:
 		return (1.0f-dz)*pix1 + dz*pix2;
 
 	}
-	inline float VMat::operator () (R3 & r)
+	inline float operator () (R3 & r)
 	{
 		return at(r);
 	}
@@ -113,7 +113,7 @@ public:
 	SIObj siobj(int block_wid, float threshold);
 	void save(std::string fname);
 	void open(std::string fname);
-	
+
 	static cv::Mat translation_matrix(float x, float y, float z);
 	static cv::Mat rotation_matrix_x(float angle);
 	static cv::Mat rotation_matrix_y(float angle);
@@ -128,17 +128,17 @@ public:
 	static cv::Mat transformation_matrix(int volume_width, float rx, float ry, float rz, float sc, float tx, float ty, float tz);
 	static cv::Mat scale_matrix(float us);
 	static cv::Mat getRYSMat(int volume_width, float sca, float ry);
-	static cv::Mat VMat::getRYSMat_gpu(int volume_width, float sca, float ry);
+	static cv::Mat getRYSMat_gpu(int volume_width, float sca, float ry);
 
 	VMat clone();
 	static inline void transform_point(cv::Mat & m, R3 & inp);
 	void transform_volume(cv::Mat & m, float nothing = 0.0f);
-	void VMat::transform_volume_forward(cv::Mat & m, float nothing = 0.0f);
+	void transform_volume_forward(cv::Mat & m, float nothing = 0.0f);
 	void transform_volume(float rx, float ry, float rz, float sc, float tx, float ty, float tz);
 	void transform_volume_forward(float rx, float ry, float rz, float sc, float tx, float ty, float tz);
-	
-	
-	
+
+
+
 	void save_obj(std::string fname, int objWid, float threshold);
 	void max_min_loc(float & minimum, float & maximum, cv::Point3i * minimumLoc = NULL, cv::Point3i * maximumLoc = NULL);
 	cv::Mat slice(int z);
@@ -151,16 +151,16 @@ public:
 	void normalize();
 	void threshold(float th);
 
-	//reduces the dimension of a 3d volume to 2d image, by performing the spherical transform, 
+	//reduces the dimension of a 3d volume to 2d image, by performing the spherical transform,
 	//each pixel at (x,y) is an average value of a ray's intersection with different voxels,
 	//this ray is defined by rotating [1,0,0] by y (about the x axis), then by x (along the y axis)
 	cv::Mat luke_dimensionsion_reduce_1a(float threshold = 0.01f, cv::Size s = cv::Size(512, 512), float min_radius = 30.0f);
 	//this finds the y-axis rotation directly
 	float fast_y_rotation_estimation_1a(VMat & signal_2, cv::Size s = cv::Size(512, 512), float min_radius = 10.0f);
 
-	
 
-	//reduces the dimension of a 3d volume to a 2d image, by taking 
+
+	//reduces the dimension of a 3d volume to a 2d image, by taking
 	//photographs along a particular axis (specified by axis) and uses the average value down said axis
 	cv::Mat luke_dimension_reduce_2a(float threshold = 0.01f, int axis = 0, cv::Size s = cv::Size(512, 512));
 	R3 luke_fast_translation_estimation_2a(VMat & signal_2, cv::Size s = cv::Size(512, 512));
@@ -196,7 +196,7 @@ public:
 	static cv::Mat pca_double(VMat & v1, VMat & v2, bool edge_detect = false, float clean_amount = 0.1f);
 
 	//performs a max per voxel like v1(x,y,z) = (v1(x,y,z)>=threshold && v2(x,y,z)>=threshold)? max(v1(x,y,z),v2(x,y,z)) : 0
-	static void or(VMat & v1, VMat & v2, float threshold);
+	static void Or(VMat & v1, VMat & v2, float threshold);
 
 	//swaps quadrants so dc value is in the center
 	static void swap_quadrants(VMat & v);
@@ -228,7 +228,7 @@ public:
 
 	static cv::Mat correction_matrix_right_axis(R3 p1a, R3 p1b, R3 p2a, R3 p2b);
 	static cv::Mat correct_volume_right_vector_rotation_matrix(R3 p1a, R3 p1b);
-	
+
 	static cv::Mat new_up_mat(R3 new_up, R3 center);
 	static cv::Mat new_right_mat(R3 new_up, R3 center);
 
@@ -236,7 +236,7 @@ public:
 
 	cv::Mat pca_correct_right();
 
-	
+
 
 };
 

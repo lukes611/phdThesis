@@ -6,6 +6,9 @@
 using namespace std;
 using namespace cv;
 
+
+
+//gets the image type as a string given the code
 string ll_type(int type)
 {
 	string r;
@@ -26,6 +29,7 @@ string ll_type(int type)
 	return r;
 }
 
+//error messaging/control quitting for debugging/testing/exception purposes
 int ll_error(string error_name, bool ll_pause, bool ll_exit, int return_value)
 {
 	cout << "ERROR: ";
@@ -55,10 +59,10 @@ void ll_sift(Mat & im1, Mat & im2, vector<Point2i> & p1, vector<Point2i> & p2, b
 	p1.clear();
 	p2.clear();
 	cv::Ptr<Feature2D> f2d = xfeatures2d::SIFT::create();
-	std::vector<KeyPoint> keypoints_1, keypoints_2;    
+	std::vector<KeyPoint> keypoints_1, keypoints_2;
 	f2d->detect( im1, keypoints_1 );
 	f2d->detect( im2, keypoints_2 );
-	Mat descriptors_1, descriptors_2;    
+	Mat descriptors_1, descriptors_2;
 	f2d->compute( im1, keypoints_1, descriptors_1 );
 	f2d->compute( im2, keypoints_2, descriptors_2 );
 	BFMatcher matcher;
@@ -99,10 +103,10 @@ void ll_surf(Mat & im1, Mat & im2, vector<Point2i> & p1, vector<Point2i> & p2, b
 	p1.clear();
 	p2.clear();
 	cv::Ptr<Feature2D> f2d = xfeatures2d::SURF::create();
-	std::vector<KeyPoint> keypoints_1, keypoints_2;    
+	std::vector<KeyPoint> keypoints_1, keypoints_2;
 	f2d->detect( im1, keypoints_1 );
 	f2d->detect( im2, keypoints_2 );
-	Mat descriptors_1, descriptors_2;    
+	Mat descriptors_1, descriptors_2;
 	f2d->compute( im1, keypoints_1, descriptors_1 );
 	f2d->compute( im2, keypoints_2, descriptors_2 );
 	BFMatcher matcher;
@@ -251,8 +255,8 @@ Mat ll_combine_images(Mat & im1, Mat & im2, bool horizontal)
 				for(int x = 0; x < im2.size().width; x++)
 					rv.at<Vec3b>(Point2i(x+im1.size().width,y)) = im2.at<Vec3b>(Point2i(x,y));
 			}
-	
-	
+
+
 		}
 		return rv.clone();
 	}
@@ -291,13 +295,15 @@ void ll_draw_matches(Mat & im, Size & left_offset, vector<Point2i> & p1, vector<
 	}
 }
 
+
 Mat ll_view_matches(Mat & im1, Mat & im2, vector<Point2i> & p1, vector<Point2i> & p2, int limit)
 {
 	Mat a, b;
+	Size im1Size = im1.size();
 	if(im1.channels() <= 1) cvtColor(im1, a, CV_GRAY2RGB); else a = im1;
 	if(im2.channels() <= 1) cvtColor(im2, b, CV_GRAY2RGB); else b = im2;
 	Mat im = ll_combine_images(a, b);
-	ll_draw_matches(im, im1.size(), p1, p2, limit);
+	ll_draw_matches(im, im1Size, p1, p2, limit);
 	return im.clone();
 }
 
@@ -403,11 +409,11 @@ Mat ll_depthsgbm(Mat & iml, Mat & imr, int ndisparities, int sad_size)
 	cvtColor(iml, left, CV_BGR2GRAY);
 	cvtColor(imr, right, CV_BGR2GRAY);
 	Mat disp1 = Mat(left.size().height, left.size().width, CV_16SC1);
-	
+
 	Ptr<StereoSGBM> bmp = StereoSGBM::create(0, ndisparities, sad_size, 0, 0, 0, 0, 0, 0, 0, 0);
-	
+
 	bmp->compute(left, right, disp1);
-	
+
 	Point2d minmax;
 	minMaxLoc(disp1, &minmax.x, &minmax.y);
 	disp1.convertTo(disp1, CV_32FC1, 1.0f / (minmax.y-minmax.x));
@@ -533,13 +539,15 @@ void ll_transform_image(Mat & inp, Mat & outp, Mat & transform)
 	warpPerspective(inp, outp, transform, inp.size());
 }
 Mat ll_transformation_matrix(Size s, double rotation, double scale, double transX, double transY)
-	{
-		Mat rote = ll_rotation_center_matrix(rotation, s);
-		Mat scal = ll_scale_center_matrix(scale, s);
-		Mat trans = ll_translation_matrix(transX, transY);
-		Mat rv = trans*scal*rote;
-		return rv.clone();
-	}
+{
+    Mat rote = ll_rotation_center_matrix(rotation, s);
+    Mat scal = ll_scale_center_matrix(scale, s);
+    Mat trans = ll_translation_matrix(transX, transY);
+    Mat rv = trans*scal*rote;
+    return rv.clone();
+}
+
+
 void ll_swap_quadrants(Mat & inp)
 {
 	int cx = inp.size().width / 2;
@@ -678,7 +686,7 @@ void ll_log_polar(Mat & imIn, Mat & outp, double scalarInput)
 	IplImage im1 = imIn;
 	outp = Mat::zeros(imIn.size(), imIn.type());
 	IplImage im2 = outp;
-	
+
 	CvPoint2D32f c;
 	c.x = (static_cast<float>(center.x), c.y = static_cast<float>(center.y));
 	cvLogPolar(&im1, &im2, c, ll_lp_scalar(imIn.size().width, scalarInput), CV_INTER_LINEAR+CV_WARP_FILL_OUTLIERS);
@@ -736,11 +744,11 @@ void ll_phase_correlate_rst(Mat & im1i, Mat & im2i, double & rotation, double & 
 {
 	Mat im1 = im1i.clone();
 	Mat im2 = im2i.clone();
-	
+
 	ll_UCF1_to_32F1(im1);
 	ll_UCF1_to_32F1(im2);
-	
-	
+
+
 
 	//initial filtering
 	Mat ham;
@@ -757,46 +765,51 @@ void ll_phase_correlate_rst(Mat & im1i, Mat & im2i, double & rotation, double & 
 
 	ll_normalize(im1);
 	ll_normalize(im2);
-	
+
 	ll_32F1_to_UCF1(im1);
 	ll_32F1_to_UCF1(im2);
-	
+
 	Mat m1, m2, p1, p2;
-		
+
 	ll_fft::fft_magnitude_phase(im1, m1, p1);
 	ll_fft::fft_magnitude_phase(im2, m2, p2);
 	m1 /= static_cast<float>(m1.size().width * m1.size().height);
 	m2 /= static_cast<float>(m1.size().width * m1.size().height);
-	
+
 	log(m1, m1);
 	log(m2, m2);
-	
+
 	Laplacian(m1, m1, m1.depth(), 1);
 	Laplacian(m2, m2, m1.depth(), 1);
-	
-	ll_log_polar(m2.clone(), m2, logTransformScalar);
-	ll_log_polar(m1.clone(), m1, logTransformScalar);
-	
+
+	{
+        Mat m1Clone = m1.clone();
+        Mat m2Clone = m2.clone();
+        ll_log_polar(m2Clone, m2, logTransformScalar);
+        ll_log_polar(m1Clone, m1, logTransformScalar);
+
+	}
+
 	if(showIms)
 	{
 		ll_imshow_32FC1("log_polar", m2);
 		ll_imshow_32FC1("log_polar2", m1);
 	}
-	
+
 	Point2d rs = phaseCorrelate(m1, m2);
-		
+
 	int hw = static_cast<int>(m1.size().width);
 	int hh = static_cast<int>(m1.size().height);
-		
+
 	rotation = rs.y;
 	rotation /= 512.0;
 	rotation *= 360.0;
-		
+
 	scale = rs.x;
 	scale /= ll_lp_scalar(m1.size().width, logTransformScalar);
 	scale = exp(scale);
 	scale = 1.0 / scale;
-		
+
 
 	m1 = im1i.clone();
 	m2 = im1i.clone();
@@ -806,16 +819,16 @@ void ll_phase_correlate_rst(Mat & im1i, Mat & im2i, double & rotation, double & 
 	ll_UCF1_to_32F1(im2Cp);
 	ll_UCF1_to_32F1(m1);
 	ll_UCF1_to_32F1(m2);
-		
+
 	Point2d trv = phaseCorrelate(m1, im2Cp);
 	Point2d trv2 = phaseCorrelate(m2, im2Cp);
-		
+
 	ll_transform_image(im1i, m1, rotation, scale, trv.x, trv.y);
 	ll_transform_image(im1i, m2, rotation+180.0, scale, trv.x, trv.y);
 	double diff1 = ll_mse<unsigned char>(m1, im2i);
 	double diff2 = ll_mse<unsigned char>(m2, im2i);
-		
-		
+
+
 	if(diff2 < diff1)
 	{
 		transX = trv2.x;
@@ -831,10 +844,10 @@ void ll_phase_correlate_rs(Mat & im1i, Mat & im2i, double & rotation, double & s
 {
 	Mat im1 = im1i.clone();
 	Mat im2 = im2i.clone();
-	
+
 	ll_UCF1_to_32F1(im1);
 	ll_UCF1_to_32F1(im2);
-	
+
 	ll_normalize(im1);
 	ll_normalize(im2);
 
@@ -845,12 +858,12 @@ void ll_phase_correlate_rs(Mat & im1i, Mat & im2i, double & rotation, double & s
 	case 1: ham = ll_hanning_window(im1i.size()); break;
 	case 2: ham = ll_hamming_window(im1i.size()); break;
 	}
-	
+
 	Mat m2, m1;
 	//log polar takes float mat
 	ll_log_polar(im2, m2, logTransformScalar);
 	ll_log_polar(im1, m1, logTransformScalar);
-	
+
 
 	if(filter != 0)
 	{
@@ -859,19 +872,19 @@ void ll_phase_correlate_rs(Mat & im1i, Mat & im2i, double & rotation, double & s
 	}
 
 	Point2d rs = phaseCorrelate(m1, m2);
-		
+
 	int hw = static_cast<int>(m1.size().width);
 	int hh = static_cast<int>(m1.size().height);
-		
+
 	rotation = rs.y;
 	rotation /= 512.0;
 	rotation *= 360.0;
-		
+
 	scale = rs.x;
 	scale /= ll_lp_scalar(m1.size().width, logTransformScalar);
 	scale = exp(scale);
 	scale = scale;
-		
+
 
 	ll_transform_image(im1, m1, rotation, scale, 0.0, 0.0);
 	ll_transform_image(im1, m2, rotation+180.0, scale, 0.0, 0.0);
@@ -882,9 +895,9 @@ void ll_phase_correlate_rs(Mat & im1i, Mat & im2i, double & rotation, double & s
 	//m1 and m2 are the possible sollutions
 	double diff1 = ll_mse<unsigned char>(m1, im2i);
 	double diff2 = ll_mse<unsigned char>(m2, im2i);
-	
+
 	if(diff2 < diff1) rotation += 180.0;
-		
+
 }
 
 double ll_lp_scalar(int w, double possibleScale)
@@ -1193,6 +1206,7 @@ double SuperFast2DPC::FastPC(Mat & im1, Mat & im2, Point2d & translation)
 	return time.getSeconds();
 }
 
+
 double SuperFast2DPC::lukeDimentionReduce1D(Mat & im, Mat & ret, float thresh, float minRad)
 {
 	Mat a = im.clone();
@@ -1282,9 +1296,9 @@ double SuperFast2DPC::phase_correlate_rt(Mat & a, Mat & b, double & rotation, Po
 	m1 /= static_cast<float>(m1.size().width * m1.size().height);
 	m2 /= static_cast<float>(m1.size().width * m1.size().height);
 
-	
 
-	
+
+
 
 	m1 *= 100000000.0f;
 	m2 *= 100000000.0f;
@@ -1327,9 +1341,9 @@ double SuperFast2DPC::phase_correlate_rt2(Mat & a, Mat & b, double & rotation, P
 	m1 /= static_cast<float>(m1.size().width * m1.size().height);
 	m2 /= static_cast<float>(m1.size().width * m1.size().height);
 
-	
 
-	
+
+
 	m1 *= 100000000.0f;
 	m2 *= 100000000.0f;
 
@@ -1362,10 +1376,14 @@ double SuperFast2DPC::phase_correlate_rt2(Mat & a, Mat & b, double & rotation, P
 
 double SuperFast2DPC::phase_correlate_rtOptimal(Mat & a, Mat & b, double & rotation, Point2d & translation)
 {
-	double r1, r2; Point2d t1, t2;
+	double r1, r2, ms1, ms2; Point2d t1, t2;
 
-	double ms1 = phase_correlate_rt(a.clone(), b.clone(), r1, t1);
-	double ms2 = phase_correlate_rt2(a.clone(), b.clone(), r2, t2);
+	{
+        Mat ac1 = a.clone(), ac2 = a.clone();
+        Mat bc1 = b.clone(), bc2 = b.clone();
+        ms1 = phase_correlate_rt(ac1, bc1, r1, t1);
+        ms2 = phase_correlate_rt2(ac2, bc2, r2, t2);
+	}
 	Mat a1, a2;
 	ll_transform_image(a, a1, r1, 1.0, t1.x, t1.y);
 	ll_transform_image(a, a2, r2, 1.0, t2.x, t2.y);
@@ -1394,9 +1412,14 @@ double SuperFast2DPC::phase_correlate_rtOptimal_ed(Mat & a, Mat & b, double & ro
 	ll_normalize(_a); ll_normalize(_b);
 	ll_32F1_to_UCF1(_a); ll_32F1_to_UCF1(_b);
 
+    double ms1, ms2;
 
-	double ms1 = phase_correlate_rt(_a.clone(), _b.clone(), r1, t1);
-	double ms2 = phase_correlate_rt2(_a.clone(), _b.clone(), r2, t2);
+	{
+        Mat _ac1 = _a.clone(), _ac2 = _a.clone();
+        Mat _bc1 = _b.clone(), _bc2 = _b.clone();
+        ms1 = phase_correlate_rt(_ac1, _bc1, r1, t1);
+        ms2 = phase_correlate_rt2(_ac2, _bc2, r2, t2);
+    }
 	Mat a1, a2;
 	ll_transform_image(a, a1, r1, 1.0, t1.x, t1.y);
 	ll_transform_image(a, a2, r2, 1.0, t2.x, t2.y);
@@ -1445,3 +1468,6 @@ Mat least_squares(Mat M, Mat y)
 	pre = pre.inv();
 	return pre * mt * y;
 }
+
+
+

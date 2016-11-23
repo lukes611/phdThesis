@@ -44,8 +44,8 @@ namespace BIT_MANIPULATOR
 	}
 	void BitReader::readFile(const char* fname)
 	{
-		FILE* fi;
-		fopen_s(&fi, fname, "rb");
+		FILE* fi = fopen(fname, "rb");
+		//fopen_s(&fi, fname, "rb");
 		if(fi == NULL)
 		{
 			error("error in BitReader.readFile(), FILE COULD NOT BE READ");
@@ -63,7 +63,7 @@ namespace BIT_MANIPULATOR
 			{
 				break;
 			}
-	
+
 		}
 		fclose(fi);
 		dataSize = list.size();
@@ -122,7 +122,7 @@ namespace BIT_MANIPULATOR
 	{
 		//at = 7 - at;
 		if(at < 0 || at > 7)
-		{ 
+		{
 			error("ERROR - in BitReader.getBit(), index out of range");
 			return 0;
 		}
@@ -181,8 +181,8 @@ namespace BIT_MANIPULATOR
 		int savedBitPointer = bitPointer;
 		int savedBytePointer = bytePointer;
 		resetPointers();
-		FILE* fi;
-		fopen_s(&fi, fname, "wb");
+		FILE* fi = fopen(fname, "wb");
+		//fopen_s(&fi, fname, "wb");
 		for(int i = 0; i < dataSize; i++)
 		{
 			LByte byte = readByte();
@@ -230,7 +230,7 @@ namespace BIT_MANIPULATOR
 	{
 		//at = 7 - at;
 		if(at < 0 || at > 7)
-		{ 
+		{
 			error("ERROR - in BitWriter.getBit(), index out of range");
 			return 0;
 		}
@@ -286,7 +286,7 @@ namespace BIT_MANIPULATOR
 			addByte(bytes[i]);
 		}
 	}
-	
+
 	void BitWriter::operator+=(LBit bit_in)
 	{
 		addBit(bit_in);
@@ -299,8 +299,8 @@ namespace BIT_MANIPULATOR
 
 	void BitWriter::save(char* fname)
 	{
-		FILE* fi;
-		fopen_s(&fi, fname, "wb");
+		FILE* fi = fopen(fname , "wb");
+		//fopen_s(&fi, fname, "wb");
 		for(int i = 0; i < dataSize; i++)
 		{
 			LByte byte = data->at(i);
@@ -315,7 +315,7 @@ namespace BIT_MANIPULATOR
 
 	void BitWriter::save(const char * fname)
 	{
-		FILE* fi; fopen_s(&fi, fname, "wb");
+		FILE* fi = fopen(fname, "wb");// fopen_s(&fi, fname, "wb");
 		for(int i = 0; i < dataSize; i++)
 		{
 			LByte byte = data->at(i);
@@ -327,7 +327,7 @@ namespace BIT_MANIPULATOR
 		}
 		fclose(fi);
 	}
-	
+
 	void BitWriter::print()
 	{
 		for(int i = 0; i < dataSize; i++)

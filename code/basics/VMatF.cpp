@@ -3,7 +3,7 @@
 
 	Author: Luke Lincoln
 
-	contents description: 
+	contents description:
 		The .cpp file for VMatF, which is a floating point, single channel only 3D version of opencv's Mat object
 
 	depends on: Pixel3DSet, R3, locv_algorithms
@@ -36,7 +36,7 @@ VMat::VMat(int sIn, vector<R3> l, float offValue, float onValue)
 		if(l[i].x < mn.x) mn.x = l[i].x;
 		if(l[i].y < mn.y) mn.y = l[i].y;
 		if(l[i].z < mn.z) mn.z = l[i].z;
-		
+
 		if(l[i].x > mx.x) mx.x = l[i].x;
 		if(l[i].y > mx.y) mx.y = l[i].y;
 		if(l[i].z > mx.z) mx.z = l[i].z;
@@ -404,7 +404,7 @@ SIObj VMat::siobj(int block_wid, float threshold)
 				rv._triangles[tcount].a = vcount+0;
 				rv._triangles[tcount].b = vcount+1;
 				rv._triangles[tcount++].c = vcount+2;
-					
+
 				rv._triangles[tcount].a = vcount+0;
 				rv._triangles[tcount].b = vcount+2;
 				rv._triangles[tcount++].c = vcount+3;
@@ -662,7 +662,8 @@ Pixel3DSet VMat::pixel3dset(float zero)
 					col[0] = v_uc;
 					col[1] = v_uc;
 					col[2] = v_uc;
-					rv.push_back(R3((float)x,(float)y,(float)z), col);
+					R3 pnt((float)x,(float)y,(float)z);
+					rv.push_back(pnt, col);
 				}
 			}
 		}
@@ -808,22 +809,22 @@ double VMat::meandifference(VMat & mIn)
 	//int counter = 0;
 	for(int i = 0; i < s3; i++)
 	{
-			
+
 		if((data[i] < 0.00001f && data[i] > -0.00001f) || (mIn.data[i] < 0.00001f && mIn.data[i] > -0.00001f))
 		{
-			rv += abs( 
+			rv += abs(
 					((double)data[i])
 				-   ((double)mIn.data[i])
 			);
 		}else
 		{
-			rv += 2.0 * abs( 
+			rv += 2.0 * abs(
 						((double)data[i])
 					-   ((double)mIn.data[i])
 				);
 		}
 		//counter++;
-			
+
 	}
 	//cout << "counter: " << counter << " :: " << s3 << " >> " << (counter / (double) s3) << endl;
 	return rv / (double)s3;
@@ -834,7 +835,7 @@ double VMat::meandifference2(VMat & mIn)
 	double rv = 0.0;
 	for(int i = 0; i < s3; i++)
 	{
-		rv += abs( 
+		rv += abs(
 				((double)data[i])
 			-   ((double)mIn.data[i])
 		);
@@ -886,7 +887,7 @@ double VMat::noise(double range)
 	srand(time(NULL));
 	double scalar = 1.0 / (double)RAND_MAX;
 	double hr = (double)range * 0.5;
-	
+
 
 	double random_value = scalar * ((double)rand()) * range - hr; // random value between -range/2 and range/2
 	double signal_value = (double)data[0];
@@ -995,7 +996,7 @@ Mat VMat::luke_dimension_reduce_2a(float threshold, int axis, Size s)
 
 	if(axis == 1)
 	{
-		
+
 		for(int z = 0; z < this->s; z++)
 		{
 			for(int x = 0; x < this->s; x++)
@@ -1105,7 +1106,7 @@ Mat VMat::luke_dimension_reduce_3a(float threshold, int axis, Size s)
 
 	if(axis == 1)
 	{
-		
+
 		for(int z = 0; z < this->s; z++)
 		{
 			for(int x = 0; x < this->s; x++)
@@ -1187,7 +1188,7 @@ Mat VMat::luke_dimension_reduce_4a(float threshold, int axis, Size s)
 
 	if(axis == 1)
 	{
-		
+
 		for(int z = 0; z < this->s; z++)
 		{
 			for(int x = 0; x < this->s; x++)
@@ -1360,7 +1361,7 @@ Mat VMat::pca_double(VMat & v1, VMat & v2, bool edge_detect, float clean_amount)
 	return m.clone();
 }
 
-void VMat::or(VMat & v1, VMat & v2, float threshold)
+void VMat::Or(VMat & v1, VMat & v2, float threshold)
 {
 	for(int i = 0; i < v1.s3; i++)
 	{
@@ -1470,7 +1471,7 @@ void VMat::log_polar(R3 & p, int s)
 	float sf = (float)s;
 	float hw = sf * 0.5f;
 	p -= R3(hw, hw, hw);
-		
+
 	float mag = p.mag();
 	float a1, a2;
 	p.normalize();
@@ -1597,7 +1598,7 @@ Mat VMat::correct_volume_up_vector_rotation_matrix(R3 p1a, R3 p1b)
 	right.normalize();
 	forward = right ^ up;
 	forward.normalize();
-	float arr[] = 
+	float arr[] =
 	{
 		right.x,	up.x,	forward.x,	0.0f,
 		right.y,	up.y,	forward.y,	0.0f,
@@ -1635,7 +1636,7 @@ Mat VMat::correct_volume_right_vector_rotation_matrix(R3 p1a, R3 p1b)
 	right.normalize();
 	forward = right ^ up;
 	forward.normalize();
-	float arr[] = 
+	float arr[] =
 	{
 		up.x,	right.x,	forward.x,	0.0f,
 		up.y,	right.y,	forward.y,	0.0f,
