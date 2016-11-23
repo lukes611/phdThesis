@@ -7,6 +7,7 @@
 #include <cmath>
 #include <vector>
 #include <functional>
+#include <string>
 
 //forward declaration
 namespace ll_siobj { class SI_Triangle; class SI_FullTriangle; class SI_Quad; class SI_Cube; class SIObj; }
@@ -32,7 +33,7 @@ namespace ll_siobj
 		void order(); //orders a,b & c in accending order
 	};
 
-	
+
 
 	class SI_FullTriangle
 	{
@@ -89,7 +90,7 @@ namespace ll_siobj
 		SI_Quad getQuad(int index);
 	};
 
-	
+
 
 	class SIObj
 	{
@@ -116,7 +117,7 @@ namespace ll_siobj
 		SI_FullTriangle getNormal(int index) const;
 		SI_FullTriangle operator[](int index);
 		ll_R3::R3 getCenterOFTriangle(int index) const;
-		
+
 		//part of old code for bio-tree:
 		float getAvgNormal(int index, SI_Cube cu, int& numHits);
 		ll_R3::R3 getAvgNormalR3(int index, SI_Cube cu, int& numHits);
@@ -128,12 +129,12 @@ namespace ll_siobj
 		void savePLY(std::string fname);
 		void saveOBJ(std::string fname);
 		void save(std::string fname);
-		
+
 
 		void addTriangles(const std::vector<SI_Triangle> & triList);
 		void addTriangles(const std::vector<SI_FullTriangle> & triList);
 
-		
+
 		void mergeCloseVertices(float distance_threshold);
 
 
@@ -167,6 +168,7 @@ namespace ll_siobj
 		bool operator == (const SIObj & o2);
 
 		void clear();
+		std::string stats();
 	};
 
 

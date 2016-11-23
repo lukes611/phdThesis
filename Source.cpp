@@ -25,12 +25,38 @@ using namespace ll_cam;
 using namespace ll_measure;
 using namespace ll_fmrsc;
 //using namespace ll_experiments;
-
+using namespace ll_siobj;
 
 
 
 
 #include "code/basics/BitReaderWriter.h"
+
+class L3DFeat{
+public:
+    R3 p, n; float s;
+    L3DFeat(R3 p, R3 n, float s)
+    {
+        this->p=p;
+        this->n=n;
+        this->s=s;
+    }
+    L3DFeat(const L3DFeat & input)
+    {
+        copyIn(input);
+    }
+    L3DFeat & operator = (const L3DFeat & input)
+    {
+        copyIn(input);
+        return *this;
+    }
+    void copyIn(const L3DFeat & input)
+    {
+        p = input.p;
+        n = input.n;
+        s = input.s;
+    }
+};
 
 class Surfel {
 public:
@@ -53,6 +79,8 @@ public:
 		normal = s.normal;
 		return *this;
 	}
+
+
 };
 
 class SurfelOTCube {
@@ -186,7 +214,7 @@ public:
 		return true;
 	}
 
-	void split(vector<Surfel> * surfels, int depthLevels = 2) {
+	void split(vector<Surfel> * surfels, int depthLevels = 8) {
 		if (depthLevels < 1) return;
 		vector<SurfelOTCube> ChildList;
 		float hs = halfSize();
@@ -255,6 +283,13 @@ public:
 	vector<Surfel> points;
 	SurfelOTCube ot;
 
+
+
+	Surfels()
+	{
+
+	}
+
 	Surfels(Pix3D & p) {
 		for (int y = 1; y < 480 - 1; y++)
 		{
@@ -319,8 +354,46 @@ public:
 				points.push_back(Surfel(n[0], normal, p.colors[index(x, y)]));
 			}
 		}
-		ot = SurfelOTCube(points);
-		ot.split(&points);
+		computeOT();
+	}
+
+	void computeOT()
+	{
+        ot = SurfelOTCube(points);
+		ot.split(&points, 4);
+	}
+
+	Surfels(SIObj & ob)
+	{
+        vector<SI_Triangle> tris = ob._triangles;
+        vector<vector<SI_Triangle*>> ls(ob._points.size());
+        //cout << "ls.size() = " << ls.size() << endl;
+        for(int i = 0; i < tris.size(); i++) //for each triangle
+        {
+            ls[tris[i].a].push_back(&tris[i]);
+            ls[tris[i].b].push_back(&tris[i]);
+            ls[tris[i].c].push_back(&tris[i]);
+        }
+
+        for(int _ = 0; _ < ls.size(); _++)
+        {
+            vector<SI_Triangle*> L = ls[_];
+            if(L.size() <= 0) continue;
+            R3 norm;
+            float scalar = 1.0f / (float) L.size();
+            for(int i = 0; i < L.size(); i++)
+            {
+                SI_FullTriangle ft(ob._points[L[i]->a],
+                                    ob._points[L[i]->b],
+                                    ob._points[L[i]->c]);
+                norm += (ft.normal() * scalar);
+            }
+            norm.normalize();
+            points.push_back(Surfel(ob._points[_], norm, Vec3b(255,255,255)));
+        }
+
+        //cout << "points.size() = " << points.size() << endl;
+        computeOT();
 	}
 
 	vector<int> pointsWithinRadius(R3 & p, float radius)
@@ -368,7 +441,17 @@ public:
 
 	float errorF(R3 x, float h) {
 		float sum = 0.0f;
-		vector<int> subs = pointsWithinRadius(x, h);
+		vector<int> subs = pointsWithinRadius(x, 2.0f);
+		for (int j = 0; j < subs.size(); j++) {
+			int i = subs[j];
+			float _ = ((_k(subs, x, h)) * (x - points[i].point));
+			sum += _b(subs, i, x, h) *  _*_;
+		}
+		return sum;
+	}
+
+	float errorF(vector<int> & subs, R3 x, float h) {
+		float sum = 0.0f;
 		for (int j = 0; j < subs.size(); j++) {
 			int i = subs[j];
 			float _ = ((_k(subs, x, h)) * (x - points[i].point));
@@ -396,7 +479,7 @@ public:
 			int i = subs[j];
 			sum += points[i].normal * _b(subs, i, x, h);
 		}
-		return sum;
+        return sum.unit();
 	}
 
 	R3 blurNormal(vector<int> & subs, R3 x, float h)
@@ -445,7 +528,8 @@ public:
         R3 prev = initialPoint;
         R3 bestPoint = prev;
         float bestScore = errorF(bestPoint, scale);
-        cout << "first error " << bestScore << endl;
+
+        //cout << "first error " << bestScore << endl;
         float prevError = bestScore;
         for(int i = 0; i < maxIterations; i++)
         {
@@ -480,8 +564,8 @@ public:
             {
                 bestScore = newError;
                 bestPoint = b1;
-               cout << "new error " << newError << endl;
-               cout << "current point " << b1 << endl;
+               //cout << "new error " << newError << endl;
+               //cout << "current point " << b1 << endl;
             }else if(i > 20) break;
 
             prev = b1;
@@ -491,35 +575,179 @@ public:
         return bestPoint;
     }
 
-    R3 getH(int level)
+
+    R3 blurPoint2(vector<int> & subs, R3 initialPoint, float scale, int maxIterations = -1)
+    {
+        maxIterations = maxIterations == -1 ? 200 : maxIterations;
+        R3 prev = initialPoint;
+        R3 bestPoint = prev;
+        float bestScore = errorF(subs, bestPoint, scale);
+
+        //cout << "first error " << bestScore << endl;
+        float prevError = bestScore;
+        for(int i = 0; i < maxIterations; i++)
+        {
+
+            //cout << t1 << " -> " << t2 << " -> " << t3 << " = " << b0 << endl;
+            R3 b1 = prev;
+            float D = 0.2f;
+
+            R3 JacobianMatrixR3(
+                (errorF(subs, b1 + R3(D, 0.0f, 0.0f),scale)-prevError) / D,
+                (errorF(subs, b1 + R3(0.0f, D, 0.0f),scale)-prevError) / D,
+                (errorF(subs, b1 + R3(0.0f, 0.0f, D),scale)-prevError) / D
+            );
+            Mat jacobian = R3ToRowMat(JacobianMatrixR3);
+            Mat jacobianT = jacobian.t();
+
+
+            Mat J = (jacobianT * jacobian);
+            J = J.inv();
+            J = J * jacobianT;
+
+            Mat b1_m = R3ToColMat(b1);
+            Mat current = float2Mat(prevError);
+
+            Mat change = J * current;
+
+            b1_m = b1_m - change;
+            //cout << change << endl;
+            b1 =  mat2R3(b1_m);
+            float newError = errorF(subs, b1, scale);
+            if(bestScore > newError)
+            {
+                bestScore = newError;
+                bestPoint = b1;
+               //cout << "new error " << newError << endl;
+               //cout << "current point " << b1 << endl;
+            }else if(i > 20) break;
+
+            prev = b1;
+            prevError = newError;
+
+        }
+        return bestPoint;
+    }
+
+
+    float getH(int level)
     {
         float H0 = 1.0f;
-        float F = 2.14f;
+        float F = ot.cubeSize * 0.02;
         return H0 * pow(F, (float) level);
     }
 
+    Surfel project(int index, int level = 1)
+    {
+        R3 p = points[index].point;
+
+        vector<int> subs = pointsWithinRadius(p, ot.cubeSize * 0.001f);
+        //cout << "subs size: " << subs.size() << endl;
+        float H = getH(level);
+        R3 rv = blurPoint2(subs, p, H);
+        //cout << " p1 ein" << endl;
+        //p = rv;
+        return Surfel(rv, blurNormal(subs, p, H), Vec3b(255, 255, 255));
+    }
+
+    Surfels compute(int level)
+    {
+        Surfels ret;
+        for(int i = 0; i < points.size(); i++)
+        {
+            ret.points.push_back(project(i, level));
+
+            //if(i % 100 == 0)
+            {
+                //cout << (i / (float)points.size()) << "%%" << endl;
+            }
+        }
+        cout << endl;
+        ret.computeOT();
+        return ret;
+    }
+
+    SIObj toObj()
+    {
+        SIObj rt(points.size(), 0);
+        for(int i = 0; i < points.size(); i++) rt._points[i] = points[i].point;
+        return rt;
+    }
+
+    float featureMeasure(int index, int myLevel)
+    {
+        Surfel me = project(index, myLevel);
+        Surfel sub = project(index, myLevel - 1);
+        return me.normal * (me.point - sub.point);
+    }
+
+    bool isFeature(int index, int level)
+    {
+        Surfel p = project(index, level);
+        vector<int> inds = pointsWithinRadius(p.point, 0.5f * getH(level));
+        //cout << inds.size() << endl;
+        int numGt = 0;
+        int numLt = 0;
+        float m1 = featureMeasure(index, level);
+        for(int i = 0; i < inds.size(); i++)
+        {
+            int j = inds[i];
+            if(featureMeasure(j, level) < m1) numLt++;
+            if(featureMeasure(j, level-1) < m1) numLt++;
+            if(featureMeasure(j, level+1) < m1) numLt++;
+
+            if(featureMeasure(j, level) > m1) numGt++;
+            if(featureMeasure(j, level-1) > m1) numGt++;
+            if(featureMeasure(j, level+1) > m1) numGt++;
+            if(numGt >= 1 && numLt >= 1) return false;
+        }
+        return true;
+    }
+
+    vector<L3DFeat> genFeatures()
+    {
+        vector<L3DFeat> ret;
+
+        for(int sc = 1; sc <= 2; sc++)
+        {
+                for(int i = 0; i < points.size(); i++)
+                {
+                    if(isFeature(i, sc))
+                    {
+                        Surfel s = project(i, sc);
+                        ret.push_back(L3DFeat(s.point, s.normal, getH(sc)));
+                    }
+                }
+        }
+        return ret;
+    }
 };
 
 int main(int argc, char * * argv)
 {
-	CapturePixel3DSet video = CapturePixel3DSet::openCustom("/home/luke/lcppdata/pix3dc/films", "Apartment.Texture.rotate", 3);
-	Pix3D p; video.read(p);
+    SIObj p; p.open_obj("/home/luke/gitProjects/loqur/monkey1.obj");
+    //cout << ob.stats() << endl;
+	//CapturePixel3DSet video = CapturePixel3DSet::openCustom("/home/luke/lcppdata/pix3dc/films", "Apartment.Texture.rotate", 3);
+	//Pix3D p; video.read(p);
 	Surfels s = p;
 
-	int level = 1;
+    //Surfels s2 = s.compute(1);
 
-	for(; level < 3; level++)
-	{
-        R3 P = s.points[0].point;
-        float S = s.getH(1);
-        LTimer t; t.start();
-        R3 x = s.blurPoint(P, S);
-        cout << "level : " << level << endl;
-        cout << "from " << P << " to " << x << endl;
-        //cout << s.errorF(s.points[154].point, 100.2f) << endl;
-        t.stop();
-        cout << t.getSeconds() <<  "num seconds to operate" << endl;
+    vector<L3DFeat> fts = s.genFeatures();
+    vector<R3> ps;
+    for(int i = 0; i < fts.size(); i++)
+    {
+        ps.push_back(fts[i].p);
     }
+
+    Pixel3DSet p3(ps);
+
+
+    p3.siobj().saveOBJ("/home/luke/Desktop/feats.obj");
+
+
+
+
 	return 0;
 }
 

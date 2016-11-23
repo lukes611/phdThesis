@@ -531,6 +531,14 @@ namespace ll_siobj
 		_uv_ind.clear();
 	}
 
+
+	string SIObj::stats()
+	{
+        stringstream ss;
+        ss << "v/t: " << _points.size() << "/" << _triangles.size() << endl;
+        return ss.str();
+	}
+
 	void SIObj::open_obj(string fname)
 	{
 		clear();
