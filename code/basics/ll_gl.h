@@ -3,7 +3,7 @@
 
 	Author: Luke Lincoln
 
-	contents description: 
+	contents description:
 		Contains some functionality which works with opengl
 
 	depends on: R3, siobj, llCamera
@@ -11,8 +11,8 @@
 #pragma once
 
 
-#include <libs\glut.h>
-#include <libs\freeglut.h>
+#include <libs/glut.h>
+#include <libs/freeglut.h>
 
 #include "SIObj.h"
 #include "llCamera.h"
@@ -24,7 +24,7 @@ namespace ll_gl
 
 	namespace ll_cube_verts
 	{
-		const float cube_vertices[8][3] = 
+		const float cube_vertices[8][3] =
 		{
 			{-0.5,-0.5,0.5},
 			{-0.5,0.5,0.5},

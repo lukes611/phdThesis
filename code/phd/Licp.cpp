@@ -35,38 +35,44 @@ Mat asMatRows(Pixel3DSet & inp)
 	return ret.clone();
 }
 
+float knn(Mat& m_destinations, Mat& m_object, vector<int>& ptpairs)
+{
+    vector<float> dists;
+    return knn(m_destinations, m_object, ptpairs, dists);
+}
+
 float knn(Mat& m_destinations, Mat& m_object, vector<int>& ptpairs, vector<float>& dists)
 {
     // find nearest neighbors using FLANN
     cv::Mat m_indices(m_object.rows, 1, CV_32S);
     cv::Mat m_dists(m_object.rows, 1, CV_32F);
- 
+
     Mat dest_32f; m_destinations.convertTo(dest_32f,CV_32FC2);
     Mat obj_32f; m_object.convertTo(obj_32f,CV_32FC2);
- 
+
     assert(dest_32f.type() == CV_32F);
 	//cout << "h" << endl;
     cv::flann::Index flann_index(dest_32f, cv::flann::KDTreeIndexParams(2));  // using 2 randomized kdtrees
-    flann_index.knnSearch(obj_32f, m_indices, m_dists, 1, cv::flann::SearchParams(64) ); 
+    flann_index.knnSearch(obj_32f, m_indices, m_dists, 1, cv::flann::SearchParams(64) );
 	//cout << "p" << endl;
     int* indices_ptr = m_indices.ptr<int>(0);
     //float* dists_ptr = m_dists.ptr<float>(0);
     for (int i=0;i<m_indices.rows;++i) {
         ptpairs.push_back(indices_ptr[i]);
     }
- 
+
     dists.resize(m_dists.rows);
     m_dists.copyTo(Mat(dists));
- 
+
     return cv::sum(m_dists)[0];
 }
 
 double closestPoints(vector<R3> & src, vector<R3> & dst, vector<int> & indexes, vector<double> & distances)
 {
 	//clear the output
-	indexes.clear(); distances.clear(); 
+	indexes.clear(); distances.clear();
 	double averageDistance = 0.0f;
-	
+
 	if(dst.size() <= 0 || src.size() <= 0) return averageDistance; //if dst has no elements: return
 	double scalar = 1.0 / (double) src.size(); //scalar for computing the averageDistane
 	for(int i = 0; i < src.size(); i++) //for each of the src input
@@ -142,8 +148,8 @@ Mat leastSquaresTransform(vector<R3> & src, vector<R3> & dst, vector<int> & inde
 	return M.clone();
 }
 
-Mat icp(vector<R3> & src, vector<R3> & dst, vector<R3> & out, 
-		double & error_out, double & time, int & iterations, 
+Mat icp(vector<R3> & src, vector<R3> & dst, vector<R3> & out,
+		double & error_out, double & time, int & iterations,
 		double minError, int maxIterations)
 {
 	time = 0.0;
@@ -154,10 +160,10 @@ Mat icp(vector<R3> & src, vector<R3> & dst, vector<R3> & out,
 	vector<int> ind;
 	out = src;
 	iterations = 0;
-	
+
 	double best_distance = DBL_MAX;
 	error_out = best_distance;
-	
+
 	Mat T = ret.clone();
 
 	while(true)
@@ -180,8 +186,8 @@ Mat icp(vector<R3> & src, vector<R3> & dst, vector<R3> & out,
 }
 
 
-Mat icp(Pixel3DSet & src, Pixel3DSet & dst, Pixel3DSet & out, 
-		double & error_out, double & time, int & iterations, 
+Mat icp(Pixel3DSet & src, Pixel3DSet & dst, Pixel3DSet & out,
+		double & error_out, double & time, int & iterations,
 		double minError, int maxIterations)
 {
 	time = 0.0;
@@ -192,10 +198,10 @@ Mat icp(Pixel3DSet & src, Pixel3DSet & dst, Pixel3DSet & out,
 	vector<int> ind;
 	out = src;
 	iterations = 0;
-	
+
 	double best_distance = DBL_MAX;
 	error_out = best_distance;
-	
+
 	Mat T = ret.clone();
 
 	while(true)
@@ -218,9 +224,9 @@ Mat icp(Pixel3DSet & src, Pixel3DSet & dst, Pixel3DSet & out,
 }
 
 
-Mat icp_outlierRemoval(vector<R3> & src, vector<R3> & _dst, vector<R3> & out, 
-					   double & error_out, double & time, int & iterations, 
-					   double outlierRemovalTimesMean, double minError, 
+Mat icp_outlierRemoval(vector<R3> & src, vector<R3> & _dst, vector<R3> & out,
+					   double & error_out, double & time, int & iterations,
+					   double outlierRemovalTimesMean, double minError,
 					   int maxIterations)
 {
 	time = 0.0;
@@ -232,10 +238,10 @@ Mat icp_outlierRemoval(vector<R3> & src, vector<R3> & _dst, vector<R3> & out,
 	out = src;
 	vector<R3> dst = _dst;
 	iterations = 0;
-	
+
 	double best_distance = DBL_MAX;
 	error_out = best_distance;
-	
+
 	Mat T = ret.clone();
 
 	while(true)
@@ -265,7 +271,7 @@ Mat icp_outlierRemoval(vector<R3> & src, vector<R3> & _dst, vector<R3> & out,
 				indTest.push_back(i);
 			}
 		}
-		
+
 		//cout << "i/o(" << out.size() << "/" << srcTest.size() << ")\n";
 
 		T = Licp::leastSquaresTransform(srcTest, dstTest, indTest);
@@ -278,9 +284,9 @@ Mat icp_outlierRemoval(vector<R3> & src, vector<R3> & _dst, vector<R3> & out,
 }
 
 
-Mat icp_outlierRemoval(Pixel3DSet & src, Pixel3DSet & _dst, Pixel3DSet & out, 
-					   double & error_out, double & time, int & iterations, 
-					   double outlierRemovalTimesMean, double minError, 
+Mat icp_outlierRemoval(Pixel3DSet & src, Pixel3DSet & _dst, Pixel3DSet & out,
+					   double & error_out, double & time, int & iterations,
+					   double outlierRemovalTimesMean, double minError,
 					   int maxIterations)
 {
 	time = 0.0;
@@ -292,10 +298,10 @@ Mat icp_outlierRemoval(Pixel3DSet & src, Pixel3DSet & _dst, Pixel3DSet & out,
 	out = src;
 	Pixel3DSet dst = _dst;
 	iterations = 0;
-	
+
 	double best_distance = DBL_MAX;
 	error_out = best_distance;
-	
+
 	Mat T = ret.clone();
 
 	while(true)
@@ -325,7 +331,7 @@ Mat icp_outlierRemoval(Pixel3DSet & src, Pixel3DSet & _dst, Pixel3DSet & out,
 				indTest.push_back(i);
 			}
 		}
-		
+
 		//cout << "i/o(" << out.size() << "/" << srcTest.size() << ")\n";
 
 		T = Licp::leastSquaresTransform(srcTest, dstTest, indTest);

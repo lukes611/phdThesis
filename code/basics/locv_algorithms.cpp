@@ -3,7 +3,7 @@
 
 	Author: Luke Lincoln
 
-	contents description: 
+	contents description:
 		The .cpp file acompanying locv_algorithms
 
 	depends on: opencv 3.0 and ll_R3, Pixel3DSet
@@ -26,7 +26,7 @@ namespace ll_algorithms
 			int from_ = sad_size;
 			int to_ = left_image.size().width - (sad_size + ndispairities);
 			if(errors.size() != Size(ndispairities, (1+to_-from_))) ll_error("ll_semiglobal_matcher::disparity_errors from locv_algorithms=> did not set up errors image to be correct size");
-			
+
 			double running_error = 0.0;
 			double window_size = static_cast<double>((sad_size + sad_size + 1) * (sad_size + sad_size + 1));
 			for(int x = from_, x_0 = 0; x <= to_; x++, x_0++)
@@ -102,7 +102,7 @@ namespace ll_algorithms
 				errors_out.at<double>(p.y, p.x) = error;
 				disparity = previous_positions.at<int>(pixel, disparity);
 			}
-		
+
 		}
 		void compute(Mat & im1, Mat & im2, Mat & depth, Mat & errors, int ndisparities, int sad_size, double smoothness, bool fliplr)
 		{
@@ -120,7 +120,8 @@ namespace ll_algorithms
 			{
 				if(!fliplr) disparity_errors(error, y, im1, im2, ndisparities, sad_size);
 				else disparity_errors(error, y, im2, im1, ndisparities, sad_size);
-				optimize(error, previous_positions, running_error, depth, errors, smoothness, Point2i(from_, from_+y-1));
+				Point2i pnt(from_, from_+y-1);
+				optimize(error, previous_positions, running_error, depth, errors, smoothness, pnt);
 			}
 		}
 		Mat ll_sgdisparity(Mat & im1, Mat & im2, int ndisparities, int sad_size, double smoothness)
@@ -130,12 +131,12 @@ namespace ll_algorithms
 			return d.clone();
 		}
 	}
-	
+
 	namespace ll_pca_3d
 	{
 		LPCA::LPCA(){}
 		LPCA::LPCA(vector<R3> & points, unsigned char type_of_compute)
-		{ 
+		{
 			if(type_of_compute == LPCA::COMPUTE_ORIGINAL) compute(points);
 			else compute2(points);
 		}
@@ -184,25 +185,25 @@ namespace ll_algorithms
 				data_pts.at<double>(i, 1) = (double)pts[i].y;
 				data_pts.at<double>(i, 2) = (double)pts[i].z;
 			}
- 
+
 			//Perform PCA analysis
 			PCA pca_analysis(data_pts, Mat(), CV_PCA_DATA_AS_ROW);
- 
+
 			//Store the position of the object
 			R3 pos = R3(static_cast<float>(pca_analysis.mean.at<double>(0, 0)),
 								static_cast<float>(pca_analysis.mean.at<double>(0, 1)),
 								static_cast<float>(pca_analysis.mean.at<double>(0, 2))
 						);
-	
+
 			//Store the eigenvalues and eigenvectors
 			vector<R3> eigen_vecs(3);
 			vector<double> eigen_val(3);
 			for (int i = 0; i < 3; ++i)
 			{
 				eigen_vecs[i] = R3(pca_analysis.eigenvectors.at<double>(i, 0),
-										pca_analysis.eigenvectors.at<double>(i, 1), 
+										pca_analysis.eigenvectors.at<double>(i, 1),
 										pca_analysis.eigenvectors.at<double>(i, 2));
- 
+
 				eigen_val[i] = pca_analysis.eigenvalues.at<double>(0, i);
 			}
 			eigenvals[0] = eigen_val[0];
@@ -225,24 +226,24 @@ namespace ll_algorithms
 				data_pts.at<double>(i, 1) = (double)pts[i].y;
 				data_pts.at<double>(i, 2) = (double)pts[i].z;
 			}
- 
+
 			//Perform PCA analysis
 			PCA pca_analysis(data_pts, Mat(), CV_PCA_DATA_AS_ROW);
- 
+
 			//Store the position of the object
 			R3 pos = R3(pca_analysis.mean.at<double>(0, 0),
 								pca_analysis.mean.at<double>(0, 1),
 								pca_analysis.mean.at<double>(0, 2));
-	
+
 			//Store the eigenvalues and eigenvectors
 			vector<R3> eigen_vecs(3);
 			vector<double> eigen_val(3);
 			for (int i = 0; i < 3; ++i)
 			{
 				eigen_vecs[i] = R3(pca_analysis.eigenvectors.at<double>(i, 0),
-										pca_analysis.eigenvectors.at<double>(i, 1), 
+										pca_analysis.eigenvectors.at<double>(i, 1),
 										pca_analysis.eigenvectors.at<double>(i, 2));
- 
+
 				eigen_val[i] = pca_analysis.eigenvalues.at<double>(0, i);
 			}
 			eigenvals[0] = eigen_val[0];
@@ -267,7 +268,7 @@ namespace ll_algorithms
 			a.normalize();
 			b.normalize();
 			c.normalize();
-			float t[] = 
+			float t[] =
 			{
 				a.x, b.x, c.x, 0.0f,
 				a.y, b.y, c.y, 0.0f,
@@ -287,7 +288,7 @@ namespace ll_algorithms
 			a.normalize();
 			b.normalize();
 			c.normalize();
-			float t[] = 
+			float t[] =
 			{
 				b.x,	a.x,	c.x,	0.0f,
 				b.y,	a.y,	c.y,	0.0f,
@@ -316,7 +317,7 @@ namespace ll_algorithms
 
 		Mat LPCA::translation_matrix(R3 tr)
 		{
-			float t[] = 
+			float t[] =
 			{
 				1.0f, 0.0f, 0.0f, tr.x,
 				0.0f, 1.0f, 0.0f, tr.y,
@@ -350,7 +351,7 @@ namespace ll_algorithms
 		{
 			ll_algorithms::ll_pca_3d::LPCA pc1(p, 0.5f);
 			ll_algorithms::ll_pca_3d::LPCA pc2(p2, 0.5f);
-			
+
 			Mat m = pc1.full_matrix(pc2);
 			return m.clone();
 		}
@@ -359,7 +360,7 @@ namespace ll_algorithms
 		{
 			ll_algorithms::ll_pca_3d::LPCA pc1(p, 0.2f, LPCA::COMPUTE_2);
 			ll_algorithms::ll_pca_3d::LPCA pc2(p2, 0.2f, LPCA::COMPUTE_2);
-			
+
 			Mat m = pc1.full_matrix_correct_vert(pc2);
 			return m.clone();
 		}
@@ -395,7 +396,7 @@ namespace ll_algorithms
 		Mat LPCA::compute_alignment_for_pc_small_change(ll_pix3d::Pixel3DSet & p, ll_pix3d::Pixel3DSet & p2)
 		{
 			Mat m;
-			
+
 			ll_algorithms::ll_pca_3d::LPCA pc1(p, 0.2f, LPCA::COMPUTE_2);
 			ll_algorithms::ll_pca_3d::LPCA pc2(p2, 0.2f, LPCA::COMPUTE_2);
 			LPCA::fix_eigenvectors(pc2, pc1);
@@ -473,13 +474,15 @@ namespace ll_algorithms
 				}
 				fi.close();
 			}
-		
+
 
 		}
 		void LNN_Set::open_weights(string fname)
 		{
 			cv::String st(fname);
-			ann = cv::ml::ANN_MLP::load<cv::ml::ANN_MLP>(fname);
+
+			//ann = cv::ml::ANN_MLP::load<cv::ml::ANN_MLP>(fname);
+			ann = cv::ml::ANN_MLP::load(fname);
 			Mat tmp = ann->getLayerSizes();
 			int tvecsize = tmp.at<int>(0,0);
 			data.push_back(vector<float>(tvecsize, 0.0f));
@@ -507,7 +510,7 @@ namespace ll_algorithms
 			{
 				vector<float> l = data[i];
 				for(int j = 0; j < l.size(); j++) rv.at<float>(Point2i(j, i)) = l[j];
-			}	
+			}
 			return rv.clone();
 		}
 		Mat LNN_Set::training_set(int i)
@@ -524,7 +527,7 @@ namespace ll_algorithms
 			{
 				vector<float> l = labels[i];
 				for(int j = 0; j < l.size(); j++) rv.at<float>(Point2i(j, i)) = l[j];
-			}	
+			}
 			return rv.clone();
 		}
 		string LNN_Set::str(const vector<float> & list)
@@ -565,7 +568,7 @@ namespace ll_algorithms
 			ann->setActivationFunction(cv::ml::ANN_MLP::SIGMOID_SYM, param1, param2);
 			ann->setTermCriteria(TermCriteria(TermCriteria::MAX_ITER+TermCriteria::EPS, num_iterations, FLT_EPSILON));
 			ann->setTrainMethod(cv::ml::ANN_MLP::BACKPROP, weight_scale);
-	
+
 			Mat tset = this->training_set();
 			Mat lset = this->label_set();
 			return ann->train(tset,ml::SampleTypes::ROW_SAMPLE,lset);
@@ -602,16 +605,16 @@ namespace ll_algorithms
 		}
 		void drawDenseOpticalFlow(Mat & ofin, Mat & im, int step, Vec3b color, bool drawCircPrev)
 		{
-			for(int y = 0; y < ofin.rows; y += step)  
+			for(int y = 0; y < ofin.rows; y += step)
 			{
-				for(int x = 0; x < ofin.cols; x += step)  
-				{  
-					const Point2f& fxy = ofin.at< Point2f>(y, x);  
-					line(im, Point(x,y), Point(cvRound(x+fxy.x), cvRound(y+fxy.y)),  
-							color); 
+				for(int x = 0; x < ofin.cols; x += step)
+				{
+					const Point2f& fxy = ofin.at< Point2f>(y, x);
+					line(im, Point(x,y), Point(cvRound(x+fxy.x), cvRound(y+fxy.y)),
+							color);
 					if(drawCircPrev) circle(im, Point(cvRound(x), cvRound(y)), 1, color, -1);
-					else circle(im, Point(cvRound(x+fxy.x), cvRound(y+fxy.y)), 1, color, -1);  
-				}  
+					else circle(im, Point(cvRound(x+fxy.x), cvRound(y+fxy.y)), 1, color, -1);
+				}
 			}
 		}
 		Mat formOFMask(Mat & ofin, double threshold)
@@ -643,7 +646,7 @@ namespace ll_algorithms
 		}
 		Mat bestOFDepth(Mat & previous, Mat & current, Mat & tmp, int sad, int bs)
 		{
-			Mat of; 
+			Mat of;
 			if(tmp.size() != Size(0,0))
 			{
 				//cout << "doing it" << endl;
@@ -742,7 +745,7 @@ namespace ll_algorithms
 		{
 			for(int x = 0; x < w; x++)
 			{
-				vector<Point2i> & pl = at(y,x); 
+				vector<Point2i> & pl = at(y,x);
 				plsize = pl.size();
 				for(int i = 0; i < plsize; i++)
 				{
@@ -946,7 +949,7 @@ namespace ll_algorithms
 
 		float logScalar = ll_lp_scalar(w, lpScalar);
 		float oriScalar = h / 360.0f;
-		
+
 		GaussianBlur(imIn, im, Size(7, 7), 0, 0, BORDER_DEFAULT); //blur image
 		for (int y = 1; y < imInSize.height - 1; y++) {
 			for (int x = 1; x < imInSize.width - 1; x++) {
@@ -963,7 +966,7 @@ namespace ll_algorithms
 		}
 	}
 
-	
+
 
 	void IPolarHM::compute(Mat & imIn, int nw, int nh, double lpScalar)
 	{
@@ -1077,13 +1080,13 @@ namespace ll_algorithms
 		return rv.clone();
 	}
 
-	
+
 	Mat IPolarHM::GenCountImage(Mat & imIn, double lpScalar)
 	{
-		
+
 		Size imInSize = imIn.size();
-		int w = imInSize.width, h = imInSize.height; 
-		
+		int w = imInSize.width, h = imInSize.height;
+
 		int hw = w / 2, hh = h / 2;
 
 		float logScalar = ll_lp_scalar(w, lpScalar);
@@ -1125,7 +1128,7 @@ namespace ll_algorithms
 		magImage1 = magImage1.mul(h);
 		magImage2 = magImage2.mul(h);
 
-		
+
 		Point2d peak = ll_phase_correlate(magImage1, magImage2);
 		double w = (double)iphm1.size().width;
 		peak.x = (peak.x) * (360.0 / w);
@@ -1192,7 +1195,7 @@ namespace ll_algorithms
 
 		elapsed = std::chrono::high_resolution_clock::now() - start;
 		ms += std::chrono::duration_cast<std::chrono::microseconds>(elapsed).count();
-		
+
 
 
 
@@ -1209,17 +1212,17 @@ namespace ll_algorithms
 		double error1, error2;
 		Mat r1, r2;
 		Point2d t1, t2;
-		
+
 		ll_transform_image(a, r1, rotation, scale, 0.0, 0.0);
 		Mat hr1 = r1.clone();
 		hr1 = hr1.mul(h);
 
 		start = std::chrono::high_resolution_clock::now();
 		t1 = ll_phase_correlate(hr1, bh);
-		
+
 		elapsed = std::chrono::high_resolution_clock::now() - start;
 		ms += std::chrono::duration_cast<std::chrono::microseconds>(elapsed).count();
-		
+
 		ll_transform_image(r1, r1, 0.0, 1.0, t1.x, t1.y);
 		error1 = ll_mse<float>(r1, b);
 
@@ -1240,7 +1243,7 @@ namespace ll_algorithms
 			rotation += 180.0;
 		}
 
-		
+
 	}
 
 	/*void IPolarHM::phaseCorrelateRST_NG(Mat & image1, Mat & image2, long long & ms, double & rotation, double & scale, Point2d & trans, double lpScalar)
@@ -1268,7 +1271,7 @@ namespace ll_algorithms
 		ms += std::chrono::duration_cast<std::chrono::microseconds>(elapsed).count();
 		start = std::chrono::high_resolution_clock::now();
 
-		
+
 		//magImage1 = magImage1.mul(h);
 		//magImage2 = magImage2.mul(h);
 
@@ -1277,7 +1280,7 @@ namespace ll_algorithms
 
 		elapsed = std::chrono::high_resolution_clock::now() - start;
 		ms += std::chrono::duration_cast<std::chrono::microseconds>(elapsed).count();
-		
+
 
 
 
@@ -1295,17 +1298,17 @@ namespace ll_algorithms
 		double error1, error2;
 		Mat r1, r2;
 		Point2d t1, t2;
-		
+
 		ll_transform_image(a, r1, rotation, scale, 0.0, 0.0);
 		Mat hr1 = r1.clone();
 		hr1 = hr1.mul(h);
 
 		start = std::chrono::high_resolution_clock::now();
 		t1 = ll_phase_correlate(hr1, bh);
-		
+
 		elapsed = std::chrono::high_resolution_clock::now() - start;
 		ms += std::chrono::duration_cast<std::chrono::microseconds>(elapsed).count();
-		
+
 		ll_transform_image(r1, r1, 0.0, 1.0, t1.x, t1.y);
 		error1 = ll_mse<float>(r1, b);
 
@@ -1326,7 +1329,7 @@ namespace ll_algorithms
 			rotation += 180.0;
 		}
 
-		
+
 	}*/
 
 	Mat IPolarHM::HPImage(Mat & input, long long & ms, double scalar)
@@ -1336,7 +1339,7 @@ namespace ll_algorithms
 		Mat ret = Mat::zeros(_size, CV_32FC1);
 		ms = 0;
 		Mat im;
-		
+
 		int hw = w / 2, hh = h / 2;
 
 		float logScalar = ll_lp_scalar(w, scalar);

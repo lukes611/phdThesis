@@ -256,13 +256,13 @@ namespace ll_pix3d
 		}
 		return rv;
 	}
-	
+
 	void Pixel3DSet::reduce(int size_)
 	{
 		float size__ = (float)size_;
 		int _s2 = size_ * size_;
 		int _s3 = _s2 * size_;
-		
+
 		vector<Vec3b> colList(_s3, Vec3b(0,0,0));
 		vector<int> counts(_s3, 0);
 		R3 mn, mx;
@@ -294,7 +294,7 @@ namespace ll_pix3d
 				{
 					int iindex = z * _s2 + y * size_ + x;
 					if(x<0 || y<0 || z<0 || x>=size_ || y>=size_ || z>=size_) continue;
-					
+
 					if(counts[iindex] <= 0) continue;
 					R3 p((float)x, (float)y, (float)z);
 					p *= (maxScalar / (float)size_);
@@ -376,7 +376,7 @@ namespace ll_pix3d
 		}
 		return rv;
 	}
-	
+
 	SIObj Pixel3DSet::siobj()
 	{
 		SIObj rv(size(), 0);
@@ -505,7 +505,7 @@ namespace ll_pix3d
 
 		vector<R3> npoints;
 		vector<Vec3b> ncolors;
-		
+
 		for (int i = 0; i < count; i++)
 		{
 			keepers[i] = true;
@@ -531,7 +531,7 @@ namespace ll_pix3d
 			ncolors.push_back(colors[i]);
 		}
 
-		
+
 
 		delete[] keepers;
 		//delete[] _colors;
@@ -550,7 +550,7 @@ namespace ll_pix3d
 
 		int hmSize = 5000;
 		vector<int> * hashmap = new vector<int>[hmSize];
-		
+
 		//add this.points to hash map
 		cout << "hashing...";
 		for (int i = 0; i < count; i++)
@@ -581,11 +581,11 @@ namespace ll_pix3d
 				colors.push_back(o.colors[i]);
 				_numKept++;
 			}
-			
+
 		}
 		delete[] hashmap;
 		cout << "keeping " << _numKept << " out of " << o.size() << endl;
-		
+
 	}
 
 	Pixel3DSet Pixel3DSet::openDepthMap(Mat & depthImage, float maxDepth, float cutOff)
@@ -596,7 +596,7 @@ namespace ll_pix3d
 			x is (x-hw) * d * 10,000 / 525
 			~x is (x-hw) * d * (10,000/525)
 		*/
-	
+
 
 		float minX = (-319.5f) * (10000.0f/525.0f);
 		float maxX = ((639.0f-319.5f) * (10000.0f/525.0f)) - minX;
@@ -642,7 +642,7 @@ namespace ll_pix3d
 			x is (x-hw) * d * 10,000 / 525
 			~x is (x-hw) * d * (10,000/525)
 		*/
-	
+
 
 		float minX = (-319.5f) * (10000.0f/525.0f);
 		float maxX = ((639.0f-319.5f) * (10000.0f/525.0f)) - minX;
@@ -665,7 +665,7 @@ namespace ll_pix3d
 					//d = 1.0f-d;
 					//d *= range;
 					//d += offset;
-					
+
 
 					d *= 10000.0f;
 					R3 point(
@@ -679,7 +679,7 @@ namespace ll_pix3d
 					point.x = -point.x;
 					points.push_back(point);
 					Vec3b color = colorImage.at<Vec3b>(y,x);
-					
+
 					colors.push_back(color);
 				}
 			}
@@ -720,7 +720,7 @@ namespace ll_pix3d
 		directory_name = dname;
 		maximum_frames = max_frames;
 		frames_written_so_far = 0;
-	
+
 		ifstream fi("Pixel3DVideoInfo", ios::in);
 		if(!fi.is_open()) ll_error("error in Pixel3DSetWriter::constructor, opening Pixel3DVideoInfo file");
 		fi >> full_path;
@@ -822,6 +822,22 @@ namespace ll_pix3d
 		fi.close();
 		reset();
 	}
+	CapturePixel3DSet::CapturePixel3DSet(int zero)
+	{
+
+	}
+	CapturePixel3DSet CapturePixel3DSet::openCustom(string full_path_in, string dname, int buffer_size_in)
+	{
+        CapturePixel3DSet ret = 0;
+		ret.directory_name = dname;
+		ret.buffer_size = buffer_size_in;
+		ret.index = 0;
+		ret.num_frames_read = 0;
+		ret.full_path = full_path_in;
+		ret.full_path += "/" + dname;
+		ret.reset();
+		return ret;
+	}
 
 	CapturePixel3DSet::~CapturePixel3DSet()
 	{
@@ -830,6 +846,7 @@ namespace ll_pix3d
 
 	void CapturePixel3DSet::reset()
 	{
+        cout << full_path + "/info" << endl;
 		ifstream fi(full_path + "/info", ios::in);
 		if(!fi.is_open()) ll_error("error in Pixel3DSetWriter::update_info_file, could not open file");
 		fi >> total_number_of_frames;
@@ -848,7 +865,8 @@ namespace ll_pix3d
 	bool CapturePixel3DSet::load_single_frame()
 	{
 		if(index >= total_number_of_frames) return false;
-		Pix3D frame(Pix3DC(full_path + string("/f") + to_string(index)));
+		Pix3DC _compressedVersion(full_path + string("/f") + to_string(index));
+		Pix3D frame(_compressedVersion);
 		frames.push(frame);
 		index++;
 		return true;
@@ -907,11 +925,11 @@ namespace ll_pix3d
 		CapturePixel3DSet cap = directory_name;
 		R3 minimum, maximum;
 		CapturePixel3DSet::minMaxLoc(directory_name, minimum, maximum);
-		
+
 		float sizef = static_cast<float>(size_);
 		int _s2 = size_ * size_;
 		int _s3 = _s2 * size_;
-		
+
 		vector<Vec3b> colList(_s3, Vec3b(0,0,0));
 		vector<int> counts(_s3, 0);
 		maximum -= minimum;
@@ -942,10 +960,10 @@ namespace ll_pix3d
 				counts[iindex] += 1;
 			}
 		}
-		
+
 		Pixel3DSet rv;
 		float maxScalar_divide_sizef = maxScalar / sizef;
-		
+
 
 		for(int z = 0; z < size_; z++)
 		{
@@ -955,7 +973,7 @@ namespace ll_pix3d
 				{
 					int iindex = z * _s2 + y * size_ + x;
 					if(x<0 || y<0 || z<0 || x>=size_ || y>=size_ || z>=size_) continue;
-					
+
 					if(counts[iindex] <= 0) continue;
 					//set p to [x,y,z]
 					p.x = static_cast<float>(x);
@@ -965,9 +983,9 @@ namespace ll_pix3d
 					p *= maxScalar_divide_sizef;
 					p += minimum;
 					Vec3b color = colList[iindex];
-					
+
 					rv.points.push_back(p);
-					
+
 					rv.colors.push_back(color);
 				}
 			}
@@ -980,8 +998,8 @@ namespace ll_pix3d
 		CapturePixel3DSet cap = directory_name;
 		R3 minimum, maximum;
 		CapturePixel3DSet::minMaxLoc(directory_name, minimum, maximum);
-		
-		
+
+
 		Pixel3DSet frame, db;
 
 		R3 p;
@@ -990,8 +1008,8 @@ namespace ll_pix3d
 		{
 			db += frame;
 		}
-		
-		
+
+
 		return db;
 	}
 
@@ -1106,7 +1124,7 @@ namespace ll_pix3d
 		streamsize size = fi.tellg();
 		length = size;
 		data = new unsigned char[length];
-		
+
 		fi.seekg(0, ios::beg);
 		int index = 0, bytesPerRead = 2000;
 
@@ -1121,7 +1139,7 @@ namespace ll_pix3d
 		fi.close();
 	}
 
-	//Pix3D 
+	//Pix3D
 	Pix3D::Pix3D()
 	{
 		setAs(); //set to default values
@@ -1342,8 +1360,8 @@ namespace ll_pix3d
 	void Pix3D::decompress(Pix3DC & d)
 	{
 		free();
-		
-		
+
+
 		BIT_MANIPULATOR::BitReader vfi(d.data, d.length);
 		type = vfi.readBit(); //type is image type
 

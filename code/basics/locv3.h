@@ -3,7 +3,7 @@
 
 	Author: Luke Lincoln
 
-	contents description: 
+	contents description:
 		Contains some objects and algorithms which are wrappers for opencv3
 
 	depends on: opencv 3.0
@@ -11,6 +11,31 @@
 #pragma once
 
 
+
+#ifndef WIN32
+
+#include <opencv2/core/core.hpp>
+#include <opencv2/flann/miniflann.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
+#include <opencv2/photo/photo.hpp>
+#include <opencv2/video/video.hpp>
+#include <opencv2/features2d/features2d.hpp>
+#include <opencv2/objdetect/objdetect.hpp>
+#include <opencv2/calib3d/calib3d.hpp>
+#include <opencv2/ml/ml.hpp>
+#include <opencv2/highgui/highgui.hpp>
+#include <opencv2/core/core_c.h>
+#include <opencv2/highgui/highgui_c.h>
+#include <opencv2/imgproc/imgproc_c.h>
+#include <opencv2/features2d/features2d.hpp>
+#include <opencv2/opencv.hpp>
+#include <opencv2/video/video.hpp>
+#include <opencv2/xfeatures2d.hpp>
+#include <opencv2/core/cuda.hpp>
+#include <opencv2/highgui.hpp>
+
+
+#else //windows
 
 #include <opencv2\core\core.hpp>
 #include <opencv2/flann/miniflann.hpp>
@@ -31,13 +56,14 @@
 #include <opencv2/xfeatures2d.hpp>
 #include <opencv2\core\cuda.hpp>
 #include <opencv2\highgui.hpp>
-
+#endif
 
 #include <stdio.h>
 #include <cmath>
 #include <math.h>
 #include <stdint.h>
 #include <vector>
+#include <string>
 
 #define LL_DEFAULT_LOG_TRANSFORM_SCALAR 3.56
 
@@ -84,7 +110,7 @@ void ll_sift_FastTopX(cv::Mat & im1, cv::Mat & im2, std::vector<cv::Point2i> & p
 
 cv::Mat ll_combine_images(cv::Mat & im1, cv::Mat & im2, bool horizontal = true); /*creates a new image, which is im1 and im2 next to eachother*/
 
-void ll_draw_matches(cv::Mat & im, cv::Size & left_offset, std::vector<cv::Point2i> & p1, std::vector<cv::Point2i> & p2, int limit = -1);// draws matches on 
+void ll_draw_matches(cv::Mat & im, cv::Size & left_offset, std::vector<cv::Point2i> & p1, std::vector<cv::Point2i> & p2, int limit = -1);// draws matches on
 //a combined image
 
 cv::Mat ll_view_matches(cv::Mat & im1, cv::Mat & im2, std::vector<cv::Point2i> & p1, std::vector<cv::Point2i> & p2, int limit = -1); //view feature matches
@@ -111,13 +137,13 @@ double ll_get_angle(double x, double y); //compute the angle given a 2d vector
 void ll_UCF1_to_32F1(cv::Mat & im); //convert an image from unsigned char single channel to float single channel
 void ll_32F1_to_UCF1(cv::Mat & im); //convert an image from float single channel to unsiged char single channel
 void ll_normalize(cv::Mat & inp); //normalize an image so pixels are within [0,1]
-void ll_normalize(cv::Mat & inp, cv::Mat & mask, float defaultValue = 0.0f); //normalize an image so pixels are within [0,1], set all pixels which 
+void ll_normalize(cv::Mat & inp, cv::Mat & mask, float defaultValue = 0.0f); //normalize an image so pixels are within [0,1], set all pixels which
 //register as 0 in the mask to the defaultValue
 
 cv::Mat ll_scale_matrix(double scx, double scy); //generate 2d scale matrix
 cv::Mat ll_rotation_matrix(double angle_degrees); //generate a 2d rotation matrix
 cv::Mat ll_translation_matrix(double tx, double ty); //generate a 2d translation matrix
-cv::Mat ll_scale_center_matrix(double scaleSize, cv::Size imSize); //generate a 2d scale matrix which performs 
+cv::Mat ll_scale_center_matrix(double scaleSize, cv::Size imSize); //generate a 2d scale matrix which performs
 cv::Mat ll_transformation_matrix(cv::Size s, double rotation, double scale, double transX, double transY);
 void ll_transform_image(cv::Mat & inp, cv::Mat & outp, double rotation, double scale, double transX, double transY); //transforms the image by some rst values
 void ll_transform_image(cv::Mat & inp, cv::Mat & outp, cv::Mat & transform); //transforms the image by some transformation matrix
@@ -137,6 +163,7 @@ namespace ll_fft
 	void ifft_real_imag(cv::Mat & re, cv::Mat & im, cv::Mat & outp, bool swap_quads = true);
 }
 
+
 template <class T>
 T ll_lirp_at(cv::Mat & im, T xf, T yf)
 {
@@ -151,11 +178,13 @@ T ll_lirp_at(cv::Mat & im, T xf, T yf)
 	int x,y;
 	x = (int)floor(xf);
 	y = (int)floor(yf);
-	p1 = im.at<T>(Point(x,y));
-	p2 = im.at<T>(Point(x+1,y));
-	p3 = im.at<T>(Point(x,y+1));
-	p4 = im.at<T>(Point(x+1,y+1));
-	
+
+
+	p1 = im.at<T>(cv::Point(x,y));
+	p2 = im.at<T>(cv::Point(x+1,y));
+	p3 = im.at<T>(cv::Point(x,y+1));
+	p4 = im.at<T>(cv::Point(x+1,y+1));
+
 	T xb = (T)x;
 	T xa = (T)(x+1);
 	T scaler1 = (xf - xb);
@@ -167,7 +196,7 @@ T ll_lirp_at(cv::Mat & im, T xf, T yf)
 	T ya = (T)(y+1);
 	T scaler2 = (yf - yb);
 	T rv = scaler2*pint2 + (1.0f-scaler2)*pint1;
-	return rv;
+    return rv;
 }
 
 void ll_log_polar(cv::Mat & imIn, cv::Mat & outp, double scalar = LL_DEFAULT_LOG_TRANSFORM_SCALAR);

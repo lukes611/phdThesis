@@ -43,7 +43,8 @@ namespace Licp
 	//returns a float representing the average distance from each closest point from src to dst
 	//returns ptpairs: where src[i] matches with dst[ptpairs[i]] as output of the matching
 	//dists represents the distance between src[i] and its match dst[ptpairs[i]]
-	float knn(cv::Mat & dst, cv::Mat & src, std::vector<int> & ptpairs, std::vector<float> & dists = std::vector<float>());
+	float knn(cv::Mat & dst, cv::Mat & src, std::vector<int> & ptpairs, std::vector<float> & dists);
+	float knn(cv::Mat & dst, cv::Mat & src, std::vector<int> & ptpairs);
 
 
 	//finds the closest point for each point in src to a point in dst
@@ -62,7 +63,7 @@ namespace Licp
 	double closestPointsf(ll_pix3d::Pixel3DSet & src, ll_pix3d::Pixel3DSet & dst, std::vector<int> & indexes, std::vector<double> & distances);
 
 	//performs least squares to find the transform from all the points in src to all the points in dst
-	//here: src[i] is matched with dst[indexes[i]] for a given index i, 
+	//here: src[i] is matched with dst[indexes[i]] for a given index i,
 	cv::Mat leastSquaresTransform(std::vector<ll_R3::R3> & src, std::vector<ll_R3::R3> & dst, std::vector<int> & indexes);
 
 

@@ -3,8 +3,8 @@
 
 	Author: Luke Lincoln
 
-	contents description: 
-		Contains some objects and algorithms which are are written by me, which perform computer vision algorithms 
+	contents description:
+		Contains some objects and algorithms which are are written by me, which perform computer vision algorithms
 
 	depends on: opencv 3.0 and ll_R3, Pixel3DSet
 */
@@ -47,7 +47,7 @@ namespace ll_algorithms
 			LPCA();
 			LPCA(std::vector<ll_R3::R3> & points, unsigned char type_of_compute = COMPUTE_ORIGINAL);
 
-			//the threshold decides whether point p (with color c) is included in the computation, where the threshold must 
+			//the threshold decides whether point p (with color c) is included in the computation, where the threshold must
 			//be met as R3(c.red,c.green,c.blue).mag() >= threshold for p to be included
 			LPCA(ll_pix3d::Pixel3DSet & p, float threshold, unsigned char type_of_compute = COMPUTE_ORIGINAL);
 
@@ -78,7 +78,7 @@ namespace ll_algorithms
 			//generates a tralslation matrix based on the translation params tr.x, tr.y, tr.z
 			static cv::Mat translation_matrix(ll_R3::R3 tr);
 
-			//generates the matrix which transforms the first set of points (which this was generated from) 
+			//generates the matrix which transforms the first set of points (which this was generated from)
 			//to align with the points of the second: b points*
 			cv::Mat full_matrix(LPCA & b);
 
@@ -87,7 +87,7 @@ namespace ll_algorithms
 
 			static cv::Mat compute_transform_between(ll_pix3d::Pixel3DSet & p, ll_pix3d::Pixel3DSet & p2);
 			static cv::Mat compute_transform_between_for_pc(ll_pix3d::Pixel3DSet & p, ll_pix3d::Pixel3DSet & p2);
-			
+
 			static cv::Mat compute_alignment_for_pc(ll_pix3d::Pixel3DSet & p, ll_pix3d::Pixel3DSet & p2);
 			static cv::Mat compute_alignment_for_pc_small_change(ll_pix3d::Pixel3DSet & p, ll_pix3d::Pixel3DSet & p2);
 
@@ -202,13 +202,13 @@ namespace ll_algorithms
 		static void phaseCorrelateRST(cv::Mat & image1, cv::Mat & image2, long long & ms, double & rotation, double & scale, cv::Point2d & trans, double lpScalar = LL_DEFAULT_LOG_TRANSFORM_SCALAR);
 		//static void phaseCorrelateRST_NG(Mat & image1, Mat & image2, long long & ms, double & rotation, double & scale, Point2d & trans);
 		static void phaseCorrelateRSTf(cv::Mat & image1, cv::Mat & image2, long long & ms, double & rotation, double & scale, cv::Point2d & trans, double lpScalar = LL_DEFAULT_LOG_TRANSFORM_SCALAR);
-		static cv::Mat IPolarHM::HPImage(cv::Mat & input, long long & ms, double scalar);
+		static cv::Mat HPImage(cv::Mat & input, long long & ms, double scalar);
 	private:
 		std::vector<std::vector<cv::Point2i>> hm;
 		cv::Mat originalCopy;
 		void possibleResize(int w, int h); //resizes and clears hash map if required, else just  clears
 		int w, h;
 	};
-	
+
 
 }

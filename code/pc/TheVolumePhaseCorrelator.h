@@ -3,7 +3,7 @@
 
 	Author: Luke Lincoln
 
-	contents description: 
+	contents description:
 		The .h file for TheVolumePhaseCorrelator which is an object enclosing a set of functions for performing various actions using
 		the GPU on a VMatF object
 
@@ -17,9 +17,9 @@
 
 #define TheVolumePhaseCorrelator_H
 
-#include "..\gpu\ExternGPUPrograms.h"
-#include "..\basics\VMatF.h"
-#include "..\basics\locv_algorithms.h"
+#include "../gpu/ExternGPUPrograms.h"
+#include "../basics/VMatF.h"
+#include "../basics/locv_algorithms.h"
 
 
 
@@ -35,7 +35,7 @@ namespace ll_volume_gpu
 	void phase_correlate_rst(VMat & v1, VMat & v2, float & rotation, float & scale, R3 & translation, bool normalize_color = false);
 
 	cv::Mat phase_correlate_rst(VMat & v1, VMat & v2, bool normalize_color = false);
-	
+
 	cv::Mat pca_phase_correlate_rst(VMat & v1, VMat & v2);
 
 	//performs basic phase correlation giving translation params
@@ -70,7 +70,7 @@ namespace ll_volume_partial
 	//despite the fact they can also be seperated by scale and translation
 	float luke_rotation_estimation_method(VMat & v1, VMat & v2, cv::Size s = cv::Size(512, 512));
 
-	
+
 
 	//finds the rotation and translation params between two volumes using luke_rotation_estimation_method()
 	void phase_correlate_rt_lrem(VMat & v1, VMat & v2, float & rotation, R3 & translation);

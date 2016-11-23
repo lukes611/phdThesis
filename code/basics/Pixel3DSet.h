@@ -7,7 +7,7 @@
 #include "SIObj.h"
 #include <functional>
 
-//depends on ll_r3, ll_siobj and opencv3 (locv3)
+//depends on ll_r3, ll_siobj and opencv3 (locv3), bit-reader/writer
 
 //forward declaration:
 namespace ll_pix3d
@@ -33,7 +33,7 @@ namespace ll_pix3d
 		Pix3DC & operator = (const Pix3DC & p);
 		~Pix3DC();
 		void clone(const Pix3DC & p); //copies p as this (deep copy)
-		
+
 		void setAs(unsigned char * dataIn = NULL, int len = 0); // sets the data to these valuds in a raw way
 		bool empty(); //returns true if there is no data owned in the heap
 		void free(); //frees memory
@@ -83,7 +83,7 @@ namespace ll_pix3d
 		bool vdImage(cv::Mat & m);
 
 		Pix3D withoutWarping(int margin = 20);
-		
+
 		const static unsigned char NonImageType = 0x00;
 		const static unsigned char ImageType = 0x01;
 		const static unsigned char NoDataType = 0x02;
@@ -96,7 +96,7 @@ namespace ll_pix3d
 		std::vector<ll_R3::R3> points;
 		std::vector<cv::Vec3b> colors;
 		Pixel3DSet();
-	
+
 		Pixel3DSet(const Pixel3DSet & a);
 		Pixel3DSet & operator = (const Pixel3DSet & a);
 		Pixel3DSet(const std::vector<ll_R3::R3> & pointz, const std::vector<cv::Vec3b> colorz);
@@ -104,7 +104,7 @@ namespace ll_pix3d
 		Pixel3DSet(const std::vector<cv::Vec3f> & pointz, const std::vector<cv::Vec3b> colorz);
 		Pixel3DSet(ll_R3::R3 * l, cv::Vec3b * color, int n);
 		Pixel3DSet(const Pix3D & p);
-	
+
 		//normalization functions
 		void normalize(int s = 384); //was n() / n(int s). Just normalizes all the points
 		void round_points(); //rounds all the points, was n2()
@@ -113,7 +113,7 @@ namespace ll_pix3d
 		void save(std::string fn);
 		void open(std::string fn);
 		Pix3D pix3d() const;
-		
+
 
 		void clear();
 		void copyFrom(const Pixel3DSet & a);
@@ -124,11 +124,11 @@ namespace ll_pix3d
 		void UNION(Pixel3DSet & a);
 		Pixel3DSet operator + (Pixel3DSet & a);
 		Pixel3DSet & operator += (Pixel3DSet & a);
-		
+
 		ll_R3::R3 getAvg();
 		void reduce(int size_);
 		void min_max_R3(ll_R3::R3 & mn, ll_R3::R3 & mx);
-		
+
 		//static functionality for matrix generation
 		static cv::Mat rotation_matrix_center(float rx, float ry, float rz, ll_R3::R3 center);
 		static cv::Mat scale_matrix_center(float sc, ll_R3::R3 center);
@@ -143,7 +143,7 @@ namespace ll_pix3d
 		static cv::Mat scale_matrix(float sx, float sy, float sz);
 		static cv::Mat center_origin_matrix_inv(ll_R3::R3 center);
 		static cv::Mat center_origin_matrix(ll_R3::R3 center);
-		
+
 		void transform_set(cv::Mat & m);
 		void transform_set(float rx, float ry, float rz, float sc, float tx, float ty, float tz, ll_R3::R3 center);
 		ll_siobj::SIObj siobj(int block_wid, int s = 384);
@@ -169,7 +169,7 @@ namespace ll_pix3d
 		static Pixel3DSet openDepthMap(cv::Mat & colorImage, cv::Mat & depthImage, float maxDepth, float cutOff = 0.1f, float offset = 0.4f, float range = 0.7f);
 		static Pixel3DSet DirectProject(cv::Mat & colorImage, cv::Mat depthImage, float size, float threshold);
 
-		
+
 	};
 
 
@@ -229,6 +229,8 @@ namespace ll_pix3d
 		std::string directory_name;
 		std::string full_path;
 		CapturePixel3DSet(std::string directory_name = "default", int buffer_size = 30);
+		CapturePixel3DSet(int zero); //null created CapturePixel3DSet
+		static CapturePixel3DSet openCustom(std::string fullPathName, std::string directory_name, int buffer_size = 30);
 		~CapturePixel3DSet();
 
 		void reset(); //loads in some frames, gets the number of frames
@@ -240,7 +242,7 @@ namespace ll_pix3d
 		int size(); //returns the total number of frames possible to read
 		bool read_frame(Pixel3DSet & p, unsigned int index_in); //reads a specific frame, but does not check if it is buffered
 		bool read_frame(Pix3D & p, unsigned int index_in); //reads a specific frame, but does not check if it is buffered
-		
+
 		static Pixel3DSet reduce_video_frames(std::string directory_name, int size_);
 		static Pixel3DSet collect_video_frames(std::string directory_name, int size_);
 		static void minMaxLoc(std::string directory_name, ll_R3::R3 & minimum, ll_R3::R3 & maximum);

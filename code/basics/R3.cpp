@@ -1,7 +1,7 @@
 #include "R3.h"
-#include <stdlib.h>
-#include <stdio.h>
 #include <functional>
+#include <cstdio>
+#include <cstdlib>
 
 
 namespace ll_R3
