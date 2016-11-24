@@ -480,9 +480,11 @@ namespace ll_algorithms
 		void LNN_Set::open_weights(string fname)
 		{
 			cv::String st(fname);
-
-			//ann = cv::ml::ANN_MLP::load<cv::ml::ANN_MLP>(fname);
+#ifdef _WIN32
+			ann = cv::ml::ANN_MLP::load<cv::ml::ANN_MLP>(fname);
+#else
 			ann = cv::ml::ANN_MLP::load(fname);
+#endif
 			Mat tmp = ann->getLayerSizes();
 			int tvecsize = tmp.at<int>(0,0);
 			data.push_back(vector<float>(tvecsize, 0.0f));
