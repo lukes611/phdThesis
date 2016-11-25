@@ -67,8 +67,27 @@ namespace ll_Sift
 		double octave;
 		R3 normal;
 		float angle1, angle2;
-		double featureVector[2];
+		vector<double> featureVector;
+		Mat im;
+
+        double measure(struct _llSiftFeat & o)
+        {
+            return cv::sum(abs(im - o.im))[0];
+            double sum = 0.0;
+            for(int i = 1; i < featureVector.size(); i++)
+            {
+                double er = featureVector[i] - o.featureVector[i];
+                sum += er*er;
+            }
+            return sum;
+        }
+
 	} llSiftFeat;
+
+	typedef struct __llSiftMatch{
+        llSiftFeat a, b;
+        double distance;
+	} llSiftMatch;
 
 	double gaussian(double x, double y, double R)
 	{
@@ -111,6 +130,15 @@ namespace ll_Sift
 		return ret.clone();
 	}
 
+	bool isTrueFeature2(int x, int y, Mat & m)
+	{
+        float v = m.at<float>(y,x);
+        for(int j = -1; j <= 1; j++)
+            for(int i = -1; i <= 1; i++)
+                if(m.at<float>(y+j,x+i) != v) return true;
+        return false;
+	}
+
 	bool isTrueFeature(int x, int y, Mat & m)
 	{
 		float dxx = m.at<float>(y, x + 1) - m.at<float>(y, x - 1);
@@ -123,22 +151,55 @@ namespace ll_Sift
 
 		float tr = dxx + dyy;
 		float det = dxx*dyy - dxy*dxy;
-		
+
 		float measure = (tr*tr) / det;
 		float r = 10.0f;
 		float r1 = r + 1.0f;
 		//cout << measure << endl;
-		
+
 		return measure <= (r1*r1) / r;
 	}
 
 	float orientation(int x, int y, Mat & m)
 	{
-		float v =
-			(m.at<float>(y + 1, x) - m.at<float>(y - 1, x)) /
-			(m.at<float>(y, x + 1) - m.at<float>(y, x - 1));
-		return atan(v);
+        R3::getAngle((m.at<float>(y + 1, x) - m.at<float>(y - 1, x)),
+        (m.at<float>(y, x + 1) - m.at<float>(y, x - 1)));
+
 	}
+
+
+    void computeFeatureVectors(llSiftFeat & ret, Mat & im, Size s)
+    {
+        double hs = s.width * 0.5;
+        int rois = (int)(sqrt(2.0*hs*hs)*2.0 + 5.5);
+        //form regular image based on
+        Mat regularImg = im(Rect(ret.x, ret.y, rois, rois)).clone();
+        int tl = (rois - s.width) / 2;
+        Mat Img;
+        ll_transform_image(regularImg, Img, -ret.angle1, 1.0, 0.0, 0.0);
+
+        Img = Img(Rect(tl, tl, s.width, s.height));
+        //cout << rois << " from " << s.width << endl;
+        //ll_normalize(Img);
+
+        //re-align it and get rid of pixels outside the circle
+        //
+        //get the log-polar of this
+        Mat lp = Img;
+        //ll_log_polar(Img, lp, 1.5);
+
+        ret.im = lp.clone();
+        //ll_normalize(lp);
+        //get the 1dfft of combined rows
+        Mat signal = Mat::zeros(Size(s.width * s.height, 1), CV_32FC1);
+        float * ptr = (float*)lp.data; for(int i = 0; i < signal.size().width; i++) signal.at<float>(0, i) = ptr[i];
+        Mat mag, pha;
+        ll_fft::fft_magnitude_phase(signal, mag, pha, false);
+        //mag = signal.clone();
+        //return some of 1dfft's mag
+        ll_normalize(mag);
+        for(int i = 0; i < mag.size().width; i++) ret.featureVector.push_back((double)mag.at<float>(0, i));
+    }
 
 
 
@@ -161,7 +222,7 @@ namespace ll_Sift
 		d = getGaussianDifferenceImage(kernelSize, R, K);
 		Mat currentG; filter2D(input, currentG, input.depth(), g);
 		Mat currentD; filter2D(input, currentD, input.depth(), d);
-		
+
 		for (int i = 2; i <= numLevels; i++)
 		{
 			R = R * K;
@@ -169,12 +230,12 @@ namespace ll_Sift
 			d = getGaussianDifferenceImage(kernelSize, R, K);
 			Mat nextG; filter2D(input, nextG, input.depth(), g);
 			Mat nextD; filter2D(input, nextD, input.depth(), d);
-			
+
 
 			//for each pixel, if feature vector: record
-			for (int y = 2; y < input.size().height - 2; y++)
+			for (int y = 50; y < input.size().height - 50; y++)
 			{
-				for (int x = 2; x < input.size().width - 2; x++)
+				for (int x = 50; x < input.size().width - 50; x++)
 				{
 					float dv = currentD.at<float>(y, x);
 					int lt = 0, gt = 0;
@@ -198,16 +259,18 @@ namespace ll_Sift
 					if (lt == 0 || gt == 0)
 					{
 						if (!isTrueFeature(x, y, currentG)) continue;
-						
+						//if (!isTrueFeature2(x,y, currentG)) continue;
+
 						llSiftFeat feature; feature.x = x; feature.y = y;
 						feature.octave = 1.0;
 						feature.scale = R/K;
-						feature.angle1 = orientation(x, y, currentG) * 57.3f;
+						feature.angle1 = orientation(x, y, currentG);
 						R3::GetUnitPointFromAngle(feature.angle1, feature.normal.x, feature.normal.y);
 
 						//compute feature vector
-						//by: 
-						
+						//by:
+                        computeFeatureVectors(feature, currentG, Size(30,30));
+
 						ret.push_back(feature);
 					}
 				}
@@ -223,30 +286,73 @@ namespace ll_Sift
 		return ret;
 	}
 
-}
+    void computeMatches(vector<llSiftFeat> & fvs1, vector<llSiftFeat> & fvs2, vector<Point2i> & p1, vector<Point2i> & p2)
+    {
+        vector<llSiftMatch> matches;
+        //a match has
+        for(int i = 0; i < fvs1.size(); i++)
+        {
+            double best = fvs2[0].measure(fvs1[i]);
+            int bj = 0;
+            for(int j = 1; j < fvs2.size(); j++)
+            {
+                double er = fvs2[j].measure(fvs1[i]);
+                if(er < best)
+                {
+                    best = er;
+                    bj = j;
+                }
+            }
+            llSiftMatch m; m.a = fvs1[i]; m.b = fvs2[bj];
+            //imshow("f1", m.a.im);
+            //imshow("f2", m.b.im); waitKey();
+            matches.push_back(m);
+
+        }
+
+        auto f = [](const llSiftMatch & a, const llSiftMatch & b) -> bool { return a.distance < b.distance; };
+		std::sort(matches.begin(), matches.end(), f);
+
+        for(int i = 0; i < 35; i++)
+        {
+            p1.push_back(Point2i(matches[i].a.x, matches[i].a.y));
+            p2.push_back(Point2i(matches[i].b.x, matches[i].b.y));
+        }
+
+
+    }
+
+};
 
 int main(int argc, char * * argv)
 {
-   
-	for (int i = 0; i <= 360; i += 2)
-	{
-		Mat lenna = imread("c:/lcppdata/ims/lena.png", CV_LOAD_IMAGE_GRAYSCALE);
-		ll_UCF1_to_32F1(lenna);
-		double D = rand() / (double)RAND_MAX;
-		D *= 30.0;
-		ll_transform_image(lenna, lenna, i, 1.0, D, 0.0);
-		vector<ll_Sift::llSiftFeat> fl = ll_Sift::findFeatures(lenna);
 
-		for (int i = 0; i < fl.size(); i++)
-		{
-			cv::circle(lenna, Point(fl[i].x, fl[i].y), 2, Scalar(1.0));
-		}
+    Mat lennaOrig = imread("/home/luke/lcppdata/ims/Lenna.png");
+    Mat lenna = imread("/home/luke/lcppdata/ims/Lenna.png", CV_LOAD_IMAGE_GRAYSCALE);
+    ll_UCF1_to_32F1(lenna);
+    //ll_transform_image(lenna, lenna, 0.0, 1.0, 5.0, 5.0);
 
-		cout << "num feats: " << fl.size() << endl;
+    Mat lenna2;
+    ll_transform_image(lenna, lenna2, 10.0f, 1.0, 0.0f, 0.0);
 
-		imshow("l", lenna);
-		waitKey();
-	}
+    //cout << ll_Sift::orientation(lenna.size().width/2, lenna.size().height/2, lenna) << endl;
+    //cout << ll_Sift::orientation(lenna.size().width/2, lenna.size().height/2, lenna2) << endl;
+    //return 0;
+
+
+    Mat lennaOrig2;
+    ll_transform_image(lennaOrig, lennaOrig2, 10.0f, 1.0, 0.0f, 0.0);
+
+    vector<ll_Sift::llSiftFeat> f1 = ll_Sift::findFeatures(lenna);
+
+    vector<ll_Sift::llSiftFeat> f2 = ll_Sift::findFeatures(lenna2);
+
+    vector<Point2i> p1, p2;
+    ll_Sift::computeMatches(f1, f2, p1, p2);
+
+    Mat ma = ll_view_matches(lennaOrig, lennaOrig2, p1, p2);
+    imshow("ma", ma);
+    waitKey();
 
 
 	return 0;
