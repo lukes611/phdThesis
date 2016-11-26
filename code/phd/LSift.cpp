@@ -52,5 +52,27 @@ namespace LukeLincoln
 		return ret.clone();
 	}
 
+    void partialDerivatives1(Mat & im, int x, int y, float & dx, float & dy)
+    {
+        dx = im.at<float>(y, x + 1) - im.at<float>(y, x - 1);
+        dy = im.at<float>(y + 1, x) - im.at<float>(y - 1, x);
+    }
+
+    void partialDerivatives2(Mat & im, int x, int y, float & dx, float & dy)
+    {
+        dx = (im.at<float>(y-1, x + 1) - im.at<float>(y-1, x - 1))
+            +
+            2.0f*(im.at<float>(y, x + 1) - 2.0f*im.at<float>(y, x - 1))
+            +
+            (im.at<float>(y+1, x + 1) - im.at<float>(y+1, x - 1))
+        ;
+        dy = (im.at<float>(y + 1, x-1) - im.at<float>(y - 1, x-1))
+            +
+            2.0f*(im.at<float>(y + 1, x) - 2.0f*im.at<float>(y - 1, x))
+            +
+            (im.at<float>(y + 1, x+1) - im.at<float>(y - 1, x+1));
+        //dx /= 4.0f, dy /= 4.0f;
+    }
+
 
 }

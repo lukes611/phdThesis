@@ -36,4 +36,8 @@ namespace LukeLincoln
     cv::Mat getGaussianImage(cv::Size s, double sigma);
     cv::Mat getGaussianDifferenceImage(cv::Size s, double sigma, double scalar);
 
+    //derivative functions
+    void partialDerivatives1(cv::Mat & im, int x, int y, float & dx, float & dy);
+    void partialDerivatives2(cv::Mat & im, int x, int y, float & dx, float & dy);
+
 }

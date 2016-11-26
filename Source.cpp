@@ -83,26 +83,37 @@ namespace ll_Sift
 
 	bool isTrueFeature(int x, int y, Mat & m)
 	{
-		float dxx = m.at<float>(y, x + 1) - m.at<float>(y, x - 1);
-		float dyy = m.at<float>(y + 1, x) - m.at<float>(y - 1, x);
-		float dxy = m.at<float>(y + 1, x + 1) - m.at<float>(y - 1, x - 1);
+		//float dxx = m.at<float>(y, x + 1) - m.at<float>(y, x - 1);
+		//float dyy = m.at<float>(y + 1, x) - m.at<float>(y - 1, x);
+		//float dxy = m.at<float>(y + 1, x + 1) - m.at<float>(y - 1, x - 1);
+		float dxx = 40.0f, dyy;
+        partialDerivatives2(m, x, y, dxx, dyy);
+        float dxy = dxx * dyy;
+        //dxx *= dxx;
+        //dyy *= dyy;
+        //dxy = sqrt(dxx + dyy);
 
-		if(dxx*dxx < 0.0001f) return false;
-		if(dyy*dyy < 0.0001f) return false;
+        //cout << Point2f(dxx, dyy) << " -> ";
+        //cin.get();
+		//if(dxx*dxx < 0.001f) return false;
+		//if(dyy*dyy < 0.001f) return false;
 
-		dxx /= 2.f;
-		dyy /= 2.f;
-		dxy /= sqrt(8.0f);
 
 		float tr = dxx + dyy;
 		float det = dxx*dyy - dxy*dxy;
+        //cout << det / tr << endl;
+		//cout << Point3f(dxx, dyy, tr) << endl;
 
 		float measure = (tr*tr) / det;
+
+		//cout << measure << endl;
+		//cin.get();
+
 		float r = 10.0f;
 		float r1 = r + 1.0f;
-		//cout << measure << endl;
-
-		return measure <= (r1*r1) / r;
+		//cout << Point2f(tr, det) << " -> " <<  measure << " " << ((r1*r1)/r)<<endl;
+        //return measure < -0.4f;
+		return (measure) > (r1*r1) / r;
 	}
 
 	float orientation(int x, int y, Mat & m)
@@ -249,7 +260,7 @@ namespace ll_Sift
 
 					if (lt == 0 || gt == 0)
 					{
-						if (!isTrueFeature(x, y, currentG)) continue;
+						if (!isTrueFeature(x, y, currentD)) continue;
 						//if (!isTrueFeature2(x,y, currentG)) continue;
 
 						SiftFeature2D feature; feature.x = x; feature.y = y;
@@ -318,7 +329,43 @@ namespace ll_Sift
 int main(int argc, char * * argv)
 {
 
+     auto viewF = [](vector<LukeLincoln::SiftFeature2D>&f, Mat im, bool w = false) -> void {
+        auto x = im.clone();
+        for(int i = 0; i < f.size(); i++)
+        {
+            Point2i p1(f[i].x, f[i].y);
+            float X, Y;
+            R3::GetUnitPointFromAngle(f[i].angle, X, Y);
+            double rad = 5.0 * f[i].scale;
+            X*= rad, Y*= rad;
+            Point2i p2(p1.x + (int)X, p1.y + (int)Y);
+            cv::line(x, p1, p2, Scalar(255));
+            cv::circle(x, p1, rad, Scalar(255));
+        }
+        stringstream name; name << "i " << w;
+        imshow(name.str(), x); if(w)waitKey();
+    };
+/*
+    Mat lenna = imread("/home/luke/lcppdata/ims/Lenna.png", CV_LOAD_IMAGE_GRAYSCALE);
+    ll_UCF1_to_32F1(lenna);
+    ll_normalize(lenna);
+    Mat g = LukeLincoln::getGaussianDifferenceImage(Size(7,7), 2.0f, pow(2.0f, 0.5f));
+    Mat gl;
+    filter2D(lenna, gl, lenna.depth(), g);
 
+    for(int y = 10; y < lenna.size().height-10; y++)
+    {
+        for(int x = 10; x < lenna.size().width-10; x++)
+        {
+            if(ll_Sift::isTrueFeature(x, y, gl))
+            {
+                circle(lenna, Point(x,y), 5, Scalar(1.0));
+            }
+        }
+    }
+
+    imshow("a", lenna); waitKey();
+*/
 
     Mat lennaOrig = imread("/home/luke/lcppdata/ims/Lenna.png");
     Mat lenna = imread("/home/luke/lcppdata/ims/Lenna.png", CV_LOAD_IMAGE_GRAYSCALE);
@@ -336,22 +383,6 @@ int main(int argc, char * * argv)
     Mat lennaOrig2;
     ll_transform_image(lennaOrig, lennaOrig2, 10.0f, 1.0, 5.0f, -10.0);
 
-    auto viewF = [](vector<LukeLincoln::SiftFeature2D>&f, Mat im, bool w = false) -> void {
-        auto x = im.clone();
-        for(int i = 0; i < f.size(); i++)
-        {
-            Point2i p1(f[i].x, f[i].y);
-            float X, Y;
-            R3::GetUnitPointFromAngle(f[i].angle, X, Y);
-            double rad = 5.0 * f[i].scale;
-            X*= rad, Y*= rad;
-            Point2i p2(p1.x + (int)X, p1.y + (int)Y);
-            cv::line(x, p1, p2, Scalar(255));
-            cv::circle(x, p1, rad, Scalar(255));
-        }
-        stringstream name; name << "i " << w;
-        imshow(name.str(), x); if(w)waitKey();
-    };
 
     vector<LukeLincoln::SiftFeature2D> f1 = ll_Sift::findFeatures(lenna);
 
@@ -360,7 +391,7 @@ int main(int argc, char * * argv)
     viewF(f1, lenna, false);
     viewF(f2, lenna2, true);
 
-    return 1;
+    //return 1;
 
     vector<Point2i> p1, p2;
     ll_Sift::computeMatches(f1, f2, p1, p2);
