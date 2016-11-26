@@ -180,7 +180,7 @@ namespace ll_Sift
     vector<float> computeOrientations(llSiftFeat & feature, Mat & image)
     {
         vector<float> ret;
-        float roiSizef = 2.5f * feature.scale;
+        float roiSizef = 1.5f * feature.scale;
         float roiSizefb = roiSizef + 4.0f;
         Mat g = ll_Sift::getGaussianImage(Size(roiSizefb, roiSizefb), 1.5f * feature.scale);
         Mat roi = image(Rect(feature.x - roiSizefb*0.5f, feature.y - roiSizefb*0.5f, (int)roiSizefb, (int)roiSizefb));
@@ -227,8 +227,30 @@ namespace ll_Sift
         return angles[0];
     }
 
+    void computeFeatureVectors(llSiftFeat & ret, Mat & im)
+    {
+        ret.im = Mat::zeros(Size(8, 16), CV_32FC1);
+        Mat roi = im(Rect(ret.x - 7, ret.y - 7, 16, 16));
+        Mat g = ll_Sift::getGaussianImage(Size(16, 16), 16.0);
 
-    void computeFeatureVectors(llSiftFeat & ret, Mat & im, Size s)
+        for(int y = 0; y < 16; y++)
+        {
+            for(int x = 0; x < 16; x++)
+            {
+                float m = magnitude(x, y, roi) * g.at<float>(y,x);
+                float o = orientation(x, y, roi);
+                int xI = x / 4;
+                int yI = y / 4;
+                int GridSection = yI * 4 + xI;
+                int bin = (int)(o / 45.0f);
+                ret.im.at<float>(GridSection, bin) += m;
+            }
+        }
+        ll_normalize(ret.im);
+    }
+
+
+    void computeFeatureVectors2(llSiftFeat & ret, Mat & im, Size s)
     {
         double hs = s.width * 0.5;
         int rois = (int)(sqrt(2.0*hs*hs)*2.0 + 5.5);
@@ -330,7 +352,8 @@ namespace ll_Sift
                             llSiftFeat f = feature;
                             f.angle1 = bestAngles[_];
                             R3::GetUnitPointFromAngle(f.angle1, f.normal.x, f.normal.y);
-                            computeFeatureVectors(f, currentG, Size(30,30));
+                            //computeFeatureVectors(f, currentG, Size(30,30));
+                            computeFeatureVectors(f, currentG);
                             ret.push_back(f);
                             //break;
 
@@ -381,7 +404,7 @@ namespace ll_Sift
         auto f = [](const llSiftMatch & a, const llSiftMatch & b) -> bool { return a.distance < b.distance; };
 		std::sort(matches.begin(), matches.end(), f);
 
-        for(int i = 0; i < 10; i++)
+        for(int i = 0; i < 100; i++)
         {
             p1.push_back(Point2i(matches[i].a.x, matches[i].a.y));
             p2.push_back(Point2i(matches[i].b.x, matches[i].b.y));
@@ -401,7 +424,7 @@ int main(int argc, char * * argv)
     //ll_transform_image(lenna, lenna, 0.0, 1.0, 5.0, 5.0);
 
     Mat lenna2;
-    ll_transform_image(lenna, lenna2, 10.0f, 1.0, 00.0f, 00.0);
+    ll_transform_image(lenna, lenna2, 1.0f, 1.0, 5.0f, 00.0);
 
     //cout << ll_Sift::orientation(lenna.size().width/2, lenna.size().height/2, lenna) << endl;
     //cout << ll_Sift::orientation(lenna.size().width/2, lenna.size().height/2, lenna2) << endl;
@@ -409,7 +432,7 @@ int main(int argc, char * * argv)
 
 
     Mat lennaOrig2;
-    ll_transform_image(lennaOrig, lennaOrig2, 10.0f, 1.0, 0.0f, 0.0);
+    ll_transform_image(lennaOrig, lennaOrig2, 1.0f, 1.0, 5.0f, 0.0);
 
     auto viewF = [](vector<ll_Sift::llSiftFeat>&f, Mat im, bool w = false) -> void {
         auto x = im.clone();
