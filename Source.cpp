@@ -14,6 +14,7 @@
 #include "code/phd/Licp.h"
 #include "code/script/LScript.h"
 #include "code/phd/fmRansac.h"
+#include "code/phd/LSift.h"
 //#include "code/pc/TheVolumePhaseCorrelator.h"
 //#include "code/phd/Lpcr.h"
 //#include "code/phd/experiments.h"
@@ -26,7 +27,7 @@ using namespace ll_measure;
 using namespace ll_fmrsc;
 //using namespace ll_experiments;
 using namespace ll_siobj;
-
+using namespace LukeLincoln;
 
 
 
@@ -61,74 +62,15 @@ public:
 namespace ll_Sift
 {
 
-	typedef struct _llSiftFeat {
-		int x, y, z;
-		double scale;
-		double octave;
-		R3 normal;
-		float angle1, angle2;
-		vector<double> featureVector;
-		Mat im;
-
-        double measure(struct _llSiftFeat & o)
-        {
-            return cv::sum(abs(im - o.im))[0];
-            double sum = 0.0;
-            for(int i = 1; i < featureVector.size(); i++)
-            {
-                double er = featureVector[i] - o.featureVector[i];
-                sum += er*er;
-            }
-            return sum;
-        }
-
-	} llSiftFeat;
 
 	typedef struct __llSiftMatch{
-        llSiftFeat a, b;
+        SiftFeature2D a, b;
         double distance;
+
 	} llSiftMatch;
 
-	double gaussian(double x, double y, double R)
-	{
-		return (1.0 / (2.0 * 3.14159265359 * R*R)) * exp(-(x*x + y*y) / (2.0 * R*R));
-	}
 
-	double gaussian(double d, double R)
-	{
-		return (1.0 / (2.0 * 3.14159265359 * R*R)) * exp(-(d) / (2.0 * R*R));
-	}
 
-	double gaussianDifference(double d, double R, double K)
-	{
-		return gaussian(d, K*R) - gaussian(d, R);
-	}
-
-	Mat getGaussianImage(Size s, double R)
-	{
-		Mat ret = Mat::zeros(s, CV_32FC1);
-		for (int y = 0; y < s.height; y++)
-		{
-			for (int x = 0; x < s.width; x++)
-			{
-				ret.at<float>(y, x) = (float)gaussian(ll_distance(x, y, s.width/2, s.height/2), R);
-			}
-		}
-		return ret.clone();
-	}
-
-	Mat getGaussianDifferenceImage(Size s, double R, double K)
-	{
-		Mat ret = Mat::zeros(s, CV_32FC1);
-		for (int y = 0; y < s.height; y++)
-		{
-			for (int x = 0; x < s.width; x++)
-			{
-				ret.at<float>(y, x) = (float)gaussianDifference(ll_distance(x, y, s.width / 2, s.height / 2), R, K);
-			}
-		}
-		return ret.clone();
-	}
 
 	bool isTrueFeature2(int x, int y, Mat & m)
 	{
@@ -177,12 +119,12 @@ namespace ll_Sift
 
 	}
 
-    vector<float> computeOrientations(llSiftFeat & feature, Mat & image)
+    vector<float> computeOrientations(SiftFeature2D & feature, Mat & image)
     {
         vector<float> ret;
         float roiSizef = 1.5f * feature.scale;
         float roiSizefb = roiSizef + 4.0f;
-        Mat g = ll_Sift::getGaussianImage(Size(roiSizefb, roiSizefb), 1.5f * feature.scale);
+        Mat g = getGaussianImage(Size(roiSizefb, roiSizefb), 1.5f * feature.scale);
         Mat roi = image(Rect(feature.x - roiSizefb*0.5f, feature.y - roiSizefb*0.5f, (int)roiSizefb, (int)roiSizefb));
         //filter2D(roi, roi, roi.depth(), g);
         Mat angles = Mat::zeros(Size(36, 1), CV_32FC1);
@@ -220,74 +162,41 @@ namespace ll_Sift
         return ret;
     }
 
-    float computeBestOrientation(llSiftFeat & feature, Mat & image)
+    float computeBestOrientation(SiftFeature2D & feature, Mat & image)
     {
         vector<float> angles = computeOrientations(feature, image);
         if(angles.size() == 0) return 0.0f;
         return angles[0];
     }
 
-    void computeFeatureVectors(llSiftFeat & ret, Mat & im)
+    void computeFeatureVectors(SiftFeature2D & ret, Mat & im)
     {
-        ret.im = Mat::zeros(Size(8, 16), CV_32FC1);
+        ret.featureVector = Mat::zeros(Size(8, 16), CV_32FC1);
         Mat roi = im(Rect(ret.x - 7, ret.y - 7, 16, 16));
-        Mat g = ll_Sift::getGaussianImage(Size(16, 16), 16.0);
+        Mat g = getGaussianImage(Size(16, 16), 16.0);
 
         for(int y = 0; y < 16; y++)
         {
             for(int x = 0; x < 16; x++)
             {
                 float m = magnitude(x, y, roi) * g.at<float>(y,x);
-                float o = orientation(x, y, roi);
+                float o = orientation(x, y, roi) - ret.angle;
+                if(o < 0.0f) o = o + 360.0f;
                 int xI = x / 4;
                 int yI = y / 4;
                 int GridSection = yI * 4 + xI;
                 int bin = (int)(o / 45.0f);
-                ret.im.at<float>(GridSection, bin) += m;
+                ret.featureVector.at<float>(GridSection, bin) += m;
             }
         }
-        ll_normalize(ret.im);
-    }
-
-
-    void computeFeatureVectors2(llSiftFeat & ret, Mat & im, Size s)
-    {
-        double hs = s.width * 0.5;
-        int rois = (int)(sqrt(2.0*hs*hs)*2.0 + 5.5);
-        //form regular image based on
-        Mat regularImg = im(Rect(ret.x, ret.y, rois, rois)).clone();
-        int tl = (rois - s.width) / 2;
-        Mat Img;
-        ll_transform_image(regularImg, Img, -ret.angle1, 1.0, 0.0, 0.0);
-
-        Img = Img(Rect(tl, tl, s.width, s.height));
-        //cout << rois << " from " << s.width << endl;
-        //ll_normalize(Img);
-
-        //re-align it and get rid of pixels outside the circle
-        //
-        //get the log-polar of this
-        Mat lp = Img;
-        //ll_log_polar(Img, lp, 1.5);
-
-        ret.im = lp.clone();
-        //ll_normalize(lp);
-        //get the 1dfft of combined rows
-        Mat signal = Mat::zeros(Size(s.width * s.height, 1), CV_32FC1);
-        float * ptr = (float*)lp.data; for(int i = 0; i < signal.size().width; i++) signal.at<float>(0, i) = ptr[i];
-        Mat mag, pha;
-        ll_fft::fft_magnitude_phase(signal, mag, pha, false);
-        //mag = signal.clone();
-        //return some of 1dfft's mag
-        ll_normalize(mag);
-        for(int i = 0; i < mag.size().width; i++) ret.featureVector.push_back((double)mag.at<float>(0, i));
+        ll_normalize(ret.featureVector);
     }
 
 
 
-	vector<llSiftFeat> findFeatures(Mat & input)
+	vector<SiftFeature2D> findFeatures(Mat & input)
 	{
-		vector<llSiftFeat> ret;
+		vector<SiftFeature2D> ret;
 		double K = sqrt(2.0);
 		Size kernelSize(7,7);
 		int numLevels = 5;
@@ -343,26 +252,17 @@ namespace ll_Sift
 						if (!isTrueFeature(x, y, currentG)) continue;
 						//if (!isTrueFeature2(x,y, currentG)) continue;
 
-						llSiftFeat feature; feature.x = x; feature.y = y;
+						SiftFeature2D feature; feature.x = x; feature.y = y;
 						feature.octave = 1.0;
 						feature.scale = R/K;
 						vector<float> bestAngles = computeOrientations(feature, currentG);//orientation(x, y, currentG);
 						for(int _ = 0; _ < bestAngles.size(); _++)
 						{
-                            llSiftFeat f = feature;
-                            f.angle1 = bestAngles[_];
-                            R3::GetUnitPointFromAngle(f.angle1, f.normal.x, f.normal.y);
-                            //computeFeatureVectors(f, currentG, Size(30,30));
+                            SiftFeature2D f = feature;
+                            f.angle = bestAngles[_];
                             computeFeatureVectors(f, currentG);
                             ret.push_back(f);
-                            //break;
-
-						}
-
-
-
-						//compute feature vector
-						//by:
+                        }
 					}
 				}
 			}
@@ -377,17 +277,17 @@ namespace ll_Sift
 		return ret;
 	}
 
-    void computeMatches(vector<llSiftFeat> & fvs1, vector<llSiftFeat> & fvs2, vector<Point2i> & p1, vector<Point2i> & p2)
+    void computeMatches(vector<SiftFeature2D> & fvs1, vector<SiftFeature2D> & fvs2, vector<Point2i> & p1, vector<Point2i> & p2)
     {
         vector<llSiftMatch> matches;
         //a match has
         for(int i = 0; i < fvs1.size(); i++)
         {
-            double best = fvs2[0].measure(fvs1[i]);
+            double best = fvs2[0].difference(fvs1[i]);
             int bj = 0;
             for(int j = 1; j < fvs2.size(); j++)
             {
-                double er = fvs2[j].measure(fvs1[i]);
+                double er = fvs2[j].difference(fvs1[i]);
                 if(er < best)
                 {
                     best = er;
@@ -404,7 +304,7 @@ namespace ll_Sift
         auto f = [](const llSiftMatch & a, const llSiftMatch & b) -> bool { return a.distance < b.distance; };
 		std::sort(matches.begin(), matches.end(), f);
 
-        for(int i = 0; i < 100; i++)
+        for(int i = 0; i < 15; i++)
         {
             p1.push_back(Point2i(matches[i].a.x, matches[i].a.y));
             p2.push_back(Point2i(matches[i].b.x, matches[i].b.y));
@@ -418,13 +318,15 @@ namespace ll_Sift
 int main(int argc, char * * argv)
 {
 
+
+
     Mat lennaOrig = imread("/home/luke/lcppdata/ims/Lenna.png");
     Mat lenna = imread("/home/luke/lcppdata/ims/Lenna.png", CV_LOAD_IMAGE_GRAYSCALE);
     ll_UCF1_to_32F1(lenna);
     //ll_transform_image(lenna, lenna, 0.0, 1.0, 5.0, 5.0);
 
     Mat lenna2;
-    ll_transform_image(lenna, lenna2, 1.0f, 1.0, 5.0f, 00.0);
+    ll_transform_image(lenna, lenna2, 10.0f, 1.0, 5.0f, -10.0);
 
     //cout << ll_Sift::orientation(lenna.size().width/2, lenna.size().height/2, lenna) << endl;
     //cout << ll_Sift::orientation(lenna.size().width/2, lenna.size().height/2, lenna2) << endl;
@@ -432,15 +334,15 @@ int main(int argc, char * * argv)
 
 
     Mat lennaOrig2;
-    ll_transform_image(lennaOrig, lennaOrig2, 1.0f, 1.0, 5.0f, 0.0);
+    ll_transform_image(lennaOrig, lennaOrig2, 10.0f, 1.0, 5.0f, -10.0);
 
-    auto viewF = [](vector<ll_Sift::llSiftFeat>&f, Mat im, bool w = false) -> void {
+    auto viewF = [](vector<LukeLincoln::SiftFeature2D>&f, Mat im, bool w = false) -> void {
         auto x = im.clone();
         for(int i = 0; i < f.size(); i++)
         {
             Point2i p1(f[i].x, f[i].y);
             float X, Y;
-            R3::GetUnitPointFromAngle(f[i].angle1, X, Y);
+            R3::GetUnitPointFromAngle(f[i].angle, X, Y);
             double rad = 5.0 * f[i].scale;
             X*= rad, Y*= rad;
             Point2i p2(p1.x + (int)X, p1.y + (int)Y);
@@ -451,14 +353,14 @@ int main(int argc, char * * argv)
         imshow(name.str(), x); if(w)waitKey();
     };
 
-    vector<ll_Sift::llSiftFeat> f1 = ll_Sift::findFeatures(lenna);
+    vector<LukeLincoln::SiftFeature2D> f1 = ll_Sift::findFeatures(lenna);
 
-    vector<ll_Sift::llSiftFeat> f2 = ll_Sift::findFeatures(lenna2);
+    vector<SiftFeature2D> f2 = ll_Sift::findFeatures(lenna2);
 
     viewF(f1, lenna, false);
     viewF(f2, lenna2, true);
 
-    //return 1;
+    return 1;
 
     vector<Point2i> p1, p2;
     ll_Sift::computeMatches(f1, f2, p1, p2);
