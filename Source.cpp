@@ -202,12 +202,12 @@ int main(int argc, char * * argv)
 
 
 
-    double R = 2.0, S = 1.0;
-    Point2d T(2.0, 1.0);
+    double R = 25.0, S = 1.0;
+    Point2d T(10.0, 5.0);
 
     Mat A, B, a, b;
 
-    A = imread("/home/luke/lcppdata/ims/e.jpg");
+    A = imread("c:/lcppdata/ims/lena.png");
 
     //ll_transform_image(A, A, 0.0, 1.0, 5.0, 5.0);
 

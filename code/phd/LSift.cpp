@@ -234,8 +234,8 @@ namespace LukeLincoln
 
     void findFeatures(vector<SiftFeature2D> & ret, int octave, Mat & input)
 	{
-		double K = sqrt(2.0);
-		Size kernelSize(16,16);
+		double K =  sqrt(2.0);
+		Size kernelSize(14,14);
 		int numLevels = 5;
 
 
@@ -289,7 +289,7 @@ namespace LukeLincoln
 
 					if (lt == 0 || gt == 0)
 					{
-                        if (!isCorner2(x, y, currentG)) continue;
+                        if (!isCorner2(x, y, currentD)) continue;
 
 						SiftFeature2D feature; feature.x = x; feature.y = y;
 						feature.octave = octave;
