@@ -72,4 +72,11 @@ namespace LukeLincoln
 	//high level functions:
 	void lukes_sift(cv::Mat & im1, cv::Mat & im2, std::vector<cv::Point2i> & p1, std::vector<cv::Point2i> & p2, bool sort = false, int top = -1);//performs sift
 	cv::Mat featureVisualization(std::vector<SiftFeature2D> & f, cv::Mat im);
+	cv::Mat lukes_siftRegister(cv::Mat & im1, cv::Mat & im2, bool sort = true, int getTopXFeatures = 50, double allowedError = 1.2);
+
+	//tests
+	void testFeatures(cv::Mat & im, double R, double S, cv::Point2d T);
+	void testMatches(cv::Mat & im, double R, double S, cv::Point2d T, bool sort = true, int top = 3);
+
+	
 }

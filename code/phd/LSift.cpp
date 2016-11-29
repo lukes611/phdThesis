@@ -168,7 +168,7 @@ namespace LukeLincoln
         partialDerivatives3(m, x, y, dxx, dyy, dxy);
 
         //compute trace and determinant
-		float tr = dxx + dyy;
+		float tr = dxx*dxx + dyy*dyy;
 		float det = dxx*dyy - dxy*dxy;
 
 
@@ -185,16 +185,17 @@ namespace LukeLincoln
 		float r1 = r + 1.0f;
 		float test = (r1*r1) / r;
 		//float test = 12.0f;
-        return measure >= test || measure < 0.0f;
+		return measure < test;
+        //return measure >= test || measure < 0.0f;
 	}
 
 
 	vector<float> computeOrientations(SiftFeature2D & feature, Mat & image)
     {
         vector<float> ret;
-        float roiSizef = 1.5f * feature.scale;
+        float roiSizef = 5.0f * feature.scale;
         float roiSizefb = roiSizef + 0.0f;
-        Mat g = getGaussianImage(Size(roiSizefb, roiSizefb), 1.5f * feature.scale);
+        Mat g = getGaussianImage(Size(roiSizefb, roiSizefb), roiSizef);
         Mat roi = image(Rect(feature.x - roiSizefb*0.5f, feature.y - roiSizefb*0.5f, (int)roiSizefb, (int)roiSizefb));
 
         Mat angles = Mat::zeros(Size(36, 1), CV_32FC1);
@@ -244,6 +245,7 @@ namespace LukeLincoln
                 float o = computeOrientation(x + X, y + Y, im) - ret.angle;
                 if(o < 0.0f) o = o + 360.0f;
 				if (o > 360.0f) o = o - 360.0f;
+				if (o < 0.0f || o > 360.0f) continue;
                 int xI = x / 4;
                 int yI = y / 4;
                 int GridSection = yI * 4 + xI;
@@ -465,6 +467,92 @@ namespace LukeLincoln
 			cv::circle(x, p1, rad, Scalar(255));
 		}
 		return x.clone();
+	}
+
+	void testFeatures(Mat & im, double R, double S, Point2d T)
+	{
+
+		Mat M = ll_transformation_matrix(im.size(), R, S, T.x, T.y);
+		Mat im2; ll_transform_image(im, im2, M);
+
+
+
+		vector<LukeLincoln::SiftFeature2D> f1 = findMultiScaleFeatures(im, 3);
+		vector<SiftFeature2D> f2 = findMultiScaleFeatures(im2, 3);
+
+		Mat check = Mat::zeros(im.size(), CV_8UC1);
+
+		int Total = f1.size();
+		int Count = 0;
+
+		for (int i = 0; i < f2.size(); i++)
+		{
+			Point2i p = f2[i].truePoint();
+			if (p.x >= 0 && p.x < check.size().width && p.y >= 0 && p.y < check.size().height) check.at<unsigned char>(p) = 1;
+		}
+
+		for (int i = 0; i < f1.size(); i++)
+		{
+			Point2f _ = M * f1[i].truePoint();
+			Point2i p = _;
+			if (p.x >= 0 && p.x < check.size().width && p.y >= 0 && p.y < check.size().height)
+				if (check.at<unsigned char>(p) == 1) Count++;
+
+		}
+
+		cout << "testing features: " << Count << " founs in other image out of " << Total;
+		cout << ", " << (100.0*Count / (double)Total) << "% were found." << endl;
+
+	}
+
+	void testMatches(cv::Mat & im, double R, double S, cv::Point2d T, bool sort, int top)
+	{
+		Mat M = ll_transformation_matrix(im.size(), R, S, T.x, T.y);
+
+		Mat im2;
+
+		ll_transform_image(im, im2, R, S, T.x, T.y);
+
+
+		vector<LukeLincoln::SiftFeature2D> f1 = findMultiScaleFeatures(im, 3);
+		vector<SiftFeature2D> f2 = findMultiScaleFeatures(im2, 3);
+
+		vector<Point2i> p1, p2;
+		computeMatches(f1, f2, p1, p2, sort, top);
+
+		
+
+		int Count = 0, Total = 0;
+
+		vector<Point2i> gp1, gp2;
+
+		for (int i = 0; i < p1.size(); i++)
+		{
+			Point2f pa(p1[i].x, p1[i].y);
+			Point2f pb(p2[i].x, p2[i].y);
+			pa = M * pa;
+			float dist = ll_distance<float>(pa.x, pa.y, pb.x, pb.y);
+			if (dist < 1.5f)
+			{
+				Count++;
+				gp1.push_back(p1[i]);
+				gp2.push_back(p2[i]);
+			}
+
+			Total++;
+		}
+		cout << "testing matches: " << Count << " correct out of " << Total;
+		cout << ", " << (100.0*Count / (double)Total) << "% were accurate." << endl;
+	}
+
+
+	Mat lukes_siftRegister(Mat & a, Mat & b, bool sort, int getTopXFeatures, double allowedError)
+	{
+		vector<Point> pnts1, pnts2;
+		Mat c;
+		lukes_sift(a, b, pnts1, pnts2, sort, getTopXFeatures);
+		Mat hm = findHomography(pnts1, pnts2, CV_RANSAC, allowedError);
+		return hm.clone();
 	}
 }
 
