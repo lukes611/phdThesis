@@ -24,7 +24,8 @@ namespace LukeLincoln
 		float angle;
 		cv::Mat featureVector;
 
-        double difference(const SiftFeature2D & o);
+        double sad(const SiftFeature2D & o);
+		double correlation(const SiftFeature2D & o);
 
         cv::Point2f truePoint();
         float trueRad();
@@ -62,6 +63,13 @@ namespace LukeLincoln
     //locate features:
     void findFeatures(std::vector<SiftFeature2D> & ret, int octave, cv::Mat & input);
     std::vector<SiftFeature2D> findFeatures(cv::Mat & input, int octave = 0);
+	std::vector<SiftFeature2D> findMultiScaleFeatures(cv::Mat & input, int numOctaves);
 
-    std::vector<SiftFeature2D> findMultiScaleFeatures(cv::Mat & input, int numOctaves);
+	//perform matching
+	void computeMatches(std::vector<SiftFeature2D> & fvs1, std::vector<SiftFeature2D> & fvs2, std::vector<cv::Point2i> & p1, std::vector<cv::Point2i> & p2, bool sort = true, int limit = -1);
+	cv::Point2f operator*(cv::Mat M, const cv::Point2f& p);
+
+	//high level functions:
+	void lukes_sift(cv::Mat & im1, cv::Mat & im2, std::vector<cv::Point2i> & p1, std::vector<cv::Point2i> & p2, bool sort = false, int top = -1);//performs sift
+	cv::Mat featureVisualization(std::vector<SiftFeature2D> & f, cv::Mat im);
 }

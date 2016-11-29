@@ -7,10 +7,33 @@ using namespace std;
 
 namespace LukeLincoln
 {
-    double SiftFeature2D::difference(const SiftFeature2D & o)
+	double correlate(cv::Mat &im_float_1, cv::Mat &im_float_2) {
+
+		// convert data-type to "float"
+		
+		int n_pixels = im_float_1.rows * im_float_1.cols;
+
+		// Compute mean and standard deviation of both images
+		cv::Scalar im1_Mean, im1_Std, im2_Mean, im2_Std;
+		meanStdDev(im_float_1, im1_Mean, im1_Std);
+		meanStdDev(im_float_2, im2_Mean, im2_Std);
+
+		// Compute covariance and correlation coefficient
+		double covar = (im_float_1 - im1_Mean).dot(im_float_2 - im2_Mean) / n_pixels;
+		double correl = covar / (im1_Std[0] * im2_Std[0]);
+
+		return correl;
+	}
+	double SiftFeature2D::sad(const SiftFeature2D & o)
+	{
+		return sum(abs(featureVector - o.featureVector))[0];
+	}
+
+    double SiftFeature2D::correlation(const SiftFeature2D & o)
     {
-        return cv::sum(abs(featureVector - o.featureVector))[0];
-    }
+		Mat oo = o.featureVector;
+		return correlate(featureVector, oo);
+	}
 
     Point2f SiftFeature2D::truePoint()
     {
@@ -206,7 +229,7 @@ namespace LukeLincoln
 
     void computeFeatureVectors(SiftFeature2D & ret, Mat & im)
     {
-        ret.featureVector = Mat::zeros(Size(8, 16), CV_32FC1);
+        ret.featureVector = Mat::zeros(Size(8, 16), CV_64FC1);
         //Mat roi = im(Rect(ret.x - 7, ret.y - 7, 16, 16));
         Mat g = getGaussianImage(Size(16, 16), 16.0);
 
@@ -220,15 +243,16 @@ namespace LukeLincoln
                 float m = computeMagnitude(x + X, y + Y, im) * g.at<float>(y,x);
                 float o = computeOrientation(x + X, y + Y, im) - ret.angle;
                 if(o < 0.0f) o = o + 360.0f;
+				if (o > 360.0f) o = o - 360.0f;
                 int xI = x / 4;
                 int yI = y / 4;
                 int GridSection = yI * 4 + xI;
                 int bin = (int)(o / 45.0f);
                 if(bin < 8 && bin >= 0)
-                    ret.featureVector.at<float>(GridSection, bin) += m;
+                    ret.featureVector.at<double>(GridSection, bin) += (double)m;
             }
         }
-        ll_normalize(ret.featureVector);
+        //ll_normalize(ret.featureVector);
     }
 
 
@@ -289,7 +313,7 @@ namespace LukeLincoln
 
 					if (lt == 0 || gt == 0)
 					{
-                        if (!isCorner2(x, y, currentD)) continue;
+                        if (!isCorner2(x, y, currentG)) continue;
 
 						SiftFeature2D feature; feature.x = x; feature.y = y;
 						feature.octave = octave;
@@ -342,5 +366,105 @@ namespace LukeLincoln
         return ret;
     }
 
+	void computeMatches(vector<SiftFeature2D> & fvs1, vector<SiftFeature2D> & fvs2, vector<Point2i> & p1, vector<Point2i> & p2, bool sort, int limit)
+	{
+		vector<tuple<SiftFeature2D, SiftFeature2D, double>> matches;
+
+		//correl norm	= 32
+		//correl		= 32
+		//sad norm		= 36
+		//sad			= 49
+		
+		for (int i = 0; i < fvs1.size(); i++)
+		{
+			double best = fvs1[i].sad(fvs2[0]);
+			int bj = 0;
+			for (int j = 1; j < fvs2.size(); j++)
+			{
+				double er = fvs1[i].sad(fvs2[j]);
+				if (er < best)
+				{
+					best = er;
+					bj = j;
+				}
+			}
+			
+			tuple<SiftFeature2D, SiftFeature2D, double> match = make_tuple(fvs1[i], fvs2[bj], best);
+			matches.push_back(match);
+
+		}
+
+		if (sort)
+		{
+			//std::cout << "sorting " << "\n";
+			auto f = [](const tuple<SiftFeature2D, SiftFeature2D, double> & a, const tuple<SiftFeature2D, SiftFeature2D, double> & b)
+				-> bool { return get<2>(a) < get<2>(b); };
+			std::sort(matches.begin(), matches.end(), f);
+
+			int am = limit == -1 ? matches.size() : limit;
+			int N = am < matches.size() ? am : matches.size();
+			for (int i = 0; i < N; i++)
+			{
+				tuple<SiftFeature2D, SiftFeature2D, double> & match = matches[i];
+				p1.push_back(get<0>(match).truePoint());
+				p2.push_back(get<1>(match).truePoint());
+			}
+
+		}
+		else
+		{
+			for (int i = 0; i < matches.size(); i++)
+			{
+				tuple<SiftFeature2D, SiftFeature2D, double> & match = matches[i];
+				p1.push_back(get<0>(match).truePoint());
+				p2.push_back(get<1>(match).truePoint());
+			}
+		}
+
+		
+
+
+	}
+
+	cv::Point2f operator*(cv::Mat M, const cv::Point2f& p)
+	{
+		Mat src = Mat::zeros(Size(1, 3), CV_64FC1);
+
+		src.at<double>(0, 0) = p.x;
+		src.at<double>(1, 0) = p.y;
+		src.at<double>(2, 0) = 1.0;
+
+		Mat dst = M*src; //USE MATRIX ALGEBRA
+		return cv::Point2f(dst.at<double>(0, 0), dst.at<double>(1, 0));
+	}
+
+	void lukes_sift(cv::Mat & A, cv::Mat & B, std::vector<cv::Point2i> & p1, std::vector<cv::Point2i> & p2, bool sort, int top)
+	{
+		Mat im1, im2;
+		if (A.type() == CV_32FC1) im1 = A; else { im1 = A.clone(); ll_UCF1_to_32F1(im1); }
+		if (B.type() == CV_32FC1) im2 = B; else { im2 = B.clone(); ll_UCF1_to_32F1(im2); }
+
+		vector<SiftFeature2D> f1 = findMultiScaleFeatures(im1, 3);
+		vector<SiftFeature2D> f2 = findMultiScaleFeatures(im2, 3);
+
+		computeMatches(f1, f2, p1, p2, sort, top);
+	}
+
+	cv::Mat featureVisualization(std::vector<SiftFeature2D> & f, cv::Mat im)
+	{
+		auto x = im.clone();
+		for (int i = 0; i < f.size(); i++)
+		{
+			Point2i p1 = f[i].truePoint();
+			float X, Y;
+			R3::GetUnitPointFromAngle(f[i].angle, X, Y);
+			double rad = 2.0 * f[i].trueRad();
+			X *= rad, Y *= rad;
+			Point2i p2(p1.x + (int)X, p1.y + (int)Y);
+			cv::line(x, p1, p2, Scalar(255));
+			cv::circle(x, p1, rad, Scalar(255));
+		}
+		return x.clone();
+	}
 }
 
