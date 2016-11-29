@@ -37,28 +37,17 @@ using namespace LukeLincoln;
 
 int main(int argc, char * * argv)
 {
+	SIObj ob;
+	ob.open_obj("C:/lcppdata/obj/bunny_simplified2.obj");
+
+	cout << ob._points.size() << endl;
+
+	VMat v(256, ob._points, 0.0f, 1.0f);
+
 
     
 
-    double R = 25.0, S = 1.0;
-    Point2d T(0.0, 0.0);
-
-    Mat A, B, a, b;
-
-    A = imread("c:/lcppdata/ims/lena.png");
-
-
-    cvtColor(A, a, cv::COLOR_BGR2GRAY); ll_UCF1_to_32F1(a);
-
-	testFeatures(a, R, S, T);
-	testMatches(a, R, S, T, true, 50);
-
-    ll_transform_image(a, b, R, S, T.x, T.y);
-    ll_transform_image(A, B, R, S, T.x, T.y);
-
-	Mat M = LukeLincoln::lukes_siftRegister(a, b, true, 50, 3.0);
-	ll_transform_image(a, a, M);
-	imshow("reg", a + b); waitKey();
+	v.save_obj("C:/Users/s2807774/Desktop/a.obj", 256, 0.2f);
 
 
 	return 0;

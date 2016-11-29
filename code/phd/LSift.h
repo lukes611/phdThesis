@@ -31,6 +31,7 @@ namespace LukeLincoln
         float trueRad();
 	};
 
+	
 	//gaussian functions:
 	double gaussian(double x, double y, double sigma);
     double gaussian(double distanceFromOrigin, double sigma);
