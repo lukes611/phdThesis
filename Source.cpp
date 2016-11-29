@@ -110,7 +110,7 @@ namespace ll_Sift
         auto f = [](const llSiftMatch & a, const llSiftMatch & b) -> bool { return a.distance < b.distance; };
 		std::sort(matches.begin(), matches.end(), f);
 
-        int am = 50;
+        int am = 200;
         int mx = am < matches.size() ? am : matches.size();
         for(int i = 0; i < mx; i++)
         {
@@ -200,12 +200,14 @@ int main(int argc, char * * argv)
     waitKey();
 */
 
-    double R = 1.5, S = 1.0;
+
+
+    double R = 2.0, S = 1.0;
     Point2d T(2.0, 1.0);
 
     Mat A, B, a, b;
 
-    A = imread("/home/luke/lcppdata/ims/Lenna.png");
+    A = imread("/home/luke/lcppdata/ims/e.jpg");
 
     //ll_transform_image(A, A, 0.0, 1.0, 5.0, 5.0);
 
