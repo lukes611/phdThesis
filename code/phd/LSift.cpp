@@ -40,6 +40,11 @@ namespace LukeLincoln
         return Point2f(x * pow(2.0f, (double)octave), y * pow(2.0f, (double)octave));
     }
 
+    R3 SiftFeature3D::truePoint()
+    {
+        return R3(x * pow(2.0f, (double)octave), y * pow(2.0f, (double)octave), z * pow(2.0f, (double)octave));
+    }
+
     float SiftFeature2D::trueRad()
     {
         return pow(2.0, octave) + (float)scale;
@@ -108,10 +113,37 @@ namespace LukeLincoln
 		return ret.clone();
 	}
 
+	VMat getGaussianDifferenceImage(int s, double sigma, double K)
+	{
+        VMat ret = s;
+        float hs = s * 0.5f;
+        R3 c(hs, hs, hs);
+        //ret.setAll(0.0f);
+        for(int z = 0; z < ret.s; z++)
+        {
+            for (int y = 0; y < ret.s; y++)
+            {
+                for (int x = 0; x < ret.s; x++)
+                {
+                    R3 p((float)x, (float)y, (float)z);
+                    ret.at(x, y, z) = (float)gaussianDifference(p.dist(c), sigma, K);
+                }
+            }
+        }
+        return ret;
+	}
+
     void partialDerivatives1(Mat & im, int x, int y, float & dx, float & dy)
     {
         dx = im.at<float>(y, x + 1) - im.at<float>(y, x - 1);
         dy = im.at<float>(y + 1, x) - im.at<float>(y - 1, x);
+    }
+
+    void partialDerivatives1(VMat & im, int x, int y, int z, float & dx, float & dy, float & dz)
+    {
+        dx = im.at(x+1, y, z) - im.at(x-1, y, z);
+        dy = im.at(x, y+1, z) - im.at(x, y-1, z);
+        dz = im.at(x, y, z+1) - im.at(x, y, z-1);
     }
 
     void partialDerivatives2(Mat & im, int x, int y, float & dx, float & dy)
@@ -137,15 +169,36 @@ namespace LukeLincoln
         dxy =   (im.at<float>(y+1, x+1) - im.at<float>(y+1, x-1) - im.at<float>(y-1, x+1) + im.at<float>(y-1, x-1) ) * 0.25f;
     }
 
+    void partialDerivatives3(VMat & im, int x, int y, int z, float & dx, float & dy, float & dz, float & dxy, float & dxz, float & dyz)
+    {
+        dx =    im.at(x-1, y, z) - 2.0f*im.at(x, y, z) + im.at(x+1, y, z);
+        dy =    im.at(x,y-1,z) - 2.0f*im.at(x,y,z) + im.at(x,y+1,z);
+        dz =    im.at(x,y,z-1) - 2.0f*im.at(x,y,z) + im.at(x,y,z+1);
+        dxy =   (im.at(x+1,y+1,z) - im.at(x-1,y+1,z) - im.at(x+1,y-1,z) + im.at(x-1,y-1,z) ) * 0.25f;
+        dxz =   (im.at(x+1,y,z+1) - im.at(x-1,y,z+1) - im.at(x+1,y,z-1) + im.at(x-1,y,z-1) ) * 0.25f;
+        dyz =   (im.at(x,y+1,z+1) - im.at(x,y-1,z+1) - im.at(x,y+1,z-1) + im.at(x,y-1,z-1) ) * 0.25f;
+
+    }
+
 
     float computeOrientation(int x, int y, Mat & m)
 	{
         float dx, dy;
         dy = m.at<float>(y + 1, x) - m.at<float>(y - 1, x);
         dx = m.at<float>(y, x + 1) - m.at<float>(y, x - 1);
-        //partialDerivatives2(m, x, y, dx, dy);
 
         return R3::getAngle(dx, dy);
+    }
+
+    Point2f computeOrientation(int x, int y, int z, VMat & m)
+	{
+        R3 d;
+        Point2f p;
+        partialDerivatives1(m, x, y, z, d.x, d.y, d.z);
+        float mag = d.mag();
+        if(mag == 0.0f) return p;
+        p.x = atan(d.y / d.x) * 57.3f;
+        p.y = acos(d.z / mag) * 57.3f;
     }
 
     float computeMagnitude(int x, int y, Mat & m)
@@ -155,6 +208,13 @@ namespace LukeLincoln
         dx = m.at<float>(y, x + 1) - m.at<float>(y, x - 1);
 
         return sqrt(dx * dx + dy * dy);
+	}
+
+	float computeMagnitude(int x, int y, int z, VMat & m)
+	{
+        R3 d;
+        partialDerivatives1(m, x, y, z, d.x, d.y, d.z);
+        return d.mag();
 	}
 
 
@@ -195,6 +255,39 @@ namespace LukeLincoln
 
         //if determinant is 0, return true
         if(det == 0.0f) return true;
+
+        //compute the measure
+		float measure = (tr*tr) / det;
+
+        //std::cout << measure << std::endl;
+
+		float r = 10.0f;
+		float r1 = r + 1.0f;
+		float test = (r1*r1) / r;
+		//float test = 12.0f;
+		return measure < test;
+        //return measure >= test || measure < 0.0f;
+	}
+
+    bool isCorner2(int x, int y, int z, VMat & m)
+    {
+		float dx, dy, dxy, dxz, dyz, dz;
+        partialDerivatives3(m, x, y, z, dx, dy, dz, dxy, dxz, dyz);
+        float _ptr[9] = {
+            dx,     dxy,    dxz,
+            dxy,    dy,     dyz,
+            dxz,    dyz,    dz
+        };
+        Mat hesMat = Mat(Size(3,3), CV_32FC1, _ptr);
+
+        //compute trace and determinant
+		float tr = trace(hesMat)[0];
+		float det = determinant(hesMat);
+
+
+
+        //if determinant is 0, return true
+        if(det == 0.0f) return false;
 
         //compute the measure
 		float measure = (tr*tr) / det;
@@ -363,7 +456,107 @@ namespace LukeLincoln
 	}
 
 
+	void findFeatures(vector<SiftFeature3D> & ret, int octave, VMat & input)
+	{
+		double K =  sqrt(2.0);
+		int kernelSize = 7;//was 14 but very slow
+		int numLevels = 5;
+
+
+
+		double R = K * 0.5;
+		VMat g = getGaussianImage(kernelSize, R);
+		VMat d = getGaussianDifferenceImage(kernelSize, R, K);
+		VMat prevG = input; prevG.filter(g);
+		VMat prevD = input; prevD.filter(d);
+
+
+
+		R = R * K;
+		g = getGaussianImage(kernelSize, R);
+		d = getGaussianDifferenceImage(kernelSize, R, K);
+		VMat currentG = input; currentG.filter(g);
+		VMat currentD = input; currentD.filter(d);
+
+		for (int i = 2; i <= numLevels; i++)
+		{
+			R = R * K;
+			g = getGaussianImage(kernelSize, R);
+			d = getGaussianDifferenceImage(kernelSize, R, K);
+			VMat nextG = input; nextG.filter(g);
+			VMat nextD = input; nextD.filter(d);
+
+
+			//for each pixel, if feature vector: record
+			for(int z = 17; z < input.s - 17; z++)
+			{
+                for (int y = 17; y < input.s - 17; y++)
+                {
+                    for (int x = 17; x < input.s - 17; x++)
+                    {
+                        float dv = currentD.at(x, y, z);
+                        int lt = 0, gt = 0;
+                        for(int r = -1; r <= 1; r++)
+                        {
+                            for (int j = -1; j <= 1; j++)
+                            {
+                                for (int i = -1; i <= 1; i++)
+                                {
+                                    if (i != 0 && j != 0 && r != 0)
+                                    {
+                                        if (dv > currentD.at(x+i, y+j, z+r)) lt++;
+                                        if (dv < currentD.at(x+i, y+j, z+r)) gt++;
+                                    }
+                                    if (dv > prevD.at(x+i, y+j, z+r)) lt++;
+                                    if (dv < prevD.at(x+i, y+j, z+r)) gt++;
+
+                                    if (dv > nextD.at(x+i, y+j, z+r)) lt++;
+                                    if (dv < nextD.at(x+i, y+j, z+r)) gt++;
+                                }
+                            }
+                        }
+
+                        if (lt == 0 || gt == 0)
+                        {
+                            //Point2i __(x,y,z);
+                            //R3 __(x,y,z);
+                            //cout << "found feature " << __ << endl;
+                            if (!isCorner2(x, y, z, currentG)) continue;
+
+                            SiftFeature3D feature; feature.x = x; feature.y = y; feature.z = z;
+                            feature.octave = octave;
+                            feature.scale = R/K;
+
+                            ret.push_back(feature);
+                            /*vector<float> bestAngles = computeOrientations(feature, currentG);
+                            for(int _ = 0; _ < bestAngles.size(); _++)
+                            {
+                                SiftFeature2D f = feature;
+                                f.angle = bestAngles[_];
+                                computeFeatureVectors(f, currentG);
+                                ret.push_back(f);
+                            }*/
+                        }
+                    }
+                }
+            }
+			//setup for next iteration
+			prevG = currentG;
+			currentG = nextG;
+
+			prevD = currentD;
+			currentD = nextD;
+		}
+		//return ret;
+	}
+
+
     std::vector<SiftFeature2D> findFeatures(cv::Mat & input, int octave)
+    {
+        findMultiScaleFeatures(input, 1);
+    }
+
+    std::vector<SiftFeature3D> findFeatures(VMat & input, int octave)
     {
         findMultiScaleFeatures(input, 1);
     }
@@ -384,6 +577,20 @@ namespace LukeLincoln
             //imshow("x", x);
             //waitKey();
 
+        }
+        return ret;
+    }
+
+    vector<SiftFeature3D> findMultiScaleFeatures(VMat & input, int numOctaves)
+    {
+        vector<SiftFeature3D> ret;
+        for(int i = 0; i < numOctaves; i++)
+        {
+            int octave = i;
+            double ns = input.s / pow(2.0, (double)octave);
+
+            VMat x = input.resize(ns);
+            findFeatures(ret, octave, x);
         }
         return ret;
     }
@@ -522,6 +729,48 @@ namespace LukeLincoln
 
 		cout << "testing features: " << Count << " founs in other image out of " << Total;
 		cout << ", " << (100.0*Count / (double)Total) << "% were found." << endl;
+
+	}
+
+	void testFeatures(VMat & im, R3 R, float S, R3 T)
+	{
+
+		Mat M = VMat::transformation_matrix(im.s, R.x, R.y, R.z, S, T.x, T.y, T.z);
+		VMat im2 = im; im2.transform_volume_forward(M, 0.0f);
+
+
+
+		vector<SiftFeature3D> f1 = findMultiScaleFeatures(im, 1);
+		vector<SiftFeature3D> f2 = findMultiScaleFeatures(im2, 1);
+
+		bool * check = new bool[im.s3]; for(int i = 0; i < im.s3; i++) check[i] = false;
+
+		int Total = f1.size();
+		int Count = 0;
+
+		for (int i = 0; i < f2.size(); i++)
+		{
+			R3 _p = f2[i].truePoint();
+			Point3i p(_p.x, _p.y, _p.z);
+			if (p.x >= 0 && p.x < im.s && p.y >= 0 && p.y < im.s && p.z >= 0 && p.z < im.s)
+                check[p.z * im.s2 + p.y * im.s + p.x] = true;
+		}
+
+		for (int i = 0; i < f1.size(); i++)
+		{
+			R3 _ = f1[i].truePoint();
+			VMat::transform_point(M, _);
+
+			Point3i p(_.x, _.y, _.z);
+			if (p.x >= 0 && p.x < im.s && p.y >= 0 && p.y < im.s && p.z >= 0 && p.z < im.s)
+				if (check[p.z * im.s2 + p.y * im.s + p.x]) Count++;
+
+		}
+
+		cout << "testing features: " << Count << " founs in other image out of " << Total;
+		cout << ", " << (100.0*Count / (double)Total) << "% were found." << endl;
+
+		delete [] check;
 
 	}
 

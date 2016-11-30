@@ -39,7 +39,7 @@ public:
 	VMat(int sIn = 8);
 	VMat(int sIn, std::vector<R3> l, float offValue, float onValue);
 	VMat(int sIn, Pixel3DSet l, float offValue, bool l_is_scaled = false);
-	VMat(SIObj & ob, int sIn = 256);
+	VMat(SIObj & ob, int sIn = 256, int pad = 20);
 	~VMat();
 	VMat(const VMat & cp);
 	VMat(std::string fn);
@@ -240,6 +240,7 @@ public:
 
 	//correlate
     void filter(VMat & filter);
+    VMat resize(int ns);
 
 
 };

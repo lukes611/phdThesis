@@ -28,12 +28,22 @@ using namespace ll_fmrsc;
 //using namespace ll_experiments;
 using namespace ll_siobj;
 using namespace LukeLincoln;
-
+using namespace ll_pix3d;
 
 
 #include "code/basics/BitReaderWriter.h"
 
-
+void l3(int s, function<void(int,int,int)> f, int from = 0)
+{
+    for(int z = from; z < s-from; z++)
+    {
+        for(int y = from; y < s-from; y++)
+        {
+            for(int x = from; x < s-from; x++)
+                f(x,y,z);
+        }
+    }
+}
 
 int main(int argc, char * * argv)
 {
@@ -41,17 +51,33 @@ int main(int argc, char * * argv)
     ob.open_obj("/home/luke/lcppdata/obj/bunny_simplified2.obj");
 
 
-    VMat v2 = ob;
-    VMat g = getGaussianImage(3, 3.0);
-
+    VMat v(ob, 128, 30);
     LTimer t; t.start();
-    v2.filter(g);
+    LukeLincoln::testFeatures(v, R3(1.0f, 2.0f, 1.0f), 1.0f, R3(1.0f, 20.0f, 3.0f));
+    t.stop();
+    cout << " time taken: " << t.getSeconds() << endl;
+
+/*
+    //v.save_obj("/home/luke/Desktop/b.obj", 128, 0.2f);
+    cout << "starting " << endl;
+    LTimer t; t.start();
+
+    vector<SiftFeature3D> f;
+    LukeLincoln::findFeatures(f, 1, v);
+
     t.stop(); cout << t.getSeconds() << endl;
 
+    cout << "num feats " << f.size() << endl;
 
-	v2.save_obj("/home/luke/Desktop/a.obj", 256, 0.2f);
+    vector<R3> ps;
+    for(int i = 0; i < f.size(); i++) ps.push_back(R3(f[i].x, f[i].y, f[i].z));
 
+    Pixel3DSet(ps).save_obj("/home/luke/Desktop/a.obj");
 
+	//v2.save_obj("/home/luke/Desktop/a.obj", 256, 0.2f);
+	//v2.threshold(0.6f);
+	//v2.pixel3dset(0.0f).save_obj("/home/luke/Desktop/a.obj");
+*/
 	return 0;
 }
 
