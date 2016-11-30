@@ -169,6 +169,29 @@ VMat::VMat(int sIn, Pixel3DSet l, float offValue, bool l_is_scaled)
 
 #endif
 
+VMat::VMat(SIObj & ob, int sIn)
+{
+    s = sIn;
+	setup_init();
+	setAll(0.0f);
+
+	SIObj obj = ob; obj.normalize((float)s);
+    vector<R3> l;
+    for(int i = 0; i < obj._triangles.size(); i++)
+    {
+        SI_FullTriangle t = obj.getTriangle(i);
+        t.rasterize(l, 1.0f);
+    }
+    for(int i = 0; i < l.size(); i++)
+    {
+        int x = round(l[i].x);
+        int y = round(l[i].y);
+        int z = round(l[i].z);
+        if(this->inbounds(x,y,z))
+            this->at(x,y,z) = 1.0f;
+    }
+}
+
 VMat::~VMat()
 {
 	if(s != 0)
@@ -1671,3 +1694,50 @@ Mat VMat::pca_correct_up()
 	transform_volume_forward(m);
 	return m.clone();
 }
+
+
+void VMat::filter(VMat & F)
+{
+    //unoptimized: 7.86 : 7.81 : 7.85 : 7.37 : 7.45 : 7.32 : 5.49
+    VMat cp = *this;
+    int fs = F.s;
+    int hfs = fs / 2;
+    float sum;
+    int xx, yy, zz;
+    float * cpD = cp.data;
+    float * fD = F.data;
+    float * meD = data;
+
+
+    for(int Z = 0; Z < s; Z++)
+    {
+        for(int Y = 0; Y < s; Y++)
+        {
+            for(int X = 0; X < s; X++)
+            {
+                sum = 0.0f;
+                for(int z = 0; z < fs; z++)
+                {
+                    zz = z + (Z-hfs);
+                    if(zz < 0 || zz >= s) continue;
+                    zz = zz * s2;
+                    for(int y = 0; y < fs; y++)
+                    {
+                        yy = y + (Y-hfs);
+                        if(yy < 0 || yy >= s) continue;
+                        yy *= s;
+                        for(int x = 0; x < fs; x++)
+                        {
+                            xx = x + (X - hfs);
+                            if(xx < 0 || xx >= s) continue;
+                            sum += fD[z*F.s2 + y*F.s + x];
+                            //sum += F.at(x,y,z) * cp.at(xx, yy, zz);
+                        }
+                    }
+                }
+                at(X,Y,Z) = sum;
+            }
+        }
+    }
+}
+

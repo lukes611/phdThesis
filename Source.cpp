@@ -38,16 +38,18 @@ using namespace LukeLincoln;
 int main(int argc, char * * argv)
 {
 	SIObj ob;
-	ob.open_obj("C:/lcppdata/obj/bunny_simplified2.obj");
-
-	cout << ob._points.size() << endl;
-
-	VMat v(256, ob._points, 0.0f, 1.0f);
+    ob.open_obj("/home/luke/lcppdata/obj/bunny_simplified2.obj");
 
 
-    
+    VMat v2 = ob;
+    VMat g = getGaussianImage(3, 3.0);
 
-	v.save_obj("C:/Users/s2807774/Desktop/a.obj", 256, 0.2f);
+    LTimer t; t.start();
+    v2.filter(g);
+    t.stop(); cout << t.getSeconds() << endl;
+
+
+	v2.save_obj("/home/luke/Desktop/a.obj", 256, 0.2f);
 
 
 	return 0;

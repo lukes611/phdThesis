@@ -10,7 +10,7 @@ namespace LukeLincoln
 	double correlate(cv::Mat &im_float_1, cv::Mat &im_float_2) {
 
 		// convert data-type to "float"
-		
+
 		int n_pixels = im_float_1.rows * im_float_1.cols;
 
 		// Compute mean and standard deviation of both images
@@ -73,6 +73,26 @@ namespace LukeLincoln
 			}
 		}
 		return ret.clone();
+	}
+
+	VMat getGaussianImage(int s, double sigma)
+	{
+        VMat ret = s;
+        float hs = s * 0.5f;
+        R3 c(hs, hs, hs);
+        //ret.setAll(0.0f);
+        for(int z = 0; z < ret.s; z++)
+        {
+            for (int y = 0; y < ret.s; y++)
+            {
+                for (int x = 0; x < ret.s; x++)
+                {
+                    R3 p((float)x, (float)y, (float)z);
+                    ret.at(x, y, z) = (float)gaussian(p.dist(c), sigma);
+                }
+            }
+        }
+        return ret;
 	}
 
 	Mat getGaussianDifferenceImage(Size s, double R, double K)
@@ -376,7 +396,7 @@ namespace LukeLincoln
 		//correl		= 32
 		//sad norm		= 36
 		//sad			= 49
-		
+
 		for (int i = 0; i < fvs1.size(); i++)
 		{
 			double best = fvs1[i].sad(fvs2[0]);
@@ -390,7 +410,7 @@ namespace LukeLincoln
 					bj = j;
 				}
 			}
-			
+
 			tuple<SiftFeature2D, SiftFeature2D, double> match = make_tuple(fvs1[i], fvs2[bj], best);
 			matches.push_back(match);
 
@@ -423,7 +443,7 @@ namespace LukeLincoln
 			}
 		}
 
-		
+
 
 
 	}
@@ -520,7 +540,7 @@ namespace LukeLincoln
 		vector<Point2i> p1, p2;
 		computeMatches(f1, f2, p1, p2, sort, top);
 
-		
+
 
 		int Count = 0, Total = 0;
 

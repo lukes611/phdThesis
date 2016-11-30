@@ -11,6 +11,7 @@ requires: locv, R3, ll_pix3d, LMat
 
 */
 #include "../basics/locv3.h"
+#include "../basics/VMatF.h"
 #include <vector>
 
 
@@ -31,7 +32,7 @@ namespace LukeLincoln
         float trueRad();
 	};
 
-	
+
 	//gaussian functions:
 	double gaussian(double x, double y, double sigma);
     double gaussian(double distanceFromOrigin, double sigma);
@@ -39,6 +40,7 @@ namespace LukeLincoln
 
     //gaussian image generators
     cv::Mat getGaussianImage(cv::Size s, double sigma);
+    VMat getGaussianImage(int s, double sigma);
     cv::Mat getGaussianDifferenceImage(cv::Size s, double sigma, double scalar);
 
     //derivative functions
@@ -79,5 +81,5 @@ namespace LukeLincoln
 	void testFeatures(cv::Mat & im, double R, double S, cv::Point2d T);
 	void testMatches(cv::Mat & im, double R, double S, cv::Point2d T, bool sort = true, int top = 3);
 
-	
+
 }

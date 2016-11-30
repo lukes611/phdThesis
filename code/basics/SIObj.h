@@ -52,6 +52,8 @@ namespace ll_siobj
 		hit is false if there is no intersection at all
 		*/
 		ll_R3::R3 normal() const;
+
+		void rasterize(std::vector<ll_R3::R3> & ret, float skip = 0.5f);
 	};
 
 	class SI_Quad
@@ -169,6 +171,8 @@ namespace ll_siobj
 
 		void clear();
 		std::string stats();
+
+
 	};
 
 
