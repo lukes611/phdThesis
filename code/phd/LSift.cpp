@@ -45,10 +45,15 @@ namespace LukeLincoln
         return Point2f(x * pow(2.0f, (double)octave), y * pow(2.0f, (double)octave));
     }
 
-    R3 SiftFeature3D::truePoint()
+    R3 SiftFeature3D::truePointR3()
     {
         return R3(x * pow(2.0f, (double)octave), y * pow(2.0f, (double)octave), z * pow(2.0f, (double)octave));
     }
+
+	Point3f SiftFeature3D::truePoint()
+	{
+		return Point3f(x * pow(2.0f, (double)octave), y * pow(2.0f, (double)octave), z * pow(2.0f, (double)octave));
+	}
 
     float SiftFeature2D::trueRad()
     {
@@ -761,7 +766,7 @@ namespace LukeLincoln
 
 	}
 
-	void computeMatches(vector<SiftFeature3D> & fvs1, vector<SiftFeature3D> & fvs2, vector<Point3i> & p1, vector<Point3i> & p2, bool sort, int limit)
+	void computeMatches(vector<SiftFeature3D> & fvs1, vector<SiftFeature3D> & fvs2, vector<Point3f> & p1, vector<Point3f> & p2, bool sort, int limit)
 	{
 		vector<tuple<SiftFeature3D, SiftFeature3D, double>> matches;
 
@@ -801,10 +806,10 @@ namespace LukeLincoln
 			for (int i = 0; i < N; i++)
 			{
 				tuple<SiftFeature3D, SiftFeature3D, double> & match = matches[i];
-				R3 _p1p = get<0>(match).truePoint();
-				R3 _p2p = get<1>(match).truePoint();
-				p1.push_back(Point3i(_p1p.x, _p1p.y, _p1p.z));
-				p2.push_back(Point3i(_p2p.x, _p2p.y, _p2p.z));
+				p1.push_back(get<0>(match).truePoint());
+				p2.push_back(get<1>(match).truePoint());
+				//cout << p1[p1.size() - 1] << " -> ";
+				//cout << p2[p2.size() - 1] << endl;
 			}
 
 		}
@@ -813,10 +818,8 @@ namespace LukeLincoln
 			for (int i = 0; i < matches.size(); i++)
 			{
 				tuple<SiftFeature3D, SiftFeature3D, double> & match = matches[i];
-				R3 _p1p = get<0>(match).truePoint();
-				R3 _p2p = get<1>(match).truePoint();
-				p1.push_back(Point3i(_p1p.x, _p1p.y, _p1p.z));
-				p2.push_back(Point3i(_p2p.x, _p2p.y, _p2p.z));
+				p1.push_back(get<0>(match).truePoint());
+				p2.push_back(get<1>(match).truePoint());
 			}
 		}
 
@@ -858,6 +861,15 @@ namespace LukeLincoln
 
 		vector<SiftFeature2D> f1 = findMultiScaleFeatures(im1, 3);
 		vector<SiftFeature2D> f2 = findMultiScaleFeatures(im2, 3);
+
+		computeMatches(f1, f2, p1, p2, sort, top);
+	}
+
+	void lukes_sift(VMat & A, VMat & B, vector<Point3f> & p1, vector<Point3f> & p2, bool sort, int top)
+	{
+		
+		vector<SiftFeature3D> f1 = findMultiScaleFeatures(A, 1);
+		vector<SiftFeature3D> f2 = findMultiScaleFeatures(B, 1);
 
 		computeMatches(f1, f2, p1, p2, sort, top);
 	}
@@ -933,18 +945,19 @@ namespace LukeLincoln
 
 		for (int i = 0; i < f2.size(); i++)
 		{
-			R3 _p = f2[i].truePoint();
-			Point3i p(_p.x, _p.y, _p.z);
+			Point3f _p = f2[i].truePoint();
+			Point3i p = _p;// (_p.x, _p.y, _p.z);
 			if (p.x >= 0 && p.x < im.s && p.y >= 0 && p.y < im.s && p.z >= 0 && p.z < im.s)
                 check[p.z * im.s2 + p.y * im.s + p.x] = true;
 		}
 
 		for (int i = 0; i < f1.size(); i++)
 		{
-			R3 _ = f1[i].truePoint();
-			VMat::transform_point(M, _);
+			Point3f _ = f1[i].truePoint();
+			_ = M * _;
+			//VMat::transform_point(M, _);
 
-			Point3i p(_.x, _.y, _.z);
+			Point3i p = _; // (_.x, _.y, _.z);
 			if (p.x >= 0 && p.x < im.s && p.y >= 0 && p.y < im.s && p.z >= 0 && p.z < im.s)
 				if (check[p.z * im.s2 + p.y * im.s + p.x]) Count++;
 
@@ -1008,7 +1021,7 @@ namespace LukeLincoln
 		vector<LukeLincoln::SiftFeature3D> f1 = findMultiScaleFeatures(im, 1);
 		vector<SiftFeature3D> f2 = findMultiScaleFeatures(im2, 1);
 
-		vector<Point3i> p1, p2;
+		vector<Point3f> p1, p2;
 		computeMatches(f1, f2, p1, p2, sort, top);
 
 
@@ -1039,6 +1052,32 @@ namespace LukeLincoln
 		lukes_sift(a, b, pnts1, pnts2, sort, getTopXFeatures);
 		Mat hm = findHomography(pnts1, pnts2, CV_RANSAC, allowedError);
 		return hm.clone();
+	}
+
+	Mat lukes_siftRegister(VMat & a, VMat & b, bool sort, int getTopXFeatures, double allowedError)
+	{
+		vector<Point3f> src, dst;
+		Mat c, ret, matrix, inliers;
+		lukes_sift(a, b, src, dst, sort, getTopXFeatures);
+
+		//for (int i = 0; i < src.size(); i++)
+		{
+			//cout << "matched ( " << src[i] << " , " << dst[i] << " )\n";
+
+		}
+		int rv = estimateAffine3D(src, dst, ret, inliers, 1.0, 0.999999999999);
+		//cout << inliers << endl;
+		//cout << ret << endl;
+		matrix = Mat::eye(Size(4, 4), CV_32FC1);
+		for (int y = 0; y < 3; y++)
+		{
+			for (int x = 0; x < 4; x++)
+			{
+				matrix.at<float>(y, x) = (float)ret.at<double>(y, x);
+			}
+		}
+		//cout << rv << endl;
+		return matrix.clone();
 	}
 }
 

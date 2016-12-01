@@ -50,11 +50,37 @@ int main(int argc, char * * argv)
 	SIObj ob;
     ob.open_obj("c:/lcppdata/obj/bunny_simplified2.obj");
 
+	/*
+		to-do : do 3d reg
+	
+	*/
+	R3 R(0.0f, 10.0f, 0.0f);
+	float S = 1.0f;
+	R3 T(0.0f, 10.0f, 10.0f);
+
 
     VMat v(ob, 128, 30);
     LTimer t; t.start();
-    //LukeLincoln::testFeatures(v, R3(1.0f, 2.0f, 1.0f), 1.0f, R3(1.0f, 20.0f, 3.0f));
-	LukeLincoln::testMatches(v, R3(1.0f, 20.0f, 1.0f), 1.0f, R3(1.0f, 20.0f, 3.0f), false, -1);
+    //LukeLincoln::testFeatures(v, R3(1.0f, 20.0f, 1.0f), 1.0f, R3(1.0f, 20.0f, 3.0f));
+	LukeLincoln::testMatches(v, R, S, T, true, 300);
+	Mat M = VMat::transformation_matrix(v.s, R.x, R.y, R.z, S, T.x, T.y, T.z);
+	VMat v2 = v; v2.transform_volume_forward(M);
+
+	Mat MM = lukes_siftRegister(v, v2, true, 300);
+
+	VMat v3 = v;
+	v3.transform_volume_forward(MM);
+	cout << M << endl;
+	cout << MM << endl;;
+	
+	
+
+	
+	v.pixel3dset().save_obj("C:/Users/s2807774/Desktop/v.obj");
+	v2.pixel3dset().save_obj("C:/Users/s2807774/Desktop/v2.obj");
+	v3.pixel3dset().save_obj("C:/Users/s2807774/Desktop/v3.obj");
+
+
     t.stop();
     cout << " time taken: " << t.getSeconds() << endl;
 

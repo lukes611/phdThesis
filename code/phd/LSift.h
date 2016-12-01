@@ -39,7 +39,8 @@ namespace LukeLincoln
 		int octave;
 		float angle1, angle2;
 		cv::Mat featureVector;
-		ll_R3::R3 truePoint();
+		cv::Point3f truePoint();
+		ll_R3::R3 truePointR3();
 		double sad(const SiftFeature3D & o);
     };
 
@@ -94,14 +95,16 @@ namespace LukeLincoln
 
 	//perform matching
 	void computeMatches(std::vector<SiftFeature2D> & fvs1, std::vector<SiftFeature2D> & fvs2, std::vector<cv::Point2i> & p1, std::vector<cv::Point2i> & p2, bool sort = true, int limit = -1);
-	void computeMatches(std::vector<SiftFeature3D> & fvs1, std::vector<SiftFeature3D> & fvs2, std::vector<cv::Point3i> & p1, std::vector<cv::Point3i> & p2, bool sort = true, int limit = -1);
+	void computeMatches(std::vector<SiftFeature3D> & fvs1, std::vector<SiftFeature3D> & fvs2, std::vector<cv::Point3f> & p1, std::vector<cv::Point3f> & p2, bool sort = true, int limit = -1);
 	cv::Point2f operator*(cv::Mat M, const cv::Point2f& p);
 	cv::Point3f operator*(cv::Mat M, const cv::Point3f& p);
 
 	//high level functions:
 	void lukes_sift(cv::Mat & im1, cv::Mat & im2, std::vector<cv::Point2i> & p1, std::vector<cv::Point2i> & p2, bool sort = false, int top = -1);//performs sift
+	void lukes_sift(VMat & im1, VMat & im2, std::vector<cv::Point3f> & p1, std::vector<cv::Point3f> & p2, bool sort = false, int top = -1);//performs sift
 	cv::Mat featureVisualization(std::vector<SiftFeature2D> & f, cv::Mat im);
 	cv::Mat lukes_siftRegister(cv::Mat & im1, cv::Mat & im2, bool sort = true, int getTopXFeatures = 50, double allowedError = 1.2);
+	cv::Mat lukes_siftRegister(VMat & a, VMat & b, bool sort = true, int getTopXFeatures = 50, double allowedError = 1.2);
 
 	//tests
 	void testFeatures(cv::Mat & im, double R, double S, cv::Point2d T);
