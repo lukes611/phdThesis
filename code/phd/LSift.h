@@ -113,4 +113,7 @@ namespace LukeLincoln
 	void testMatches(VMat & im, R3 R, float S, R3 T, bool sort = true, int top = 3);
 
 
+	cv::Mat findTransform(std::vector<cv::Point3f> & p1, std::vector<cv::Point3f> & p2, cv::Mat & rotationMatrix, float & scale, cv::Point3f & trans);
+    int lukesRansac(std::vector<cv::Point3f> & src, std::vector<cv::Point3f> & dst, cv::Mat & H, std::vector<bool> & inliers, float maxError);
+
 }

@@ -357,12 +357,12 @@ namespace LukeLincoln
 		int rsf = (int)(roiSizef + 0.5f);
 		VMat g = getGaussianImage(rsf, roiSizef);
 		int rsfh = (int)(roiSizef * 0.5f);
-		
+
 		//angles: 36 bins * 2 angles
 
 		Mat angles = Mat::zeros(Size(18, 18), CV_32FC1);
-		
-		
+
+
 		for (int z = feature.z - rsfh, _z = 0; z <= feature.z + rsfh; z++, _z++)
 		{
 			for (int y = feature.y - rsfh, _y = 0; y <= feature.y + rsfh; y++, _y++)
@@ -395,7 +395,7 @@ namespace LukeLincoln
 				}*/
 			}
 		}
-		
+
 		return ret;
 	}
 
@@ -457,7 +457,7 @@ namespace LukeLincoln
 					float m = computeMagnitude(x + X, y + Y, z+Z, im) * g.at(x, y, z);
 					Point2f o = computeOrientation(x + X, y + Y, z + Z, im);
 					o.x = o.x < 0.0f ? o.x + 180.0f : o.x;
-					
+
 					o.x -= fo.x;
 					o.x = o.x < 0.0f ? 180.0f + o.x : o.x;
 					o.y -= fo.y;
@@ -637,7 +637,7 @@ namespace LukeLincoln
                             feature.octave = octave;
                             feature.scale = R/K;
 
-                            
+
                             vector<Point2f> bestAngles = computeOrientations(feature, currentG);
                             for(int _ = 0; _ < bestAngles.size(); _++)
                             {
@@ -867,7 +867,7 @@ namespace LukeLincoln
 
 	void lukes_sift(VMat & A, VMat & B, vector<Point3f> & p1, vector<Point3f> & p2, bool sort, int top)
 	{
-		
+
 		vector<SiftFeature3D> f1 = findMultiScaleFeatures(A, 1);
 		vector<SiftFeature3D> f2 = findMultiScaleFeatures(B, 1);
 
@@ -1012,7 +1012,7 @@ namespace LukeLincoln
 
 	void testMatches(VMat & im, R3 R, float S, R3 T, bool sort, int top)
 	{
-		
+
 		Mat M = VMat::transformation_matrix(im.s, R.x, R.y, R.z, S, T.x, T.y, T.z);
 
 		VMat im2 = im; im2.transform_volume_forward(M);
@@ -1037,7 +1037,7 @@ namespace LukeLincoln
 			float dist = sqrt(dv.dot(dv));
 			if (dist < 1.5f)
 				Count++;
-		
+
 			Total++;
 		}
 		cout << "testing matches: " << Count << " correct out of " << Total;
@@ -1057,7 +1057,7 @@ namespace LukeLincoln
 	Mat lukes_siftRegister(VMat & a, VMat & b, bool sort, int getTopXFeatures, double allowedError)
 	{
 		vector<Point3f> src, dst;
-		Mat c, ret, matrix, inliers;
+		Mat c, ret, matrix;
 		lukes_sift(a, b, src, dst, sort, getTopXFeatures);
 
 		//for (int i = 0; i < src.size(); i++)
@@ -1065,7 +1065,9 @@ namespace LukeLincoln
 			//cout << "matched ( " << src[i] << " , " << dst[i] << " )\n";
 
 		}
-		int rv = estimateAffine3D(src, dst, ret, inliers, 1.0, 0.999999999999);
+		vector<bool> inliers;
+		//int rv = estimateAffine3D(src, dst, ret, inliers, 1.0, 0.999999999999);
+		int rv = lukesRansac(src, dst, ret, inliers, 1.1f);
 		//cout << inliers << endl;
 		//cout << ret << endl;
 		matrix = Mat::eye(Size(4, 4), CV_32FC1);
@@ -1079,5 +1081,126 @@ namespace LukeLincoln
 		//cout << rv << endl;
 		return matrix.clone();
 	}
+
+    Mat findTransform(vector<Point3f> & p1, vector<Point3f> & p2, Mat & rotationMatrix, float & scale, Point3f & trans)
+    {
+        Point3f avg1(0.0f, 0.0f, 0.0f), avg2(0.0f, 0.0f, 0.0f);
+        float scalar = 1.0f / (float)p1.size();
+        //cout << scalar << endl;
+        for(int i = 0; i < p1.size(); i++)
+        {
+            //cout << p1[i] << endl;
+            //cout << (p1[i] * scalar) << endl;
+            avg1 += p1[i] * scalar;
+            avg2 += p2[i] * scalar;
+        }
+        //cout << avg1 << " and avg2 = " << avg2 << endl;
+
+
+        Mat H = Mat::zeros(Size(3,3), CV_32FC1);
+        for(int i = 0; i < p1.size(); i++)
+        {
+            float _[3] = {p1[i].x - avg1.x, p1[i].y - avg1.y, p1[i].z - avg1.z};
+            float _2[3] = {p2[i].x - avg2.x, p2[i].y - avg2.y, p2[i].z - avg2.z};
+            Mat a(Size(1, 3), CV_32FC1, _);
+            Mat b(Size(1,3), CV_32FC1, _2);
+            transpose(b,b);
+            a = a * b;
+            H += a;
+        }
+
+        Mat S, U, Vt, V;
+        Mat Sm = Mat::eye(Size(3,3), CV_32FC1);
+        SVD::compute(H, S, U, Vt);
+        transpose(Vt,V);
+        Mat Ut; transpose(U, Ut);
+        //Sm.at<float>(0,0) = S.at<float>(0,0);
+        //Sm.at<float>(1,1) = S.at<float>(1,0);
+        //Sm.at<float>(2,2) = S.at<float>(2,0);
+
+
+        //cout << H << endl << endl;
+        //cout << S << endl << endl;
+        //cout << U << endl << endl;
+        //cout << V << endl << endl;
+        //cout << (U*Sm*V) << endl;
+
+        Mat _rm = V * Ut;
+        rotationMatrix = Mat::eye(Size(4,4), CV_32FC1);
+        for(int y = 0; y < 3; y++)
+        {
+            for(int x = 0; x < 3; x++)
+            {
+                rotationMatrix.at<float>(y,x) = _rm.at<float>(y,x);
+            }
+        }
+
+        //cout << rotationMatrix << "\n" << " is the rmat" << endl;
+
+        {
+            //Mat x1(Size(1, 3), CV_32FC1, {p1[0].x - avg1.x, p1[0].y - avg1.y, p1[0].z - avg1.z});
+            //Mat x2(Size(1, 3), CV_32FC1, {p2[0].x - avg2.x, p2[0].y - avg2.y, p2[0].z - avg2.z});
+            //x1 = rotationMatrix * x1;
+            //scale = x2.at<float>(0,0) / x1.at<float>(0,0);
+            Point3f x1 = rotationMatrix*(p1[0] - avg1);
+            Point3f x2 = p2[0] - avg2;
+            scale = x2.x / x1.x;
+
+        }
+        //float avg1_arr[3] = {avg1.x * scale, avg1.y * scale, avg1.z * scale};
+        //Mat avg1M = Mat(Size(1, 3), CV_32FC1, avg1_arr);
+        trans = (-rotationMatrix) * avg1 + avg2;
+        //trans = Point3f(_t.at<float>(0,0), _t.at<float>(1,0), _t.at<float>(2,0)) + avg2;
+
+        //cout << trans << endl;
+        //cout << scale << endl;
+        //return S;
+        float smatptr[16] = {scale, 0.0f, 0.0f, 0.0f, 0.0f, scale, 0.0f, 0.0f, 0.0f, 0.0f, scale, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f};
+        Mat scaleMatrix(Size(4,4), CV_32FC1, smatptr);
+        Mat tMat = VMat::transformation_matrix(0, 0.0f, 0.0f, 0.0f, 1.0f, trans.x, trans.y, trans.z);
+
+
+        return tMat * (scaleMatrix * rotationMatrix);
+    }
+
+    //to-do : implement the ransac alg using findTransform
+    int lukesRansac(vector<Point3f> & src, vector<Point3f> & dst, Mat & H, vector<bool> & inliers, float maxError)
+    {
+        inliers = vector<bool>(src.size());
+        int numIterations = 100;
+        H = Mat::eye(Size(4,4), CV_32FC1);
+        int nBest = 0;
+        for(int i = 0; i < numIterations; i++)
+        {
+            vector<Point3f> p1sub, p2sub;
+            for(int j = 0; j < 4; j++)
+            {
+                int rI = rand() % src.size();
+                p1sub.push_back(src[rI]);
+                p2sub.push_back(dst[rI]);
+            }
+            Mat rm; float s; Point3f t;
+            Mat Hi = findTransform(p1sub, p2sub, rm, s, t);
+            int numInliers = 0;
+            for(int j = 0; j < src.size(); j++)
+            {
+                Point3f _ = Hi * src[j];
+                Point3f __ = dst[j] - _;
+                float dist = sqrt(__.dot(__));
+                if(dist < maxError)
+                {
+                    inliers[j] = true;
+                    numInliers++;
+                }
+            }
+            if(numInliers > nBest)
+            {
+                H = Hi;
+                nBest = numInliers;
+            }
+        }
+        return 1;
+    }
+
 }
 
