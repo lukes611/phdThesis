@@ -29,6 +29,11 @@ namespace LukeLincoln
 		return sum(abs(featureVector - o.featureVector))[0];
 	}
 
+	double SiftFeature3D::sad(const SiftFeature3D & o)
+	{
+		return sum(abs(featureVector - o.featureVector))[0];
+	}
+
     double SiftFeature2D::correlation(const SiftFeature2D & o)
     {
 		Mat oo = o.featureVector;
@@ -298,7 +303,7 @@ namespace LukeLincoln
 		float r1 = r + 1.0f;
 		float test = (r1*r1) / r;
 		//float test = 12.0f;
-		return measure < test;
+		return measure >= test || measure < 0.0f;
         //return measure >= test || measure < 0.0f;
 	}
 
@@ -340,6 +345,55 @@ namespace LukeLincoln
         return ret;
     }
 
+	vector<Point2f> computeOrientations(SiftFeature3D & feature, VMat & image)
+	{
+		vector<Point2f> ret;
+		float roiSizef = 5.0f * feature.scale;
+		int rsf = (int)(roiSizef + 0.5f);
+		VMat g = getGaussianImage(rsf, roiSizef);
+		int rsfh = (int)(roiSizef * 0.5f);
+		
+		//angles: 36 bins * 2 angles
+
+		Mat angles = Mat::zeros(Size(18, 18), CV_32FC1);
+		
+		
+		for (int z = feature.z - rsfh, _z = 0; z <= feature.z + rsfh; z++, _z++)
+		{
+			for (int y = feature.y - rsfh, _y = 0; y <= feature.y + rsfh; y++, _y++)
+			{
+				for (int x = feature.x - rsfh, _x = 0; x <= feature.x + rsfh; x++, _x++)
+				{
+					Point2f O = computeOrientation(x, y, z, image);
+					int binX = (int)((O.x + 90.0f) / 10.0f);
+					int binY = (int)((O.y) / 10.0f);
+					if (binX >= 0 && binX < 18 && binY >= 0 && binY < 18)
+						angles.at<float>(binY, binX) += computeMagnitude(x, y, z, image) * g.at(_x, _y, _z);
+				}
+			}
+		}
+		ll_normalize(angles);
+
+		//float best = angles.at<float>(0, 0);
+		//Point2i bestInd(0,0);
+
+		for (int y = 0; y < 18; y++)
+		{
+			for (int x = 0; x < 18; x++)
+			{
+				float v = angles.at<float>(y, x);
+				if (v >= 0.8f) ret.push_back(Point2f(x * 10.0f - 90.0f, y * 10.0f));
+				/*if (best < v)
+				{
+					best = v;
+					bestInd = ret.size() - 1;
+				}*/
+			}
+		}
+		
+		return ret;
+	}
+
 
     void computeFeatureVectors(SiftFeature2D & ret, Mat & im)
     {
@@ -369,6 +423,57 @@ namespace LukeLincoln
         }
         //ll_normalize(ret.featureVector);
     }
+
+	void computeFeatureVectors(SiftFeature3D & ret, VMat & im)
+	{
+
+		int binSize = 4;
+		int binsSize = 4 * 4; // == 16
+		int gridSize = 4 * 4 * 4; //== 64
+		int totalSize = gridSize * binsSize; // == 1024
+
+		ret.featureVector = Mat::zeros(Size(totalSize, 1), CV_64FC1);
+		VMat g = getGaussianImage(16, 16.0);
+
+		int X = ret.x - 7;
+		int Y = ret.y - 7;
+		int Z = ret.z - 7;
+
+		Point2f fo(ret.angle1, ret.angle2);
+		fo.x = fo.x < 0.0f ? fo.x + 180.0f : fo.x;
+
+		//X=Y=0;
+		for (int z = 0; z < 16; z++)
+		{
+			for (int y = 0; y < 16; y++)
+			{
+				for (int x = 0; x < 16; x++)
+				{
+					float m = computeMagnitude(x + X, y + Y, z+Z, im) * g.at(x, y, z);
+					Point2f o = computeOrientation(x + X, y + Y, z + Z, im);
+					o.x = o.x < 0.0f ? o.x + 180.0f : o.x;
+					
+					o.x -= fo.x;
+					o.x = o.x < 0.0f ? 180.0f + o.x : o.x;
+					o.y -= fo.y;
+					o.y = o.y < 0.0f ? 180.0f + o.y : o.y;
+
+
+					if (o.x < 0.0f || o.x > 180.0f) continue;
+					if (o.y < 0.0f || o.y > 180.0f) continue;
+					int xI = x / 4;
+					int yI = y / 4;
+					int zI = z / 4;
+					int GridSection = zI * 16 + yI * 4 + xI;
+					int bin1 = (int)(o.x / 45.0f);
+					int bin2 = (int)(o.y / 45.0f);
+					if (bin1 < 4 && bin1 >= 0 && bin2 >= 0 && bin2 < 4)
+						ret.featureVector.at<double>(0, GridSection*binsSize + bin2*4 + bin1) += (double)m;
+				}
+			}
+		}
+		//ll_normalize(ret.featureVector);
+	}
 
 
     void findFeatures(vector<SiftFeature2D> & ret, int octave, Mat & input)
@@ -460,7 +565,7 @@ namespace LukeLincoln
 	{
 		double K =  sqrt(2.0);
 		int kernelSize = 7;//was 14 but very slow
-		int numLevels = 5;
+		int numLevels = 3;
 
 
 
@@ -527,15 +632,16 @@ namespace LukeLincoln
                             feature.octave = octave;
                             feature.scale = R/K;
 
-                            ret.push_back(feature);
-                            /*vector<float> bestAngles = computeOrientations(feature, currentG);
+                            
+                            vector<Point2f> bestAngles = computeOrientations(feature, currentG);
                             for(int _ = 0; _ < bestAngles.size(); _++)
                             {
-                                SiftFeature2D f = feature;
-                                f.angle = bestAngles[_];
+                                SiftFeature3D f = feature;
+                                f.angle1 = bestAngles[_].x;
+								f.angle2 = bestAngles[_].y;
                                 computeFeatureVectors(f, currentG);
                                 ret.push_back(f);
-                            }*/
+                            }
                         }
                     }
                 }
@@ -655,6 +761,70 @@ namespace LukeLincoln
 
 	}
 
+	void computeMatches(vector<SiftFeature3D> & fvs1, vector<SiftFeature3D> & fvs2, vector<Point3i> & p1, vector<Point3i> & p2, bool sort, int limit)
+	{
+		vector<tuple<SiftFeature3D, SiftFeature3D, double>> matches;
+
+		//correl norm	= 32
+		//correl		= 32
+		//sad norm		= 36
+		//sad			= 49
+
+		for (int i = 0; i < fvs1.size(); i++)
+		{
+			double best = fvs1[i].sad(fvs2[0]);
+			int bj = 0;
+			for (int j = 1; j < fvs2.size(); j++)
+			{
+				double er = fvs1[i].sad(fvs2[j]);
+				if (er < best)
+				{
+					best = er;
+					bj = j;
+				}
+			}
+
+			tuple<SiftFeature3D, SiftFeature3D, double> match = make_tuple(fvs1[i], fvs2[bj], best);
+			matches.push_back(match);
+
+		}
+
+		if (sort)
+		{
+			//std::cout << "sorting " << "\n";
+			auto f = [](const tuple<SiftFeature3D, SiftFeature3D, double> & a, const tuple<SiftFeature3D, SiftFeature3D, double> & b)
+				-> bool { return get<2>(a) < get<2>(b); };
+			std::sort(matches.begin(), matches.end(), f);
+
+			int am = limit == -1 ? matches.size() : limit;
+			int N = am < matches.size() ? am : matches.size();
+			for (int i = 0; i < N; i++)
+			{
+				tuple<SiftFeature3D, SiftFeature3D, double> & match = matches[i];
+				R3 _p1p = get<0>(match).truePoint();
+				R3 _p2p = get<1>(match).truePoint();
+				p1.push_back(Point3i(_p1p.x, _p1p.y, _p1p.z));
+				p2.push_back(Point3i(_p2p.x, _p2p.y, _p2p.z));
+			}
+
+		}
+		else
+		{
+			for (int i = 0; i < matches.size(); i++)
+			{
+				tuple<SiftFeature3D, SiftFeature3D, double> & match = matches[i];
+				R3 _p1p = get<0>(match).truePoint();
+				R3 _p2p = get<1>(match).truePoint();
+				p1.push_back(Point3i(_p1p.x, _p1p.y, _p1p.z));
+				p2.push_back(Point3i(_p2p.x, _p2p.y, _p2p.z));
+			}
+		}
+
+
+
+
+	}
+
 	cv::Point2f operator*(cv::Mat M, const cv::Point2f& p)
 	{
 		Mat src = Mat::zeros(Size(1, 3), CV_64FC1);
@@ -665,6 +835,19 @@ namespace LukeLincoln
 
 		Mat dst = M*src; //USE MATRIX ALGEBRA
 		return cv::Point2f(dst.at<double>(0, 0), dst.at<double>(1, 0));
+	}
+
+	cv::Point3f operator*(cv::Mat M, const cv::Point3f& p)
+	{
+		Mat src = Mat::zeros(Size(1, 4), CV_32FC1);
+
+		src.at<float>(0, 0) = p.x;
+		src.at<float>(1, 0) = p.y;
+		src.at<float>(2, 0) = p.z;
+		src.at<float>(3, 0) = 1.0;
+
+		Mat dst = M*src; //USE MATRIX ALGEBRA
+		return cv::Point3f(dst.at<float>(0, 0), dst.at<float>(1, 0), dst.at<float>(2,0));
 	}
 
 	void lukes_sift(cv::Mat & A, cv::Mat & B, std::vector<cv::Point2i> & p1, std::vector<cv::Point2i> & p2, bool sort, int top)
@@ -727,7 +910,7 @@ namespace LukeLincoln
 
 		}
 
-		cout << "testing features: " << Count << " founs in other image out of " << Total;
+		cout << "testing features: " << Count << " found in other image out of " << Total;
 		cout << ", " << (100.0*Count / (double)Total) << "% were found." << endl;
 
 	}
@@ -767,7 +950,7 @@ namespace LukeLincoln
 
 		}
 
-		cout << "testing features: " << Count << " founs in other image out of " << Total;
+		cout << "testing features: " << Count << " found in other image out of " << Total;
 		cout << ", " << (100.0*Count / (double)Total) << "% were found." << endl;
 
 		delete [] check;
@@ -808,6 +991,40 @@ namespace LukeLincoln
 				gp2.push_back(p2[i]);
 			}
 
+			Total++;
+		}
+		cout << "testing matches: " << Count << " correct out of " << Total;
+		cout << ", " << (100.0*Count / (double)Total) << "% were accurate." << endl;
+	}
+
+	void testMatches(VMat & im, R3 R, float S, R3 T, bool sort, int top)
+	{
+		
+		Mat M = VMat::transformation_matrix(im.s, R.x, R.y, R.z, S, T.x, T.y, T.z);
+
+		VMat im2 = im; im2.transform_volume_forward(M);
+
+
+		vector<LukeLincoln::SiftFeature3D> f1 = findMultiScaleFeatures(im, 1);
+		vector<SiftFeature3D> f2 = findMultiScaleFeatures(im2, 1);
+
+		vector<Point3i> p1, p2;
+		computeMatches(f1, f2, p1, p2, sort, top);
+
+
+
+		int Count = 0, Total = 0;
+
+		for (int i = 0; i < p1.size(); i++)
+		{
+			Point3f pa(p1[i].x, p1[i].y, p1[i].z);
+			Point3f pb(p2[i].x, p2[i].y, p2[i].z);
+			pa = M * pa;
+			Point3f dv = pa - pb;
+			float dist = sqrt(dv.dot(dv));
+			if (dist < 1.5f)
+				Count++;
+		
 			Total++;
 		}
 		cout << "testing matches: " << Count << " correct out of " << Total;

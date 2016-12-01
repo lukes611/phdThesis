@@ -48,19 +48,20 @@ void l3(int s, function<void(int,int,int)> f, int from = 0)
 int main(int argc, char * * argv)
 {
 	SIObj ob;
-    ob.open_obj("/home/luke/lcppdata/obj/bunny_simplified2.obj");
+    ob.open_obj("c:/lcppdata/obj/bunny_simplified2.obj");
 
 
     VMat v(ob, 128, 30);
     LTimer t; t.start();
-    LukeLincoln::testFeatures(v, R3(1.0f, 2.0f, 1.0f), 1.0f, R3(1.0f, 20.0f, 3.0f));
+    //LukeLincoln::testFeatures(v, R3(1.0f, 2.0f, 1.0f), 1.0f, R3(1.0f, 20.0f, 3.0f));
+	LukeLincoln::testMatches(v, R3(1.0f, 20.0f, 1.0f), 1.0f, R3(1.0f, 20.0f, 3.0f), false, -1);
     t.stop();
     cout << " time taken: " << t.getSeconds() << endl;
 
-/*
+
     //v.save_obj("/home/luke/Desktop/b.obj", 128, 0.2f);
-    cout << "starting " << endl;
-    LTimer t; t.start();
+    /*cout << "starting " << endl;
+    t.reset(); t.start();
 
     vector<SiftFeature3D> f;
     LukeLincoln::findFeatures(f, 1, v);
@@ -72,12 +73,12 @@ int main(int argc, char * * argv)
     vector<R3> ps;
     for(int i = 0; i < f.size(); i++) ps.push_back(R3(f[i].x, f[i].y, f[i].z));
 
-    Pixel3DSet(ps).save_obj("/home/luke/Desktop/a.obj");
+    Pixel3DSet(ps).save_obj("C:/Users/s2807774/Desktop/a.obj");
 
 	//v2.save_obj("/home/luke/Desktop/a.obj", 256, 0.2f);
 	//v2.threshold(0.6f);
 	//v2.pixel3dset(0.0f).save_obj("/home/luke/Desktop/a.obj");
-*/
+	*/
 	return 0;
 }
 

@@ -38,7 +38,9 @@ namespace LukeLincoln
 		double scale;
 		int octave;
 		float angle1, angle2;
+		cv::Mat featureVector;
 		ll_R3::R3 truePoint();
+		double sad(const SiftFeature3D & o);
     };
 
 
@@ -76,9 +78,11 @@ namespace LukeLincoln
 
     //compute orientations
     std::vector<float> computeOrientations(SiftFeature2D & feature, cv::Mat & image);
+	std::vector<cv::Point2f> computeOrientations(SiftFeature3D & feature, VMat & image);
 
     //compute feature signature
     void computeFeatureVectors(SiftFeature2D & ret, cv::Mat & im);
+	void computeFeatureVectors(SiftFeature3D & ret, VMat & im);
 
     //locate features:
     void findFeatures(std::vector<SiftFeature2D> & ret, int octave, cv::Mat & input);
@@ -90,7 +94,9 @@ namespace LukeLincoln
 
 	//perform matching
 	void computeMatches(std::vector<SiftFeature2D> & fvs1, std::vector<SiftFeature2D> & fvs2, std::vector<cv::Point2i> & p1, std::vector<cv::Point2i> & p2, bool sort = true, int limit = -1);
+	void computeMatches(std::vector<SiftFeature3D> & fvs1, std::vector<SiftFeature3D> & fvs2, std::vector<cv::Point3i> & p1, std::vector<cv::Point3i> & p2, bool sort = true, int limit = -1);
 	cv::Point2f operator*(cv::Mat M, const cv::Point2f& p);
+	cv::Point3f operator*(cv::Mat M, const cv::Point3f& p);
 
 	//high level functions:
 	void lukes_sift(cv::Mat & im1, cv::Mat & im2, std::vector<cv::Point2i> & p1, std::vector<cv::Point2i> & p2, bool sort = false, int top = -1);//performs sift
@@ -101,6 +107,7 @@ namespace LukeLincoln
 	void testFeatures(cv::Mat & im, double R, double S, cv::Point2d T);
 	void testFeatures(VMat & im, R3 R, float S, R3 T);
 	void testMatches(cv::Mat & im, double R, double S, cv::Point2d T, bool sort = true, int top = 3);
+	void testMatches(VMat & im, R3 R, float S, R3 T, bool sort = true, int top = 3);
 
 
 }
