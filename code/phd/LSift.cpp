@@ -1075,7 +1075,7 @@ namespace LukeLincoln
 		{
 			for (int x = 0; x < 4; x++)
 			{
-				matrix.at<float>(y, x) = (float)ret.at<double>(y, x);
+				matrix.at<float>(y, x) = (float)ret.at<float>(y, x);
 			}
 		}
 		//cout << rv << endl;
@@ -1163,7 +1163,7 @@ namespace LukeLincoln
         return tMat * (scaleMatrix * rotationMatrix);
     }
 
-    //to-do : implement the ransac alg using findTransform
+    
     int lukesRansac(vector<Point3f> & src, vector<Point3f> & dst, Mat & H, vector<bool> & inliers, float maxError)
     {
         inliers = vector<bool>(src.size());
@@ -1172,6 +1172,7 @@ namespace LukeLincoln
         int nBest = 0;
         for(int i = 0; i < numIterations; i++)
         {
+			cout << "num inliers: " << nBest << endl;
             vector<Point3f> p1sub, p2sub;
             for(int j = 0; j < 4; j++)
             {
@@ -1197,6 +1198,7 @@ namespace LukeLincoln
             {
                 H = Hi;
                 nBest = numInliers;
+				//cout << t << " is translation " << endl;
             }
         }
         return 1;

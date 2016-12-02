@@ -48,68 +48,50 @@ void l3(int s, function<void(int,int,int)> f, int from = 0)
 int main(int argc, char * * argv)
 {
 
-    R3 R(0.0f, 180.0f, 0.0f);
+    R3 R(5.0f, 2.0f, 10.0f);
 	float S = 1.0f;
-	R3 T(5.0f, 4.0f, 3.0f);
-    Mat M = VMat::transformation_matrix(0, R.x, R.y, R.z, S, T.x, T.y, T.z);
+	R3 T(10.0f, 1.0f, 9.0f);
+    
 
 
-    vector<Point3f> p1, p2;
+   
 
-    for(int i = 0; i < 50; i++)
-    {
-        Point3f p;
-        p.x = (rand() / (float)RAND_MAX) * 1000.0f;
-        p.y = (rand() / (float)RAND_MAX) * 1000.0f;
-        p.z = (rand() / (float)RAND_MAX) * 1000.0f;
-
-        Point3f pp = M * p;
-        //pp = p;
-        p1.push_back(p);
-        p2.push_back(pp);
-
-    }
-
-    Mat rm;
-    float s;
-    Point3f t;
-    LukeLincoln::findTransform(p1, p2, rm, s, t);
-    cout << s << ", " << t << ", \n" << rm << endl;
-/*
 	SIObj ob;
-    ob.open_obj("/home/luke/lcppdata/obj/bunny_simplified2.obj");
-
-	/*
-		to-do : do 3d reg
+    ob.open_obj("c:/lcppdata/obj/bunny_simplified2.obj");
+	cout << ob._points.size() << " points and " << ob._triangles.size() << " triangles" << endl;
+	
+	//to-do : do 3d reg
 
 
 
 
     VMat v(ob, 128, 30);
+	Mat M = VMat::transformation_matrix(v.s, R.x, R.y, R.z, S, T.x, T.y, T.z);
+
     LTimer t; t.start();
-    //LukeLincoln::testFeatures(v, R3(1.0f, 20.0f, 1.0f), 1.0f, R3(1.0f, 20.0f, 3.0f));
-	//LukeLincoln::testMatches(v, R, S, T, true, 300);
+    //LukeLincoln::testFeatures(v, R, S, T);
+	LukeLincoln::testMatches(v, R, S, T, true, 80);
 
 	VMat v2 = v; v2.transform_volume_forward(M);
 
-	//Mat MM = lukes_siftRegister(v, v2, true, 50);
-	vector<Point3f> p1, p2;
-    LukeLincoln::lukes_sift(v, v2, p1, p2, true, 50);
+	Mat MM = lukes_siftRegister(v, v2, true, 80);
+	//vector<Point3f> p1, p2;
+    //LukeLincoln::lukes_sift(v, v2, p1, p2, true, 50);
 
 
 
 
-	//VMat v3 = v;
-	//v3.transform_volume_forward(MM);
+	VMat v3 = v;
+	v3.transform_volume_forward(MM);
 	//cout << M << endl;
 	//cout << MM << endl;;
 
 
 
 
-	//v.pixel3dset().save_obj("C:/Users/s2807774/Desktop/v.obj");
-	//v2.pixel3dset().save_obj("C:/Users/s2807774/Desktop/v2.obj");
-	//v3.pixel3dset().save_obj("C:/Users/s2807774/Desktop/v3.obj");
+	v.pixel3dset().save_obj("C:/Users/s2807774/Desktop/v.obj");
+	v2.pixel3dset().save_obj("C:/Users/s2807774/Desktop/v2.obj");
+	v3.pixel3dset().save_obj("C:/Users/s2807774/Desktop/v3.obj");
 
 
     t.stop();
@@ -117,25 +99,25 @@ int main(int argc, char * * argv)
 
 
     //v.save_obj("/home/luke/Desktop/b.obj", 128, 0.2f);
-    /*cout << "starting " << endl;
-    t.reset(); t.start();
+    //cout << "starting " << endl;
+   // t.reset(); t.start();
 
-    vector<SiftFeature3D> f;
-    LukeLincoln::findFeatures(f, 1, v);
+    //vector<SiftFeature3D> f;
+    //LukeLincoln::findFeatures(f, 1, v);
 
-    t.stop(); cout << t.getSeconds() << endl;
+    //t.stop(); cout << t.getSeconds() << endl;
 
-    cout << "num feats " << f.size() << endl;
+    //cout << "num feats " << f.size() << endl;
 
-    vector<R3> ps;
-    for(int i = 0; i < f.size(); i++) ps.push_back(R3(f[i].x, f[i].y, f[i].z));
+    //vector<R3> ps;
+    //for(int i = 0; i < f.size(); i++) ps.push_back(R3(f[i].x, f[i].y, f[i].z));
 
-    Pixel3DSet(ps).save_obj("C:/Users/s2807774/Desktop/a.obj");
+    //Pixel3DSet(ps).save_obj("C:/Users/s2807774/Desktop/a.obj");
 
 	//v2.save_obj("/home/luke/Desktop/a.obj", 256, 0.2f);
 	//v2.threshold(0.6f);
 	//v2.pixel3dset(0.0f).save_obj("/home/luke/Desktop/a.obj");
-	*/
+	
 	return 0;
 }
 
