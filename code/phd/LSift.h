@@ -115,5 +115,5 @@ namespace LukeLincoln
 
 	cv::Mat findTransform(std::vector<cv::Point3f> & p1, std::vector<cv::Point3f> & p2, cv::Mat & rotationMatrix, float & scale, cv::Point3f & trans);
     int lukesRansac(std::vector<cv::Point3f> & src, std::vector<cv::Point3f> & dst, cv::Mat & H, std::vector<bool> & inliers, float maxError);
-
+	cv::Mat sift3DRegister(Pixel3DSet & object1, Pixel3DSet & object2, double & seconds, bool isScaled, int volumeSize);
 }

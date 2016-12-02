@@ -1,23 +1,22 @@
 #include <iostream>
 #include <string>
 #include <vector>
-#include <stack>
-#include <functional>
 
-#include "code/basics/locv3.h"
-#include "code/basics/R3.h"
-#include "code/basics/llCamera.h"
-#include "code/basics/LTimer.h"
-#include "code/basics/Pixel3DSet.h"
-#include "code/basics/VMatF.h"
-#include "code/phd/measurements.h"
-#include "code/phd/Licp.h"
-#include "code/script/LScript.h"
-#include "code/phd/fmRansac.h"
+//#define USINGGPU 
+
+#include "code\basics\locv3.h"
+#include "code\basics\R3.h"
+#include "code\basics\llCamera.h"
+#include "code\basics\VMatF.h"
+#include "code\basics\LTimer.h"
+#include "code\phd\Licp.h"
+#include "code\phd\measurements.h"
+#include "code\phd\fmRansac.h"
+#include "code\pc\TheVolumePhaseCorrelator.h"
+#include "code\phd\Lpcr.h"
+#include "code\script\LScript.h"
+#include "code\phd\experiments.h"
 #include "code/phd/LSift.h"
-//#include "code/pc/TheVolumePhaseCorrelator.h"
-//#include "code/phd/Lpcr.h"
-//#include "code/phd/experiments.h"
 
 using namespace std;
 using namespace cv;
@@ -25,102 +24,219 @@ using namespace ll_R3;
 using namespace ll_cam;
 using namespace ll_measure;
 using namespace ll_fmrsc;
-//using namespace ll_experiments;
-using namespace ll_siobj;
-using namespace LukeLincoln;
-using namespace ll_pix3d;
+using namespace ll_experiments;
+
+//using namespace cv;
+
+//proto-type for experiments: VMat pc(VMat a, VMat b, double & time, Mat & transform, double & mse);
+//to-do:= pc, ipc, 
+
+/*
+read in 1 x Pixel3DSets
+mutate points slightly
+get knn working with 4d data
+
+string askPython(string data)
+
+PixCompressor api:
+
+range representation __from __to
+from -256 + 512
+
+plan: experiment api:
+algorithm name
+data name
+vector<int> frameIndexes
+
+write:
+input:
+algorithm
+data
+description
+vector<indexes> frames
+error added
+output:
+alg, data, description, error added
+errors, seconds per experiment
 
 
-#include "code/basics/BitReaderWriter.h"
+writes error to csv format file: data name, algorithm errorx, error y, error z times. description
 
-void l3(int s, function<void(int,int,int)> f, int from = 0)
+
+*/
+
+
+#include "code\basics\BitReaderWriter.h"
+
+
+
+void exp1(string name, vector<int> frames)
 {
-    for(int z = from; z < s-from; z++)
-    {
-        for(int y = from; y < s-from; y++)
-        {
-            for(int x = from; x < s-from; x++)
-                f(x,y,z);
-        }
-    }
+	CapturePixel3DSet video(name, 10);
+
+	Pixel3DSet output;
+
+	Mat accMatrix = Mat::eye(Size(4, 4), CV_32FC1);
+	Pix3D frame1, frame2;
+	Pixel3DSet a, b;
+
+	//add first frame to the output
+	video.read_frame(frame1, frames[0]);
+	output += Pixel3DSet(frame1);
+
+	for (int _i = 1; _i < frames.size(); _i++)
+	{
+		int currentIndex = frames[_i];
+		//get match _m from i+1 to i
+		double seconds = 0.0, error = 0.0; int iters = 0;
+		Pixel3DSet _;
+
+		video.read_frame(frame2, currentIndex);
+
+		a = frame1; b = frame2;
+
+		Mat _m = Mat::eye(Size(4, 4), CV_32FC1);
+
+		cout << "matching " << currentIndex << " with " << frames[_i - 1] << endl;
+		//cout << "worked " << ll_fmrsc::registerPix3D("surf", frame2, frame1, _m, seconds, true, 50) << endl;;
+		_m = LukeLincoln::sift3DRegister(b, a, seconds, true, 256);
+		//_m = ll_pc::pc_register_pca_i(b, a, seconds);
+		//_m = ll_pc::pc_register(b, a, seconds);
+		//_m = ll_pc::pc_register_pca(b, a, seconds, true, 256);
+		//_m.convertTo(_m, CV_32FC1);
+		//_m = Licp::icp(b, a, _, error, seconds, iters);
+
+		//_m = ll_pca::register_pca(b, a, seconds, 256);
+
+		//_m.convertTo(_m, CV_32FC1);
+		cout << "error: " << error << endl;
+
+
+		//b.transform_set(_m);
+
+		//optionally measure the error here
+
+		//if (error >= 1.0) continue;
+		//m = m * _m : either is fine
+		accMatrix = accMatrix * _m;
+		//accMatrix = _m * accMatrix;
+		//multiply i by m and add to output
+		//cout << nm.size() << " -> " << ll_type(nm.type()) << endl;
+
+		b.transform_set(accMatrix);
+
+		output += b;
+		cout << "output size: " << output.size() << endl;
+		//output.unionFilter(b, 1.0f);
+		cout << "output size reduced to : " << output.size() << endl;
+
+		if (_i % 3 == 0)
+		{
+			cout << "output size: " << output.size() << endl;
+			output.basicMinFilter(0.5f);
+			cout << "output size reduced to : " << output.size() << endl;
+		}
+		frame1 = frame2;
+	}
+	cout << "saving" << endl;
+
+	//output.reduce(256);
+	//SIObj(output.points).saveOBJ("C:/Users/luke/Desktop/result2.obj");
+	LLPointers::setPtr("object", &output);
+	ll_experiments::viewPixel3DSet();
+
+
+}
+
+void quantitativeExperiment(string algorithm_name,
+	string data_name,
+	string description,
+	vector<int> frames,
+	float error_added)
+{
+	CapturePixel3DSet video(data_name, 10);
+	Pix3D frame1, frame2;
+	Pixel3DSet a, b;
+
+	vector<double> times, errors, mses, pmes; //times, errors, mse errors, percent matches
+
+											  //add first frame to the output
+	video.read_frame(frame1, frames[0]);
+
+	for (int _i = 1; _i < frames.size(); _i++)
+	{
+		int currentIndex = frames[_i];
+		//get match _m from i+1 to i
+		double seconds = 0.0;
+		double hde, msee, pme;
+		int iters = 0;
+		Pixel3DSet _;
+
+		video.read_frame(frame2, currentIndex);
+
+		a = frame1; b = frame2;
+
+		Mat _m = Mat::eye(Size(4, 4), CV_32FC1);
+
+		//algorithms here:
+		if (algorithm_name == "none") {
+		}
+#ifdef USINGGPU
+		else if (algorithm_name == "pc") {
+			_m = ll_pc::pc_register(b, a, seconds);
+		}
+
+		else if (algorithm_name == "pc2") {
+			_m = ll_pc::pc_register_pca_i(b, a, seconds);
+		}
+#endif
+		else if (algorithm_name == "icp") {
+			_m = Licp::icp(b, a, _, hde, seconds, iters);
+		}
+
+		else if (algorithm_name == "icp2") {
+			_m = Licp::icp_outlierRemoval(b, a, _, hde, seconds, iters, 10.0);
+		}
+
+		else if (algorithm_name == "fm") {
+			ll_fmrsc::registerPix3D("surf", frame2, frame1, _m, seconds, true, 150);
+		}
+
+		//:end
+
+		//compute the errors
+		b.transform_set(_m);
+		ll_measure::error_metrics(a, b, hde, msee, pme);
+
+		//append data to lists
+		pmes.push_back(pme);
+		mses.push_back(msee);
+		errors.push_back(hde);
+		times.push_back(seconds);
+
+
+		frame1 = frame2;
+	}
+
+
+
+}
+
+
+
+int add(int a) {
+	if (LLPointers::has("b")) return a + LLPointers::get<int>("b");
+	return a;
 }
 
 int main(int argc, char * * argv)
 {
-
-    R3 R(5.0f, 2.0f, 10.0f);
-	float S = 1.0f;
-	R3 T(10.0f, 1.0f, 9.0f);
-    
-
-
-   
-
-	SIObj ob;
-    ob.open_obj("c:/lcppdata/obj/bunny_simplified2.obj");
-	cout << ob._points.size() << " points and " << ob._triangles.size() << " triangles" << endl;
-	
-	//to-do : do 3d reg
+	exp1("Apartment.Texture.rotate", ll_experiments::rng(0, 10, 2));
 
 
 
 
-    VMat v(ob, 128, 30);
-	Mat M = VMat::transformation_matrix(v.s, R.x, R.y, R.z, S, T.x, T.y, T.z);
-
-    LTimer t; t.start();
-    //LukeLincoln::testFeatures(v, R, S, T);
-	LukeLincoln::testMatches(v, R, S, T, true, 80);
-
-	VMat v2 = v; v2.transform_volume_forward(M);
-
-	Mat MM = lukes_siftRegister(v, v2, true, 80);
-	//vector<Point3f> p1, p2;
-    //LukeLincoln::lukes_sift(v, v2, p1, p2, true, 50);
 
 
-
-
-	VMat v3 = v;
-	v3.transform_volume_forward(MM);
-	//cout << M << endl;
-	//cout << MM << endl;;
-
-
-
-
-	v.pixel3dset().save_obj("C:/Users/s2807774/Desktop/v.obj");
-	v2.pixel3dset().save_obj("C:/Users/s2807774/Desktop/v2.obj");
-	v3.pixel3dset().save_obj("C:/Users/s2807774/Desktop/v3.obj");
-
-
-    t.stop();
-    cout << " time taken: " << t.getSeconds() << endl;
-
-
-    //v.save_obj("/home/luke/Desktop/b.obj", 128, 0.2f);
-    //cout << "starting " << endl;
-   // t.reset(); t.start();
-
-    //vector<SiftFeature3D> f;
-    //LukeLincoln::findFeatures(f, 1, v);
-
-    //t.stop(); cout << t.getSeconds() << endl;
-
-    //cout << "num feats " << f.size() << endl;
-
-    //vector<R3> ps;
-    //for(int i = 0; i < f.size(); i++) ps.push_back(R3(f[i].x, f[i].y, f[i].z));
-
-    //Pixel3DSet(ps).save_obj("C:/Users/s2807774/Desktop/a.obj");
-
-	//v2.save_obj("/home/luke/Desktop/a.obj", 256, 0.2f);
-	//v2.threshold(0.6f);
-	//v2.pixel3dset(0.0f).save_obj("/home/luke/Desktop/a.obj");
-	
 	return 0;
 }
-
-
-
-

@@ -1,5 +1,6 @@
 #include "LSift.h"
 #include "../basics/R3.h"
+#include "../basics/LTimer.h"
 
 using namespace cv;
 using namespace ll_R3;
@@ -1204,5 +1205,20 @@ namespace LukeLincoln
         return 1;
     }
 
+
+	Mat sift3DRegister(Pixel3DSet & object1, Pixel3DSet & object2, double & seconds, bool isScaled, int volumeSize)
+	{
+		
+		VMat VA(volumeSize, object1, 0.0f, true);
+		VMat VB(volumeSize, object2, 0.0f, true);
+		VA.resize(128);
+		VB.resize(128);
+		LTimer t; t.start();
+		Mat ret = lukes_siftRegister(VA, VB, true, 50, 1.5f);
+		ret = VMat::transformation_matrix(volumeSize, 0.0f, 0.0f, 0.0f, volumeSize / (float)VA.s, 0.0f, 0.0f, 0.0f) * ret * VMat::transformation_matrix(volumeSize, 0.0f, 0.0f, 0.0f, VA.s / (float)volumeSize, 0.0f, 0.0f, 0.0f);
+		t.stop();
+		seconds = t.getSeconds();
+		return ret.clone();
+	}
 }
 
