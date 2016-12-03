@@ -292,7 +292,7 @@ namespace LukeLincoln
         }
 
         LVol(const LVol & c) { copyIn(c); }
-        LVol & operator = (const LVol & c) { if(this != &c) copyIn(c); return *this; }
+        LVol & operator = (const LVol & c) { if(this != &c) {copyIn(c);} return *this; }
 
 
         //destructor
@@ -479,7 +479,12 @@ namespace LukeLincoln
             int S = width * height * depth;
             for(int i = 0; i < S; i++) data[i] = v;
         }
+
+
     };
+
+
+    Pixel3DSet makePixel3DSet(LVol<cv::Vec3b> & in);
 
 }
 

@@ -379,7 +379,7 @@ namespace ll_pix3d
 
 	SIObj Pixel3DSet::siobj()
 	{
-		SIObj rv(size(), 0);
+        SIObj rv(size(), 0);
 		for(int i = 0; i < size(); i++)
 		{
 			rv._points[i] = points[i];

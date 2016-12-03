@@ -81,8 +81,9 @@ void exp1(string name, vector<int> frames)
 	//CapturePixel3DSet video(name, 10);
     CapturePixel3DSet video = CapturePixel3DSet::openCustom("/home/luke/lcppdata/pix3dc/films", name, 2);
 
-	//Pixel3DSet output;
-    LukeLincoln::LVol<Vec3b> output(64, 64, 64, Vec3b(0,0,0));
+	LukeLincoln::LVol<Vec3b> output(64, 64, 64, Vec3b(0,0,0));
+
+    output(20,20,20) = Vec3b(255, 0,0);
 
 	Mat accMatrix = Mat::eye(Size(4, 4), CV_32FC1);
 	Pix3D frame1, frame2;
@@ -92,7 +93,6 @@ void exp1(string name, vector<int> frames)
 	video.read_frame(frame1, frames[0]);
 	{
         Pixel3DSet _frame1(frame1);
-        //output += _frame1;
         output.add(_frame1.points, _frame1.colors);
 	}
 
@@ -137,24 +137,15 @@ void exp1(string name, vector<int> frames)
 
 		b.transform_set(accMatrix);
 
-		//output += b;
 		cout << "adding " << output.add(b.points, b.colors) << " out of " << b.points.size() << endl;;
-		//cout << "output size: " << output.size() << endl;
-		//output.unionFilter(b, 1.0f);
-		//cout << "output size reduced to : " << output.size() << endl;
 
-		if (_i % 3 == 0)
-		{
-			//cout << "output size: " << output.size() << endl;
-			//output.basicMinFilter(0.5f);
-			//cout << "output size reduced to : " << output.size() << endl;
-		}
 		frame1 = frame2;
 	}
 	//cout << "saving" << endl;
 
-	//output.reduce(256);
-	//SIObj(output.points).saveOBJ("C:/Users/luke/Desktop/result2.obj");
+	Pixel3DSet obj = LukeLincoln::makePixel3DSet(output);
+	obj.save_obj("/home/luke/Desktop/one.obj");
+
 	#ifdef USINGGPU
 	LLPointers::setPtr("object", &output);
     ll_experiments::viewPixel3DSet();

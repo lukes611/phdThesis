@@ -1770,4 +1770,28 @@ VMat VMat::resize(int ns)
 }
 
 
+Pixel3DSet LukeLincoln::makePixel3DSet(LVol<cv::Vec3b> & in)
+{
+
+
+    std::vector<cv::Vec3b> cols;
+    std::vector<R3> pnts;
+    for(int z = 0; z < in.depth; z++)
+    {
+        for(int y = 0; y < in.height; y++)
+        {
+            for(int x = 0; x < in.width; x++)
+            {
+                if(in(x,y,z) != cv::Vec3b(0,0,0))
+                {
+                    cols.push_back(in(x,y,z));
+                    cv::Point3i _(x,y,z);
+                    pnts.push_back(in.unIndex(_));
+                }
+            }
+        }
+    }
+    return Pixel3DSet(pnts, cols);
+
+}
 
