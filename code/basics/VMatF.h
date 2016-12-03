@@ -245,6 +245,242 @@ public:
 
 };
 
+namespace LukeLincoln
+{
 
+
+    template <class T>
+    class LVol{
+    public:
+        int width, height, depth;
+        R3 corner;
+        float resolution; //number of items per voxel
+        T * data;
+        int widthTimesHeight;
+
+        //default constructor
+        LVol()
+        {
+            width = height = depth = widthTimesHeight = 0;
+            corner = R3();
+            resolution = 1.0f;
+            data = NULL;
+        }
+        //basic constructor
+        LVol(int width, int height, int depth, T defaultValue = 0)
+        {
+            corner = R3();
+            resolution = 1.0f;
+            this->width = width;
+            this->height = height;
+            this->depth = depth;
+            this->widthTimesHeight = width * height;
+            data = new T[width * height * depth];
+            setEach(defaultValue);
+        }
+
+        LVol(R3 & ncorner, int w, int h, int d, float res, T defaultVal = 0)
+        {
+            corner = ncorner;
+            resolution = res;
+            this->width = w;
+            this->height = h;
+            this->depth = d;
+            this->widthTimesHeight = width * height;
+            data = new T[width * height * depth];
+            setEach(defaultVal);
+        }
+
+        LVol(const LVol & c) { copyIn(c); }
+        LVol & operator = (const LVol & c) { if(this != &c) copyIn(c); return *this; }
+
+
+        //destructor
+        ~LVol() { free(); }
+
+        void free()
+        {
+            if(width > 0 && height > 0 && depth > 0)
+            {
+                width = height = depth = 0;
+                delete [] data;
+            }
+        }
+
+        void copyIn(const LVol & c)
+        {
+            free();
+            corner = c.corner;
+            resolution = c.resolution;
+            width = c.width;
+            height = c.height;
+            depth = c.depth;
+            widthTimesHeight = width * height;
+            int SS = width * height * depth;
+            data = new T[SS];
+            for(int i = 0; i < SS; i++) data[i]=c.data[i];
+
+
+        }
+
+
+
+        //gets the index into the volume given a real point
+        cv::Point3i index(ll_R3::R3 & p)
+        {
+            ll_R3::R3 x = (p - corner) / resolution;
+            return cv::Point3i(x.x + 0.5f, x.y + 0.5f, x.z + 0.5f);
+        }
+
+        //gets the real point from a given volume index
+        ll_R3::R3 unIndex(cv::Point3i & p)
+        {
+            ll_R3::R3 ret((float)p.x, (float)p.y, (float)p.z);
+            return ret*resolution + corner;
+        }
+
+        //returns true is a given index is within bounds
+        bool inbounds(cv::Point3i & p)
+        {
+            return  p.x >= 0 && p.y >= 0 && p.z >= 0
+            &&      p.x < width && p.y < height && p.z < depth;
+        }
+
+        ll_R3::R3 getMax()
+        {
+            cv::Point3i p(width, height, depth);
+            return unIndex(p);
+        }
+
+        //returns the stats about a given set of points
+        void stats(std::vector<R3> & points, R3 & cornerOut, R3 & maxCorn)
+        {
+            if(points.size() == 0) return;
+            cornerOut = points[0];
+            maxCorn = points[0];
+            for(int i = 1; i < points.size(); i++)
+            {
+                cornerOut.min(points[i]);
+                maxCorn.max(points[i]);
+            }
+            maxCorn;
+            R3 one(2.0f, 2.0f, 2.0f);
+            maxCorn += one;
+            cornerOut -= one;
+        }
+
+        //returns a boolean whether the volume must be resized for the given list,
+        //if true then the new corner and w,h,d are returned
+        bool mustResize(std::vector<R3> & points, R3 & newCorner, cv::Point3i & newSizes)
+        {
+            R3 cr, mc;
+            //get the stats on the new set of points
+            stats(points, cr, mc);
+            //std::cout << "got mc << " << mc << std::endl;
+            //std::cout << "current is << " << getMax() << std::endl;
+
+            //set the possible new corner and size
+            newCorner = corner;
+            R3 newMx = getMax();
+            newCorner.min(cr);
+            newMx.max(mc);
+
+
+            //if they are the same as the old, no resize necessary
+            if(newCorner == corner && newMx == getMax()) return false;
+
+            //std::cout << "should change the newS to " << newMx << std::endl;
+            //else compute the new sizes and return true
+            newMx = (newMx-newCorner) / resolution;
+            newSizes = cv::Point3i(newMx.x, newMx.y, newMx.z);
+
+            return true;
+
+        }
+
+        //add vector<R3> and vector<T> without and with resize and without
+        //returns the number of points added
+        int addWithoutResize(std::vector<R3> & points, std::vector<T> & data)
+        {
+            int counter = 0;
+            for(int i = 0; i < points.size(); i++)
+            {
+                R3 point = points[i];
+                cv::Point3i ind = index(point);
+                if(inbounds(ind))
+                {
+                    this->operator()(ind.x, ind.y, ind.z) = data[i];
+                    counter++;
+                }else
+                {
+                    //std::cout << "could not add: " << point << " in " << getMax() << std::endl;
+                }
+            }
+            return counter;
+        }
+
+        int add(std::vector<R3> & points, std::vector<T> & data)
+        {
+            R3 nc; cv::Point3i ns;
+            bool mr = mustResize(points, nc, ns);
+
+            if(!mr) return addWithoutResize(points, data);
+            else
+            {
+                double sizeMB = (sizeof(T) * ns.x * ns.y * ns.z);
+                sizeMB /= (1024.0 * 1024.0);
+                //std::cout << "sz: " << sizeMB << std::endl;
+                if(sizeMB > 3000.0) return addWithoutResize(points, data);
+
+
+                //std::cout << "changing size to " << ns << " and corner to " << nc << "\n";
+                //std::cin.get();
+
+                LVol<T> cp(nc, ns.x+10, ns.y+10, ns.z+10, resolution);
+
+                for(int z = 0; z < depth; z++)
+                {
+                    for(int y=0; y < height; y++)
+                    {
+                        for(int x = 0; x < width; x++)
+                        {
+                            cv::Point3i from(x,y,z);
+                            T d = this->operator()(x,y,z);
+                            R3 to = unIndex(from);
+                            cv::Point3i reIndex = cp.index(to);
+                            if(cp.inbounds(reIndex))
+                                cp(reIndex.x, reIndex.y, reIndex.z) = d;
+                        }
+                    }
+                }
+                int rv = cp.addWithoutResize(points, data);
+
+                *this = cp;
+                return rv;
+            }
+        }
+
+
+        T & operator () (int x, int y, int z)
+        {
+            return data[z * widthTimesHeight + y * width + x];
+        }
+
+        //return how large it is in mb
+        double numMB()
+        {
+            double scalar = 1024.0 * 1024.0; scalar = 1.0 / scalar;
+            return scalar * (double)(sizeof(T) * width * height * depth);
+        }
+
+        //set each value to this
+        void setEach(T & v)
+        {
+            int S = width * height * depth;
+            for(int i = 0; i < S; i++) data[i] = v;
+        }
+    };
+
+}
 
 

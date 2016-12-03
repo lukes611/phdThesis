@@ -848,7 +848,7 @@ namespace ll_pix3d
 	{
         cout << full_path + "/info" << endl;
 		ifstream fi(full_path + "/info", ios::in);
-		if(!fi.is_open()) ll_error("error in Pixel3DSetWriter::update_info_file, could not open file");
+		if(!fi.is_open()) ll_error("error in CapturePixel3DSet::update_info_file, could not open file");
 		fi >> total_number_of_frames;
 		fi.close();
 		index = 0;

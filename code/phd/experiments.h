@@ -4,6 +4,7 @@
 #include <vector>
 #include <map>
 
+//#define HASGL
 
 
 namespace ll_experiments
@@ -39,6 +40,8 @@ namespace ll_experiments
 	std::vector<int> rng(int from, int to);
 	std::vector<int> rng(int from, int to, int inc);
 
+#ifdef HASGL
 	//set Pixel3DSet object in LLPointers by key "object"
 	void viewPixel3DSet();
+#endif
 }

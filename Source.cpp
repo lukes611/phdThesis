@@ -2,20 +2,24 @@
 #include <string>
 #include <vector>
 
-//#define USINGGPU 
+//#define USINGGPU
 
-#include "code\basics\locv3.h"
-#include "code\basics\R3.h"
-#include "code\basics\llCamera.h"
-#include "code\basics\VMatF.h"
-#include "code\basics\LTimer.h"
-#include "code\phd\Licp.h"
-#include "code\phd\measurements.h"
-#include "code\phd\fmRansac.h"
-#include "code\pc\TheVolumePhaseCorrelator.h"
-#include "code\phd\Lpcr.h"
-#include "code\script\LScript.h"
-#include "code\phd\experiments.h"
+#include "code/basics/locv3.h"
+
+
+#include "code/basics/R3.h"
+#include "code/basics/llCamera.h"
+#include "code/basics/VMatF.h"
+#include "code/basics/LTimer.h"
+#include "code/phd/Licp.h"
+#include "code/phd/measurements.h"
+#include "code/phd/fmRansac.h"
+#include "code/pc/TheVolumePhaseCorrelator.h"
+#ifdef USINGGPU
+#include "code/phd/Lpcr.h"
+#endif
+#include "code/script/LScript.h"
+#include "code/phd/experiments.h"
 #include "code/phd/LSift.h"
 
 using namespace std;
@@ -29,7 +33,7 @@ using namespace ll_experiments;
 //using namespace cv;
 
 //proto-type for experiments: VMat pc(VMat a, VMat b, double & time, Mat & transform, double & mse);
-//to-do:= pc, ipc, 
+//to-do:= pc, ipc,
 
 /*
 read in 1 x Pixel3DSets
@@ -63,18 +67,22 @@ errors, seconds per experiment
 writes error to csv format file: data name, algorithm errorx, error y, error z times. description
 
 
+
+
 */
 
 
-#include "code\basics\BitReaderWriter.h"
+#include "code/basics/BitReaderWriter.h"
 
 
 
 void exp1(string name, vector<int> frames)
 {
-	CapturePixel3DSet video(name, 10);
+	//CapturePixel3DSet video(name, 10);
+    CapturePixel3DSet video = CapturePixel3DSet::openCustom("/home/luke/lcppdata/pix3dc/films", name, 2);
 
-	Pixel3DSet output;
+	//Pixel3DSet output;
+    LukeLincoln::LVol<Vec3b> output(64, 64, 64, Vec3b(0,0,0));
 
 	Mat accMatrix = Mat::eye(Size(4, 4), CV_32FC1);
 	Pix3D frame1, frame2;
@@ -82,7 +90,11 @@ void exp1(string name, vector<int> frames)
 
 	//add first frame to the output
 	video.read_frame(frame1, frames[0]);
-	output += Pixel3DSet(frame1);
+	{
+        Pixel3DSet _frame1(frame1);
+        //output += _frame1;
+        output.add(_frame1.points, _frame1.colors);
+	}
 
 	for (int _i = 1; _i < frames.size(); _i++)
 	{
@@ -97,9 +109,9 @@ void exp1(string name, vector<int> frames)
 
 		Mat _m = Mat::eye(Size(4, 4), CV_32FC1);
 
-		cout << "matching " << currentIndex << " with " << frames[_i - 1] << endl;
-		//cout << "worked " << ll_fmrsc::registerPix3D("surf", frame2, frame1, _m, seconds, true, 50) << endl;;
-		_m = LukeLincoln::sift3DRegister(b, a, seconds, true, 256);
+		cout << "matching " << currentIndex << " with " << frames[_i - 1] << " ";
+		cout << "worked " << ll_fmrsc::registerPix3D("surf", frame2, frame1, _m, seconds, true, 50) << endl;
+		//_m = LukeLincoln::sift3DRegister(b, a, seconds, true, 256);
 		//_m = ll_pc::pc_register_pca_i(b, a, seconds);
 		//_m = ll_pc::pc_register(b, a, seconds);
 		//_m = ll_pc::pc_register_pca(b, a, seconds, true, 256);
@@ -109,7 +121,7 @@ void exp1(string name, vector<int> frames)
 		//_m = ll_pca::register_pca(b, a, seconds, 256);
 
 		//_m.convertTo(_m, CV_32FC1);
-		cout << "error: " << error << endl;
+		//cout << "error: " << error << endl;
 
 
 		//b.transform_set(_m);
@@ -125,25 +137,28 @@ void exp1(string name, vector<int> frames)
 
 		b.transform_set(accMatrix);
 
-		output += b;
-		cout << "output size: " << output.size() << endl;
+		//output += b;
+		cout << "adding " << output.add(b.points, b.colors) << " out of " << b.points.size() << endl;;
+		//cout << "output size: " << output.size() << endl;
 		//output.unionFilter(b, 1.0f);
-		cout << "output size reduced to : " << output.size() << endl;
+		//cout << "output size reduced to : " << output.size() << endl;
 
 		if (_i % 3 == 0)
 		{
-			cout << "output size: " << output.size() << endl;
-			output.basicMinFilter(0.5f);
-			cout << "output size reduced to : " << output.size() << endl;
+			//cout << "output size: " << output.size() << endl;
+			//output.basicMinFilter(0.5f);
+			//cout << "output size reduced to : " << output.size() << endl;
 		}
 		frame1 = frame2;
 	}
-	cout << "saving" << endl;
+	//cout << "saving" << endl;
 
 	//output.reduce(256);
 	//SIObj(output.points).saveOBJ("C:/Users/luke/Desktop/result2.obj");
+	#ifdef USINGGPU
 	LLPointers::setPtr("object", &output);
-	ll_experiments::viewPixel3DSet();
+    ll_experiments::viewPixel3DSet();
+    #endif
 
 
 }
@@ -224,14 +239,10 @@ void quantitativeExperiment(string algorithm_name,
 
 
 
-int add(int a) {
-	if (LLPointers::has("b")) return a + LLPointers::get<int>("b");
-	return a;
-}
-
 int main(int argc, char * * argv)
 {
 	exp1("Apartment.Texture.rotate", ll_experiments::rng(0, 10, 2));
+
 
 
 

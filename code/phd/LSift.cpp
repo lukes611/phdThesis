@@ -1,6 +1,7 @@
 #include "LSift.h"
 #include "../basics/R3.h"
 #include "../basics/LTimer.h"
+#include "experiments.h"
 
 using namespace cv;
 using namespace ll_R3;
@@ -1164,7 +1165,7 @@ namespace LukeLincoln
         return tMat * (scaleMatrix * rotationMatrix);
     }
 
-    
+
     int lukesRansac(vector<Point3f> & src, vector<Point3f> & dst, Mat & H, vector<bool> & inliers, float maxError)
     {
         inliers = vector<bool>(src.size());
@@ -1208,7 +1209,7 @@ namespace LukeLincoln
 
 	Mat sift3DRegister(Pixel3DSet & object1, Pixel3DSet & object2, double & seconds, bool isScaled, int volumeSize)
 	{
-		
+
 		VMat VA(volumeSize, object1, 0.0f, true);
 		VMat VB(volumeSize, object2, 0.0f, true);
 		VA.resize(128);

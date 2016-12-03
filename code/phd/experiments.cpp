@@ -2,7 +2,9 @@
 
 using namespace std;
 #include "../basics/Pixel3DSet.h"
+#ifdef HASGL
 #include "../basics/ll_gl.h"
+#endif
 #include "../basics/R3.h"
 #include "../basics/llCamera.h"
 
@@ -32,7 +34,7 @@ void viewVideo(string name, bool viewColor, bool viewDepth, bool viewVD, int wks
 	for(int i = 0; i < video.size(); i++)
 	{
 		video.read(p);
-		
+
 		if(viewColor)
 		{
 			p.colorImage(color);
@@ -50,7 +52,7 @@ void viewVideo(string name, bool viewColor, bool viewDepth, bool viewVD, int wks
 			p.vdImage(vd);
 			imshow("vd",vd);
 		}
-		
+
 		if(viewColor || viewDepth || viewVD)
 		{
 			if (wks > 0) waitKey(wks);
@@ -73,22 +75,23 @@ vector<int> rng(int from, int to, int inc)
 	return ret;
 }
 
+#ifdef HASGL
 
 void viewPixel3DSet()
 {
 	ll_gl::default_glut_main("lukes phd project", 640, 480);
-	
+
 	Fps_cam * camera = new Fps_cam(R3(40,40,-60), 90.0f, 90.0f);
 	LLPointers::setPtr("camera", camera);
 
 	glutDisplayFunc([]()->void
 	{
-		
+
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		Fps_cam * camera = LLPointers::getPtr<Fps_cam>("camera");
 		ll_gl::default_viewing(*camera);
-		
+
 		ll_gl::default_lighting();
 		ll_gl::turn_off_lights();
 
@@ -119,8 +122,8 @@ void viewPixel3DSet()
 		}
 	});
 	glutReshapeFunc([](int wi, int he)->void{
-		
-	}); 
+
+	});
 	glutMotionFunc([](int x, int y)->void{
 		Fps_cam * camera = LLPointers::getPtr<Fps_cam>("camera");
 		camera->mouse(x,y);
@@ -131,6 +134,8 @@ void viewPixel3DSet()
 	});
 	glutMainLoop();
 }
+
+#endif
 
 }
 
