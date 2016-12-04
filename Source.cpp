@@ -66,6 +66,15 @@ errors, seconds per experiment
 
 writes error to csv format file: data name, algorithm errorx, error y, error z times. description
 
+filename:
+algorithm_name.data_name
+version number,
+data name
+description
+frame number
+frame number 2
+errors...
+
 
 
 
@@ -140,7 +149,9 @@ void exp1(string name, vector<int> frames)
 		b.transform_set(accMatrix);
 
 		double hde, msee, pme;
+		LTimer ___; ___.start();
 		ll_measure::error_metrics(a, b, hde, msee, pme);
+		___.stop(); cout << "measuring error takes" << ___.getSeconds() << endl;
 
 		cout << hde << " " << msee << " " << pme << endl;
 

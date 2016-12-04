@@ -274,7 +274,7 @@ namespace ll_pix3d
         double averageLeafSize();
 
         bool NN(Pixel3DSet & pset, ll_R3::R3 & q, int & index, ll_R3::R3 & w);
-        void NN(Pixel3DSet & pset, ll_R3::R3 & q, int & index, ll_R3::R3 & w, float & distance, bool & isFound); //q=query point, w=closest point
+        void NN(Pixel3DSet & pset, ll_R3::R3 & q, int & index, ll_R3::R3 & p, float & w); //q=query point, w=closest point
 
 	};
 

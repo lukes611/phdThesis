@@ -1596,37 +1596,39 @@ namespace ll_pix3d
 
     bool LKDNode::NN(Pixel3DSet & pset, R3 & q, int & index, R3 & w)
     {
-        bool iff = false; float dist;
-        w = _p;
-        NN(pset, q, index, w, dist, iff);
-        return iff;
+        float dist = DBL_MAX;
+        R3 p = _p;
+        NN(pset, q, index, p, dist);
+        w = pset[index];
+        return true;
     }
-    void LKDNode::NN(Pixel3DSet & pset, R3 & q, int & index, R3 & w, float & distance, bool & isFound)
+    void LKDNode::NN(Pixel3DSet & pset, R3 & q, int & index, R3 & p, float & w)
     {
         if(isLeaf())
         {
             for(int i = 0; i < indices.size(); i++)
             {
-                R3 p = pset[indices[i]];
-                float m = p.dist(q);
-                if(m < distance || !isFound)
+                R3 pnt = pset[indices[i]];
+                float _w = pnt.dist(q);
+                if(_w < w)
                 {
-                    distance = m;
-                    w = p;
+                    w = _w;
+                    p = _p;
                     index = indices[i];
-                    isFound = true;
+                    //isFound = true;
                 }
             }
         }else
         {
             if(q[axis] <= value) //search left first
             {
-                if(q[axis]-w[axis] <= value) left->NN(pset, q, index, w, distance, isFound);
-                if(q[axis]+w[axis] > value) right->NN(pset, q, index, w, distance, isFound);
-            }else
+                //if closest distance is less than distance from q to the pivot
+                if(q[axis]-w <= value) left->NN(pset, q, index, p, w);
+                if(q[axis]+w > value) right->NN(pset, q, index, p, w);
+            }else //search right first
             {
-                if(q[axis]+w[axis] > value) right->NN(pset, q, index, w, distance, isFound);
-                if(q[axis]-w[axis] <= value) left->NN(pset, q, index, w, distance, isFound);
+                if(q[axis]+w > value) right->NN(pset, q, index, p, w);
+                if(q[axis]-w <= value) left->NN(pset, q, index, p, w);;
             }
         }
     }

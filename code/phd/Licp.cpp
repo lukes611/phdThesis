@@ -138,7 +138,7 @@ double closestPointsf(Pixel3DSet & src, Pixel3DSet & dst, vector<int> & indexes,
 {
     //cout << "timing " << endl;
     double error;
-    //LTimer t; t.start();
+    LTimer t; t.start();
 	distances.clear();
 	indexes.clear();
 	#ifndef USE_KD
@@ -152,8 +152,8 @@ double closestPointsf(Pixel3DSet & src, Pixel3DSet & dst, vector<int> & indexes,
 
 
 	LKDNode n; n.init(dst);
-    n.split(dst);
-    cout << n.averageLeafSize() << endl;
+    n.split(dst, 0, 15);
+    //cout << n.averageLeafSize() << endl;
     error = 0.0;
     for(int i = 0; i < src.size(); i++)
     {
@@ -161,7 +161,7 @@ double closestPointsf(Pixel3DSet & src, Pixel3DSet & dst, vector<int> & indexes,
         R3 w;
         int index = 0;
         n.NN(dst,p, index, w);
-        if(i%1000 == 0 )cout << i << " / " << src.size() << endl;
+        //if(i%1000 == 0 )cout << i << " / " << src.size() << endl;
         indexes.push_back(index);
         float D = p.dist(dst[index]);
         distances.push_back(D);
@@ -170,8 +170,8 @@ double closestPointsf(Pixel3DSet & src, Pixel3DSet & dst, vector<int> & indexes,
 
 
 	#endif
-    //t.stop();
-    //cout << "took " << t.getSeconds() << endl;
+    t.stop();
+    cout << "took " << t.getSeconds() << endl;
 
 	return error;
 }
