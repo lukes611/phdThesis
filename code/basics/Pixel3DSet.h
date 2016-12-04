@@ -249,4 +249,33 @@ namespace ll_pix3d
 	};
 
 
+	class LKDNode
+	{
+	public:
+        int axis; //0-x,1-y,2-z
+        float value; //the value of axis to split on
+        LKDNode * left, * right;
+        ll_R3::R3 _p;
+        std::vector<int> indices;
+
+        LKDNode();
+        LKDNode(int ax, float val, ll_R3::R3 & pIn, LKDNode * l = NULL, LKDNode * r = NULL);
+        LKDNode(const LKDNode & input);
+        LKDNode & operator = (const LKDNode & input);
+        void copyIn(const LKDNode & input);
+        void free();
+
+        void init(Pixel3DSet & pset);
+        void split(int chosenAxis, Pixel3DSet & pset);
+        bool isLeaf();
+
+        void split(Pixel3DSet & pset, int startAxis = 0, int maxDepth = 15);
+        void forEach(std::function<void(LKDNode *)> f);
+        double averageLeafSize();
+
+        bool NN(Pixel3DSet & pset, ll_R3::R3 & q, int & index, ll_R3::R3 & w);
+        void NN(Pixel3DSet & pset, ll_R3::R3 & q, int & index, ll_R3::R3 & w, float & distance, bool & isFound); //q=query point, w=closest point
+
+	};
+
 }

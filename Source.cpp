@@ -79,7 +79,7 @@ writes error to csv format file: data name, algorithm errorx, error y, error z t
 void exp1(string name, vector<int> frames)
 {
 	//CapturePixel3DSet video(name, 10);
-    CapturePixel3DSet video = CapturePixel3DSet::openCustom("/home/luke/lcppdata/pix3dc/films", name, 2);
+    CapturePixel3DSet video = CapturePixel3DSet::openCustom("/home/luke/lcppdata/pix3dc/films", name, 1);
 
 	LukeLincoln::LVol<Vec3b> output(64, 64, 64, Vec3b(0,0,0));
 
@@ -96,6 +96,7 @@ void exp1(string name, vector<int> frames)
         output.add(_frame1.points, _frame1.colors);
 	}
 
+
 	for (int _i = 1; _i < frames.size(); _i++)
 	{
 		int currentIndex = frames[_i];
@@ -110,13 +111,13 @@ void exp1(string name, vector<int> frames)
 		Mat _m = Mat::eye(Size(4, 4), CV_32FC1);
 
 		cout << "matching " << currentIndex << " with " << frames[_i - 1] << " ";
-		cout << "worked " << ll_fmrsc::registerPix3D("surf", frame2, frame1, _m, seconds, true, 50) << endl;
+		//cout << "worked " << ll_fmrsc::registerPix3D("surf", frame2, frame1, _m, seconds, true, 50) << endl;
 		//_m = LukeLincoln::sift3DRegister(b, a, seconds, true, 256);
 		//_m = ll_pc::pc_register_pca_i(b, a, seconds);
 		//_m = ll_pc::pc_register(b, a, seconds);
 		//_m = ll_pc::pc_register_pca(b, a, seconds, true, 256);
 		//_m.convertTo(_m, CV_32FC1);
-		//_m = Licp::icp(b, a, _, error, seconds, iters);
+		_m = Licp::icp(b, a, _, error, seconds, iters);
 
 		//_m = ll_pca::register_pca(b, a, seconds, 256);
 
@@ -134,8 +135,15 @@ void exp1(string name, vector<int> frames)
 		//accMatrix = _m * accMatrix;
 		//multiply i by m and add to output
 		//cout << nm.size() << " -> " << ll_type(nm.type()) << endl;
+		//double hde, msee, pme;
 
 		b.transform_set(accMatrix);
+
+		double hde, msee, pme;
+		ll_measure::error_metrics(a, b, hde, msee, pme);
+
+		cout << hde << " " << msee << " " << pme << endl;
+
 
 		cout << "adding " << output.add(b.points, b.colors) << " out of " << b.points.size() << endl;;
 
@@ -232,7 +240,7 @@ void quantitativeExperiment(string algorithm_name,
 
 int main(int argc, char * * argv)
 {
-	exp1("Apartment.Texture.rotate", ll_experiments::rng(0, 10, 2));
+	exp1("Apartment.Texture.rotate", ll_experiments::rng(0, 4, 2));
 
 
 
