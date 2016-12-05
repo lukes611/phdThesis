@@ -66,13 +66,15 @@ errors, seconds per experiment
 
 writes error to csv format file: data name, algorithm errorx, error y, error z times. description
 
+V1.0
 filename:
-algorithm_name.data_name
+data_name.algorithm_name
 version number,
 data name
 description
 frame number
 frame number 2
+amount of error added
 errors...
 
 
@@ -82,6 +84,8 @@ errors...
 
 
 #include "code/basics/BitReaderWriter.h"
+
+
 
 
 
@@ -173,17 +177,49 @@ void exp1(string name, vector<int> frames)
 
 }
 
-void quantitativeExperiment(string algorithm_name,
+void saveV10(string data_name, string alg_name, string desc, int frame1, int frame2, float errorAdded, float seconds, float mse, float pm, float hd)
+{
+    //save output to file
+    cout << "saving..." << endl;
+    #ifdef _WIN32
+    string outDirName = "";
+    #else
+    string outDirName = "/home/luke/gitProjects/phdThesis/experiments";
+    #endif
+
+    stringstream outFn; outFn << outDirName << "/" << data_name << "." << alg_name << ".csv";
+    string header = "data name, algorithm name, description, frame-index 1, frame-index 2, error-added, seconds, mse, percent match, hausdorff distance";
+    string fileName = outFn.str();
+    stringstream outData;
+    outData <<
+    data_name << "," <<
+    alg_name << "," <<
+    desc << "," <<
+    frame1 << "," <<
+    frame2 << "," <<
+    errorAdded << "," <<
+    seconds << "," <<
+    mse << "," <<
+    pm << "," <<
+    hd;
+
+    appendData(fileName, header, outData.str());
+
+
+
+}
+
+void quantitativeExperiment10(string algorithm_name,
 	string data_name,
 	string description,
 	vector<int> frames,
 	float error_added)
 {
-	CapturePixel3DSet video(data_name, 10);
+	CapturePixel3DSet video(data_name, 1);
 	Pix3D frame1, frame2;
 	Pixel3DSet a, b;
 
-	vector<double> times, errors, mses, pmes; //times, errors, mse errors, percent matches
+	//vector<double> times, errors, mses, pmes; //times, errors, mse errors, percent matches
 
 											  //add first frame to the output
 	video.read_frame(frame1, frames[0]);
@@ -234,14 +270,16 @@ void quantitativeExperiment(string algorithm_name,
 		ll_measure::error_metrics(a, b, hde, msee, pme);
 
 		//append data to lists
-		pmes.push_back(pme);
-		mses.push_back(msee);
-		errors.push_back(hde);
-		times.push_back(seconds);
+		//pmes.push_back(pme);
+		//mses.push_back(msee);
+		//errors.push_back(hde);
+		//times.push_back(seconds);
+		saveV10(data_name, algorithm_name, description, frames[_i], frames[_i-1], error_added, seconds, msee, pme, hde);
 
 
 		frame1 = frame2;
 	}
+
 
 
 

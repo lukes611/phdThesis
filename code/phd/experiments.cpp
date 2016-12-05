@@ -75,6 +75,30 @@ vector<int> rng(int from, int to, int inc)
 	return ret;
 }
 
+bool fileIsEmpty(string fileName)
+{
+    ifstream file;
+    file.open(fileName.c_str(), ios::in);
+    file.seekg(0, ios::end);
+    int len = file.tellg();
+    file.close();
+    return len == 0;
+}
+
+void appendData(string fileName, string header, string data, bool includeNewLine)
+{
+    bool isEmpty = fileIsEmpty(fileName);
+    ofstream file;
+    file.open(fileName, ios::out);
+
+    if(isEmpty)
+    {
+        file << header; if(includeNewLine) file << "\n";
+    }
+    file << data; if(includeNewLine) file << "\n";
+    file.close();
+}
+
 #ifdef HASGL
 
 void viewPixel3DSet()

@@ -40,6 +40,10 @@ namespace ll_experiments
 	std::vector<int> rng(int from, int to);
 	std::vector<int> rng(int from, int to, int inc);
 
+	bool fileIsEmpty(std::string fileName);
+    void appendData(std::string fileName, std::string header, std::string data, bool includeNewLine = true);
+
+
 #ifdef HASGL
 	//set Pixel3DSet object in LLPointers by key "object"
 	void viewPixel3DSet();
