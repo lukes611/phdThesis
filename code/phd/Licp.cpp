@@ -138,7 +138,7 @@ double closestPointsf(Pixel3DSet & src, Pixel3DSet & dst, vector<int> & indexes,
 {
     //cout << "timing " << endl;
     double error;
-    LTimer t; t.start();
+    //LTimer t; t.start();
 	distances.clear();
 	indexes.clear();
 	#ifndef USE_KD
@@ -170,8 +170,8 @@ double closestPointsf(Pixel3DSet & src, Pixel3DSet & dst, vector<int> & indexes,
 
 
 	#endif
-    t.stop();
-    cout << "took " << t.getSeconds() << endl;
+    //t.stop();
+    //cout << "took " << t.getSeconds() << endl;
 
 	return error;
 }

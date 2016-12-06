@@ -91,8 +91,12 @@ errors...
 
 void exp1(string name, vector<int> frames)
 {
-	//CapturePixel3DSet video(name, 10);
+
+#ifdef _WIN32
+	CapturePixel3DSet video(name, 1);
+#else
     CapturePixel3DSet video = CapturePixel3DSet::openCustom("/home/luke/lcppdata/pix3dc/films", name, 1);
+#endif
 
 	LukeLincoln::LVol<Vec3b> output(64, 64, 64, Vec3b(0,0,0));
 
@@ -187,7 +191,7 @@ void saveV10(string data_name, string alg_name, string desc, int frame1, int fra
     string outDirName = "/home/luke/gitProjects/phdThesis/experiments";
     #endif
 
-    stringstream outFn; outFn << outDirName << "/" << data_name << "." << alg_name << ".csv";
+    stringstream outFn; outFn << outDirName << "/" << data_name << "." << alg_name << ".v1.0.csv";
     string header = "data name, algorithm name, description, frame-index 1, frame-index 2, error-added, seconds, mse, percent match, hausdorff distance";
     string fileName = outFn.str();
     stringstream outData;
@@ -203,11 +207,46 @@ void saveV10(string data_name, string alg_name, string desc, int frame1, int fra
     pm << "," <<
     hd;
 
+    cout << outData.str() << endl;
+
     appendData(fileName, header, outData.str());
 
 
 
 }
+
+void saveV11(string data_name, string alg_name, string desc, int frame1, int frame2, float errorAdded, float seconds, float mse)
+{
+    //save output to file
+    cout << "saving..." << endl;
+    #ifdef _WIN32
+    string outDirName = "";
+    #else
+    string outDirName = "/home/luke/gitProjects/phdThesis/experiments";
+    #endif
+
+    stringstream outFn; outFn << outDirName << "/" << data_name << "." << alg_name << ".v1.1.csv";
+    string header = "data name, algorithm name, description, frame-index 1, frame-index 2, error-added, seconds, mse";
+    string fileName = outFn.str();
+    stringstream outData;
+    outData <<
+    data_name << "," <<
+    alg_name << "," <<
+    desc << "," <<
+    frame1 << "," <<
+    frame2 << "," <<
+    errorAdded << "," <<
+    seconds << "," <<
+    mse;
+
+    cout << outData.str() << endl;
+
+    appendData(fileName, header, outData.str());
+
+
+
+}
+
 
 void quantitativeExperiment10(string algorithm_name,
 	string data_name,
@@ -215,7 +254,12 @@ void quantitativeExperiment10(string algorithm_name,
 	vector<int> frames,
 	float error_added)
 {
+	#ifdef _WIN32
 	CapturePixel3DSet video(data_name, 1);
+#else
+    CapturePixel3DSet video = CapturePixel3DSet::openCustom("/home/luke/lcppdata/pix3dc/films", data_name, 1);
+#endif
+
 	Pix3D frame1, frame2;
 	Pixel3DSet a, b;
 
@@ -232,6 +276,8 @@ void quantitativeExperiment10(string algorithm_name,
 		double hde, msee, pme;
 		int iters = 0;
 		Pixel3DSet _;
+
+		cout << algorithm_name << " : " << _i << " / " << frames.size() << endl;
 
 		video.read_frame(frame2, currentIndex);
 
@@ -261,7 +307,12 @@ void quantitativeExperiment10(string algorithm_name,
 
 		else if (algorithm_name == "fm") {
 			ll_fmrsc::registerPix3D("surf", frame2, frame1, _m, seconds, true, 150);
+		}else if(algorithm_name == "fm3d"){
+		    _m = LukeLincoln::sift3DRegister(b, a, seconds, true, 256);
+
 		}
+
+
 
 		//:end
 
@@ -286,11 +337,115 @@ void quantitativeExperiment10(string algorithm_name,
 }
 
 
+void quantitativeExperiment11(string algorithm_name,
+	string data_name,
+	string description,
+	vector<int> frames,
+	float error_added)
+{
+	#ifdef _WIN32
+	CapturePixel3DSet video(data_name, 1);
+#else
+    CapturePixel3DSet video = CapturePixel3DSet::openCustom("/home/luke/lcppdata/pix3dc/films", data_name, 1);
+#endif
+
+	Pix3D frame1, frame2;
+	Pixel3DSet a, b;
+
+	//vector<double> times, errors, mses, pmes; //times, errors, mse errors, percent matches
+
+											  //add first frame to the output
+	video.read_frame(frame1, frames[0]);
+
+	for (int _i = 1; _i < frames.size(); _i++)
+	{
+		int currentIndex = frames[_i];
+		//get match _m from i+1 to i
+		double seconds = 0.0;
+		double hde, msee, pme;
+		int iters = 0;
+		Pixel3DSet _;
+
+		cout << algorithm_name << " : " << _i << " / " << frames.size() << endl;
+
+		video.read_frame(frame2, currentIndex);
+
+		a = frame1; b = frame2;
+
+		Mat _m = Mat::eye(Size(4, 4), CV_32FC1);
+
+		//algorithms here:
+		if (algorithm_name == "none") {
+		}
+#ifdef USINGGPU
+		else if (algorithm_name == "pc") {
+			_m = ll_pc::pc_register(b, a, seconds);
+		}
+
+		else if (algorithm_name == "pc2") {
+			_m = ll_pc::pc_register_pca_i(b, a, seconds);
+		}
+#endif
+		else if (algorithm_name == "icp") {
+			_m = Licp::icp(b, a, _, hde, seconds, iters);
+		}
+
+		else if (algorithm_name == "icp2") {
+			_m = Licp::icp_outlierRemoval(b, a, _, hde, seconds, iters, 10.0);
+		}
+
+		else if (algorithm_name == "fm") {
+			ll_fmrsc::registerPix3D("surf", frame2, frame1, _m, seconds, true, 150);
+		}else if(algorithm_name == "fm3d"){
+		    _m = LukeLincoln::sift3DRegister(b, a, seconds, true, 256);
+
+		}
+
+
+
+		//:end
+
+		//compute the errors
+		b.transform_set(_m);
+		//ll_measure::error_metrics(a, b, hde, msee, pme);
+        {
+            VMat A(256, a, 0.0f, true);
+            VMat B(256, b, 0.0f, true);
+            A *= 255.0f;
+            B *= 255.0f;
+            msee = A.mse(B) * 1000.0f;
+            saveV11(data_name, algorithm_name, description, frames[_i], frames[_i-1], error_added, seconds, msee);
+        }
+
+
+
+		frame1 = frame2;
+	}
+
+
+
+
+}
+
+
 
 int main(int argc, char * * argv)
 {
-	exp1("Apartment.Texture.rotate", ll_experiments::rng(0, 4, 2));
 
+    string fn = "Apartment.Texture.rotateXAxis";
+    int start = 4, to = 30, inc = 1;
+    vector<int> inds = ll_experiments::rng(start, to, inc);
+
+
+	//exp1("Apartment.Texture.rotate", ll_experiments::rng(0, 4, 2));
+    quantitativeExperiment10("none", fn, "regular", inds,0.0f);
+    quantitativeExperiment10("fm", fn, "regular", inds,0.0f);
+    //quantitativeExperiment10("fm3d", fn, "regular", inds,0.0f);
+    quantitativeExperiment10("icp", fn, "regular", inds,0.0f);
+    quantitativeExperiment10("icp2", fn, "regular", inds,0.0f);
+    //quantitativeExperiment10("pc", fn, "regular", ll_experiments::rng(0,40,1),0.0f);
+    //quantitativeExperiment10("pc2", fn, "regular", ll_experiments::rng(0,40,1),0.0f);
+    //quantitativeExperiment10("pca", fn, "regular", ll_experiments::rng(0,40,1),0.0f);
 
 
 

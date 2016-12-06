@@ -28,11 +28,13 @@ namespace LukeLincoln
 	}
 	double SiftFeature2D::sad(const SiftFeature2D & o)
 	{
-		return sum(abs(featureVector - o.featureVector))[0];
+        return sum(abs(featureVector - o.featureVector))[0];
 	}
 
 	double SiftFeature3D::sad(const SiftFeature3D & o)
 	{
+        if(featureVector.size().width == 0 || featureVector.size() != o.featureVector.size())
+            return 100000000000.0;
 		return sum(abs(featureVector - o.featureVector))[0];
 	}
 
@@ -44,6 +46,7 @@ namespace LukeLincoln
 
     Point2f SiftFeature2D::truePoint()
     {
+
         return Point2f(x * pow(2.0f, (double)octave), y * pow(2.0f, (double)octave));
     }
 
@@ -209,8 +212,8 @@ namespace LukeLincoln
         partialDerivatives1(m, x, y, z, d.x, d.y, d.z);
         float mag = d.mag();
         if(mag == 0.0f) return p;
-        p.x = atan(d.y / d.x) * 57.3f;
-        p.y = acos(d.z / mag) * 57.3f;
+        p.x = atan(d.y / d.x) * 57.2958f;
+        p.y = acos(d.z / mag) * 57.2958f;
     }
 
     float computeMagnitude(int x, int y, Mat & m)
@@ -365,13 +368,15 @@ namespace LukeLincoln
 		Mat angles = Mat::zeros(Size(18, 18), CV_32FC1);
 
 
+
+
 		for (int z = feature.z - rsfh, _z = 0; z <= feature.z + rsfh; z++, _z++)
 		{
 			for (int y = feature.y - rsfh, _y = 0; y <= feature.y + rsfh; y++, _y++)
 			{
 				for (int x = feature.x - rsfh, _x = 0; x <= feature.x + rsfh; x++, _x++)
 				{
-					Point2f O = computeOrientation(x, y, z, image);
+                    Point2f O = computeOrientation(x, y, z, image);
 					int binX = (int)((O.x + 90.0f) / 10.0f);
 					int binY = (int)((O.y) / 10.0f);
 					if (binX >= 0 && binX < 18 && binY >= 0 && binY < 18)
@@ -390,11 +395,6 @@ namespace LukeLincoln
 			{
 				float v = angles.at<float>(y, x);
 				if (v >= 0.8f) ret.push_back(Point2f(x * 10.0f - 90.0f, y * 10.0f));
-				/*if (best < v)
-				{
-					best = v;
-					bestInd = ret.size() - 1;
-				}*/
 			}
 		}
 
@@ -772,6 +772,8 @@ namespace LukeLincoln
 	{
 		vector<tuple<SiftFeature3D, SiftFeature3D, double>> matches;
 
+
+		if(fvs1.size() != fvs2.size() || fvs1.size() < 1) return;
 		//correl norm	= 32
 		//correl		= 32
 		//sad norm		= 36
@@ -1059,20 +1061,15 @@ namespace LukeLincoln
 	Mat lukes_siftRegister(VMat & a, VMat & b, bool sort, int getTopXFeatures, double allowedError)
 	{
 		vector<Point3f> src, dst;
-		Mat c, ret, matrix;
-		lukes_sift(a, b, src, dst, sort, getTopXFeatures);
-
-		//for (int i = 0; i < src.size(); i++)
-		{
-			//cout << "matched ( " << src[i] << " , " << dst[i] << " )\n";
-
-		}
+		Mat ret = Mat::eye(Size(4,3), CV_32FC1), matrix = Mat::eye(Size(4,4), CV_32FC1);
+        lukes_sift(a, b, src, dst, sort, getTopXFeatures);
 		vector<bool> inliers;
 		//int rv = estimateAffine3D(src, dst, ret, inliers, 1.0, 0.999999999999);
 		int rv = lukesRansac(src, dst, ret, inliers, 1.1f);
+
 		//cout << inliers << endl;
 		//cout << ret << endl;
-		matrix = Mat::eye(Size(4, 4), CV_32FC1);
+
 		for (int y = 0; y < 3; y++)
 		{
 			for (int x = 0; x < 4; x++)
@@ -1168,14 +1165,16 @@ namespace LukeLincoln
 
     int lukesRansac(vector<Point3f> & src, vector<Point3f> & dst, Mat & H, vector<bool> & inliers, float maxError)
     {
+
         inliers = vector<bool>(src.size());
         int numIterations = 100;
         H = Mat::eye(Size(4,4), CV_32FC1);
+        if(src.size() != dst.size() || src.size() < 4) return 0;
         int nBest = 0;
         for(int i = 0; i < numIterations; i++)
         {
-			cout << "num inliers: " << nBest << endl;
-            vector<Point3f> p1sub, p2sub;
+			//cout << "num inliers: " << nBest << endl;
+			vector<Point3f> p1sub, p2sub;
             for(int j = 0; j < 4; j++)
             {
                 int rI = rand() % src.size();
@@ -1212,8 +1211,10 @@ namespace LukeLincoln
 
 		VMat VA(volumeSize, object1, 0.0f, true);
 		VMat VB(volumeSize, object2, 0.0f, true);
-		VA.resize(128);
-		VB.resize(128);
+		VA=VA.resize(128);
+		VB=VB.resize(128);
+
+		std::cout << VA.s << std::endl;
 		LTimer t; t.start();
 		Mat ret = lukes_siftRegister(VA, VB, true, 50, 1.5f);
 		ret = VMat::transformation_matrix(volumeSize, 0.0f, 0.0f, 0.0f, volumeSize / (float)VA.s, 0.0f, 0.0f, 0.0f) * ret * VMat::transformation_matrix(volumeSize, 0.0f, 0.0f, 0.0f, VA.s / (float)volumeSize, 0.0f, 0.0f, 0.0f);

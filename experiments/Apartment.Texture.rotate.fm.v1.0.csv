@@ -1,0 +1,26 @@
+data name, algorithm name, description, frame-index 1, frame-index 2, error-added, seconds, mse, percent match, hausdorff distance
+Apartment.Texture.rotate,fm,regular,5,4,0,0.239689,1.95217,0.885627,0.462944
+Apartment.Texture.rotate,fm,regular,6,5,0,0.226308,6.02475,0.849718,0.590329
+Apartment.Texture.rotate,fm,regular,7,6,0,0.223452,1687.43,0.230844,18.4279
+Apartment.Texture.rotate,fm,regular,8,7,0,0.232947,2860.1,0.367257,23.356
+Apartment.Texture.rotate,fm,regular,9,8,0,0.227189,82.7732,0.727149,1.39909
+Apartment.Texture.rotate,fm,regular,10,9,0,0.206781,19.3902,0.77164,0.859037
+Apartment.Texture.rotate,fm,regular,11,10,0,0.208837,10.5655,0.678491,1.01678
+Apartment.Texture.rotate,fm,regular,12,11,0,0.213031,3099.38,0.231087,24.1224
+Apartment.Texture.rotate,fm,regular,13,12,0,0.196755,16138.7,0.218667,55.3352
+Apartment.Texture.rotate,fm,regular,14,13,0,0.209273,1593.91,0.230719,17.8964
+Apartment.Texture.rotate,fm,regular,15,14,0,0.211326,6913.09,0.468123,10.061
+Apartment.Texture.rotate,fm,regular,16,15,0,0.199993,196.338,0.586864,1.91705
+Apartment.Texture.rotate,fm,regular,17,16,0,0.205627,13.626,0.599208,1.42392
+Apartment.Texture.rotate,fm,regular,18,17,0,0.207989,34.8904,0.467843,2.63237
+Apartment.Texture.rotate,fm,regular,19,18,0,0.217616,5980.46,0.247298,30.4836
+Apartment.Texture.rotate,fm,regular,20,19,0,0.222305,21.1813,0.540359,1.75063
+Apartment.Texture.rotate,fm,regular,21,20,0,0.228625,14.7178,0.569935,1.51577
+Apartment.Texture.rotate,fm,regular,22,21,0,0.231272,145.617,0.455849,3.66914
+Apartment.Texture.rotate,fm,regular,23,22,0,0.2335,36.4598,0.590574,1.7228
+Apartment.Texture.rotate,fm,regular,24,23,0,0.245707,96.0118,0.62586,1.55675
+Apartment.Texture.rotate,fm,regular,25,24,0,0.238431,191.315,0.503888,3.52612
+Apartment.Texture.rotate,fm,regular,26,25,0,0.240628,117.85,0.554295,2.21911
+Apartment.Texture.rotate,fm,regular,27,26,0,0.244537,203.541,0.632991,2.20272
+Apartment.Texture.rotate,fm,regular,28,27,0,0.263186,513.769,0.452492,5.128
+Apartment.Texture.rotate,fm,regular,29,28,0,0.272661,145.414,0.599611,1.64029

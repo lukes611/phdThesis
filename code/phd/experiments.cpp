@@ -79,6 +79,9 @@ bool fileIsEmpty(string fileName)
 {
     ifstream file;
     file.open(fileName.c_str(), ios::in);
+
+    if(!file.is_open()) return true;
+
     file.seekg(0, ios::end);
     int len = file.tellg();
     file.close();
@@ -89,8 +92,9 @@ void appendData(string fileName, string header, string data, bool includeNewLine
 {
     bool isEmpty = fileIsEmpty(fileName);
     ofstream file;
-    file.open(fileName, ios::out);
+    file.open(fileName, ios::app);
 
+    cout << "is empty : " << isEmpty << endl;
     if(isEmpty)
     {
         file << header; if(includeNewLine) file << "\n";

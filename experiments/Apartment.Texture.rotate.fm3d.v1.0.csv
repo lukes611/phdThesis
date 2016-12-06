@@ -1,0 +1,26 @@
+data name, algorithm name, description, frame-index 1, frame-index 2, error-added, seconds, mse, percent match, hausdorff distance
+Apartment.Texture.rotate,fm3d,regular,5,4,0,70.6891,2.34442,0.876063,0.491501
+Apartment.Texture.rotate,fm3d,regular,6,5,0,70.6621,6.97869,0.745563,0.770158
+Apartment.Texture.rotate,fm3d,regular,7,6,0,70.6921,1711.19,0.220487,18.0133
+Apartment.Texture.rotate,fm3d,regular,8,7,0,70.9203,2841.01,0.266773,23.8736
+Apartment.Texture.rotate,fm3d,regular,9,8,0,70.5948,62.8233,0.464734,2.1838
+Apartment.Texture.rotate,fm3d,regular,10,9,0,70.6124,22.7734,0.429979,1.90064
+Apartment.Texture.rotate,fm3d,regular,11,10,0,70.5021,53.5264,0.446745,1.85019
+Apartment.Texture.rotate,fm3d,regular,12,11,0,70.6358,3100.43,0.132755,26.307
+Apartment.Texture.rotate,fm3d,regular,13,12,0,70.7132,19865.9,0.0568886,64.0344
+Apartment.Texture.rotate,fm3d,regular,14,13,0,70.6036,2020.94,0.129652,20.4216
+Apartment.Texture.rotate,fm3d,regular,15,14,0,70.7039,607.877,0.146893,9.67044
+Apartment.Texture.rotate,fm3d,regular,16,15,0,70.6828,224.815,0.211244,4.0074
+Apartment.Texture.rotate,fm3d,regular,17,16,0,70.6579,472.862,0.197446,4.44695
+Apartment.Texture.rotate,fm3d,regular,18,17,0,70.7578,1646.29,0.147509,6.65363
+Apartment.Texture.rotate,fm3d,regular,19,18,0,71.0627,3988.64,0.0651546,27.9312
+Apartment.Texture.rotate,fm3d,regular,20,19,0,70.6087,91.7726,0.153212,4.37702
+Apartment.Texture.rotate,fm3d,regular,21,20,0,70.6262,127.696,0.0982701,4.94388
+Apartment.Texture.rotate,fm3d,regular,22,21,0,70.6795,1629.16,0.0345613,11.6937
+Apartment.Texture.rotate,fm3d,regular,23,22,0,70.6064,183.876,0.0963283,5.77021
+Apartment.Texture.rotate,fm3d,regular,24,23,0,70.6613,414.005,0.280808,3.33381
+Apartment.Texture.rotate,fm3d,regular,25,24,0,70.6322,250.155,0.0644636,9.26426
+Apartment.Texture.rotate,fm3d,regular,26,25,0,70.891,74.147,0.25454,3.4783
+Apartment.Texture.rotate,fm3d,regular,27,26,0,70.6676,580.742,0.19609,4.64565
+Apartment.Texture.rotate,fm3d,regular,28,27,0,70.7378,652.814,0.0801812,9.62441
+Apartment.Texture.rotate,fm3d,regular,29,28,0,70.6504,252.114,0.238782,3.22339

@@ -1,0 +1,26 @@
+data name, algorithm name, description, frame-index 1, frame-index 2, error-added, seconds, mse, percent match, hausdorff distance
+Apartment.Texture.rotateXAxis,none,regular,5,4,0,0,86.979,0.261082,3.08855
+Apartment.Texture.rotateXAxis,none,regular,6,5,0,0,236.82,0.214429,4.80936
+Apartment.Texture.rotateXAxis,none,regular,7,6,0,0,5161.36,0.18247,11.3491
+Apartment.Texture.rotateXAxis,none,regular,8,7,0,0,227.292,0.601373,2.10866
+Apartment.Texture.rotateXAxis,none,regular,9,8,0,0,317.227,0.154545,10.3862
+Apartment.Texture.rotateXAxis,none,regular,10,9,0,0,643.26,0.21216,4.13877
+Apartment.Texture.rotateXAxis,none,regular,11,10,0,0,280.148,0.376807,2.38474
+Apartment.Texture.rotateXAxis,none,regular,12,11,0,0,269.135,0.267513,4.54057
+Apartment.Texture.rotateXAxis,none,regular,13,12,0,0,590.001,0.148114,6.27455
+Apartment.Texture.rotateXAxis,none,regular,14,13,0,0,32.9023,0.431461,1.89207
+Apartment.Texture.rotateXAxis,none,regular,15,14,0,0,282.845,0.141289,4.86872
+Apartment.Texture.rotateXAxis,none,regular,16,15,0,0,1767.67,0.135451,23.6112
+Apartment.Texture.rotateXAxis,none,regular,17,16,0,0,98.7286,0.318377,2.60064
+Apartment.Texture.rotateXAxis,none,regular,18,17,0,0,162.74,0.408186,2.50544
+Apartment.Texture.rotateXAxis,none,regular,19,18,0,0,489.523,0.122578,11.4667
+Apartment.Texture.rotateXAxis,none,regular,20,19,0,0,2033.87,0.0687133,28.1651
+Apartment.Texture.rotateXAxis,none,regular,21,20,0,0,1158.41,0.0770011,18.3994
+Apartment.Texture.rotateXAxis,none,regular,22,21,0,0,5505.07,0.0534427,34.9226
+Apartment.Texture.rotateXAxis,none,regular,23,22,0,0,5729.01,0.337809,4.56315
+Apartment.Texture.rotateXAxis,none,regular,24,23,0,0,128.925,0.602995,1.65903
+Apartment.Texture.rotateXAxis,none,regular,25,24,0,0,48.2376,0.453195,2.22826
+Apartment.Texture.rotateXAxis,none,regular,26,25,0,0,850.308,0.560454,2.3571
+Apartment.Texture.rotateXAxis,none,regular,27,26,0,0,803.142,0.163883,10.9633
+Apartment.Texture.rotateXAxis,none,regular,28,27,0,0,482.34,0.267103,8.90518
+Apartment.Texture.rotateXAxis,none,regular,29,28,0,0,91.7809,0.599988,1.98057
