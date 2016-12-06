@@ -773,7 +773,7 @@ namespace LukeLincoln
 		vector<tuple<SiftFeature3D, SiftFeature3D, double>> matches;
 
 
-		if(fvs1.size() != fvs2.size() || fvs1.size() < 1) return;
+		if(fvs1.size() < 1 || fvs2.size() < 1) return;
 		//correl norm	= 32
 		//correl		= 32
 		//sad norm		= 36
@@ -1025,9 +1025,10 @@ namespace LukeLincoln
 		vector<LukeLincoln::SiftFeature3D> f1 = findMultiScaleFeatures(im, 1);
 		vector<SiftFeature3D> f2 = findMultiScaleFeatures(im2, 1);
 
+		
 		vector<Point3f> p1, p2;
 		computeMatches(f1, f2, p1, p2, sort, top);
-
+		
 
 
 		int Count = 0, Total = 0;
@@ -1157,7 +1158,7 @@ namespace LukeLincoln
         float smatptr[16] = {scale, 0.0f, 0.0f, 0.0f, 0.0f, scale, 0.0f, 0.0f, 0.0f, 0.0f, scale, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f};
         Mat scaleMatrix(Size(4,4), CV_32FC1, smatptr);
         Mat tMat = VMat::transformation_matrix(0, 0.0f, 0.0f, 0.0f, 1.0f, trans.x, trans.y, trans.z);
-
+		//cout << "trans: " << trans << endl;
 
         return tMat * (scaleMatrix * rotationMatrix);
     }
@@ -1167,7 +1168,8 @@ namespace LukeLincoln
     {
 
         inliers = vector<bool>(src.size());
-        int numIterations = 100;
+		//cout << "i have " << src.size() << " points to work with" << endl;
+        int numIterations = 500;
         H = Mat::eye(Size(4,4), CV_32FC1);
         if(src.size() != dst.size() || src.size() < 4) return 0;
         int nBest = 0;
@@ -1209,16 +1211,30 @@ namespace LukeLincoln
 	Mat sift3DRegister(Pixel3DSet & object1, Pixel3DSet & object2, double & seconds, bool isScaled, int volumeSize)
 	{
 
-		VMat VA(volumeSize, object1, 0.0f, true);
-		VMat VB(volumeSize, object2, 0.0f, true);
-		VA=VA.resize(128);
-		VB=VB.resize(128);
+		Pixel3DSet tmp1 = object1;
+		Pixel3DSet tmp2 = object2;
+		float scTo = 128 / (float)volumeSize;
+		float scToi = volumeSize / 128.0f;
+		
 
-		std::cout << VA.s << std::endl;
+		R3 ct(128.0f, 128.0f, 128.0f);
+		ct *= 0.0f;
+		Mat To128 = tmp1.transformation_matrix(0.0f, 0.0f, 0.0f, 0.5f, 0.0f, 0.0f, 0.0f, ct);
+		Mat From128 = tmp1.transformation_matrix(0.0f, 0.0f, 0.0f, 2.0f, 0.0f, 0.0f, 0.0f, ct);
+		//cout << To128 << " -> " << From128 << endl;
+		
+		VMat VA(volumeSize, tmp1, 0.0f, true);
+		VMat VB(volumeSize, tmp2, 0.0f, true);
+
+
+		VA=VA.resizeFwd(128);
+		VB=VB.resizeFwd(128);
 		LTimer t; t.start();
-		Mat ret = lukes_siftRegister(VA, VB, true, 50, 1.5f);
-		ret = VMat::transformation_matrix(volumeSize, 0.0f, 0.0f, 0.0f, volumeSize / (float)VA.s, 0.0f, 0.0f, 0.0f) * ret * VMat::transformation_matrix(volumeSize, 0.0f, 0.0f, 0.0f, VA.s / (float)volumeSize, 0.0f, 0.0f, 0.0f);
+		Mat ret = lukes_siftRegister(VA, VB, true, 50, 1.0f);
+		
+		ret = From128 * ret * To128;
 		t.stop();
+		
 		seconds = t.getSeconds();
 		return ret.clone();
 	}

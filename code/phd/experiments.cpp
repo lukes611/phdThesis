@@ -1,4 +1,5 @@
 #include "experiments.h"
+#include <fstream>
 
 using namespace std;
 #include "../basics/Pixel3DSet.h"
@@ -101,6 +102,13 @@ void appendData(string fileName, string header, string data, bool includeNewLine
     }
     file << data; if(includeNewLine) file << "\n";
     file.close();
+}
+
+ll_pix3d::CapturePixel3DSet openData(string name, int numFrames)
+{
+	stringstream path;
+	path << LCPPDATA_DIR << "/pix3dc/films";
+	return CapturePixel3DSet::openCustom(path.str(), name, numFrames);
 }
 
 #ifdef HASGL

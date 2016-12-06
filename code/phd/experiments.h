@@ -3,12 +3,37 @@
 #include <string>
 #include <vector>
 #include <map>
+#include "../basics/Pixel3DSet.h"
 
-//#define HASGL
+#define AT_UNI //i am at uni
+
+#ifdef _WIN32 //if on windows
+#define HASGL //use openGL
+
+#ifdef AT_UNI //if at uni and windows
+
+#define LCPPDATA_DIR "C:/lcppdata"
+#define DESKTOP_DIR "C:/Users/s2807774/Desktop"
+
+#else //on windows laptop
+
+#define HASCUDA
+
+#endif
+
+
+#else //using linux on my laptop
+
+
+
+#endif
+
 
 
 namespace ll_experiments
 {
+
+
 
 	class LLPointers{
 		static std::map<std::string, void *> * access();
@@ -42,6 +67,8 @@ namespace ll_experiments
 
 	bool fileIsEmpty(std::string fileName);
     void appendData(std::string fileName, std::string header, std::string data, bool includeNewLine = true);
+
+	ll_pix3d::CapturePixel3DSet openData(std::string name, int numFrames);
 
 
 #ifdef HASGL

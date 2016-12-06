@@ -1760,13 +1760,52 @@ VMat VMat::resize(int ns)
             for(int x = 0; x < ns; x++)
             {
                 R3 other(x,y,z);
-                other *= (ns / (float) s);
+                other *= (s / (float) ns);
                 ret.at(x,y,z) = at(other);
             }
         }
     }
 
     return ret;
+}
+
+VMat VMat::resizeFwd(int ns)
+{
+	VMat ret = ns;
+	VMat tmp = ns;
+	tmp.setAll(0.0f);
+
+	for (int z = 0; z < s; z++)
+	{
+		for (int y = 0; y < s; y++)
+		{
+			for (int x = 0; x < s; x++)
+			{
+				float val = at(x, y, z);
+				R3 other = R3(x,y,z) * (ns / (float)s);
+				other=other.round();
+				if (ret.inbounds(other.x, other.y, other.z))
+				{
+					ret.at(other.x, other.y, other.z) += val;
+					tmp.at(other.x, other.y, other.z) += 1.0f;
+				}
+					
+			}
+		}
+	}
+
+	for (int z = 0; z < ns; z++)
+	{
+		for (int y = 0; y < ns; y++)
+		{
+			for (int x = 0; x < ns; x++)
+			{
+				if (tmp.at(x, y, z) > 0.0f) ret.at(x, y, z) /= tmp.at(x, y, z);
+			}
+		}
+	}
+
+	return ret;
 }
 
 

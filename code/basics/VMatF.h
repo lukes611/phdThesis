@@ -241,6 +241,7 @@ public:
 	//correlate
     void filter(VMat & filter);
     VMat resize(int ns);
+	VMat resizeFwd(int ns);
 
 
 };
