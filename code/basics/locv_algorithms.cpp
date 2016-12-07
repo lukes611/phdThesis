@@ -386,13 +386,36 @@ namespace ll_algorithms
 			ll_algorithms::ll_pca_3d::LPCA pc1(p1, 0.2f, LPCA::COMPUTE_2);
 			ll_algorithms::ll_pca_3d::LPCA pc2(p2, 0.2f, LPCA::COMPUTE_2);
 
-			//hello
+			float datapc1[16] = {
+				pc1.eigenvecs[0].x, pc1.eigenvecs[1].x, pc1.eigenvecs[2].x, 0.0f,
+				pc1.eigenvecs[0].y, pc1.eigenvecs[1].y, pc1.eigenvecs[2].y, 0.0f,
+				pc1.eigenvecs[0].z, pc1.eigenvecs[1].z, pc1.eigenvecs[2].z, 0.0f,
+				0.0f, 0.0f, 0.0f, 1.0f
+			};
+
+			float datapc2[16] = {
+				pc2.eigenvecs[0].x, pc2.eigenvecs[1].x, pc2.eigenvecs[2].x, 0.0f,
+				pc2.eigenvecs[0].y, pc2.eigenvecs[1].y, pc2.eigenvecs[2].y, 0.0f,
+				pc2.eigenvecs[0].z, pc2.eigenvecs[1].z, pc2.eigenvecs[2].z, 0.0f,
+				0.0f, 0.0f, 0.0f, 1.0f
+			};
+
+			Mat pc1Rm(Size(4,4), CV_32FC1, datapc1);
+			Mat pc2Rm(Size(4,4), CV_32FC1, datapc2);
+			Mat pc1RmT = pc1Rm; pc1RmT = pc1RmT.t();
+			Mat pc2RmT = pc2Rm; pc2RmT = pc2RmT.t();
+			
 			Mat ret = Mat::eye(Size(4,4), CV_32FC1);
 
 			/*
 				sum mean, un-rotate by self, rotate by other, add other's mean
 			*/
-			Mat unMean = Pixel3DSet::transformation_matrix(0.0f, 0.0f, 0.0f, 1.0f, -pc1.mean.x, -pc1.mean.y, -pc1.mean.z);
+			Mat unMean = Pixel3DSet::transformation_matrix(0.0f, 0.0f, 0.0f, 1.0f, -pc1.mean.x, -pc1.mean.y, -pc1.mean.z, R3());
+			Mat meanIt = Pixel3DSet::transformation_matrix(0.0f, 0.0f, 0.0f, 1.0f, pc2.mean.x, pc2.mean.y, pc2.mean.z, R3());
+
+			ret = unMean * pc1RmT * pc2Rm * meanIt;
+
+			cout << ret << endl;
 
 			return ret.clone();
 		}

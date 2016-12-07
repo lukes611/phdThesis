@@ -175,7 +175,7 @@ void testSetPix3d(string name)
 	//	test(name, Point3d(0.0, 0.0, 0.0), 1.0f, Point3d(x, 0.0, 0.0));
 	//for(double S = 0.9; S <= 1.2; S += 0.5)
 	//	test(name, Point3d(0.0, 0.0, 0.0), S, Point3d(0.0, 0.0, 0.0));
-
+	
 	for(int y = 0; y < 30; y+=10)
 	{
 		for(int x = 0; x < 30; x+=10)
