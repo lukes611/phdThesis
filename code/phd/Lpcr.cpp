@@ -57,9 +57,10 @@ namespace ll_pca
 Mat register_pca(Pixel3DSet & object1, Pixel3DSet & object2, double & seconds, int volumeSize)
 {
 	LTimer t; t.start();
-	VMat VA(volumeSize, object1, 0.0f, true);
-	VMat VB(volumeSize, object2, 0.0f, true);
-	Mat ret = VMat::pca(VA, VB);
+	//VMat VA(volumeSize, object1, 0.0f, true);
+	//VMat VB(volumeSize, object2, 0.0f, true);
+	//Mat ret = VMat::pca(VA, VB);
+	Mat ret = ll_algorithms::ll_pca_3d::LPCA::compute_alignment_for_pc(object1, object2);
 	t.stop();
 	seconds = t.getSeconds();
 	return ret.clone();

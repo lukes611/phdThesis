@@ -81,8 +81,8 @@ void test(string name, Point3d rotation, float scale, Point3d translation, bool 
 	//algorithms.push_back("fm");
 	//algorithms.push_back("fm3d");
 	//algorithms.push_back("icp");
-	algorithms.push_back("pc");
-	algorithms.push_back("pc2");
+	//algorithms.push_back("pc");
+	//algorithms.push_back("pc2");
 	algorithms.push_back("pca");
 
 
@@ -166,18 +166,21 @@ void test(string name, Point3d rotation, float scale, Point3d translation, bool 
 
 void testSetPix3d(string name)
 {
-	for(int Y = 0; Y < 360; Y+=10)
-		test(name, Point3d(0.0, Y, 0.0), 1.0f, Point3d(0.0, 0.0, 0.0)); 
-	for(int x = 0; x < 160; x+=10)
-		test(name, Point3d(0.0, 0.0, 0.0), 1.0f, Point3d(x, 0.0, 0.0));
-	for(double S = 0.9; S <= 1.2; S += 0.5)
-		test(name, Point3d(0.0, 0.0, 0.0), S, Point3d(0.0, 0.0, 0.0));
+	//test(name, Point3d(), 1.0f, Point3d());
+	cout << "**************" << endl;
+	test(name, Point3d(0.0, 0.0, 0.0), 1.0f, Point3d(20.0, 0.0, 0.0));
+	//for(int Y = 0; Y < 360; Y+=10)
+	//	test(name, Point3d(0.0, Y, 0.0), 1.0f, Point3d(0.0, 0.0, 0.0)); 
+	//for(int x = 0; x < 160; x+=10)
+	//	test(name, Point3d(0.0, 0.0, 0.0), 1.0f, Point3d(x, 0.0, 0.0));
+	//for(double S = 0.9; S <= 1.2; S += 0.5)
+	//	test(name, Point3d(0.0, 0.0, 0.0), S, Point3d(0.0, 0.0, 0.0));
 
 	for(int y = 0; y < 30; y+=10)
 	{
 		for(int x = 0; x < 30; x+=10)
-			for(int z = 0; z < 30; z += 10)
-				test(name, Point3d(x, y, z), 1.0f, Point3d(10.0, 5.0, 2.0));
+			for(int z = 0; z < 30; z += 10);
+				//test(name, Point3d(x, y, z), 1.0f, Point3d(10.0, 5.0, 2.0));
 	}
 	
 }
