@@ -77,13 +77,13 @@ void test(string name, Point3d rotation, float scale, Point3d translation, bool 
 	}
 
 	vector<string> algorithms;
-	algorithms.push_back("none");
-	algorithms.push_back("fm");
-	algorithms.push_back("fm3d");
-	algorithms.push_back("icp");
-	//algorithms.push_back("pc");
-	//algorithms.push_back("pc2");
-	//algorithms.push_back("pca");
+	//algorithms.push_back("none");
+	//algorithms.push_back("fm");
+	//algorithms.push_back("fm3d");
+	//algorithms.push_back("icp");
+	algorithms.push_back("pc");
+	algorithms.push_back("pc2");
+	algorithms.push_back("pca");
 
 
 
@@ -108,6 +108,18 @@ void test(string name, Point3d rotation, float scale, Point3d translation, bool 
 		{
 			M2 = LukeLincoln::sift3DRegister(f1, f2, seconds, true, 256);
 		}
+#ifdef HASCUDA
+		else if(algorithms[i] == "pc")
+		{
+			M2 = ll_pc::pc_register(f1, f2, seconds);
+		}else if(algorithms[i] == "pc2")
+		{
+			M2 = ll_pc::pc_register_pca_i(f1, f2, seconds, 3);
+		}else if(algorithms[i] == "pca")
+		{
+			M2 = ll_pca::register_pca(f1, f2, seconds, 256);
+		}
+#endif
 			
 		
 		//measure error
@@ -122,8 +134,14 @@ void test(string name, Point3d rotation, float scale, Point3d translation, bool 
 		}
 
 		double percentMatch = 100.0 * (numMatches / count);
+		stringstream line; line << algorithms[i] << ", " << rotation.x << ", " << rotation.y << ", " << rotation.z <<
+			scale << ", " << translation.x << ", " << translation.y << ", " << translation.z << ", " << percentMatch << ", " << seconds;
+
 		//print error
 		cout << "algorithm[" << algorithms[i] << "] had " << percentMatch << "% matching rate" << endl;
+		ll_experiments::appendData(string(EXPS_DIR) + string("/") + name + string(".tests.csv"),
+			string("algorithm, rx, ry, rz, scale, tx, ty, tz, percent match, seconds"),
+			line.str());
 
 #ifdef HASGL
 		if(algorithms[i] == "="){
@@ -144,6 +162,24 @@ void test(string name, Point3d rotation, float scale, Point3d translation, bool 
 
 
 
+}
+
+void testSetPix3d(string name)
+{
+	for(int Y = 0; Y < 360; Y+=10)
+		test(name, Point3d(0.0, Y, 0.0), 1.0f, Point3d(0.0, 0.0, 0.0)); 
+	for(int x = 0; x < 160; x+=10)
+		test(name, Point3d(0.0, 0.0, 0.0), 1.0f, Point3d(x, 0.0, 0.0));
+	for(double S = 0.9; S <= 1.2; S += 0.5)
+		test(name, Point3d(0.0, 0.0, 0.0), S, Point3d(0.0, 0.0, 0.0));
+
+	for(int y = 0; y < 30; y+=10)
+	{
+		for(int x = 0; x < 30; x+=10)
+			for(int z = 0; z < 30; z += 10)
+				test(name, Point3d(x, y, z), 1.0f, Point3d(10.0, 5.0, 2.0));
+	}
+	
 }
 
 
@@ -239,12 +275,8 @@ void saveV10(string data_name, string alg_name, string desc, int frame1, int fra
 {
     //save output to file
     cout << "saving..." << endl;
-    #ifdef _WIN32
-    string outDirName = "";
-    #else
-    string outDirName = "/home/luke/gitProjects/phdThesis/experiments";
-    #endif
-
+    string outDirName = EXPS_DIR;
+    
     stringstream outFn; outFn << outDirName << "/" << data_name << "." << alg_name << ".v1.0.csv";
     string header = "data name, algorithm name, description, frame-index 1, frame-index 2, error-added, seconds, mse, percent match, hausdorff distance";
     string fileName = outFn.str();
@@ -342,7 +374,7 @@ void quantitativeExperiment10(string algorithm_name,
 		//algorithms here:
 		if (algorithm_name == "none") {
 		}
-#ifdef USINGGPU
+#ifdef HASCUDA
 		else if (algorithm_name == "pc") {
 			_m = ll_pc::pc_register(b, a, seconds);
 		}
@@ -363,7 +395,6 @@ void quantitativeExperiment10(string algorithm_name,
 			ll_fmrsc::registerPix3D("surf", frame2, frame1, _m, seconds, true, 150);
 		}else if(algorithm_name == "fm3d"){
 		    _m = LukeLincoln::sift3DRegister(b, a, seconds, true, 256);
-
 		}
 
 
@@ -431,7 +462,7 @@ void quantitativeExperiment11(string algorithm_name,
 		//algorithms here:
 		if (algorithm_name == "none") {
 		}
-#ifdef USINGGPU
+#ifdef HASCUDA
 		else if (algorithm_name == "pc") {
 			_m = ll_pc::pc_register(b, a, seconds);
 		}
@@ -486,13 +517,14 @@ void quantitativeExperiment11(string algorithm_name,
 int main(int argc, char * * argv)
 {
 
-    string fn = "Apartment.Texture.rotateXAxis";
+    string fn = "Apartment.Texture.rotate";
     int start = 4, to = 30, inc = 1;
     vector<int> inds = ll_experiments::rng(start, to, inc);
 
+	testSetPix3d(fn);
 
 	//exp1("Apartment.Texture.rotate", ll_experiments::rng(15, 20, 1));
-	test("Apartment.Texture.rotate", Point3d(5.0f, 2.0f, 0.0f), 1.0f, Point3d(0.0, 1.0, 8.0));
+	//test("Apartment.Texture.rotate", Point3d(5.0f, 2.0f, 0.0f), 1.0f, Point3d(0.0, 1.0, 8.0));
     //quantitativeExperiment10("none", fn, "regular", inds,0.0f);
     //quantitativeExperiment10("fm", fn, "regular", inds,0.0f);
     //quantitativeExperiment10("fm3d", fn, "regular", inds,0.0f);
