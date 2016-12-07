@@ -1356,6 +1356,7 @@ Mat VMat::pca_lukes_pc_t(VMat & v1, VMat & v2, bool edge_detect, Size s)
 	return rv.clone();
 }
 
+//not do not use this function for regular registration
 Mat VMat::pca(VMat & v1, VMat & v2, bool edge_detect, float clean_amount)
 {
 	VMat s1 = v1.clone();
