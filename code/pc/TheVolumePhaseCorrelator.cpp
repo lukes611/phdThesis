@@ -46,7 +46,7 @@ namespace ll_volume_gpu
 	Mat pca_phase_correlate_rst(VMat & v1_in, VMat & v2_in)
 	{
 		//set identity
-		Mat rv = VMat::transformation_matrix(v1_in.s, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f);
+		Mat rv = Mat::eye(Size(4,4), CV_32FC1);
 		//copy both
 		VMat v1 = v1_in;
 		VMat v2 = v2_in;

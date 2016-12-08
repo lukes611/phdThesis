@@ -22,6 +22,9 @@ namespace ll_pc
 
 	//does pc_register_pca a number of times to get a better registration
 	cv::Mat pc_register_pca_i(ll_pix3d::Pixel3DSet & object1, ll_pix3d::Pixel3DSet & object2, double & seconds, int count = 2, int volumeSize = 256);
+
+	//uses pca, pc and icp to find the transform
+	cv::Mat pc_pca_icp(ll_pix3d::Pixel3DSet & object1, ll_pix3d::Pixel3DSet & object2, double & seconds, bool isScaled = true, int volumeSize = 256);
 }
 
 namespace ll_pca

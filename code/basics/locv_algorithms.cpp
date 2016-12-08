@@ -188,12 +188,15 @@ namespace ll_algorithms
 
 			//Perform PCA analysis
 			PCA pca_analysis(data_pts, Mat(), CV_PCA_DATA_AS_ROW);
+			
 
 			//Store the position of the object
 			R3 pos = R3(static_cast<float>(pca_analysis.mean.at<double>(0, 0)),
 								static_cast<float>(pca_analysis.mean.at<double>(0, 1)),
 								static_cast<float>(pca_analysis.mean.at<double>(0, 2))
 						);
+
+			cout << "got mean " << pos << endl;
 
 			//Store the eigenvalues and eigenvectors
 			vector<R3> eigen_vecs(3);
@@ -218,6 +221,17 @@ namespace ll_algorithms
 
 		void LPCA::compute2(vector<R3> & pts)
 		{
+
+			if(pts.size() < 3)
+			{
+				eigenvecs[0] = R3(0.0f, 1.0f, 0.0f);
+				eigenvecs[1] = R3(1.0f, 0.0f, 0.0f);
+				eigenvecs[2] = R3(0.0f, 0.0f, 1.0f);
+				mean = R3();
+
+				return;
+			}
+
 			//Construct a buffer used by the pca analysis
 			Mat data_pts = Mat(pts.size(), 3, CV_64FC1);
 			for (int i = 0; i < data_pts.rows; ++i)
@@ -227,36 +241,43 @@ namespace ll_algorithms
 				data_pts.at<double>(i, 2) = (double)pts[i].z;
 			}
 
+
 			//Perform PCA analysis
 			PCA pca_analysis(data_pts, Mat(), CV_PCA_DATA_AS_ROW);
+			
 
 			//Store the position of the object
 			R3 pos = R3(pca_analysis.mean.at<double>(0, 0),
 								pca_analysis.mean.at<double>(0, 1),
 								pca_analysis.mean.at<double>(0, 2));
-
+			//cout << pos << endl;
 			//Store the eigenvalues and eigenvectors
-			vector<R3> eigen_vecs(3);
-			vector<double> eigen_val(3);
+			//vector<R3> eigen_vecs(3);
+			//vector<double> eigen_val(3);
+			//cout << pca_analysis.eigenvectors << endl;
+			//cout << pca_analysis.eigenvalues << endl;
 			for (int i = 0; i < 3; ++i)
 			{
-				eigen_vecs[i] = R3(pca_analysis.eigenvectors.at<double>(i, 0),
-										pca_analysis.eigenvectors.at<double>(i, 1),
-										pca_analysis.eigenvectors.at<double>(i, 2));
+				//eigen vecs are the cols
+				//eigenvecs[i] = R3(pca_analysis.eigenvectors.at<double>(0, i),pca_analysis.eigenvectors.at<double>(1, i),pca_analysis.eigenvectors.at<double>(2, i));
+				//eigen vecs are the rows
+				eigenvecs[i] = R3(pca_analysis.eigenvectors.at<double>(i, 0),pca_analysis.eigenvectors.at<double>(i, 1),pca_analysis.eigenvectors.at<double>(i, 2));
 
-				eigen_val[i] = pca_analysis.eigenvalues.at<double>(0, i);
+				eigenvals[i] = pca_analysis.eigenvalues.at<double>(0, i);
 			}
-			eigenvals[0] = eigen_val[0];
-			eigenvals[1] = eigen_val[1];
-			eigenvals[2] = eigen_val[2];
 
- 			eigenvecs[0] = eigen_vecs[0].unit();
-			eigenvecs[1] = R3(1.0f, 0.0f, 0.0f);
-			eigenvecs[2] = eigenvecs[1] ^ eigenvecs[0];
-			eigenvecs[1] = eigenvecs[0] ^ eigenvecs[2];
-			eigenvecs[0].normalize();
-			eigenvecs[1].normalize();
-			eigenvecs[2].normalize();
+			//eigenvals[0] = eigen_val[0];
+			//eigenvals[1] = eigen_val[1];
+			//eigenvals[2] = eigen_val[2];
+			
+
+ 			//eigenvecs[0] = eigen_vecs[0].unit();
+			//eigenvecs[1] = R3(1.0f, 0.0f, 0.0f);
+			//eigenvecs[2] = eigenvecs[1] ^ eigenvecs[0];
+			//eigenvecs[1] = eigenvecs[0] ^ eigenvecs[2];
+			//eigenvecs[0].normalize();
+			//eigenvecs[1].normalize();
+			//eigenvecs[2].normalize();
 			mean = pos;
 		}
 
@@ -377,6 +398,65 @@ namespace ll_algorithms
 
 			return m.clone();
 		}
+
+		Mat LPCA::pca_register(ll_pix3d::Pixel3DSet & p1, ll_pix3d::Pixel3DSet & p2)
+		{
+			ll_algorithms::ll_pca_3d::LPCA pc1(p1.points, LPCA::COMPUTE_2);
+			ll_algorithms::ll_pca_3d::LPCA pc2(p2.points, LPCA::COMPUTE_2);
+
+			float datapc1[16] = {
+				pc1.eigenvecs[0].x, pc1.eigenvecs[1].x, pc1.eigenvecs[2].x, 0.0f,
+				pc1.eigenvecs[0].y, pc1.eigenvecs[1].y, pc1.eigenvecs[2].y, 0.0f,
+				pc1.eigenvecs[0].z, pc1.eigenvecs[1].z, pc1.eigenvecs[2].z, 0.0f,
+				0.0f, 0.0f, 0.0f, 1.0f
+			};
+
+			/*cout << pc1.eigenvecs[0] << " -> " << pc2.eigenvecs[0] << endl;
+			cout << pc1.eigenvecs[1] << " -> " << pc2.eigenvecs[1] << endl;
+			cout << pc1.eigenvecs[2] << " -> " << pc2.eigenvecs[2] << endl;
+
+			cout << pc1.eigenvals[0] << " -> " << pc2.eigenvals[0] << endl;
+			cout << pc1.eigenvals[1] << " -> " << pc2.eigenvals[1] << endl;
+			cout << pc1.eigenvals[2] << " -> " << pc2.eigenvals[2] << endl;
+			cout << "()()()()()()" << endl;*/
+
+			float datapc2[16] = {
+				pc2.eigenvecs[0].x, pc2.eigenvecs[1].x, pc2.eigenvecs[2].x, 0.0f,
+				pc2.eigenvecs[0].y, pc2.eigenvecs[1].y, pc2.eigenvecs[2].y, 0.0f,
+				pc2.eigenvecs[0].z, pc2.eigenvecs[1].z, pc2.eigenvecs[2].z, 0.0f,
+				0.0f, 0.0f, 0.0f, 1.0f
+			};
+
+			Mat pc1Rm(Size(4,4), CV_32FC1, datapc1);
+			Mat pc2Rm(Size(4,4), CV_32FC1, datapc2);
+			Mat pc1RmT; transpose(pc1Rm, pc1RmT);
+			Mat pc2RmT; transpose(pc2Rm, pc2RmT);
+
+
+			
+			Mat ret = Mat::eye(Size(4,4), CV_32FC1);
+
+			/*
+				um mean, un-rotate by self, rotate by other, add other's mean
+			*/
+			Mat unMean = Pixel3DSet::transformation_matrix(0.0f, 0.0f, 0.0f, 1.0f, -pc1.mean.x, -pc1.mean.y, -pc1.mean.z, R3());
+			Mat meanIt = Pixel3DSet::transformation_matrix(0.0f, 0.0f, 0.0f, 1.0f, pc2.mean.x, pc2.mean.y, pc2.mean.z, R3());
+			//cout << unMean << endl << meanIt << endl;
+			//cout << pc1.mean << endl;
+			//cout << pc2.mean << endl;
+			//cout << unMean << endl;
+			//cout << meanIt << endl;
+			//cout << pc1Rm << endl << pc2Rm << endl;// << (pc1RmT*pc1Rm) << endl;
+			//cout << pc2Rm << endl;
+
+			ret = meanIt * pc2Rm * pc1RmT * unMean;
+
+			//cout << ret << endl;
+
+			return ret.clone();
+		}
+
+
 
 		R3 LPCA::best_eigen_vec()
 		{

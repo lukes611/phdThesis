@@ -1356,6 +1356,7 @@ Mat VMat::pca_lukes_pc_t(VMat & v1, VMat & v2, bool edge_detect, Size s)
 	return rv.clone();
 }
 
+//not do not use this function for regular registration
 Mat VMat::pca(VMat & v1, VMat & v2, bool edge_detect, float clean_amount)
 {
 	VMat s1 = v1.clone();
@@ -1687,10 +1688,35 @@ Mat VMat::pca_correct_right()
 Mat VMat::pca_correct_up()
 {
 	Pixel3DSet p = pixel3dset();
-	ll_algorithms::ll_pca_3d::LPCA pc1(p, 0.2f, ll_algorithms::ll_pca_3d::LPCA::COMPUTE_2);
-	R3 newUp = pc1.eigenvecs[0];
-	R3 center = pc1.mean;
-	Mat m = new_up_mat(newUp, center);
+	ll_algorithms::ll_pca_3d::LPCA pc(p.points, ll_algorithms::ll_pca_3d::LPCA::COMPUTE_2);
+	//R3 newUp = pc1.eigenvecs[0];
+	float mean2Origin_data[] = {
+		1.0f, 0.0f, 0.0f, -pc.mean.x,
+		0.0f, 1.0f, 0.0f, -pc.mean.y,
+		0.0f, 0.0f, 1.0f, -pc.mean.z,
+		0.0f, 0.0f, 0.0f, 1.0f,
+	}; Mat mean2Origin(Size(4,4), CV_32FC1, mean2Origin_data);
+	float HS = s * 0.5f;
+	float originToVolCenter_data[] = {
+		1.0f, 0.0f, 0.0f, HS,
+		0.0f, 1.0f, 0.0f, HS,
+		0.0f, 0.0f, 1.0f, HS,
+		0.0f, 0.0f, 0.0f, 1.0f,
+	}; Mat originToVolCenter(Size(4,4), CV_32FC1, originToVolCenter_data);
+
+	float orthoAlign_data[] = {
+		pc.eigenvecs[1].x, pc.eigenvecs[0].x, pc.eigenvecs[2].x, 0.0f,
+		pc.eigenvecs[1].y, pc.eigenvecs[0].y, pc.eigenvecs[2].y, 0.0f,
+		pc.eigenvecs[1].z, pc.eigenvecs[0].z, pc.eigenvecs[2].z, 0.0f,
+		0.0f, 0.0f, 0.0f, 1.0f,
+	}; Mat orthoAlign(Size(4,4), CV_32FC1, orthoAlign_data);
+	transpose(orthoAlign, orthoAlign);
+
+
+	Mat m = originToVolCenter * orthoAlign * mean2Origin;
+
+	//R3 center = pc1.mean;
+	//Mat m = new_up_mat(newUp, center);
 	transform_volume_forward(m);
 	return m.clone();
 }
