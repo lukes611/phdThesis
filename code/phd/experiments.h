@@ -8,6 +8,9 @@
 #define AT_UNI //i am at uni
 
 #ifdef _WIN32 //if on windows
+
+
+
 #define HASGL //use openGL
 
 #ifdef AT_UNI //if at uni and windows
@@ -27,6 +30,30 @@
 
 
 #endif
+
+
+
+
+
+
+
+
+
+
+#ifdef _WIN32
+
+windows code goes here
+
+#else
+
+apple code goes here
+
+#endif
+
+
+
+
+
 
 
 
