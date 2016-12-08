@@ -1,0 +1,26 @@
+data name, algorithm name, description, frame-index 1, frame-index 2, error-added, seconds, mse, percent match, hausdorff distance
+Apartment.Texture.rotate,none,regular,5,4,0,0,3.03831,0.8756,0.499573
+Apartment.Texture.rotate,none,regular,6,5,0,0,5.11941,0.746966,0.754007
+Apartment.Texture.rotate,none,regular,7,6,0,0,2430.71,0.221416,20.9976
+Apartment.Texture.rotate,none,regular,8,7,0,0,2517.15,0.266754,22.7815
+Apartment.Texture.rotate,none,regular,9,8,0,0,84.9575,0.464144,2.29853
+Apartment.Texture.rotate,none,regular,10,9,0,0,237.815,0.429987,2.1156
+Apartment.Texture.rotate,none,regular,11,10,0,0,162.111,0.446653,1.88212
+Apartment.Texture.rotate,none,regular,12,11,0,0,2540.5,0.132591,23.0867
+Apartment.Texture.rotate,none,regular,13,12,0,0,16705.3,0.056964,59.3139
+Apartment.Texture.rotate,none,regular,14,13,0,0,1792.46,0.130594,20.5659
+Apartment.Texture.rotate,none,regular,15,14,0,0,1889.56,0.146354,10.8231
+Apartment.Texture.rotate,none,regular,16,15,0,0,254.085,0.211311,4.26924
+Apartment.Texture.rotate,none,regular,17,16,0,0,980.989,0.197262,4.59484
+Apartment.Texture.rotate,none,regular,18,17,0,0,326.945,0.148813,6.36128
+Apartment.Texture.rotate,none,regular,19,18,0,0,3874.98,0.0649379,28.3647
+Apartment.Texture.rotate,none,regular,20,19,0,0,113.993,0.153559,4.41265
+Apartment.Texture.rotate,none,regular,21,20,0,0,251.262,0.0983928,5.29977
+Apartment.Texture.rotate,none,regular,22,21,0,0,2592.15,0.0343894,12.7472
+Apartment.Texture.rotate,none,regular,23,22,0,0,295.97,0.0964431,6.10797
+Apartment.Texture.rotate,none,regular,24,23,0,0,187.918,0.280835,3.18593
+Apartment.Texture.rotate,none,regular,25,24,0,0,2239.17,0.0638535,11.9092
+Apartment.Texture.rotate,none,regular,26,25,0,0,176.409,0.254354,3.79783
+Apartment.Texture.rotate,none,regular,27,26,0,0,1024.39,0.196367,4.85847
+Apartment.Texture.rotate,none,regular,28,27,0,0,540.156,0.0792924,9.56452
+Apartment.Texture.rotate,none,regular,29,28,0,0,166.121,0.238337,3.26741

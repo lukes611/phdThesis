@@ -285,7 +285,7 @@ void saveV10(string data_name, string alg_name, string desc, int frame1, int fra
     cout << "saving..." << endl;
     string outDirName = EXPS_DIR;
     
-    stringstream outFn; outFn << outDirName << "/" << data_name << "." << alg_name << ".v1.0.csv";
+    stringstream outFn; outFn << outDirName << "/" << data_name << ".v1.0.csv";
     string header = "data name, algorithm name, description, frame-index 1, frame-index 2, error-added, seconds, mse, percent match, hausdorff distance";
     string fileName = outFn.str();
     stringstream outData;
@@ -407,7 +407,7 @@ void quantitativeExperiment10(string algorithm_name,
 int main(int argc, char * * argv)
 {
 
-    string fn = "Apartment.Texture.rotate";
+    string fn = "Boxes.Texture.arbitrarycamera";
     int start = 4, to = 30, inc = 1;
     vector<int> inds = ll_experiments::rng(start, to, inc);
 
@@ -420,10 +420,10 @@ int main(int argc, char * * argv)
     //quantitativeExperiment10("fm3d", fn, "regular", inds,0.0f);
     //quantitativeExperiment10("icp", fn, "regular", inds,0.0f);
     //quantitativeExperiment10("icp2", fn, "regular", inds,0.0f);
-    quantitativeExperiment10("pc", fn, "regular", ll_experiments::rng(0,40,1),0.0f);
-    quantitativeExperiment10("pc2", fn, "regular", ll_experiments::rng(0,40,1),0.0f);
-    quantitativeExperiment10("pca", fn, "regular", ll_experiments::rng(0,40,1),0.0f);
-	quantitativeExperiment10("pc3", fn, "regular", ll_experiments::rng(0,40,1),0.0f);
+    quantitativeExperiment10("pc", fn, "regular", inds,0.0f);
+    quantitativeExperiment10("pc2", fn, "regular", inds,0.0f);
+    quantitativeExperiment10("pca", fn, "regular", inds,0.0f);
+	quantitativeExperiment10("pc3", fn, "regular", inds,0.0f);
 
 
 

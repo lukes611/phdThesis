@@ -1,0 +1,26 @@
+data name, algorithm name, description, frame-index 1, frame-index 2, error-added, seconds, mse, percent match, hausdorff distance
+Apartment.Texture.rotate,pc3,regular,5,4,0,11.7018,3.36884,0.879406,0.493881
+Apartment.Texture.rotate,pc3,regular,6,5,0,12.0268,8.51375,0.776659,0.761577
+Apartment.Texture.rotate,pc3,regular,7,6,0,41.3341,1959.07,0.216255,18.6112
+Apartment.Texture.rotate,pc3,regular,8,7,0,21.8959,2897.74,0.371936,23.8514
+Apartment.Texture.rotate,pc3,regular,9,8,0,30.3933,54.5814,0.744907,1.30028
+Apartment.Texture.rotate,pc3,regular,10,9,0,30.644,45.3962,0.726746,0.984243
+Apartment.Texture.rotate,pc3,regular,11,10,0,30.7546,34.5454,0.684741,1.07994
+Apartment.Texture.rotate,pc3,regular,12,11,0,41.7547,1521.63,0.196919,18.2283
+Apartment.Texture.rotate,pc3,regular,13,12,0,34.0843,17878.5,0.174998,58.3707
+Apartment.Texture.rotate,pc3,regular,14,13,0,54.4426,1135.17,0.146948,15.5584
+Apartment.Texture.rotate,pc3,regular,15,14,0,31.7126,564.517,0.387623,8.56828
+Apartment.Texture.rotate,pc3,regular,16,15,0,50.4669,162.173,0.56773,1.73728
+Apartment.Texture.rotate,pc3,regular,17,16,0,41.5222,14.7648,0.590965,1.38318
+Apartment.Texture.rotate,pc3,regular,18,17,0,32.322,142.104,0.425033,2.56234
+Apartment.Texture.rotate,pc3,regular,19,18,0,36.6277,1661.37,0.144716,18.3087
+Apartment.Texture.rotate,pc3,regular,20,19,0,41.6532,23.8332,0.510992,1.6711
+Apartment.Texture.rotate,pc3,regular,21,20,0,31.8236,21.1138,0.535266,1.55822
+Apartment.Texture.rotate,pc3,regular,22,21,0,51.8549,302.186,0.342057,4.46572
+Apartment.Texture.rotate,pc3,regular,23,22,0,49.5999,44.988,0.494562,2.03678
+Apartment.Texture.rotate,pc3,regular,24,23,0,21.7514,65.9809,0.49274,1.9
+Apartment.Texture.rotate,pc3,regular,25,24,0,41.3231,342.989,0.355614,4.61692
+Apartment.Texture.rotate,pc3,regular,26,25,0,48.8743,64.4677,0.581084,1.92412
+Apartment.Texture.rotate,pc3,regular,27,26,0,62.0542,173.287,0.615021,2.07296
+Apartment.Texture.rotate,pc3,regular,28,27,0,43.3872,793.921,0.367128,5.91744
+Apartment.Texture.rotate,pc3,regular,29,28,0,32.1898,170.695,0.552864,1.79373
