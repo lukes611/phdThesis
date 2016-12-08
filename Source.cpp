@@ -54,6 +54,8 @@ errors...
 
 void test(string name, Point3d rotation, float scale, Point3d translation, bool view = false)
 {
+	cout << "**************\n";
+	cout << "rotation: " << rotation << ", scale: " << scale << ", translation: " << translation << endl;
 
 	CapturePixel3DSet video = ll_experiments::openData(name, 1);
 	Mat M = VMat::transformation_matrix(256, rotation.x, rotation.y, rotation.z, scale, translation.x, translation.y, translation.z);
@@ -77,12 +79,13 @@ void test(string name, Point3d rotation, float scale, Point3d translation, bool 
 	}
 
 	vector<string> algorithms;
-	//algorithms.push_back("none");
+	algorithms.push_back("none");
 	//algorithms.push_back("fm");
 	//algorithms.push_back("fm3d");
 	//algorithms.push_back("icp");
-	//algorithms.push_back("pc");
-	//algorithms.push_back("pc2");
+	algorithms.push_back("pc");
+	algorithms.push_back("pc2");
+	algorithms.push_back("pc3");
 	algorithms.push_back("pca");
 
 
@@ -114,10 +117,13 @@ void test(string name, Point3d rotation, float scale, Point3d translation, bool 
 			M2 = ll_pc::pc_register(f1, f2, seconds);
 		}else if(algorithms[i] == "pc2")
 		{
-			M2 = ll_pc::pc_register_pca_i(f1, f2, seconds, 3);
+			M2 = ll_pc::pc_register_pca(f1, f2, seconds);
 		}else if(algorithms[i] == "pca")
 		{
 			M2 = ll_pca::register_pca(f1, f2, seconds, 256);
+		}else if(algorithms[i] == "pc3")
+		{
+			M2 = ll_pc::pc_pca_icp(f1, f2, seconds);
 		}
 #endif
 			
@@ -129,7 +135,7 @@ void test(string name, Point3d rotation, float scale, Point3d translation, bool 
 			Point3f _ = LukeLincoln::operator*(M2, Point3f(frame1.points[i].x, frame1.points[i].y, frame1.points[i].z));
 			R3 p(_.x, _.y, _.z);
 			float D = p.dist(frame2.points[i]);
-			if (D < 2.0f) numMatches += 1.0;
+			if (D < 3.0f) numMatches += 1.0;
 			count += 1.0;
 		}
 
@@ -166,21 +172,20 @@ void test(string name, Point3d rotation, float scale, Point3d translation, bool 
 
 void testSetPix3d(string name)
 {
-	//test(name, Point3d(), 1.0f, Point3d());
-	cout << "**************" << endl;
-	test(name, Point3d(0.0, 0.0, 0.0), 1.0f, Point3d(20.0, 0.0, 0.0));
-	//for(int Y = 0; Y < 360; Y+=10)
-	//	test(name, Point3d(0.0, Y, 0.0), 1.0f, Point3d(0.0, 0.0, 0.0)); 
-	//for(int x = 0; x < 160; x+=10)
-	//	test(name, Point3d(0.0, 0.0, 0.0), 1.0f, Point3d(x, 0.0, 0.0));
-	//for(double S = 0.9; S <= 1.2; S += 0.5)
-	//	test(name, Point3d(0.0, 0.0, 0.0), S, Point3d(0.0, 0.0, 0.0));
+	for(int Y = 0; Y < 360; Y+=10){
+		test(name, Point3d(0.0, Y, 0.0), 1.0f, Point3d(0.0, 0.0, 0.0)); 
+		
+	}
+	for(int x = 0; x < 160; x+=10)
+		test(name, Point3d(0.0, 0.0, 0.0), 1.0f, Point3d(x, 0.0, 0.0));
+	for(double S = 0.9; S <= 1.2; S += 0.5)
+		test(name, Point3d(0.0, 0.0, 0.0), S, Point3d(0.0, 0.0, 0.0));
 	
 	for(int y = 0; y < 30; y+=10)
 	{
 		for(int x = 0; x < 30; x+=10)
-			for(int z = 0; z < 30; z += 10);
-				//test(name, Point3d(x, y, z), 1.0f, Point3d(10.0, 5.0, 2.0));
+			for(int z = 0; z < 30; z += 10)
+				test(name, Point3d(x, y, z), 1.0f, Point3d(10.0, 5.0, 2.0));
 	}
 	
 }
