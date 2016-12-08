@@ -272,8 +272,8 @@ void exp1(string name, vector<int> frames)
 	obj.save_obj(string(DESKTOP_DIR) + "/one.obj");
 
 	#ifdef HASGL
-	LLPointers::setPtr("object", &obj);
-    ll_experiments::viewPixel3DSet();
+	//LLPointers::setPtr("object", &obj);
+    //ll_experiments::viewPixel3DSet();
     #endif
 
 
@@ -309,37 +309,6 @@ void saveV10(string data_name, string alg_name, string desc, int frame1, int fra
 
 }
 
-void saveV11(string data_name, string alg_name, string desc, int frame1, int frame2, float errorAdded, float seconds, float mse)
-{
-    //save output to file
-    cout << "saving..." << endl;
-    #ifdef _WIN32
-    string outDirName = "";
-    #else
-    string outDirName = "/home/luke/gitProjects/phdThesis/experiments";
-    #endif
-
-    stringstream outFn; outFn << outDirName << "/" << data_name << "." << alg_name << ".v1.1.csv";
-    string header = "data name, algorithm name, description, frame-index 1, frame-index 2, error-added, seconds, mse";
-    string fileName = outFn.str();
-    stringstream outData;
-    outData <<
-    data_name << "," <<
-    alg_name << "," <<
-    desc << "," <<
-    frame1 << "," <<
-    frame2 << "," <<
-    errorAdded << "," <<
-    seconds << "," <<
-    mse;
-
-    cout << outData.str() << endl;
-
-    appendData(fileName, header, outData.str());
-
-
-
-}
 
 
 void quantitativeExperiment10(string algorithm_name,
@@ -390,6 +359,9 @@ void quantitativeExperiment10(string algorithm_name,
 		else if (algorithm_name == "pc2") {
 			_m = ll_pc::pc_register_pca_i(b, a, seconds);
 		}
+		else if (algorithm_name == "pc3") {
+			_m = ll_pc::pc_pca_icp(b, a, seconds);
+		}
 #endif
 		else if (algorithm_name == "icp") {
 			_m = Licp::icp(b, a, _, hde, seconds, iters);
@@ -430,96 +402,6 @@ void quantitativeExperiment10(string algorithm_name,
 }
 
 
-void quantitativeExperiment11(string algorithm_name,
-	string data_name,
-	string description,
-	vector<int> frames,
-	float error_added)
-{
-	#ifdef _WIN32
-	CapturePixel3DSet video(data_name, 1);
-#else
-    CapturePixel3DSet video = CapturePixel3DSet::openCustom("/home/luke/lcppdata/pix3dc/films", data_name, 1);
-#endif
-
-	Pix3D frame1, frame2;
-	Pixel3DSet a, b;
-
-	//vector<double> times, errors, mses, pmes; //times, errors, mse errors, percent matches
-
-											  //add first frame to the output
-	video.read_frame(frame1, frames[0]);
-
-	for (int _i = 1; _i < frames.size(); _i++)
-	{
-		int currentIndex = frames[_i];
-		//get match _m from i+1 to i
-		double seconds = 0.0;
-		double hde, msee, pme;
-		int iters = 0;
-		Pixel3DSet _;
-
-		cout << algorithm_name << " : " << _i << " / " << frames.size() << endl;
-
-		video.read_frame(frame2, currentIndex);
-
-		a = frame1; b = frame2;
-
-		Mat _m = Mat::eye(Size(4, 4), CV_32FC1);
-
-		//algorithms here:
-		if (algorithm_name == "none") {
-		}
-#ifdef HASCUDA
-		else if (algorithm_name == "pc") {
-			_m = ll_pc::pc_register(b, a, seconds);
-		}
-
-		else if (algorithm_name == "pc2") {
-			_m = ll_pc::pc_register_pca_i(b, a, seconds);
-		}
-#endif
-		else if (algorithm_name == "icp") {
-			_m = Licp::icp(b, a, _, hde, seconds, iters);
-		}
-
-		else if (algorithm_name == "icp2") {
-			_m = Licp::icp_outlierRemoval(b, a, _, hde, seconds, iters, 10.0);
-		}
-
-		else if (algorithm_name == "fm") {
-			ll_fmrsc::registerPix3D("surf", frame2, frame1, _m, seconds, true, 150);
-		}else if(algorithm_name == "fm3d"){
-		    _m = LukeLincoln::sift3DRegister(b, a, seconds, true, 256);
-
-		}
-
-
-
-		//:end
-
-		//compute the errors
-		b.transform_set(_m);
-		//ll_measure::error_metrics(a, b, hde, msee, pme);
-        {
-            VMat A(256, a, 0.0f, true);
-            VMat B(256, b, 0.0f, true);
-            A *= 255.0f;
-            B *= 255.0f;
-            msee = A.mse(B) * 1000.0f;
-            saveV11(data_name, algorithm_name, description, frames[_i], frames[_i-1], error_added, seconds, msee);
-        }
-
-
-
-		frame1 = frame2;
-	}
-
-
-
-
-}
-
 
 
 int main(int argc, char * * argv)
@@ -529,18 +411,19 @@ int main(int argc, char * * argv)
     int start = 4, to = 30, inc = 1;
     vector<int> inds = ll_experiments::rng(start, to, inc);
 
-	testSetPix3d(fn);
+	//testSetPix3d(fn);
 
 	//exp1("Apartment.Texture.rotate", ll_experiments::rng(15, 20, 1));
 	//test("Apartment.Texture.rotate", Point3d(5.0f, 2.0f, 0.0f), 1.0f, Point3d(0.0, 1.0, 8.0));
-    //quantitativeExperiment10("none", fn, "regular", inds,0.0f);
+    quantitativeExperiment10("none", fn, "regular", inds,0.0f);
     //quantitativeExperiment10("fm", fn, "regular", inds,0.0f);
     //quantitativeExperiment10("fm3d", fn, "regular", inds,0.0f);
     //quantitativeExperiment10("icp", fn, "regular", inds,0.0f);
     //quantitativeExperiment10("icp2", fn, "regular", inds,0.0f);
-    //quantitativeExperiment10("pc", fn, "regular", ll_experiments::rng(0,40,1),0.0f);
-    //quantitativeExperiment10("pc2", fn, "regular", ll_experiments::rng(0,40,1),0.0f);
-    //quantitativeExperiment10("pca", fn, "regular", ll_experiments::rng(0,40,1),0.0f);
+    quantitativeExperiment10("pc", fn, "regular", ll_experiments::rng(0,40,1),0.0f);
+    quantitativeExperiment10("pc2", fn, "regular", ll_experiments::rng(0,40,1),0.0f);
+    quantitativeExperiment10("pca", fn, "regular", ll_experiments::rng(0,40,1),0.0f);
+	quantitativeExperiment10("pc3", fn, "regular", ll_experiments::rng(0,40,1),0.0f);
 
 
 
