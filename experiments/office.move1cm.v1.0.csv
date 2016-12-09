@@ -1,0 +1,9 @@
+data name, algorithm name, description, frame-index 1, frame-index 2, error-added, seconds, mse, percent match, hausdorff distance
+office.move1cm,none,regular,5,4,0,0,40566,0.0765192,20.2084
+office.move1cm,none,regular,6,5,0,0,177884,0.0306717,85.485
+office.move1cm,none,regular,7,6,0,0,16985.1,0.351741,5.1168
+office.move1cm,none,regular,8,7,0,0,65.8223,0.621491,1.59286
+office.move1cm,none,regular,9,8,0,0,292.091,0.711825,2.08318
+office.move1cm,none,regular,10,9,0,0,2.63184e+006,0.00190723,1228.46
+office.move1cm,none,regular,11,10,0,0,1.7431e+006,0.00245196,1127.2
+office.move1cm,none,regular,12,11,0,0,542.219,0.103887,10.5439
