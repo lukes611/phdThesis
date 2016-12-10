@@ -407,7 +407,7 @@ void quantitativeExperiment10(string algorithm_name,
 int main(int argc, char * * argv)
 {
 
-    string fn = "office.move1cm";
+    string fn = "PlantsOutdoors.tc.rotation";
     int start = 4, to = 30, inc = 1;
     vector<int> inds = ll_experiments::rng(start, to, inc);
 
