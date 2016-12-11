@@ -126,8 +126,8 @@ void test(string name, Point3d rotation, float scale, Point3d translation, bool 
 			M2 = ll_pc::pc_pca_icp(f1, f2, seconds);
 		}
 #endif
-			
-		
+
+
 		//measure error
 		double count = 0.0, numMatches = 0.0;
 		for (int i = 0; i < frame1.count; i++)
@@ -159,12 +159,12 @@ void test(string name, Point3d rotation, float scale, Point3d translation, bool 
 #endif
 	}
 
-	
-	
-	
 
-	
-	
+
+
+
+
+
 
 
 
@@ -173,21 +173,21 @@ void test(string name, Point3d rotation, float scale, Point3d translation, bool 
 void testSetPix3d(string name)
 {
 	for(int Y = 0; Y < 360; Y+=10){
-		test(name, Point3d(0.0, Y, 0.0), 1.0f, Point3d(0.0, 0.0, 0.0)); 
-		
+		test(name, Point3d(0.0, Y, 0.0), 1.0f, Point3d(0.0, 0.0, 0.0));
+
 	}
 	for(int x = 0; x < 160; x+=10)
 		test(name, Point3d(0.0, 0.0, 0.0), 1.0f, Point3d(x, 0.0, 0.0));
 	for(double S = 0.9; S <= 1.2; S += 0.5)
 		test(name, Point3d(0.0, 0.0, 0.0), S, Point3d(0.0, 0.0, 0.0));
-	
+
 	for(int y = 0; y < 30; y+=10)
 	{
 		for(int x = 0; x < 30; x+=10)
 			for(int z = 0; z < 30; z += 10)
 				test(name, Point3d(x, y, z), 1.0f, Point3d(10.0, 5.0, 2.0));
 	}
-	
+
 }
 
 
@@ -284,7 +284,7 @@ void saveV10(string data_name, string alg_name, string desc, int frame1, int fra
     //save output to file
     cout << "saving..." << endl;
     string outDirName = EXPS_DIR;
-    
+
     stringstream outFn; outFn << outDirName << "/" << data_name << ".v1.0.csv";
     string header = "data name, algorithm name, description, frame-index 1, frame-index 2, error-added, seconds, mse, percent match, hausdorff distance";
     string fileName = outFn.str();
@@ -407,25 +407,53 @@ void quantitativeExperiment10(string algorithm_name,
 int main(int argc, char * * argv)
 {
 
-    string fn = "PlantsOutdoors.tc.rotation";
+    string namesList[20] = {
+
+        "Apartment.Texture.rotate",
+        "Apartment.Texture.rotateXAxis",
+        "Boxes.Texture.arbitrarycamera",
+        "Boxes.Texture.rotate",
+        "Boxes.Texture.zoomOut",
+        "Desk.Texture.Translation",
+        "IndoorSpace.tc.translation",
+        "Kitchen.littleTexture.pan",
+        "Kitchen.littleTexture.zoom",
+        "OfficeDesk.Texture.rotationLift",
+        //"office.move1cm",
+        "Office.Texture.blindSpotRotation",
+        "Office.TexturedItems.Translation",
+        "Office.Texture.rotation",
+        "Office.Texture.rotationXAxis",
+        "Office.Texture.Translation",
+        "Outside.NoTexture.rotation",
+        "Outside.NoTexture.translation",
+        "Outside.TextureConfusion.rotation",
+        "Outside.TextureConfusion.Translation",
+        "PlantsOutdoors.tc.rotation"
+    };
+
+    //string fn = "PlantsOutdoors.tc.rotation";
     int start = 4, to = 30, inc = 1;
     vector<int> inds = ll_experiments::rng(start, to, inc);
 
 	//testSetPix3d(fn);
 
+	for(int i = 10; i < 21; i++)
+	{
+	string fn = namesList[i];
 	//exp1("Apartment.Texture.rotate", ll_experiments::rng(15, 20, 1));
 	//test("Apartment.Texture.rotate", Point3d(5.0f, 2.0f, 0.0f), 1.0f, Point3d(0.0, 1.0, 8.0));
-    quantitativeExperiment10("none", fn, "regular", inds,0.0f);
-    //quantitativeExperiment10("fm", fn, "regular", inds,0.0f);
+    //quantitativeExperiment10("none", fn, "regular", inds,0.0f);
+    quantitativeExperiment10("fm", fn, "regular", inds,0.0f);
     //quantitativeExperiment10("fm3d", fn, "regular", inds,0.0f);
-    //quantitativeExperiment10("icp", fn, "regular", inds,0.0f);
+    quantitativeExperiment10("icp", fn, "regular", inds,0.0f);
     //quantitativeExperiment10("icp2", fn, "regular", inds,0.0f);
-    quantitativeExperiment10("pc", fn, "regular", inds,0.0f);
-    quantitativeExperiment10("pc2", fn, "regular", inds,0.0f);
-    quantitativeExperiment10("pca", fn, "regular", inds,0.0f);
-	quantitativeExperiment10("pc3", fn, "regular", inds,0.0f);
+    //quantitativeExperiment10("pc", fn, "regular", inds,0.0f);
+    //quantitativeExperiment10("pc2", fn, "regular", inds,0.0f);
+    //quantitativeExperiment10("pca", fn, "regular", inds,0.0f);
+	//quantitativeExperiment10("pc3", fn, "regular", inds,0.0f);
 
-
+    }
 
 
 

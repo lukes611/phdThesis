@@ -29,6 +29,11 @@
 
 #else //using linux on my laptop
 
+#define DESKTOP_DIR "/home/luke/Desktop"
+#define LCPPDATA_DIR "/home/luke/lcppdata"
+#define EXPS_DIR "/home/luke/gitProjects/phdThesis/experiments"
+
+
 
 
 #endif
