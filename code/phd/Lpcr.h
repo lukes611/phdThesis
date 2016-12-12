@@ -8,8 +8,11 @@ author : luke lincoln @ lukes611@gmail.com
 requires: locv, R3, ll_pix3d, volumePhaseCorrelator, gpu (cuda)
 
 */
-#include "..\basics\locv3.h"
-#include "..\basics\Pixel3DSet.h"
+#include "../basics/locv3.h"
+#include "../basics/Pixel3DSet.h"
+#include "experiments.h"
+
+#ifdef HASCUDA
 
 namespace ll_pc
 {
@@ -26,6 +29,8 @@ namespace ll_pc
 	//uses pca, pc and icp to find the transform
 	cv::Mat pc_pca_icp(ll_pix3d::Pixel3DSet & object1, ll_pix3d::Pixel3DSet & object2, double & seconds, bool isScaled = true, int volumeSize = 256);
 }
+
+#endif
 
 namespace ll_pca
 {
