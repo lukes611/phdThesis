@@ -435,8 +435,8 @@ int main(int argc, char * * argv)
     int start = 4, to = 30, inc = 1;
     vector<int> inds = ll_experiments::rng(start, to, inc);
 
-	//testSetPix3d(fn);
-	test("Apartment.Texture.rotate", Point3d(5.0f, 2.0f, 0.0f), 1.0f, Point3d(0.0, 1.0, 8.0));
+	testSetPix3d(namesList[0]);
+	//test("Apartment.Texture.rotate", Point3d(5.0f, 2.0f, 0.0f), 1.0f, Point3d(0.0, 1.0, 8.0));
 
 	//for(int i = 13; i < 20; i++)
 	{
