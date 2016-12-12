@@ -140,7 +140,7 @@ void test(string name, Point3d rotation, float scale, Point3d translation, bool 
 		}
 
 		double percentMatch = 100.0 * (numMatches / count);
-		stringstream line; line << algorithms[i] << ", " << rotation.x << ", " << rotation.y << ", " << rotation.z <<
+		stringstream line; line << algorithms[i] << ", " << rotation.x << ", " << rotation.y << ", " << rotation.z << ", " <<
 			scale << ", " << translation.x << ", " << translation.y << ", " << translation.z << ", " << percentMatch << ", " << seconds;
 
 		//print error
