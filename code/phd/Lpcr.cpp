@@ -8,6 +8,7 @@ using namespace ll_pix3d;
 using namespace cv;
 using namespace std;
 
+#ifdef HASCUDA
 
 namespace ll_pc
 {
@@ -72,6 +73,8 @@ Mat pc_pca_icp(Pixel3DSet & object1, Pixel3DSet & object2, double & seconds, boo
 }
 
 }
+
+#endif
 
 namespace ll_pca
 {
