@@ -438,15 +438,15 @@ int main(int argc, char * * argv)
 
 	//testSetPix3d(fn);
 
-	for(int i = 10; i < 21; i++)
+	for(int i = 0; i < 2; i++)
 	{
 	string fn = namesList[i];
 	//exp1("Apartment.Texture.rotate", ll_experiments::rng(15, 20, 1));
 	//test("Apartment.Texture.rotate", Point3d(5.0f, 2.0f, 0.0f), 1.0f, Point3d(0.0, 1.0, 8.0));
     //quantitativeExperiment10("none", fn, "regular", inds,0.0f);
-    quantitativeExperiment10("fm", fn, "regular", inds,0.0f);
-    //quantitativeExperiment10("fm3d", fn, "regular", inds,0.0f);
-    quantitativeExperiment10("icp", fn, "regular", inds,0.0f);
+    //quantitativeExperiment10("fm", fn, "regular", inds,0.0f);
+    quantitativeExperiment10("fm3d", fn, "regular", inds,0.0f);
+    //quantitativeExperiment10("icp", fn, "regular", inds,0.0f);
     //quantitativeExperiment10("icp2", fn, "regular", inds,0.0f);
     //quantitativeExperiment10("pc", fn, "regular", inds,0.0f);
     //quantitativeExperiment10("pc2", fn, "regular", inds,0.0f);
