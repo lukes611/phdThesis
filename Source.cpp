@@ -438,7 +438,7 @@ int main(int argc, char * * argv)
 
 	//testSetPix3d(fn);
 
-	for(int i = 2; i < 20; i++)
+	for(int i = 13; i < 20; i++)
 	{
 	string fn = namesList[i];
 	//exp1("Apartment.Texture.rotate", ll_experiments::rng(15, 20, 1));
