@@ -5,7 +5,7 @@
 #include <map>
 #include "../basics/Pixel3DSet.h"
 
-//#define AT_UNI //i am at uni
+#define AT_UNI //i am at uni
 
 #ifdef _WIN32 //if on windows
 
@@ -17,6 +17,7 @@
 
 #define LCPPDATA_DIR "C:/lcppdata"
 #define DESKTOP_DIR "C:/Users/s2807774/Desktop"
+#define EXPS_DIR "C:/Users/s2807774/Documents/Visual Studio 2015/Projects/PhD project 16/Ocv3 Basic with ll_ libraries/experiments"
 
 #else //on windows laptop
 
@@ -25,7 +26,7 @@
 #define EXPS_DIR "C:/Users/luke/Documents/Visual Studio 2012/Projects/PhD 16 Sem2/PhD 16 Sem2/experiments"
 
 
-#define HASCUDA
+//#define HASCUDA
 
 #endif
 
@@ -45,15 +46,6 @@
 
 
 
-#ifdef _WIN32
-
-windows code goes here
-
-#else
-
-apple code goes here
-
-#endif
 
 
 

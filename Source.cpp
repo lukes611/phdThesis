@@ -79,14 +79,14 @@ void test(string name, Point3d rotation, float scale, Point3d translation, bool 
 	}
 
 	vector<string> algorithms;
-	algorithms.push_back("none");
+	//algorithms.push_back("none");
 	//algorithms.push_back("fm");
-	//algorithms.push_back("fm3d");
-	//algorithms.push_back("icp");
-	algorithms.push_back("pc");
-	algorithms.push_back("pc2");
-	algorithms.push_back("pc3");
-	algorithms.push_back("pca");
+	algorithms.push_back("fm3d");
+	algorithms.push_back("icp");
+	//algorithms.push_back("pc");
+	//algorithms.push_back("pc2");
+	//algorithms.push_back("pc3");
+	//algorithms.push_back("pca");
 
 
 
