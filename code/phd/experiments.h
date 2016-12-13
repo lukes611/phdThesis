@@ -99,6 +99,38 @@ namespace ll_experiments
 
 	ll_pix3d::CapturePixel3DSet openData(std::string name, int numFrames);
 
+	/*
+	A noise generator
+	*/
+	class NoiseGenerator{
+	public:
+		std::vector<cv::Point3f> signal, noise;
+
+		NoiseGenerator(bool seedAtBeginning = true);
+		~NoiseGenerator();
+		double randomNumber(); //returns a random number between 0 and 1
+		cv::Point3f randomPoint(); //returns a random point each coord is between 0 and 1
+		void seed(); //seeds the randomNumbers
+		double randomNumber(double range); //returns a random number between -.5x and .5x
+		cv::Point3f randomPoint(double range); //returns a random point each coord is between -.5x and .5x
+
+		cv::Point3f getNoise(cv::Point3f signal, double range); //returns noise to be added to the data
+		ll_R3::R3 getNoise(ll_R3::R3 signal, double range); //returns noise to be added to the data
+
+		cv::Point3f stdDev(std::vector<cv::Point3f> & data);
+		cv::Point3f mean(std::vector<cv::Point3f> & data);
+		cv::Point3f stdDevNoise();
+		cv::Point3f stdDevSignal();
+
+		void getSNR(cv::Point3f & out);
+		void getSNR(double & out);
+		
+
+	};
+
+	ll_pix3d::Pixel3DSet getNoisedVersion(ll_pix3d::Pixel3DSet & input, double noiseRange, double & snrOut);
+	ll_pix3d::Pix3D getNoisedVersion(ll_pix3d::Pix3D & input, double noiseRange, double & snrOut);
+
 
 #ifdef HASGL
 	//set Pixel3DSet object in LLPointers by key "object"

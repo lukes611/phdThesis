@@ -1,5 +1,6 @@
 #include "experiments.h"
 #include <fstream>
+#include <ctime>
 
 using namespace std;
 #include "../basics/Pixel3DSet.h"
@@ -172,6 +173,148 @@ void viewPixel3DSet()
 }
 
 #endif
+
+
+NoiseGenerator::NoiseGenerator(bool seedAtBeginning)
+{
+	if (seedAtBeginning) seed();
+}
+NoiseGenerator::~NoiseGenerator()
+{
+	noise.clear();
+	signal.clear();
+}
+double NoiseGenerator::randomNumber()
+{
+	return rand() / (double)RAND_MAX;
+}
+Point3f NoiseGenerator::randomPoint()
+{
+	return Point3f(randomNumber(), randomNumber(), randomNumber());
+}
+void NoiseGenerator::seed()
+{
+	srand(time(NULL));
+}
+double NoiseGenerator::randomNumber(double range)
+{
+	double h = range * 0.5f;
+	return randomNumber() * range - h;
+}
+Point3f NoiseGenerator::randomPoint(double range)
+{
+	return Point3f(randomNumber(range), randomNumber(range), randomNumber(range));
+}
+
+Point3f NoiseGenerator::getNoise(Point3f signal, double range)
+{
+	Point3f newNoise = randomPoint(range);
+
+	this->signal.push_back(signal);
+	this->noise.push_back(newNoise);
+
+	return newNoise;
+}
+
+R3 NoiseGenerator::getNoise(R3 signal, double range)
+{
+	Point3f _ = randomPoint(range);
+	R3 newNoise(_.x, _.y, _.z);
+
+	this->signal.push_back(Point3f(signal.x, signal.y, signal.z));
+	this->noise.push_back(Point3f(newNoise.x, newNoise.y, newNoise.z));
+
+	return newNoise;
+}
+
+Point3f NoiseGenerator::stdDev(vector<Point3f> & data)
+{
+	Point3f mn = mean(data);
+	Point3f stdDev(0.0f, 0.0f, 0.0f);
+	if (data.size() == 0) return stdDev;
+	float scalar = 1.0f / (float)data.size();
+
+	for (int i = 0; i < data.size(); i++)
+	{
+		Point3f p = data[i] - mn;
+		p.x *= p.x;
+		p.y *= p.y;
+		p.z *=  p.z;
+		stdDev += p;
+	}
+
+	stdDev.x = sqrt(stdDev.x * scalar);
+	stdDev.y = sqrt(stdDev.y * scalar);
+	stdDev.z = sqrt(stdDev.z * scalar);
+
+	return stdDev;
+}
+
+Point3f NoiseGenerator::mean(vector<Point3f> & data)
+{
+	Point3f init(0.0f, 0.0f, 0.0f);
+	if (data.size() == 0) return init;
+	float scalar = 1.0f / (float)data.size();
+	for (int i = 0; i < data.size(); i++)
+	{
+		init += data[i] * scalar;
+	}
+		
+	
+	
+	return init;
+}
+Point3f NoiseGenerator::stdDevNoise()
+{
+	return stdDev(noise);
+}
+Point3f NoiseGenerator::stdDevSignal()
+{
+	return stdDev(signal);
+}
+
+void NoiseGenerator::getSNR(Point3f & out)
+{
+	Point3f ss = stdDevSignal(), ns = stdDevNoise();
+
+	out.x = (ss.x * ss.x) / (ns.x * ns.x);
+	out.y = (ss.y * ss.y) / (ns.y * ns.y);
+	out.z = (ss.z * ss.z) / (ns.z * ns.z);
+
+}
+void NoiseGenerator::getSNR(double & out)
+{
+	Point3f op;
+	getSNR(op);
+
+	out = (op.x + op.y + op.z) / 3.0f;
+}
+
+ll_pix3d::Pixel3DSet getNoisedVersion(ll_pix3d::Pixel3DSet & input, double noiseRange, double & snrOut)
+{
+	Pixel3DSet cp = input;
+	NoiseGenerator noise;
+	for (int i = 0; i < cp.size(); i++)
+	{
+		cp.points[i] += noise.getNoise(input.points[i], noiseRange);
+	}
+	noise.getSNR(snrOut);
+	return cp;
+}
+ll_pix3d::Pix3D getNoisedVersion(ll_pix3d::Pix3D & input, double noiseRange, double & snrOut)
+{
+	Pix3D cp = input;
+	NoiseGenerator noise;
+	for (int i = 0; i < cp.count; i++)
+	{
+		if (cp.validDepth && cp.validDepth[i])
+		{
+			cp.points[i] += noise.getNoise(input.points[i], noiseRange);
+		}
+	}
+	noise.getSNR(snrOut);
+	return cp;
+}
 
 }
 

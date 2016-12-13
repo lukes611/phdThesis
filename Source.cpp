@@ -50,7 +50,7 @@ errors...
 #include "code/basics/BitReaderWriter.h"
 
 
-void test(string name, Point3d rotation, float scale, Point3d translation, bool view = false)
+void test(string name, Point3d rotation, float scale, Point3d translation, double noiseRange = 0.0, bool view = false)
 {
 	cout << "**************\n";
 	cout << "rotation: " << rotation << ", scale: " << scale << ", translation: " << translation << endl;
@@ -93,11 +93,21 @@ void test(string name, Point3d rotation, float scale, Point3d translation, bool 
 	{
 		//register
 		Mat M2 = Mat::eye(Size(4, 4), CV_32FC1);
-		Pixel3DSet f1 = frame1;
-		Pixel3DSet f2 = frame2;
+
+		double snr1, snr2, snrOut;
+
+		Pix3D frame1Noise = ll_experiments::getNoisedVersion(frame1, noiseRange, snr1);
+		Pix3D frame2Noise = ll_experiments::getNoisedVersion(frame2, noiseRange, snr2);
+		snrOut = (snr1 + snr2) * 0.5f;
+
+		Pixel3DSet f1 = frame1Noise;
+		Pixel3DSet f2 = frame2Noise;
+
+		
+
 		double seconds;
 		if (algorithms[i] == "fm")
-			ll_fmrsc::registerPix3D("", frame1, frame2, M2, seconds, true, 50);
+			ll_fmrsc::registerPix3D("", frame1Noise, frame2Noise, M2, seconds, true, 50);
 		else if (algorithms[i] == "icp")
 		{
 			Pixel3DSet out;
@@ -140,12 +150,14 @@ void test(string name, Point3d rotation, float scale, Point3d translation, bool 
 
 		double percentMatch = 100.0 * (numMatches / count);
 		stringstream line; line << algorithms[i] << ", " << rotation.x << ", " << rotation.y << ", " << rotation.z << ", " <<
-			scale << ", " << translation.x << ", " << translation.y << ", " << translation.z << ", " << percentMatch << ", " << seconds;
+			scale << ", " << translation.x << ", " << translation.y << ", " << translation.z << ", " << 
+			noiseRange << ", " << snrOut << ", "
+			<< percentMatch << ", " << seconds;
 
 		//print error
 		cout << "algorithm[" << algorithms[i] << "] had " << percentMatch << "% matching rate" << endl;
-		ll_experiments::appendData(string(EXPS_DIR) + string("/") + name + string(".tests.csv"),
-			string("algorithm, rx, ry, rz, scale, tx, ty, tz, percent match, seconds"),
+		ll_experiments::appendData(string(EXPS_DIR) + string("/") + name + string(".tests.v2.csv"),
+			string("algorithm, rx, ry, rz, scale, tx, ty, tz, noiseRange, SNR, percent match, seconds"),
 			line.str());
 
 #ifdef HASGL
@@ -171,20 +183,21 @@ void test(string name, Point3d rotation, float scale, Point3d translation, bool 
 
 void testSetPix3d(string name)
 {
+	double nr = 0.0;
 	for(int Y = 0; Y < 360; Y+=10){
-		test(name, Point3d(0.0, Y, 0.0), 1.0f, Point3d(0.0, 0.0, 0.0));
+		test(name, Point3d(0.0, Y, 0.0), 1.0f, Point3d(0.0, 0.0, 0.0), nr);
 
 	}
 	for(int x = 0; x < 160; x+=10)
-		test(name, Point3d(0.0, 0.0, 0.0), 1.0f, Point3d(x, 0.0, 0.0));
+		test(name, Point3d(0.0, 0.0, 0.0), 1.0f, Point3d(x, 0.0, 0.0), nr);
 	for(double S = 0.9; S <= 1.2; S += 0.5)
-		test(name, Point3d(0.0, 0.0, 0.0), S, Point3d(0.0, 0.0, 0.0));
+		test(name, Point3d(0.0, 0.0, 0.0), S, Point3d(0.0, 0.0, 0.0), nr);
 
 	for(int y = 0; y < 30; y+=10)
 	{
 		for(int x = 0; x < 30; x+=10)
 			for(int z = 0; z < 30; z += 10)
-				test(name, Point3d(x, y, z), 1.0f, Point3d(10.0, 5.0, 2.0));
+				test(name, Point3d(x, y, z), 1.0f, Point3d(10.0, 5.0, 2.0), nr);
 	}
 
 }
@@ -307,8 +320,6 @@ void saveV10(string data_name, string alg_name, string desc, int frame1, int fra
 
 
 }
-
-
 
 void quantitativeExperiment10(string algorithm_name,
 	string data_name,
