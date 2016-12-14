@@ -1,16 +1,3 @@
-\section{Results}
-
-%in methodology section?
-\section{Test Data}
-
-\section{Analysis Tools}
-
-\section{Qualitative Experiments}
-
-\section{Quantitative Experiments}
-
-\subsection{Pose Estimation Experiments}
-
 \begin{figure*}[t]
 \centering
 \includegraphics[width=6.0in]{images/results/Apartment_Texture_Rotate}
@@ -137,13 +124,3 @@
 \label{fig:PET17}
 \end{figure*}
 
-
-
-\subsection{3D Registration Experiments}
-
-\subsection{Noise Robustness Tests}
-
-hi
-
-
-\section{Conclusion}
