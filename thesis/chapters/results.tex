@@ -67,12 +67,19 @@ Experiment results for the boxes scene where the camera was moved forward, effec
 \label{fig:PET5}
 \end{figure*}
 
+In ~52\% of the frames of the desk translation data-set in figure \ref{fig:PET4}, the FVR method outperformed others relative to just ~26\% for ICP, ~9\% for 2D-feature-matching and PCA and ~4\% for 3D-feature-matching. This data-set tested for the pose-estimation procedure's ability to align a moving camera along a path. 3D feature matching was a notable poor performer here, ICP and FVR seemed to be strongest. 
+
+
 \begin{figure*}[t]
 \centering
 \includegraphics[width=6.0in]{images/results/Kitchen_LittleTexture_Pan}
 \caption{Registration Error for the Low-Texture Kitchen Translation Data Set}
 \label{fig:PET6}
 \end{figure*}
+
+An important data-set tested is the Indoor-Space with texture confusion (figure \ref{fig:PET5}). Here, a small scene was observed, where texture-confusion was present, this makes registration more difficult for all algorithms most notably the feature matching methods. We suspected that ICP, PCA, and FVR would perform best here. Here, around 39\% of the time, FVR performed best. Compared to the best feature-matching method (2D) with ~22\% of performances being the best. Interestingly PCA performed much worse compared with 2D-feature-matching. ICP outperformed others around 33\% of the time, similar to FVR's position but not quite as good. 
+
+Results for the low-textured Kitchen data-set were collected and shown in figure \ref{fig:PET6}. Again around 44\% of the frames had best results given by FVR. Compared with the next best algorithm ICP at ~27\%. In this case, this is expected as the feature-matching methods should perform worse in a low-textured scene. PCA was next best having the best registration ~22\% of the time.
 
 \begin{figure*}[t]
 \centering
@@ -81,12 +88,17 @@ Experiment results for the boxes scene where the camera was moved forward, effec
 \label{fig:PET7}
 \end{figure*}
 
+Another test for the low-textured Kitchen scene was also performed, this time by moving the camera forward and backwards, zooming in on the scene. In this test, FVR only outperformed the other methods in 3 out of the 13 frames. ICP outperformed FVR on this data-set, as 6 out of the 5 frames had best results given by ICP. It could also be said that ICP was a little more consistent. Interestingly 3D-feature-matching outperformed the 2D counterpart.
+
 \begin{figure*}[t]
 \centering
 \includegraphics[width=6.0in]{images/results/Office_TexturedItems_Translation}
 \caption{Registration Error for the Office Translation Data Set}
 \label{fig:PET8}
 \end{figure*}
+
+In the results for the Textured Office set (figure \ref{fig:PET8}), FVR matched or beat the other algorithms 80\% of the time. 2D-feature matching also performed well but did not manage to best FVR most of the time. This results shows that, to our surprise, FVR not only works well compared to other algorithms in scenes with little or no texture or in scenes where feature confusion is high, but also in high texture scenes where feature-matching should have an advantage.
+
 
 \begin{figure*}[t]
 \centering
@@ -95,12 +107,16 @@ Experiment results for the boxes scene where the camera was moved forward, effec
 \label{fig:PET9}
 \end{figure*}
 
+Figure \ref{fig:PET9} shows results for the centred object rotation scene. Here, a large divider was placed in the middle of two desks. The idea was to create an environment where the large divider could throw off the effects of PCA and FVR and give an advantage to the feature matching approaches and ICP. Interestingly, around 35\% of the time, FVR had the best result. 2D-feature-matching outperformed the 3D counterpart but only got the best result 10\% of the time. ICP on the other hand got the best result for around 55\% of the frames. It is suspected that ICP is able to use the large divider as an anchor which would make it more robust to non-overlapped data.
+
 \begin{figure*}[t]
 \centering
 \includegraphics[width=6.0in]{images/results/Office_Texture_Rotate_XAxis}
 \caption{Registration Error for the Office X/Y-Axis Rotation Data Set}
 \label{fig:PET10}
 \end{figure*}
+
+Another experiment where the scene was filmed with the camera rotated predominantly about the x-axis is shown in figure \ref{fig:PET10}, this time 2D-feature-matching, ICP and FVR all performed similarly, with only PCA and 3D-feature-matching failing to get good registrations. 
 
 \begin{figure*}[t]
 \centering
@@ -109,12 +125,16 @@ Experiment results for the boxes scene where the camera was moved forward, effec
 \label{fig:PET11}
 \end{figure*}
 
+Figure \ref{fig:PET11} shows the registration errors for the Office data-set with camera rotation about the Y-axis. Here, in around 50\% of the cases, FVR outperformed or matched the best result. 2D-feature-matching was next best matching or outperforming the best result around 34\% of the time. Interestingly, PCA performed the worst with this data-set. Because rotation can incur a smaller overlap and thus a large shift in the axes and mean of the principal components, this could be expected.
+
 \begin{figure*}[t]
 \centering
 \includegraphics[width=6.0in]{images/results/Office_Texture_Translation}
 \caption{Registration Error for the Office Translation Data Set}
 \label{fig:PET12}
 \end{figure*}
+
+In the Office translation scene, FVR outperformed or matched the other algorithms around 85\% of the time. This shows that the FVR has high accuracy when dealing with translation detection and the registration of 3D data with only translational changes. Here, PCA and 3D-feature matching performed the worst with ICP and 2D-feature matching also being quite consistent and robust.
 
 \begin{figure*}[t]
 \centering
@@ -123,12 +143,16 @@ Experiment results for the boxes scene where the camera was moved forward, effec
 \label{fig:PET13}
 \end{figure*}
 
+Figure \ref{fig:PET13} shows results for an outdoors scene with little texture, here the camera was rotated about an origin. In this case, PCA performed the worst, and 3D-feature-matching also failed several times. The only algorithm which did not fail once was FVR. In this test, FVR outperformed or matched the other algorithms 88\% of the time. This can be explained by FVR's robustness to out-door scenes and scenes with little texture. 
+
 \begin{figure*}[t]
 \centering
 \includegraphics[width=6.0in]{images/results/Outside_No_Texture_Translation}
 \caption{Registration Error for the Little Texture Outdoors Translation Data Set}
 \label{fig:PET14}
 \end{figure*}
+
+Another test using a low-textured out-doors scene was tested where the camera was translated along a path. Results are shown in figure \ref{fig:PET14}. Here again the FVR method dominated recording either the best result or matching best result for around 73\% of the frames. Notably, PCA performed poorly, and both the feature-matching methods failed to register a few times. ICP was more consistent, recoding the best or equivalent result around 47\% of the time. Again, this shows the strength of the FVR method in out-door and low-texture environments. 
 
 \begin{figure*}[t]
 \centering
@@ -137,12 +161,16 @@ Experiment results for the boxes scene where the camera was moved forward, effec
 \label{fig:PET15}
 \end{figure*}
 
+Another test was performed with an outdoors scene. Here only 8 of the frames had any good results for all algorithms. They are shown in figure \ref{fig:PET15}. In these results, 6 out of the 8 frames had either a matching or best registration for the FVR method. 2D-feature-matching and 3D-feature-matching both failed a few times, and PCA was inconsistent. ICP had a competitive result 3 out of the 8 times, both FVR and ICP were most consistent. 
+
 \begin{figure*}[t]
 \centering
 \includegraphics[width=6.0in]{images/results/Outside_TextureConfusion_Translation}
 \caption{Registration Error for the Outdoors Texture Confusion Translation Data Set}
 \label{fig:PET16}
 \end{figure*}
+
+Another scene with texture-confusion was taken out-doors. The interesting results are shown in figure \ref{fig:PET16}. Here, 3D-feature matching failed a majority of the time. Interestingly PCA also failed, the likely reason is because of the amount of noise in an out-doors scene. This noise can give inconsistencies in the principal axes and mean computation. Again, FVR performed best with it getting the best or equivalent result around 55\% of the time. This is another experiment where FVR is shown to be highly robust to scenes with texture confusion. 
 
 \begin{figure*}[t]
 \centering
@@ -151,9 +179,11 @@ Experiment results for the boxes scene where the camera was moved forward, effec
 \label{fig:PET17}
 \end{figure*}
 
-
+The final figure in the pose estimation tests shows another scene taken out-doors. This scene also contains texture confusion, but the camera was rotated about an axis rather than translated in this data-set. Results shown in figure \ref{fig:PET17} indicate that again FVR dominates with 16 out of the 21 frames having a matching or best registration by FVR. 
 
 \subsection{3D Registration Experiments}
+
+
 
 \subsection{Noise Robustness Tests}
 
