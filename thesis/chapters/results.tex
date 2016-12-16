@@ -11,12 +11,18 @@
 
 \subsection{Pose Estimation Experiments}
 
+These experiments measured registration error for the data sets mentioned in the test data section. As mentioned, different camera movements and scene types are used. Different camera movements such as translation, rotation and zoom were used. The different scenes used include: in-door, out-door, low-textured areas, large object frames areas and areas which include texture confusion. \\
+
+
 \begin{figure*}[t]
 \centering
 \includegraphics[width=6.0in]{images/results/Apartment_Texture_Rotate}
 \caption{Registration Error for the Apartment Y-Axis Rotation Data Set}
 \label{fig:PET0}
 \end{figure*}
+
+The first experiment was performed with the textured apartment data-set \ref{fig:PET0}. In each of these graphs, the x-axis represents the frame number (in which the previous frame was matched to) and the y-axis represents the registration error in Hausdorff distance relative to performing zero registration. For identical point-clouds, a Hausdorff error above 1 would mean a failure to register in any way, whilst a 0 would mean a complete registration. Since frames do not overlap, it would be improbably to get 0, and a registration error of 1 or above may still be considered good, especially if there was not much overlap in the first place. \\
+
 
 \begin{figure*}[t]
 \centering
@@ -25,12 +31,16 @@
 \label{fig:PET1}
 \end{figure*}
 
+In figure \ref{fig:PET0}, feature-matching, 3D-feature-matching, ICP, PCA and Fourier Volume Registration (FVR) were tested. In the first frame, FVR only outperformed feature-matching and PCA. In a few of the frames, the 3D feature matching and the PCA methods performed poorly relative to the reset, on other frames they were on par with others. In some frames FVR outperformed the others, this occurred on 13 out of the 23 frames tested (about 60\%). This was not completely expected as for this scene, where much texture is present, feature matching should have dominated. The frames were not highly separated so ICP should have gotten a better result too. Although ICP could be said to be very consistent.
+
 \begin{figure*}[t]
 \centering
 \includegraphics[width=6.0in]{images/results/Boxes_Texture_Rotate}
 \caption{Registration Error for the Boxes Y-Axis Rotation Data Set}
 \label{fig:PET2}
 \end{figure*}
+
+Figure \ref{fig:PET1} shows registration errors for the same scene, the apartment, this time the camera is moved about the x-axis predominantly, again it contains lots of texture. In a about 60\% of the frames, FVR either outperforms or matches the best performing algorithm. Here, ICP and 2D-feature matching are also very competitive, with 3D-feature-matching and PCA failing. In the case of PCA, when there is not enough overlap PCA fails to compute the principal components well. When FVR uses PCA, it only uses the primary axis, and can iteratively refine the alignment in a second stage.
 
 \begin{figure*}[t]
 \centering
@@ -39,12 +49,16 @@
 \label{fig:PET3}
 \end{figure*}
 
+In figure \ref{fig:PET2} 7 registration errors are shown in a graph. In 4 out of the 7 frames, FVR outperformed the other algorithms. Note in frame 3, both PCA and feature-matching failed, despite texture being present in the scene. In frames 4 and 5, ICP outperformed the others by a successful margin. 
+
 \begin{figure*}[t]
 \centering
 \includegraphics[width=6.0in]{images/results/Desk_Texture_Translation}
 \caption{Registration Error for the Desk Translation Data Set}
 \label{fig:PET4}
 \end{figure*}
+
+Experiment results for the boxes scene where the camera was moved forward, effectively zooming in on the boxes, are shown in figure \ref{fig:PET3}. Here, only 10 out of the 21 (~47\%) of the frames had a registration error lowest or equal for FVR. In a rare case, frame 16 observed a worst performance by FVR. In frame 3, 2D-feature-matching performed the worst, and towards the last few frames PCA and 3D-feature-matching performed worst.
 
 \begin{figure*}[t]
 \centering
@@ -143,7 +157,6 @@
 
 \subsection{Noise Robustness Tests}
 
-hi
 
 
 \section{Conclusion}
