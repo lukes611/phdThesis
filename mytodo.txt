@@ -1,9 +1,17 @@
 todo:
-	write about test-data
-	fix up experiments/results section
-	put lit review in different files
-	write some from experiments/results section
-	add in experiments from my previous papers
-	add in references to previous work
-	fix lit rev
-	fix intro & conc
+	1. write about test-data and tools
+	2. mention previous fvr work:
+		exps:
+			+differences between speedup and not
+			+camera movements
+			+qualitative pics
+			+noise
+			+3d compression
+		+add in references and let them know you published a journal
+	3. fix literature review:
+		+read & write about more
+		+add more
+	4. more experiments:
+		+noise experiments
+		+different transform experiments
+	5.re-write introduction and conclusion
