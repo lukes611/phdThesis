@@ -1,0 +1,9 @@
+todo:
+	write about test-data
+	fix up experiments/results section
+	put lit review in different files
+	write some from experiments/results section
+	add in experiments from my previous papers
+	add in references to previous work
+	fix lit rev
+	fix intro & conc
