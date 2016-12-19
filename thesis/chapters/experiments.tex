@@ -17,11 +17,34 @@ Some frames from the original test-set are shown in appendix \ref{AppendixA}. Th
 
 The boxes scene was captured under arbitrary-rotation, translation and zoom-in/out camera motions. It contains some useful information on the boxes themselves, however the texture on the carpet is of little to no use for most feature based registration methods. The Desk Texture Translation scene contains a desk with a desktop computer and several items on it. The In-door space with texture-confusion contains a set of chairs and picture frames which look similar to eachother locally but may cause confusion for registration techniques which rely on local features.  \\
 
-The kitchen scene was captured with both translation and zoom camera movements. The scene contains very little texture and the color is predominantly white. The Office textured blind-spot rotation scene is a textured office scene where the camera is rotated about the y-axis. The scene is focused on a large divider which seperates two desks. The divider may confuse registration methods which rely too heavily on minimization by aligning the large divider in priority rather than taking into acount the smaller details of the scene.
+The kitchen scene was captured with both translation and zoom camera movements. The scene contains very little texture and the color is predominantly white. The Office textured blind-spot rotation scene is a textured office scene where the camera is rotated about the y-axis. The scene is focused on a large divider which seperates two desks. The divider may confuse registration methods which rely too heavily on minimization by aligning the large divider in priority rather than taking into acount the smaller details of the scene. \\
+
+The Office scenes contain a decent amount of usable texture and different sets were created by translating, rotating about the y-axis and rotating about the x-axis. Other office scenes, where the camera has objects in both the foreground and the background and where the camera is lifted and rotated whilst focusing on an office desk/chair. \\
+
+Some out-door scenes were also captured around the university. Scenes are captured with both rotation and translation camera movements. These scenes are also labelled as being susceptable to texture confusion.
 
 \section{Analysis Tools}
 
+In order to test different registration methods. Algorithms were written in C/C++ using both Visual Studio (2012 and 2015) on a Windows (7 & 10) machine and code-blocks 16 on an Ubuntu machine. All source code is made available online at: https://github.com/lukes611/phdThesis. In order to measure registration algorithms we use the error metrics described in the ERROR_METRICS_SECTION section.  
+
+\section{Algorithms}
+
+Different 3D-registration algorithms were implemented to test the Fourier Volume Registration (FVR) method. We compared with Feature Matching methods because these methods are still dominant and very successful in image processing and computer vision. In this research we aimed to show that FVR was competitive with these feature matching methods whilst beating them in certain contexts (such as little textuere or scenes where texture confusion may occur). \\ 
+
+We test with both 2D feature matching, where the features are found and matched between a pair of 2D-images, then RANSAC is used with the corresponding matches and true 3D point to compute pose. The pose is then used to reconstruct the scene. We found that SURF performed best out of the other feature matching methods, so we use SURF in our 2D feature matching algorithm. The 2D feature matching method is limited as it cannot register frames which have too few features or frames which contain texture confusion. It is also not able to handle wider base-lines. \\
+
+We also test 3D-feature matching using an implementation of SIFT in 3D. This algorithm was tested and written in C/C++ and is also susceptable to failed registration in scenes with too few features and texture confusion but it shouble be more able to handle wider base-lines than the 2D counterpart as it works in 3D. //
+
+Another algorithm we test against is ICP or Iterative Closest Point. This method has become very popular in 3D reconstruction and works well on most scene types. One disadvantage is that this method may get stuck in a minima and fail to register, this can occur especially when registering wider baselines. \\
+
+The other method we test with is PCA or Principal Components Analysis is actually used to find the mean and principal components of a multi-dimensional data-set. This is useful for registration purposes as it works on wide-baselines, is very fast and provides additional information about a scene. The downside is that is is very susceptable to noisey or mis-aligned data. Our FVR method actually makes use of information from PCA so it is good to compare the two to find out what improvements if any are made by FVR. \\
+
+The final algorithm tested is the proposed FVR algorithm, which uses both PCA and Fourier Phase Correlation to find the registration transformation between two 3D data-sets. This algorithm was proposed to handle general transformations about any rotation axis, translation axis as well as handle scaling. It was also designed to be able to handle noisey data, data with texture-confusion and data with little to no texture making it a viable option in the 3D registration and pose estimation research areas.
+
+
 \section{Qualitative Experiments}
+
+
 
 \section{Quantitative Experiments}
 
