@@ -44,132 +44,25 @@ The final algorithm tested is the proposed FVR algorithm, which uses both PCA an
 
 \section{Qualitative Experiments}
 
-Our Qualitative experiments were performed by using different algorithms to generate 3D reconstructed scenes. 
+Our Qualitative experiments were performed by using different algorithms to generate 3D reconstructed scenes. The scenes include some indoor and out-door scenes. 
 
 \section{Quantitative Experiments}
 
+\subsection{Pose Estimation Experiments}
+
+Out quantitative experiments were performed by registering multiple frames from the different scenes mentioned in the algorithms section. We use the test-data mentioned, and estimate pose for each frame. We gathered results from a few metrics including: Mean Squared Error, Percent Match and Hausdorff Error. We found that measuring the Hausdorff error relative to the Hausdorff error between the two un-registered frames provided the most clear indication of performance and accuracy. We provide results for each of the raw measurements in the Appendix.
+
+
 \subsection{Camera Movement Experiments}
 
-\subsection{Pose Estimation Experiments}
+Experiments are performed where by the camera is translated or rotated and the registration transform is compared to the true camera movement and the error between the true and computed camera movement is presented.
+
+
 
 \subsection{Noise Experiments}
 
+Experiments determining each algorithm's robustness to noise are performed similarly to pose estimation experiments in that specific transforms are applied to real data and each algorithm's ability to register against such transforms is evaluated. However, in these tests we apply different amounts of noise to data and compare each registration to that of the registration of data minus the noise.
 
 
 
-\begin{figure*}[t] 
-        \centering
-        \begin{subfigure}[b]{2.0in}
-                \includegraphics[width=2.0in]{images/ch2/unit21}
-                \caption{Apartment}
-                \label{fig:RECON_UNIT}
-        \end{subfigure}%
-        \begin{subfigure}[b]{2.0in}
-                \includegraphics[width=2.0in]{images/ch2/officeA}
-                \caption{Office}
-                \label{fig:RECON_OFFICE}
-        \end{subfigure}%
-        \begin{subfigure}[b]{2.0in}
-                \includegraphics[width=2.0in]{images/ch2/outdoorA}
-                \caption{Garden}
-                \label{fig:RECON_GARDEN}
-        \end{subfigure}
-       \caption{Reconstructed Scenes.}
-       \label{fig:RECONSTRUCTIONS}
-\end{figure*}
-
-
-\subsection{Codec Evaluation \& Comparison Techniques}
-
-Codec evaluation involves comparing storage requirements between the original model and codec output. In the case of lossy codecs, a quantitative quality metric is also required. Compression metrics are easy to compute, quality metrics are more involved and there have been many proposed techniques. Quality metrics compare the distortion created by the codec relative to the original model. Two measurements are usually performed, the distance from the compressed model to the original and the distance from the original to the compressed model. Quality metrics are split into empirical and perceptual based metrics. Empirical metrics measure geometric error and perceptual metrics estimate human perception. Perception based metrics are a part of psychophysics research. For a more in-depth survey of these methods, see work by Bubill \textit{et al.} \cite{Bulbul11Assessing}.
-
-\subsubsection{Compression Metrics}
-
-In the context of 3D model compression, the file size of both, the compressed model and the original are compared. Alternatively, the file size of the compressed model from one codec can be compared to the file size of the same model compressed using another codec. The compression ratio ($CR$), defined as the original file size divided by the compressed file size, is a measure of compression performance. Another metric used is called the bit rate, different bit rates are used depending on the representation being compressed. The mesh representation uses bits per vertex (bpv) and bits per triangle (bpt), the volumetric representation uses bits per voxel and the point cloud representation uses bits per point.
-
-\subsubsection{Empirical Error Metrics}
-
-The following metrics are used to assess the error between two data samples. For two points, $p$ \& $q$, in $\Re^3$ space, the basic euclidean distance metric,
-$$
-ED(q,p) = \sqrt{(q_x - p_x)^2 + (q_y - p_y)^2 + (q_z - p_z)^2}
-$$,
-the absolute error,
-$$
-AE(q,p) = \|q_x - p_x\| + \|q_y - p_y\| + \|q_z - p_z\|
-$$
-and the squared error $SE$, 
-$$
-SE(q,p) = (q_x - p_x)^2 + (q_y - p_y)^2 + (q_z - p_z)^2
-$$
-are often used as a basis for other metrics. 3D models can be sampled into a set of points in $\Re^3$. Using these samples, the following metrics can be used: sum of distances ($SOD$), sum of absolute differences ($SAD$), sum of squared errors ($SSE$), mean square error ($MSE$) and root mean square error ($RMS$). Since the two models may be sampled differently, the minimum error from one sample to the others is used. These metrics are defined below using two point sets, $A$ \& $B$ where the length of these sets is $M$ and $N$ respectively.
-$$
-SOD(A,B) = \sum_{k=0}^{M} \min_{b \in B}(ED(A_k,b))
-$$
-
-$$
-SAD(A,B) = \sum_{k=0}^{M} \min_{b \in B}(AE(A_k,b))
-$$
-
-$$
-SSE(A,B) = \sum_{k=0}^{M} \min_{b \in B}(SE(A_k,b))
-$$
-
-$$
-MSE(A,B) = \frac{1}{M}SSE(A,B)
-$$
-
-$$
-RMS(A,B) = \sqrt{MSE(A,B)}
-$$
-
-For each of these metrics, $METRIC(A,B) \neq METRIC(B,A)$. Therefore, these methods are often averaged (below). This is termed the average metric (AM), as opposed to the minimum metric (MM) which is the smallest value of the two.
-
-$$
-AvgError = \frac{Metric(A,B)+Metric(B,A)}{2}
-$$
-
-Another metric, the Hausdorff distance ($HD$) is a measure of overall shape similarity. It is defined as the largest value of the maximum distances between objects from $A$ to $B$ and from $B$ to $A$. For example, for two objects $A$ \& $B$, the Hausforff distance $HD$, from $A$ to $B$, is defined as,
-$$
-HD(A,B) = \max(D(A,B),D(B,A))
-$$
-where $D(A,B)$ is defined as,
-$$
-D(A,B) = \{a \in A \| \max(dist(a,B)\}
-$$
-and $dist(a,B)$ is defined below.
-$$
-dist(a,B) = \{b \in B \left| \min(\|a-b\|)\right.\}
-$$
-
-\subsubsection{Human Perception Based Metrics}
-
-Lavoue \textit{et al.} \cite{Lavoue06Perceptually} devised a metric based on structural distortion, this method correlates well with human perception. It is based on the SSIM method of Wang \textit{et al.} \cite{Wang04Image}, which is a popular image metric. Lavoue \textit{et al.} call their method the, Mesh Structural Distortion Measure (MSDM). An updated version of this metric was also developed \cite{Lavoue11Multiscale}.
-
-\paragraph{Laplacian Metric}
-
-Karni \& Gotsman \cite{Karni00Spectral} developed their own on-line metric for use during their spectral based codec. It is based on the laplacian and measures the difference between two objects in terms of their smoothness. 
-
-\paragraph{Elastic Deformation Based Metric}
-
-Bian \textit{et al.} \cite{Bian09Evaluation} developed a novel metric, useful for both on and off-line model comparison. The algorithm is based on the theory of strain fields. A strain field is a metric derived from elasticity, it is used to describe the deformation of some object which has elastic properties. Using this concept, both models are treated as having elastic properties in order to perform quality assessment.
-
-\paragraph{Saliency Based Metrics}
-
-Howlett \textit{et al.} \cite{Howlett04Experimental} and Lee \textit{et al.} \cite{Lee05Mesh} both presented work aimed at determining salient features in 3D models. They incorporated these findings in their own metrics. Howlett \textit{et al.} used a human gaze detection device to study the psychophysical effects of viewing 3D objects. Both of these metrics are based on preserving the sections of the object in which any distortion would be visibly noticeable to humans.
-
-\paragraph{The Depth Difference Metric}
-
-Krivokuca \textit{et al.} \cite{Krivokuca12New} developed a perceptual based metric for the off-line quality assessment of 3D models. This method is independent of model representation and is based on generating multiple depth maps from different orthographic perspectives. It improves upon both the Hausdorff distance and RMS error and is good at detecting both small and large geometric errors. Krivokuca \textit{et al.} call their method, the Depth Difference (DD). It works by comparing orthographic depth maps from both the original and compressed models. First a difference depth image is calculated ($DDI$) from orthographic depth maps of the original object ($DIO$) and of the compressed object ($DIC$). The $DDI$ is calculated using element-wise matrix subtraction,
-
-$$
-DDI = DIO - DIC
-$$
-
-Then the average depth distance value ($ADD$) is calculated from the $DDI$ matrix, this equation is presented below.
-
-$$
-ADD = \frac{1}{MN} \sum_{y=0}^{M} \sum_{x=0}^{N} DDI_{y,x}
-$$
-
-This $ADD$ value is then summed up and averaged over different orthographic views, this average is the Depth Difference.
 

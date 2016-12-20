@@ -1,5 +1,4 @@
 todo:
-	1. write about test-data and tools [Monday]
 	2. mention previous fvr work: [Monday]
 		exps:
 			+differences between speedup and not

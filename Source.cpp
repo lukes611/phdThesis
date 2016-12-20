@@ -77,14 +77,14 @@ void test(string name, Point3d rotation, float scale, Point3d translation, doubl
 	}
 
 	vector<string> algorithms;
-	algorithms.push_back("none");
-	algorithms.push_back("fm");
-	algorithms.push_back("fm3d");
-	algorithms.push_back("icp");
-	//algorithms.push_back("pc");
-	//algorithms.push_back("pc2");
-	//algorithms.push_back("pc3");
-	algorithms.push_back("pca");
+	//algorithms.push_back("none");
+	//algorithms.push_back("fm");
+	//algorithms.push_back("fm3d");
+	//algorithms.push_back("icp");
+	algorithms.push_back("pc");
+	algorithms.push_back("pc2");
+	algorithms.push_back("pc3");
+	//algorithms.push_back("pca");
 
 
 
@@ -183,8 +183,17 @@ void test(string name, Point3d rotation, float scale, Point3d translation, doubl
 
 void testSetPix3d(string name)
 {
+<<<<<<< HEAD
 	double nr = 1.0;
+=======
+<<<<<<< HEAD
+	double nr = 3.0;
+	for(int Y = 330; Y < 360; Y+=10){
+=======
+	double nr = 2.0;
+>>>>>>> f15cb1f45bf824faa2d57c5439f624dc6aae058e
 	for(int Y = 0; Y < 360; Y+=10){
+>>>>>>> 3c9fa0ed7bbcf9756ff6f761ac182de0b57513b1
 		test(name, Point3d(0.0, Y, 0.0), 1.0f, Point3d(0.0, 0.0, 0.0), nr);
 
 	}
@@ -448,7 +457,31 @@ int main(int argc, char * * argv)
 
 
 	//save images: 4 per video file
+<<<<<<< HEAD
+	/*for(int videoI = 0; videoI < 20; videoI++)
+	{
+		CapturePixel3DSet video = openData(namesList[videoI], 1);
+		for(int i = 0; i < 4; i++)
+		{
+			int j = 4 + i * 6;
+			Pix3D frame;
+			video.read_frame(frame, j);
+			Mat image;
+			frame.colorImage(image);
+			//imshow("image", image);
+			//waitKey(100);
+			stringstream file_name;
+			file_name << "C:/Users/luke/Documents/Visual Studio 2012/Projects/PhD 16 Sem2/PhD 16 Sem2/thesis/images/experiments/"
+				<< "test_data/" << namesList[videoI] << "." << i << ".png";
+			cv::resize(image, image, Size(640/2, 480/2));
+			cv::imwrite(file_name.str(), image);
+			
+			//cout << file_name.str() << endl;
+		}
+	}*/
+=======
 	
+>>>>>>> 3c9fa0ed7bbcf9756ff6f761ac182de0b57513b1
 
 	testSetPix3d(namesList[0]);
 	//test("Apartment.Texture.rotate", Point3d(5.0f, 2.0f, 0.0f), 1.0f, Point3d(0.0, 1.0, 8.0));
