@@ -1,6 +1,6 @@
 todo:
-	1. write about test-data and tools
-	2. mention previous fvr work:
+	1. write about test-data and tools [Monday]
+	2. mention previous fvr work: [Monday]
 		exps:
 			+differences between speedup and not
 			+camera movements
@@ -8,10 +8,10 @@ todo:
 			+noise
 			+3d compression
 		+add in references and let them know you published a journal
-	3. fix literature review:
+	3. fix literature review: [Thursday]
 		+read & write about more
 		+add more
-	4. more experiments:
+	4. more experiments: [Monday]
 		+noise experiments
 		+different transform experiments
-	5.re-write introduction and conclusion
+	5.re-write introduction and conclusion [Thursday]
