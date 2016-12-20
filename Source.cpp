@@ -183,7 +183,7 @@ void test(string name, Point3d rotation, float scale, Point3d translation, doubl
 
 void testSetPix3d(string name)
 {
-	double nr = 2.0;
+	double nr = 1.0;
 	for(int Y = 0; Y < 360; Y+=10){
 		test(name, Point3d(0.0, Y, 0.0), 1.0f, Point3d(0.0, 0.0, 0.0), nr);
 
