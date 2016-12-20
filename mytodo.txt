@@ -1,11 +1,14 @@
 todo:
 	2. mention previous fvr work: [Monday]
 		exps:
-			+differences between speedup and not
-			+camera movements
+			speed
+			translation tracking
+			rotation tracking
+			object motion test
 			+qualitative pics
-			+noise
+			+differences between speedup and not
 			+3d compression
+			+3d compression for the frames
 		+add in references and let them know you published a journal
 	3. fix literature review: [Thursday]
 		+read & write about more
