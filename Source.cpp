@@ -77,14 +77,14 @@ void test(string name, Point3d rotation, float scale, Point3d translation, doubl
 	}
 
 	vector<string> algorithms;
-	algorithms.push_back("none");
-	algorithms.push_back("fm");
-	algorithms.push_back("fm3d");
-	algorithms.push_back("icp");
-	//algorithms.push_back("pc");
-	//algorithms.push_back("pc2");
-	//algorithms.push_back("pc3");
-	algorithms.push_back("pca");
+	//algorithms.push_back("none");
+	//algorithms.push_back("fm");
+	//algorithms.push_back("fm3d");
+	//algorithms.push_back("icp");
+	algorithms.push_back("pc");
+	algorithms.push_back("pc2");
+	algorithms.push_back("pc3");
+	//algorithms.push_back("pca");
 
 
 
@@ -183,8 +183,8 @@ void test(string name, Point3d rotation, float scale, Point3d translation, doubl
 
 void testSetPix3d(string name)
 {
-	double nr = 0.0;
-	for(int Y = 0; Y < 360; Y+=10){
+	double nr = 3.0;
+	for(int Y = 330; Y < 360; Y+=10){
 		test(name, Point3d(0.0, Y, 0.0), 1.0f, Point3d(0.0, 0.0, 0.0), nr);
 
 	}
@@ -448,7 +448,7 @@ int main(int argc, char * * argv)
 
 
 	//save images: 4 per video file
-	for(int videoI = 0; videoI < 20; videoI++)
+	/*for(int videoI = 0; videoI < 20; videoI++)
 	{
 		CapturePixel3DSet video = openData(namesList[videoI], 1);
 		for(int i = 0; i < 4; i++)
@@ -468,9 +468,9 @@ int main(int argc, char * * argv)
 			
 			//cout << file_name.str() << endl;
 		}
-	}
+	}*/
 
-	//testSetPix3d(namesList[0]);
+	testSetPix3d(namesList[0]);
 	//test("Apartment.Texture.rotate", Point3d(5.0f, 2.0f, 0.0f), 1.0f, Point3d(0.0, 1.0, 8.0));
 
 	//for(int i = 13; i < 20; i++)

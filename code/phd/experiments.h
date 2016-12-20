@@ -5,7 +5,7 @@
 #include <map>
 #include "../basics/Pixel3DSet.h"
 
-#define AT_UNI //i am at uni
+//#define AT_UNI //i am at uni
 
 #ifdef _WIN32 //if on windows
 
@@ -26,7 +26,7 @@
 #define EXPS_DIR "C:/Users/luke/Documents/Visual Studio 2012/Projects/PhD 16 Sem2/PhD 16 Sem2/experiments"
 
 
-//#define HASCUDA
+#define HASCUDA
 
 #endif
 
