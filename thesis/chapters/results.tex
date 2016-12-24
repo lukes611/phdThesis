@@ -4,314 +4,36 @@
 \end{savequote}
 \makeatletter
 \chapter{Results}
-
 \label{ResultsSection}
 
 \section{Results}
 
+In this section results are presented and discussed. First we present qualitative results comparing the proposed FVR method with other 3D-Reconstruction, then we present some qualitative results.  
 
+%plan:
+%	qualitative results:
+%		old -towrite
+%		new -toadd
+%	quantitative:
+%		camera movement experiments -towrite
+%		pose estimation experiments -done
+%	noise experiments
+		% -toadd
+%	data representation experiments -toadd
+		
+		
 
 \section{Qualitative Results}
 
-\begin{figure*}[t] 
-        \centering
-        \begin{subfigure}[b]{2.0in}
-                \includegraphics[width=2.0in]{images/ch2/unit21}
-                \caption{Apartment}
-                \label{fig:RECON_UNIT}
-        \end{subfigure}%
-        \begin{subfigure}[b]{2.0in}
-                \includegraphics[width=2.0in]{images/ch2/officeA}
-                \caption{Office}
-                \label{fig:RECON_OFFICE}
-        \end{subfigure}%
-        \begin{subfigure}[b]{2.0in}
-                \includegraphics[width=2.0in]{images/ch2/outdoorA}
-                \caption{Garden}
-                \label{fig:RECON_GARDEN}
-        \end{subfigure}
-       \caption{Reconstructed Scenes.}
-       \label{fig:RECONSTRUCTIONS}
-\end{figure*}
+\input{chapters/results/qualitative}
 
 \section{Quantitative Results}
 
-\subsection{Pose Estimation Results}
-
-These experiments measured registration error for the data sets mentioned in the test data section. As mentioned, different camera movements and scene types are used. Different camera movements such as translation, rotation and zoom were used. The different scenes used include: in-door, out-door, low-textured areas, large object frames areas and areas which include texture confusion. \\
-
-
-\begin{figure*}[t]
-\centering
-\includegraphics[width=6.0in]{images/results/Apartment_Texture_Rotate}
-\caption{Registration Error for the Apartment Y-Axis Rotation Data Set}
-\label{fig:PET0}
-\end{figure*}
-
-The first experiment was performed with the textured apartment data-set \ref{fig:PET0}. In each of these graphs, the x-axis represents the frame number (in which the previous frame was matched to) and the y-axis represents the registration error in Hausdorff distance relative to performing zero registration. For identical point-clouds, a Hausdorff error above 1 would mean a failure to register in any way, whilst a 0 would mean a complete registration. Since frames do not overlap, it would be improbably to get 0, and a registration error of 1 or above may still be considered good, especially if there was not much overlap in the first place. \\
-
-
-\begin{figure*}[t]
-\centering
-\includegraphics[width=6.0in]{images/results/Apartment_Texture_Rotate_XAxis}
-\caption{Registration Error for the Apartment X/Y-Axis Rotation Data Set}
-\label{fig:PET1}
-\end{figure*}
-
-In figure \ref{fig:PET0}, feature-matching, 3D-feature-matching, ICP, PCA and Fourier Volume Registration (FVR) were tested. In the first frame, FVR only outperformed feature-matching and PCA. In a few of the frames, the 3D feature matching and the PCA methods performed poorly relative to the reset, on other frames they were on par with others. In some frames FVR outperformed the others, this occurred on 13 out of the 23 frames tested (about 60\%). This was not completely expected as for this scene, where much texture is present, feature matching should have dominated. The frames were not highly separated so ICP should have gotten a better result too. Although ICP could be said to be very consistent.
-
-\begin{figure*}[t]
-\centering
-\includegraphics[width=6.0in]{images/results/Boxes_Texture_Rotate}
-\caption{Registration Error for the Boxes Y-Axis Rotation Data Set}
-\label{fig:PET2}
-\end{figure*}
-
-Figure \ref{fig:PET1} shows registration errors for the same scene, the apartment, this time the camera is moved about the x-axis predominantly, again it contains lots of texture. In a about 60\% of the frames, FVR either outperforms or matches the best performing algorithm. Here, ICP and 2D-feature matching are also very competitive, with 3D-feature-matching and PCA failing. In the case of PCA, when there is not enough overlap PCA fails to compute the principal components well. When FVR uses PCA, it only uses the primary axis, and can iteratively refine the alignment in a second stage.
-
-\begin{figure*}[t]
-\centering
-\includegraphics[width=6.0in]{images/results/Boxes_Texture_ZoomOut}
-\caption{Registration Error for the Boxes Zoom Data Set}
-\label{fig:PET3}
-\end{figure*}
-
-In figure \ref{fig:PET2} 7 registration errors are shown in a graph. In 4 out of the 7 frames, FVR outperformed the other algorithms. Note in frame 3, both PCA and feature-matching failed, despite texture being present in the scene. In frames 4 and 5, ICP outperformed the others by a successful margin. 
-
-\begin{figure*}[t]
-\centering
-\includegraphics[width=6.0in]{images/results/Desk_Texture_Translation}
-\caption{Registration Error for the Desk Translation Data Set}
-\label{fig:PET4}
-\end{figure*}
-
-Experiment results for the boxes scene where the camera was moved forward, effectively zooming in on the boxes, are shown in figure \ref{fig:PET3}. Here, only 10 out of the 21 (~47\%) of the frames had a registration error lowest or equal for FVR. In a rare case, frame 16 observed a worst performance by FVR. In frame 3, 2D-feature-matching performed the worst, and towards the last few frames PCA and 3D-feature-matching performed worst.
-
-\begin{figure*}[t]
-\centering
-\includegraphics[width=6.0in]{images/results/IndoorSpace_texture_confusion_translation}
-\caption{Registration Error for the Texture Confusion Indoor-Space Translation Data Set}
-\label{fig:PET5}
-\end{figure*}
-
-In ~52\% of the frames of the desk translation data-set in figure \ref{fig:PET4}, the FVR method outperformed others relative to just ~26\% for ICP, ~9\% for 2D-feature-matching and PCA and ~4\% for 3D-feature-matching. This data-set tested for the pose-estimation procedure's ability to align a moving camera along a path. 3D feature matching was a notable poor performer here, ICP and FVR seemed to be strongest. 
-
-
-\begin{figure*}[t]
-\centering
-\includegraphics[width=6.0in]{images/results/Kitchen_LittleTexture_Pan}
-\caption{Registration Error for the Low-Texture Kitchen Translation Data Set}
-\label{fig:PET6}
-\end{figure*}
-
-An important data-set tested is the Indoor-Space with texture confusion (figure \ref{fig:PET5}). Here, a small scene was observed, where texture-confusion was present, this makes registration more difficult for all algorithms most notably the feature matching methods. We suspected that ICP, PCA, and FVR would perform best here. Here, around 39\% of the time, FVR performed best. Compared to the best feature-matching method (2D) with ~22\% of performances being the best. Interestingly PCA performed much worse compared with 2D-feature-matching. ICP outperformed others around 33\% of the time, similar to FVR's position but not quite as good. 
-
-Results for the low-textured Kitchen data-set were collected and shown in figure \ref{fig:PET6}. Again around 44\% of the frames had best results given by FVR. Compared with the next best algorithm ICP at ~27\%. In this case, this is expected as the feature-matching methods should perform worse in a low-textured scene. PCA was next best having the best registration ~22\% of the time.
-
-\begin{figure*}[t]
-\centering
-\includegraphics[width=6.0in]{images/results/Kitchen_Little_Texture_Zoom}
-\caption{Registration Error for the Low-Texture Kitchen Zoom Data Set}
-\label{fig:PET7}
-\end{figure*}
-
-Another test for the low-textured Kitchen scene was also performed, this time by moving the camera forward and backwards, zooming in on the scene. In this test, FVR only outperformed the other methods in 3 out of the 13 frames. ICP outperformed FVR on this data-set, as 6 out of the 5 frames had best results given by ICP. It could also be said that ICP was a little more consistent. Interestingly 3D-feature-matching outperformed the 2D counterpart.
-
-\begin{figure*}[t]
-\centering
-\includegraphics[width=6.0in]{images/results/Office_TexturedItems_Translation}
-\caption{Registration Error for the Office Translation Data Set}
-\label{fig:PET8}
-\end{figure*}
-
-In the results for the Textured Office set (figure \ref{fig:PET8}), FVR matched or beat the other algorithms 80\% of the time. 2D-feature matching also performed well but did not manage to best FVR most of the time. This results shows that, to our surprise, FVR not only works well compared to other algorithms in scenes with little or no texture or in scenes where feature confusion is high, but also in high texture scenes where feature-matching should have an advantage.
-
-
-\begin{figure*}[t]
-\centering
-\includegraphics[width=6.0in]{images/results/Office_Texture_blind_spot_rotation}
-\caption{Registration Error for the Office Centered Object Rotation Data Set}
-\label{fig:PET9}
-\end{figure*}
-
-Figure \ref{fig:PET9} shows results for the centred object rotation scene. Here, a large divider was placed in the middle of two desks. The idea was to create an environment where the large divider could throw off the effects of PCA and FVR and give an advantage to the feature matching approaches and ICP. Interestingly, around 35\% of the time, FVR had the best result. 2D-feature-matching outperformed the 3D counterpart but only got the best result 10\% of the time. ICP on the other hand got the best result for around 55\% of the frames. It is suspected that ICP is able to use the large divider as an anchor which would make it more robust to non-overlapped data.
-
-\begin{figure*}[t]
-\centering
-\includegraphics[width=6.0in]{images/results/Office_Texture_Rotate_XAxis}
-\caption{Registration Error for the Office X/Y-Axis Rotation Data Set}
-\label{fig:PET10}
-\end{figure*}
-
-Another experiment where the scene was filmed with the camera rotated predominantly about the x-axis is shown in figure \ref{fig:PET10}, this time 2D-feature-matching, ICP and FVR all performed similarly, with only PCA and 3D-feature-matching failing to get good registrations. 
-
-\begin{figure*}[t]
-\centering
-\includegraphics[width=6.0in]{images/results/Office_Texture_Rotation}
-\caption{Registration Error for the Office Y-Axis Rotation Data Set}
-\label{fig:PET11}
-\end{figure*}
-
-Figure \ref{fig:PET11} shows the registration errors for the Office data-set with camera rotation about the Y-axis. Here, in around 50\% of the cases, FVR outperformed or matched the best result. 2D-feature-matching was next best matching or outperforming the best result around 34\% of the time. Interestingly, PCA performed the worst with this data-set. Because rotation can incur a smaller overlap and thus a large shift in the axes and mean of the principal components, this could be expected.
-
-\begin{figure*}[t]
-\centering
-\includegraphics[width=6.0in]{images/results/Office_Texture_Translation}
-\caption{Registration Error for the Office Translation Data Set}
-\label{fig:PET12}
-\end{figure*}
-
-In the Office translation scene, FVR outperformed or matched the other algorithms around 85\% of the time. This shows that the FVR has high accuracy when dealing with translation detection and the registration of 3D data with only translational changes. Here, PCA and 3D-feature matching performed the worst with ICP and 2D-feature matching also being quite consistent and robust.
-
-\begin{figure*}[t]
-\centering
-\includegraphics[width=6.0in]{images/results/Outside_No_Texture_Rotation}
-\caption{Registration Error for the Little Texture Outdoors Rotation Data Set}
-\label{fig:PET13}
-\end{figure*}
-
-Figure \ref{fig:PET13} shows results for an outdoors scene with little texture, here the camera was rotated about an origin. In this case, PCA performed the worst, and 3D-feature-matching also failed several times. The only algorithm which did not fail once was FVR. In this test, FVR outperformed or matched the other algorithms 88\% of the time. This can be explained by FVR's robustness to out-door scenes and scenes with little texture. 
-
-\begin{figure*}[t]
-\centering
-\includegraphics[width=6.0in]{images/results/Outside_No_Texture_Translation}
-\caption{Registration Error for the Little Texture Outdoors Translation Data Set}
-\label{fig:PET14}
-\end{figure*}
-
-Another test using a low-textured out-doors scene was tested where the camera was translated along a path. Results are shown in figure \ref{fig:PET14}. Here again the FVR method dominated recording either the best result or matching best result for around 73\% of the frames. Notably, PCA performed poorly, and both the feature-matching methods failed to register a few times. ICP was more consistent, recoding the best or equivalent result around 47\% of the time. Again, this shows the strength of the FVR method in out-door and low-texture environments. 
-
-\begin{figure*}[t]
-\centering
-\includegraphics[width=6.0in]{images/results/Outside_TextureConfusion_Rotation}
-\caption{Registration Error for the Outdoors Texture Confusion Rotation Data Set}
-\label{fig:PET15}
-\end{figure*}
-
-Another test was performed with an outdoors scene. Here only 8 of the frames had any good results for all algorithms. They are shown in figure \ref{fig:PET15}. In these results, 6 out of the 8 frames had either a matching or best registration for the FVR method. 2D-feature-matching and 3D-feature-matching both failed a few times, and PCA was inconsistent. ICP had a competitive result 3 out of the 8 times, both FVR and ICP were most consistent. 
-
-\begin{figure*}[t]
-\centering
-\includegraphics[width=6.0in]{images/results/Outside_TextureConfusion_Translation}
-\caption{Registration Error for the Outdoors Texture Confusion Translation Data Set}
-\label{fig:PET16}
-\end{figure*}
-
-Another scene with texture-confusion was taken out-doors. The interesting results are shown in figure \ref{fig:PET16}. Here, 3D-feature matching failed a majority of the time. Interestingly PCA also failed, the likely reason is because of the amount of noise in an out-doors scene. This noise can give inconsistencies in the principal axes and mean computation. Again, FVR performed best with it getting the best or equivalent result around 55\% of the time. This is another experiment where FVR is shown to be highly robust to scenes with texture confusion. 
-
-\begin{figure*}[t]
-\centering
-\includegraphics[width=6.0in]{images/results/Plants_Outdoors_Texture_Confusion_Rotation}
-\caption{Registration Error for the Outdoor Plants Texture Confusion Rotation Data Set}
-\label{fig:PET17}
-\end{figure*}
-
-The final figure in the pose estimation tests shows another scene taken out-doors. This scene also contains texture confusion, but the camera was rotated about an axis rather than translated in this data-set. Results shown in figure \ref{fig:PET17} indicate that again FVR dominates with 16 out of the 21 frames having a matching or best registration by FVR. 
-
-\subsection{3D Registration Results}
-
-A number of experiments were undertaken to assess the reconstruction accuracy, noise sensitivity and robustness to object motion. Experiments were performed using an ASUS Zenbook UX303LN with an Intel i7 5500u Dual Core 2.4GHz processor, 8GB of RAM and an NVIDIA GE-FORCE 840 M GPU. For volumes of $384^3$, 1 $\times$ registration per second was possible. To achieve real-time performance, 1 out of every 30th frames was processed.
-
-\begin{table}[ht]
-\centering
-\scalebox{0.75}{
-\begin{tabular}{ccccc}
-\hline
-\textbf{translation (cm)} & \textbf{noise range (\%)} & \textbf{SNR} & \textbf{error (cm)} & \textbf{error (voxel)}\\ \hline
-5cm & 0 & $\infty$ & 0 & 0\\
-5cm & 10 & 20db & 0 & 0\\
-5cm & 25 & 12db & 0 & 0\\
-5cm & 50 & 6db & 0 & 0\\
-5cm & 75 & 2.5db & 112.28 & 89.83\\
-10cm & 0 & $\infty$ & 0 & 0\\
-10cm & 10 & 20db & 0 & 0\\
-10cm & 25 & 12db & 0 & 0\\
-10cm & 50 & 6db & 156.65 & 125.32\\
-15cm & 0 & $\infty$ & 2.8 & 2.24\\
-15cm & 10 & 20db & 2.8 & 2.24\\
-15cm & 25 & 12db & 2.8 & 2.24\\
-15cm & 50 & 6db & 198.55 & 158.84\\
-\\
-\end{tabular}}
-\\
-\caption{Translation Tracking}
-\label{table:trans}
-\end{table}[ht]
-
-
-
-
-
-
-
-To assess reconstruction accuracy, two indoor environments (Apartment and Office) as well as one outdoor environment (Garden) were used, these can be seen in figures \ref{fig:RECON_UNIT}, \ref{fig:RECON_OFFICE} and \ref{fig:RECON_GARDEN} respectively. The Apartment reconstruction was recorded by moving through a room whilst rotating the camera. Some frames contained nothing but featureless walls, others had contrast shifts due to the camera's automatic contrast feature, yet, accurate reconstruction was achieved. The office reconstruction was generated by rotating the camera about the y-axis while moving backwards. Whilst our method is a closed form solution, its accuracy is still comparable to existing feature based SLAM methods. Typical feature based methods work well with indoor environments where local features are readily distinguishable and easy to match. They do not tend to work as well with complex outdoor scenes where feature confusion is likely. To assess performance in such outdoor scenes, a garden scene containing bushes, plants and a ground covering of bark and rocks was used. In the case of a feature matching approach this scene would likely result in feature confusion, making camera tracking difficult. The proposed method was able to produce a good quality reconstruction. Hence, our approach readily overcomes difficulties common to feature matching methods.             
-
-
-
-
-\subsection{Robustness to Object Motion}
-
-
-\begin{table*}[ht]
-\parbox{.45\linewidth}{
-\centering
-\scalebox{0.75}{
-\begin{tabular}{ccccc}\hline
-\textbf{rotation} & \textbf{noise (\%)} & \textbf{SNR} & \textbf{error ($\theta$)} & \textbf{error (voxel)}\\ \hline
-$10^{\circ}$ & 0 & $\infty$ & 0.31 & 0\\
-$10^{\circ}$ & 10 & 20db & 0.31 & 0\\
-$10^{\circ}$ & 25 & 12db & 0.63 & 1\\
-$10^{\circ}$ & 30 & 10.5db & 90.62 & 96\\
-$20^{\circ}$ & 0 & $\infty$ & 0.31 & 0\\
-$20^{\circ}$ & 10 & 20db & 0.63 & 1\\
-$20^{\circ}$ & 15 & 16.5db & 38.13 & 40\\
-$30^{\circ}$ & 0 & $\infty$ & 3.75 & 4\\
-$30^{\circ}$ & 10 & 20db & 3.28 & 3\\
-$30^{\circ}$ & 15 & 16.5db & 30 & 32\\
-\\
-\end{tabular}}
-\caption{Rotation Tracking}
-\label{table:rote}
-}
-\hfill
-\parbox{.45\linewidth}{
-\centering
-\scalebox{0.75}{
-\begin{tabular}{ccc}\hline
-\textbf{Object Size} & \textbf{error (cm)} & \textbf{error (voxel)}\\ \hline
-0.35 & 0 & 0\\
-2.95 & 0 & 0\\
-6.22 & 0 & 0\\
-12.28 & 0 & 0\\
-19.82 & 0 & 0\\
-22.39 & 0 & 0\\
-26.09 & 0 & 0\\
-31.00 & 0 & 0\\
-48.23 & 38.42 & 15\\
-74.32 & 113.57 & 44\\
-\\
-\end{tabular}}
-\caption{Object Motion Test}
-\label{table:OBJECT_MOVE_EXP}
-}
-\end{table*}[ht]
-
-
-To assess robustness to object motion, experiments were conducted by moving the camera backwards along the z-axis by 5cm per frame whilst moving objects in and out of the scene so that they only appear in one of the volumes being registered. Various sized objects including stacks of CDs, large boxes, people and several pieces of furniture were used and are measured by the percentage of the frame they occupy. Results from Table \ref{table:OBJECT_MOVE_EXP} show the proposed method was accurate upto an object size of 31\%, but failed for objects taking up over 48.23\%.
-
-\subsection{Noise Robustness Results}
-
-
-
-
-To assess robustness to noise, the estimated camera parameters are compared to ground truth data under different noise conditions. In each experiment, varying amounts of random noise were added per voxel prior to registration. This is expressed in decibels using the Signal to Noise Ratio (SNR). Each voxel value lies in the range [0-1]. Here, a noise value of 10\% means random noise was added in the range [-0.05, 0.05]. Tracking error is measured in centimetres and voxel error (the error in the phase correlation volume). The first experiment evaluated noise robustness whilst the camera was translated by varying amounts (5cm, 10cm and 15cm). Results in Table \ref{table:trans} show that, for camera translations up to 15cm and SNR values above 6.0 our method is robust to noise. At video rates, a displacement of 10cm per frame equates to a camera velocity of 3 m/s (about twice the normal walking speed). 
-
-
-Table \ref{table:rote} shows the results for tracking camera rotations of 10, 20 and 30 degrees per frame. At video rates, 12 degrees per frame is almost a full rotation per second. In rotations of 10 degrees, the error was less than a degree for all but a noise level of 30\% and above. This base line error is due to the sampling resolution of the volume, as voxel error was in fact zero. As with pure translation, the effect of noise increases with camera disparity. At 30 degrees, little matching information is available. However, for noise levels of 10\% or less, voxel distance error was as low as 4 with an angular error less than 3.8. Rotations of this magnitude are unlikely, moreover motion blur would occur.
+\input{chapters/results/quantitative}
 
 \section{3D Phase Correlation Performance}
 
-To assess the performance of our method, the size of the volumes being registered is defined as $N^3$ whilst each frame is sampled at a resolution of $W$ $\times$ $H$. The projection process requires $12WH$ operations whilst re-sampling the point cloud requires $2WH$ operations. The Volume Registration process, $VolumeRegister{\theta \varphi t_x t_y t_z}(V_1, V_2)$ consists of 2 $\times$ Hanning windowing processes, 2 $\times$ 3D FFTs, 2 $\times$ volume-logs, 2 $\times$ log-spherical transforms, 2 $\times$ phase correlation processes and 1 $\times$ linear transformation and peak finding. 
+The performance of the FVR method is shown theoretically in this section. The size of the volumes being registered is defined as $N^3$ and each frame is sampled at a resolution of $W$ $\times$ $H$. The projection process requires $12WH$ operations whilst re-sampling the point cloud requires $2WH$ operations. The Volume Registration process, $VolumeRegister{\theta \varphi t_x t_y t_z}(V_1, V_2)$ consists of 2 $\times$ Hanning windowing processes, 2 $\times$ 3D FFTs, 2 $\times$ volume-logs, 2 $\times$ log-spherical transforms, 2 $\times$ phase correlation processes and 1 $\times$ linear transformation and peak finding. 
 
 The Hanning windowing function requires 26 operations. The 3D FFT has complexity of $3N^3\log{N}$, the log and log-spherical transform functions require 3 and 58 operations per voxel respectively. Multiplying two frequency spectra together and transforming a volume requires 15 and 30 operations per voxel respectively. Finding the peak value requires $2N^3$ operations. The complexity in terms of number of operations for the phase correlation process is given in Eq. \ref{eqn:PCFULLPERFORMANCE} This process requires 2 $\times$ 3D FFTs, 1 $\times$ frequency spectra multiplication, and 1 $\times$ peak finding operation. 
 \begin{equation} \label{eqn:PCFULLPERFORMANCE}
