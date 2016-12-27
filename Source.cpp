@@ -156,7 +156,7 @@ void test(string name, Point3d rotation, float scale, Point3d translation, doubl
 
 		//print error
 		cout << "algorithm[" << algorithms[i] << "] had " << percentMatch << "% matching rate" << endl;
-		ll_experiments::appendData(string(EXPS_DIR) + string("/") + name + string(".tests.v2.csv"),
+		ll_experiments::appendData(string(EXPS_DIR) + string("/") + name + string(".") + algorithms[i] + string(".") + string(".tests.v3.csv"),
 			string("algorithm, rx, ry, rz, scale, tx, ty, tz, noiseRange, SNR, percent match, seconds"),
 			line.str());
 
@@ -447,7 +447,6 @@ int main(int argc, char * * argv)
 
 
 	//save images: 4 per video file
-<<<<<<< HEAD
 	/*for(int videoI = 0; videoI < 20; videoI++)
 	{
 		CapturePixel3DSet video = openData(namesList[videoI], 1);
@@ -469,9 +468,6 @@ int main(int argc, char * * argv)
 			//cout << file_name.str() << endl;
 		}
 	}*/
-=======
-	
->>>>>>> 3c9fa0ed7bbcf9756ff6f761ac182de0b57513b1
 
 	testSetPix3d(namesList[0]);
 	//test("Apartment.Texture.rotate", Point3d(5.0f, 2.0f, 0.0f), 1.0f, Point3d(0.0, 1.0, 8.0));
@@ -492,8 +488,6 @@ int main(int argc, char * * argv)
 	//quantitativeExperiment10("pc3", fn, "regular", inds,0.0f);
 
     }
-
-
 
 
 	return 0;
