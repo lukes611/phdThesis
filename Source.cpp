@@ -415,8 +415,8 @@ void quantitativeExperiment10(string algorithm_name,
 
 int main(int argc, char * * argv)
 {
-
-    string namesList[20] = {
+	
+	string namesList[20] = {
 
         "Apartment.Texture.rotate",
         "Apartment.Texture.rotateXAxis",
