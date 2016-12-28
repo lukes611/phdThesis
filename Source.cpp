@@ -81,9 +81,9 @@ void test(string name, Point3d rotation, float scale, Point3d translation, doubl
 	//algorithms.push_back("fm");
 	//algorithms.push_back("fm3d");
 	//algorithms.push_back("icp");
-	algorithms.push_back("pc");
+	//algorithms.push_back("pc");
 	algorithms.push_back("pc2");
-	algorithms.push_back("pc3");
+	//algorithms.push_back("pc3");
 	//algorithms.push_back("pca");
 
 
@@ -129,7 +129,8 @@ void test(string name, Point3d rotation, float scale, Point3d translation, doubl
 			M2 = ll_pc::pc_register(f1, f2, seconds);
 		}else if(algorithms[i] == "pc2")
 		{
-			M2 = ll_pc::pc_register_pca(f1, f2, seconds);
+			//M2 = ll_pc::pc_register_pca(f1, f2, seconds);
+			ll_pc::pc_register_pca_i(f1, f2, seconds);
 		}else if(algorithms[i] == "pc3")
 		{
 			M2 = ll_pc::pc_pca_icp(f1, f2, seconds);
