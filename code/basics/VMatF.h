@@ -105,7 +105,7 @@ public:
 	double noise(double range); //returns SNR, takes in range and adds random values to volume from -range/2 to range/2
 	float average_pixel();
 	float average_pixel_non_zeros();
-	inline bool inbounds(int x, int y, int z);
+	bool inbounds(int x, int y, int z);
 	inline cv::Point3i round_point(R3 & r);
 	void setAll(float value);
 	int count(float threshold);
