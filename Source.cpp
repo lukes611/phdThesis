@@ -111,11 +111,13 @@ public:
             {
                 for(int x = corner.x; x < corner.x + size; x++)
                 {
-                    sum += (int)(volume(x,y,z) * 255.0f);
+                    if(volume.inbounds(x,y,z))
+                        sum += (int)(volume(x,y,z) * 255.0f);
+                    else s3--;
                 }
             }
         }
-        return ((unsigned char)(sum / (double)s3));
+        return ((sum / (double)s3));
     }
 
     virtual int countBits() = 0;
@@ -419,16 +421,16 @@ public:
     int getSubCornerIndex(int x, int y, int z, int hs)
     {
         int ret = 0;
-        if(y / hs == 0)
+        if(y < hs)
         {
-            if(x / hs == 0) ret = 0;
+            if(x < hs) ret = 0;
             else ret = 1;
         }else
         {
-            if(x / hs == 0) ret = 3;
+            if(x < hs) ret = 3;
             else ret = 2;
         }
-        if(z / hs > 0) ret += 4;
+        if(z >= hs) ret += 4;
         return ret;
     }
 
@@ -439,6 +441,8 @@ public:
 
     float getColor(int x, int y, int z, Point3i corner, int size)
     {
+
+
         float a = interpolate(colors[0], colors[3], (y-corner.y) / (float) size);
         float b = interpolate(colors[1], colors[2], (y-corner.y) / (float) size);
 
@@ -457,14 +461,29 @@ public:
 
     void computeRepresentation(VMat & volume)
     {
-
         Point3i corner = getCorner();
         int size = getSize();
 
+
+
+
+
         for(int i = 0; i < 8; i++) colors[i] = 0.0f;
 
-        int hs = size / 2;
-        int s3 = hs * hs * hs;
+        //int hs = size / 2;
+        int newSize;
+        vector<Point3i> corners;
+        VMatOctant::getSubCubes(corner, size, corners, newSize);
+
+        for(int i = 0; i < corners.size(); i++)
+        {
+            ILQV tmp;
+            tmp.setSize(newSize);
+            tmp.setCorner(corners[i] - Point3i(newSize/2, newSize/2, newSize/2));
+            colors[i] = tmp.getAverageColor(volume);
+        }
+
+        /*int s3 = hs * hs * hs;
         float scalar = 1.0f / (float) s3;
         for(int z = corner.z, _z = 0; z < corner.z + size; z++, _z++)
         {
@@ -477,7 +496,7 @@ public:
                     colors[index] += V * scalar;
                 }
             }
-        }
+        }*/
     }
 
     void computeMse(VMat & volume)
@@ -507,7 +526,7 @@ public:
         //cout << "mse: " << getMse() << endl;
         //cout << "size: " << getSize() << endl;
         //cout << "i asked for " << threshold << endl;
-        if(getMse() > threshold && getSize() > 2 && getSize() > minChild) //split
+        if(getMse() > threshold && getSize() > minChild && getSize() > 2) //split
         {
             vector<Point3i> corners; int newSize;
             VMatOctant::getSubCubes(getCorner(), getSize(), corners, newSize);
@@ -572,8 +591,8 @@ public:
                         for(int x = corner.x; x < corner.x + size; x++)
                         {
                             float oo = self->getColor(x,y,z, corner, size) / 255.0f;
-                            oo *= 4.0f;
-                            oo = floor(oo) / 4.0f;
+                            //oo *= 4.0f;
+                            //oo = floor(oo) / 4.0f;
                             //oo *= 255.0f;
                             ret(x,y,z) = oo;
                         }
@@ -623,7 +642,7 @@ public:
         Point3i corner = getCorner();
         int size = getSize();
 
-        if(size <= 4)
+        if(size <= 2)
         {
             computeRepresentationBasic(volume);
             return;
@@ -714,8 +733,8 @@ public:
             numberOfBits++; //0 is leaf, 1 is parent
             if(x->isLeaf())
             {
-                if(x->getSize() > 4) numberOfBits += 6*8; //for the colors
-                else numberOfBits += 8;
+                if(x->getSize() > 4) numberOfBits += 6*4; //for the colors
+                else numberOfBits += 4;
             }else
             {
                 numberOfBits += 8; //for the children locations
@@ -799,8 +818,9 @@ int main(int argc, char * * argv)
     thresholds.push_back(0.01f);
 
     string type = "pt";
-    int minCube = 8;
+    int minCube = 1;
 
+    for(int _j = 0, minCube = 1; _j < 4; _j++, minCube *= 2)
     for(int i = 0; i < thresholds.size(); i++)
     {
         double threshold = thresholds[i];
