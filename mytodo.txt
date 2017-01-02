@@ -4,11 +4,8 @@ todo:
 		+read & write about more
 		+add more
 	3. more experiments: [Wednesday]
-		+3d compression for the frames
-			write OT, ST compress and generate psnr to coding rate graphs
-			compare ot and st
-			test psnr
-			output graphs
 
-	speed test experiments...
+		write OT, ST compress and generate psnr to coding rate graphs
+		output graphs
+
 	4.re-write introduction and conclusion [Thursday]
