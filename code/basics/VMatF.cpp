@@ -169,6 +169,29 @@ VMat::VMat(int sIn, Pixel3DSet l, float offValue, bool l_is_scaled)
 
 #endif
 
+VMat::VMat(SIObj & ob, int sIn, int pad)
+{
+    s = sIn;
+	setup_init();
+	setAll(0.0f);
+
+	SIObj obj = ob; obj.normalize((float)(s - pad * 2));
+    vector<R3> l;
+    for(int i = 0; i < obj._triangles.size(); i++)
+    {
+        SI_FullTriangle t = obj.getTriangle(i);
+        t.rasterize(l, 1.0f);
+    }
+    for(int i = 0; i < l.size(); i++)
+    {
+        int x = round(l[i].x + pad);
+        int y = round(l[i].y + pad);
+        int z = round(l[i].z + pad);
+        if(this->inbounds(x,y,z))
+            this->at(x,y,z) = 1.0f;
+    }
+}
+
 VMat::~VMat()
 {
 	if(s != 0)
@@ -1333,6 +1356,7 @@ Mat VMat::pca_lukes_pc_t(VMat & v1, VMat & v2, bool edge_detect, Size s)
 	return rv.clone();
 }
 
+//not do not use this function for regular registration
 Mat VMat::pca(VMat & v1, VMat & v2, bool edge_detect, float clean_amount)
 {
 	VMat s1 = v1.clone();
@@ -1664,10 +1688,175 @@ Mat VMat::pca_correct_right()
 Mat VMat::pca_correct_up()
 {
 	Pixel3DSet p = pixel3dset();
-	ll_algorithms::ll_pca_3d::LPCA pc1(p, 0.2f, ll_algorithms::ll_pca_3d::LPCA::COMPUTE_2);
-	R3 newUp = pc1.eigenvecs[0];
-	R3 center = pc1.mean;
-	Mat m = new_up_mat(newUp, center);
+	ll_algorithms::ll_pca_3d::LPCA pc(p.points, ll_algorithms::ll_pca_3d::LPCA::COMPUTE_2);
+	//R3 newUp = pc1.eigenvecs[0];
+	float mean2Origin_data[] = {
+		1.0f, 0.0f, 0.0f, -pc.mean.x,
+		0.0f, 1.0f, 0.0f, -pc.mean.y,
+		0.0f, 0.0f, 1.0f, -pc.mean.z,
+		0.0f, 0.0f, 0.0f, 1.0f,
+	}; Mat mean2Origin(Size(4,4), CV_32FC1, mean2Origin_data);
+	float HS = s * 0.5f;
+	float originToVolCenter_data[] = {
+		1.0f, 0.0f, 0.0f, HS,
+		0.0f, 1.0f, 0.0f, HS,
+		0.0f, 0.0f, 1.0f, HS,
+		0.0f, 0.0f, 0.0f, 1.0f,
+	}; Mat originToVolCenter(Size(4,4), CV_32FC1, originToVolCenter_data);
+
+	float orthoAlign_data[] = {
+		pc.eigenvecs[1].x, pc.eigenvecs[0].x, pc.eigenvecs[2].x, 0.0f,
+		pc.eigenvecs[1].y, pc.eigenvecs[0].y, pc.eigenvecs[2].y, 0.0f,
+		pc.eigenvecs[1].z, pc.eigenvecs[0].z, pc.eigenvecs[2].z, 0.0f,
+		0.0f, 0.0f, 0.0f, 1.0f,
+	}; Mat orthoAlign(Size(4,4), CV_32FC1, orthoAlign_data);
+	transpose(orthoAlign, orthoAlign);
+
+
+	Mat m = originToVolCenter * orthoAlign * mean2Origin;
+
+	//R3 center = pc1.mean;
+	//Mat m = new_up_mat(newUp, center);
 	transform_volume_forward(m);
 	return m.clone();
 }
+
+
+void VMat::filter(VMat & F)
+{
+    //unoptimized: 7.86 : 7.81 : 7.85 : 7.37 : 7.45 : 7.32 : 5.49 : 6.68 : 3.26
+    VMat cp = *this;
+    int fs = F.s;
+    int fs2 = F.s2;
+    int hfs = fs / 2;
+    float sum;
+    int xx, yy, zz, XX, YY, ZZ, x,y,z, X,Y,Z;
+    float * cpD = cp.data;
+    float * FD = F.data;
+    float * meD = data;
+    int _Z = 0, _Y, _X;
+
+
+    for(Z = 0; Z < s; Z++)
+    {
+        _Z = Z * s2;
+        for(Y = 0; Y < s; Y++)
+        {
+            _Y = _Z + Y * s;
+            for(X = 0; X < s; X++)
+            {
+                sum = 0.0f;
+                for(z = 0; z < fs; z++)
+                {
+                    ZZ = (z-hfs) + Z;
+                    if(ZZ < 0 || ZZ >= s) continue;
+                    ZZ = ZZ * s2;
+                    zz = z * fs2;
+                    for(y = 0; y < fs; y++)
+                    {
+                        YY = (y-hfs) + Y;
+                        if(YY < 0 || YY >= s) continue;
+                        YY = YY * s + ZZ;
+                        yy = y * fs + zz;
+                        for(x = 0; x < fs; x++)
+                        {
+                            XX = (x-hfs) + X;
+                            if(XX < 0 || XX >= s) continue;
+                            XX += YY;
+                            xx = x + yy;
+                            sum += cpD[XX] * FD[xx];
+                        }
+                    }
+                }
+                _X = X + _Y;
+                data[_X] = sum;
+            }
+        }
+    }
+}
+
+VMat VMat::resize(int ns)
+{
+    VMat ret = ns;
+
+    for(int z = 0; z < ns; z++)
+    {
+        for(int y = 0; y < ns; y++)
+        {
+            for(int x = 0; x < ns; x++)
+            {
+                R3 other(x,y,z);
+                other *= (s / (float) ns);
+                ret.at(x,y,z) = at(other);
+            }
+        }
+    }
+
+    return ret;
+}
+
+VMat VMat::resizeFwd(int ns)
+{
+	VMat ret = ns;
+	VMat tmp = ns;
+	tmp.setAll(0.0f);
+
+	for (int z = 0; z < s; z++)
+	{
+		for (int y = 0; y < s; y++)
+		{
+			for (int x = 0; x < s; x++)
+			{
+				float val = at(x, y, z);
+				R3 other = R3(x,y,z) * (ns / (float)s);
+				other=other.round();
+				if (ret.inbounds(other.x, other.y, other.z))
+				{
+					ret.at(other.x, other.y, other.z) += val;
+					tmp.at(other.x, other.y, other.z) += 1.0f;
+				}
+					
+			}
+		}
+	}
+
+	for (int z = 0; z < ns; z++)
+	{
+		for (int y = 0; y < ns; y++)
+		{
+			for (int x = 0; x < ns; x++)
+			{
+				if (tmp.at(x, y, z) > 0.0f) ret.at(x, y, z) /= tmp.at(x, y, z);
+			}
+		}
+	}
+
+	return ret;
+}
+
+
+Pixel3DSet LukeLincoln::makePixel3DSet(LVol<cv::Vec3b> & in)
+{
+
+
+    std::vector<cv::Vec3b> cols;
+    std::vector<R3> pnts;
+    for(int z = 0; z < in.depth; z++)
+    {
+        for(int y = 0; y < in.height; y++)
+        {
+            for(int x = 0; x < in.width; x++)
+            {
+                if(in(x,y,z) != cv::Vec3b(0,0,0))
+                {
+                    cols.push_back(in(x,y,z));
+                    cv::Point3i _(x,y,z);
+                    pnts.push_back(in.unIndex(_));
+                }
+            }
+        }
+    }
+    return Pixel3DSet(pnts, cols);
+
+}
+

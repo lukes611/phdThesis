@@ -40,11 +40,11 @@ namespace ll_R3
 		stream << "[" << input.x << ", " << input.y << ", " << input.z << "] ";
 		return stream;
 	}
-	
+
 	//algebra
 	inline R3 R3::operator+(const R3 & r2) const { return R3(x+r2.x, y+r2.y, z+r2.z); }
 	inline R3 & R3::operator+=(const R3 & r2) { x+=r2.x; y+=r2.y; z+=r2.z; return *this; }
-	
+
 	inline R3 R3::operator-(const R3 & r2) const { return R3(x-r2.x, y-r2.y, z-r2.z); }
 	inline R3 & R3::operator-=(const R3 & r2) { x-=r2.x; y-=r2.y; z-=r2.z; return *this; }
 
@@ -85,7 +85,7 @@ namespace ll_R3
 	inline bool R3::operator<=(const R3 & r2) const { return *this<r2 || *this==r2;  }
 	inline bool R3::operator>=(const R3 & r2) const { return *this>r2 || *this==r2;  }
 
-	inline float& R3::operator[](int index)
+	float& R3::operator[](int index)
 	{
 		switch (index)
 		{
@@ -131,7 +131,7 @@ namespace ll_R3
 	bool R3::ray_plane_intersection(const R3 & point_from, const R3 & ray_vector, const R3 & point_on_plane, const R3 & plane_normal, float & t, R3 * point_of_intersection)
 	{
 		float denominator = plane_normal * ray_vector;
-		if(denominator == 0.0f) return false; 
+		if(denominator == 0.0f) return false;
 		float d = precompute_d(point_on_plane, plane_normal);
 		t = -(((plane_normal * point_from) + d) / denominator);
 		if(point_of_intersection) *point_of_intersection = point_from + ray_vector * t;
@@ -141,7 +141,7 @@ namespace ll_R3
 	bool R3::ray_plane_intersection(const R3 & point_from, const R3 & ray_vector, const R3 & point_on_plane, const R3 & plane_normal, float d, float & t, R3 * point_of_intersection)
 	{
 		float denominator = plane_normal * ray_vector;
-		if(denominator == 0.0f) return false; 
+		if(denominator == 0.0f) return false;
 		t = -(((plane_normal * point_from) + d) / denominator);
 		if(point_of_intersection) *point_of_intersection = point_from + ray_vector * t;
 		return true;
@@ -153,7 +153,7 @@ namespace ll_R3
 		float chq[3];
 
 		R3 normal = triangle_normal;
-		
+
 		normal = normal.unit();
 		Ns[0] = ((b - a) ^ normal);
 		chq[0] = (point * Ns[0]) - (Ns[0] * a);
@@ -165,7 +165,7 @@ namespace ll_R3
 		Ns[2] = ((a - c) ^ normal);
 		chq[2] = (point * Ns[2]) - (Ns[2] * c);
 
-		return	(	
+		return	(
 					(chq[0] >= 0.0f && chq[1] >= 0.0f && chq[2] >= 0.0f) ||
 					(chq[0] <= 0.0f && chq[1] <= 0.0f && chq[2] <= 0.0f)
 				);
@@ -200,7 +200,7 @@ namespace ll_R3
 			return;
 		}
 		a1 = getAngle(c2.x, c2.z);
-	
+
 		a2 = acos(ydir * c2);
 		a2 *= ll_R3_C::ll_R3_rad2deg;
 	}
@@ -348,7 +348,7 @@ namespace ll_Quarternion
 		z = inp.z;
 		w = inp.w;
 	}
-	
+
 	Quarternion & Quarternion::operator=(const Quarternion & inp)
 	{
 		x = inp.x;
@@ -455,7 +455,7 @@ namespace ll_Quarternion
 		z *= inp;
 		w *= inp;
 	}
-	
+
 
 	std::ostream& operator<<(std::ostream& stream, const Quarternion& input)
 	{
@@ -467,7 +467,7 @@ namespace ll_Quarternion
 		Quarternion cpa = a.clone();
 		return cpa.getMultiplicationBy(b.clone());
 	}
-	
+
 
 
 }

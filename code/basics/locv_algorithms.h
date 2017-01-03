@@ -89,6 +89,7 @@ namespace ll_algorithms
 			static cv::Mat compute_transform_between_for_pc(ll_pix3d::Pixel3DSet & p, ll_pix3d::Pixel3DSet & p2);
 
 			static cv::Mat compute_alignment_for_pc(ll_pix3d::Pixel3DSet & p, ll_pix3d::Pixel3DSet & p2);
+			static cv::Mat pca_register(ll_pix3d::Pixel3DSet & p, ll_pix3d::Pixel3DSet & p2);
 			static cv::Mat compute_alignment_for_pc_small_change(ll_pix3d::Pixel3DSet & p, ll_pix3d::Pixel3DSet & p2);
 
 			static void compute_axis(ll_pix3d::Pixel3DSet & p, ll_R3::R3 & center, ll_R3::R3 & a1, ll_R3::R3 & a2, ll_R3::R3 & a3);

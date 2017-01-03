@@ -2,6 +2,7 @@
 #include <time.h>
 #include <fstream>
 #include "BitReaderWriter.h"
+#include <stack>
 using namespace std;
 using namespace cv;
 using namespace ll_R3;
@@ -379,7 +380,7 @@ namespace ll_pix3d
 
 	SIObj Pixel3DSet::siobj()
 	{
-		SIObj rv(size(), 0);
+        SIObj rv(size(), 0);
 		for(int i = 0; i < size(); i++)
 		{
 			rv._points[i] = points[i];
@@ -848,7 +849,7 @@ namespace ll_pix3d
 	{
         cout << full_path + "/info" << endl;
 		ifstream fi(full_path + "/info", ios::in);
-		if(!fi.is_open()) ll_error("error in Pixel3DSetWriter::update_info_file, could not open file");
+		if(!fi.is_open()) ll_error("error in CapturePixel3DSet::update_info_file, could not open file");
 		fi >> total_number_of_frames;
 		fi.close();
 		index = 0;
@@ -1460,4 +1461,175 @@ namespace ll_pix3d
 		}
 		return Pix3D(pts, cols);
 	}
+
+
+    //KD-Tree Implementation
+    LKDNode::LKDNode()
+    {
+        axis = 0;
+        value = 0.0f;
+        _p = R3();
+        left = right = NULL;
+    }
+    LKDNode::LKDNode(int ax, float val, R3 & pIn, LKDNode * l, LKDNode * r)
+    {
+        axis = ax;
+        value = val;
+        _p = pIn;
+        left = l;
+        right = r;
+    }
+    LKDNode::LKDNode(const LKDNode & input)
+    {
+        copyIn(input);
+    }
+    LKDNode & LKDNode::operator = (const LKDNode & input)
+    {
+        if(&input == this) return *this;
+        copyIn(input);
+        return *this;
+    }
+    void LKDNode::copyIn(const LKDNode & input)
+    {
+        axis = input.axis;
+        value = input.value;
+        _p = input.value;
+        left = input.left;
+        right = input.right;
+        indices = input.indices;
+    }
+
+    void LKDNode::free()
+    {
+        if(left){ left->free(); delete left; }
+        if(right){ right->free(); delete right; }
+    }
+
+    void LKDNode::init(Pixel3DSet & pset)
+    {
+        indices.clear(); for(int i = 0; i < pset.size(); i++) indices.push_back(i);
+    }
+    void LKDNode::split(int chosenAxis, Pixel3DSet & pset)
+    {
+        if(indices.size() == 1) return;
+        axis = chosenAxis;
+
+        //set value and _p here
+        vector<R3*> tmp; for(int i = 0; i < indices.size(); i++) tmp.push_back(&pset[indices[i]]);
+        int ax = axis;
+        sort(tmp.begin(), tmp.end(), [ax](const R3 * p1, const R3 * p2)->bool{
+            R3 t1 = *p1, t2 = *p2;
+            return t1[ax] < t2[ax];
+        });
+
+        _p = *tmp[tmp.size()/2];
+        value = _p[axis];
+
+        vector<int> ls, rs;
+        for(int i = 0; i < indices.size(); i++)
+        {
+            R3 p = pset[indices[i]];
+            if(p[axis] <= value) ls.push_back(indices[i]);
+            else rs.push_back(indices[i]);
+        }
+
+        if(ls.size() > 1 && rs.size() > 1)
+        {
+            left = new LKDNode();
+            right = new LKDNode();
+            left->indices = ls;
+            right->indices = rs;
+
+            indices.clear();
+        }
+    }
+
+    bool LKDNode::isLeaf()
+    {
+        return left == NULL && right == NULL;
+    }
+
+    void LKDNode::split(Pixel3DSet & pset, int startAxis, int maxDepth)
+    {
+        if(maxDepth <= 0) return;
+        split(startAxis, pset);
+        if(!isLeaf())
+        {
+            int nextAxis = (startAxis + 1) % 3;
+            left->split(pset, nextAxis, maxDepth - 1);
+            right->split(pset, nextAxis, maxDepth - 1);
+        }
+    }
+
+    void LKDNode::forEach(std::function<void(LKDNode *)> f)
+    {
+        stack<LKDNode *> s;
+        s.push(this);
+
+        while(!s.empty())
+        {
+            LKDNode * c = s.top(); s.pop();
+            if(c == NULL) continue;
+            f(c);
+            if(!c->isLeaf())
+            {
+                s.push(c->left);
+                s.push(c->right);
+            }
+        }
+
+    }
+
+    double LKDNode::averageLeafSize()
+    {
+        double avg = 0.0, c = 0.0;
+        forEach([&avg, &c](LKDNode * ptr)->void{
+            if(ptr->isLeaf())
+            {
+                avg += (double)ptr->indices.size();
+                c += 1.0;
+            }
+        });
+        if(c == 0.0) return 0.0;
+        return avg / c;
+    }
+
+    bool LKDNode::NN(Pixel3DSet & pset, R3 & q, int & index, R3 & w)
+    {
+        float dist = DBL_MAX;
+        R3 p = _p;
+        NN(pset, q, index, p, dist);
+        w = pset[index];
+        return true;
+    }
+    void LKDNode::NN(Pixel3DSet & pset, R3 & q, int & index, R3 & p, float & w)
+    {
+        if(isLeaf())
+        {
+            for(int i = 0; i < indices.size(); i++)
+            {
+                R3 pnt = pset[indices[i]];
+                float _w = pnt.dist(q);
+                if(_w < w)
+                {
+                    w = _w;
+                    p = _p;
+                    index = indices[i];
+                    //isFound = true;
+                }
+            }
+        }else
+        {
+            if(q[axis] <= value) //search left first
+            {
+                //if closest distance is less than distance from q to the pivot
+                if(q[axis]-w <= value) left->NN(pset, q, index, p, w);
+                if(q[axis]+w > value) right->NN(pset, q, index, p, w);
+            }else //search right first
+            {
+                if(q[axis]+w > value) right->NN(pset, q, index, p, w);
+                if(q[axis]-w <= value) left->NN(pset, q, index, p, w);;
+            }
+        }
+    }
 }

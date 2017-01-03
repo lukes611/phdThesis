@@ -5,6 +5,8 @@
 #include <string>
 #include <cstdio>
 #include <cstdlib>
+#include <cmath>
+#include <algorithm>
 
 using namespace std;
 
@@ -142,6 +144,37 @@ namespace ll_siobj
 	ll_R3::R3 SI_FullTriangle::normal() const
 	{
 		return (((b - a).unit()) ^ ((c - a).unit())).unit();
+	}
+
+	void SI_FullTriangle::rasterize(vector<R3> & ret, float skip)
+	{
+        //
+        R3 a2c = c-a;
+        R3 b2c = c-b;
+
+        float a2cm = a2c.mag();
+        float b2cm = b2c.mag();
+
+        int D = (int)(max(a2cm, b2cm) / skip + 0.5f);
+
+        for(int i = 0; i < D; i++)
+        {
+            float t1 = i / (float) D;
+            R3 _a = a.interpolate_to(c, t1);
+            R3 _b = b.interpolate_to(c, t1);
+
+            float a2bm = (_b - _a).mag();
+            int D = (int)(a2bm + 0.5f);
+            for(int j = 0; j < D; j++)
+            {
+                float t2 = j / (float) D;
+                R3 _ = _a.interpolate_to(_b, t2);
+                ret.push_back(_);
+            }
+        }
+
+
+        //return ret;
 	}
 
 	// basic quad object

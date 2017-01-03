@@ -1,0 +1,11 @@
+todo:
+	1. add in references and let them know you published a journal
+	2. fix literature review: [Thursday]
+		+read & write about more
+		+add more
+	3. more experiments: [Wednesday]
+
+		write OT, ST compress and generate psnr to coding rate graphs
+		output graphs
+
+	4.re-write introduction and conclusion [Thursday]

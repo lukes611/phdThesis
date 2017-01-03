@@ -99,6 +99,8 @@ The complete function to recover translation, rotation and scaling, combining eq
 
 \subsection{Full Recovery of 3D Rotation}
 
+\label{FullRecovery3DSection}
+
 In order to recover full 3D rotation (as well as scale and translation) the model must first be aligned by some common axis. PCA or Principals Component Analysis is a well known technique for recovering the primary axes of an N-dimensional signal. In this case, we can use the most accurate axis (the eigen-vector with the largest corresponding eigen-value) to align two volumes, then y-axis rotation, scale and translation values can be recovered by the described FFT based volume registration method. \\
 
 WARNING: SHOW picture of this PCA procedure

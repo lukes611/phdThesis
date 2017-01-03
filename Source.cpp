@@ -2,21 +2,20 @@
 #include <string>
 #include <vector>
 #include <stack>
-#include <functional>
-
 #include "code/basics/locv3.h"
+#include "code/phd/experiments.h"
 #include "code/basics/R3.h"
 #include "code/basics/llCamera.h"
-#include "code/basics/LTimer.h"
-#include "code/basics/Pixel3DSet.h"
 #include "code/basics/VMatF.h"
-#include "code/phd/measurements.h"
+#include "code/basics/LTimer.h"
 #include "code/phd/Licp.h"
-#include "code/script/LScript.h"
+#include "code/phd/measurements.h"
 #include "code/phd/fmRansac.h"
-//#include "code/pc/TheVolumePhaseCorrelator.h"
-//#include "code/phd/Lpcr.h"
-//#include "code/phd/experiments.h"
+#include "code/pc/TheVolumePhaseCorrelator.h"
+#include "code/phd/Lpcr.h"
+#include "code/script/LScript.h"
+#include "code/phd/LSift.h"
+#include "code/basics/BitReaderWriter.h"
 
 using namespace std;
 using namespace cv;
@@ -24,733 +23,850 @@ using namespace ll_R3;
 using namespace ll_cam;
 using namespace ll_measure;
 using namespace ll_fmrsc;
-//using namespace ll_experiments;
-using namespace ll_siobj;
+using namespace ll_experiments;
 
-
-
-
-#include "code/basics/BitReaderWriter.h"
-
-class L3DFeat{
-public:
-    R3 p, n; float s;
-    L3DFeat(R3 p, R3 n, float s)
-    {
-        this->p=p;
-        this->n=n;
-        this->s=s;
-    }
-    L3DFeat(const L3DFeat & input)
-    {
-        copyIn(input);
-    }
-    L3DFeat & operator = (const L3DFeat & input)
-    {
-        copyIn(input);
-        return *this;
-    }
-    void copyIn(const L3DFeat & input)
-    {
-        p = input.p;
-        n = input.n;
-        s = input.s;
-    }
-};
-
-class Surfel {
-public:
-	R3 point;
-	R3 normal;
-	Vec3b color;
-	Surfel(R3 p, R3 n, Vec3b c) {
-		color = c;
-		point = p;
-		normal = n;
-	}
-	Surfel(const Surfel & s) {
-		color = s.color;
-		point = s.point;
-		normal = s.normal;
-	}
-	Surfel & operator = (const Surfel & s) {
-		color = s.color;
-		point = s.point;
-		normal = s.normal;
-		return *this;
-	}
-
-
-};
-
-class SurfelOTCube {
-public:
-	R3 corner; //the bottom corner
-	float cubeSize; //the size of the cube
-	vector<int> I; //the indices
-	vector<SurfelOTCube> children; //the children
-
-
-	SurfelOTCube()
-	{
-        corner *= 0.0f;
-        cubeSize = 512.0f;
-    }
-	SurfelOTCube(R3 c, float s)
-	{
-        corner = c;
-        cubeSize = s;
-    }
-
-    float halfSize()
-    {
-        return cubeSize * 0.5f;
-    }
-
-	SurfelOTCube(vector<Surfel> & surfels) {
-		vector<R3> ls; //create a list of points
-
-		R3 mn = surfels[0].point;
-		R3 mx = mn;
-
-		for (int i = 0; i < surfels.size(); i++) //for each point
-		{
-            R3 point = surfels[i].point;
-            mx.max(point);
-            mn.min(point);
-			ls.push_back(point);
-			I.push_back(i);
-		}
-		//cout << "min/max R3:= " << mn << " , " << mx << endl;
-		corner = mn - R3(1.0f, 1.0f, 1.0f);
-		cubeSize = (mx-mn).max() + 1.0f;
-
-		//cout << "corner/size in constructor := " << corner << ", " << cubeSize << endl;
-		//cout << "percentage which fit in @ constructor := " << percentageFit(&surfels) << endl;
-
-	}
-
-	SurfelOTCube(const SurfelOTCube & c) {
-		input(c);
-	}
-	SurfelOTCube & operator = (const SurfelOTCube & c) {
-		input(c); return *this;
-	}
-	void input(const SurfelOTCube & c) {
-		corner = c.corner;
-		cubeSize = c.cubeSize;
-		I = c.I;
-		children = c.children;
-	}
-	bool isLeaf() { return children.size() == 0; }
-
-	void forEachChild(function<void(SurfelOTCube*)> f)
-	{
-        stack<SurfelOTCube*> Stack;
-		Stack.push(this);
-		while (!Stack.empty())
-		{
-			SurfelOTCube* that = Stack.top(); Stack.pop();
-			if (that->isLeaf()) //if leaf
-				f(that);
-			else
-			{
-				for (int i = 0; i < that->children.size(); i++) //for each child
-				{
-					Stack.push(&that->children[i]);
-				}
-			}
-		}
-	}
-
-	float avgCount() {
-        int c = 0, n = 0;
-        forEachChild([&c, &n](SurfelOTCube * that) -> void {
-            c += that->I.size();
-            n++;
-        });
-        return c / (float) n;
-	}
-
-	int count() {
-        int c = 0;
-        forEachChild([&c](SurfelOTCube * that) -> void {
-            c += that->I.size();
-        });
-        return c;
-	}
-
-
-	float percentageFit(vector<Surfel> * surfels)
-	{
-        int fitCount = 0;
-        for(int i = 0; i < I.size(); i++)
-        {
-            int j = I[i];
-            R3 p = surfels->at(j).point;
-            if(couldContain(p)) fitCount++;
-        }
-        if(I.size() == 0) return 1.0f;
-        return fitCount / (float) I.size();
-	}
-
-	bool couldContain(R3 & p) {
-		if (p.x < corner.x || p.x > (corner.x + cubeSize)) return false;
-		if (p.y < corner.y || p.y > corner.y + cubeSize) return false;
-		if (p.z < corner.z || p.z > corner.z + cubeSize) return false;
-		return true;
-	}
-
-	bool sphereCollision(R3 & center, float radius)
-	{
-		if (center.x + radius < corner.x) return false;
-		if (center.x - radius > corner.x + cubeSize) return false;
-
-		if (center.y + radius < corner.y) return false;
-		if (center.y - radius > corner.y + cubeSize) return false;
-
-		if (center.z + radius < corner.z) return false;
-		if (center.z - radius > corner.z + cubeSize) return false;
-		return true;
-	}
-
-	void split(vector<Surfel> * surfels, int depthLevels = 8) {
-		if (depthLevels < 1) return;
-		vector<SurfelOTCube> ChildList;
-		float hs = halfSize();
-
-		ChildList.push_back(SurfelOTCube(corner, hs));
-		ChildList.push_back(SurfelOTCube(corner + R3(hs, 0.0f, 0.0f), hs));
-		ChildList.push_back(SurfelOTCube(corner + R3(hs, hs, 0.0f), hs));
-		ChildList.push_back(SurfelOTCube(corner + R3(0.0f, hs, 0.0f), hs));
-
-		ChildList.push_back(SurfelOTCube(corner + R3(0.0f, 0.0f, hs), hs));
-		ChildList.push_back(SurfelOTCube(corner + R3(hs, 0.0f, hs), hs));
-		ChildList.push_back(SurfelOTCube(corner + R3(hs, hs, hs), hs));
-		ChildList.push_back(SurfelOTCube(corner + R3(0.0f, hs, hs), hs));
-
-
-
-
-		//cout << "parent. c/s " << "percentage which fits: " << percentageFit(surfels) << endl;
-        //int fit = 0, dontFit = 0;
-		for (int i = 0; i < I.size(); i++)
-		{
-            int j = I[i];
-            //bool foundHome = false;
-			for (int c = 0; c < ChildList.size(); c++)
-			{
-                R3 point = surfels->at(j).point;
-				if (ChildList[c].couldContain(point)) {
-					ChildList[c].I.push_back(j);
-					//fit++;
-					//foundHome = true;
-					break;
-				}
-			}
-
-			//if(!foundHome)
-			//{
-            //    dontFit++;
-                //cout << "bad sabta" << endl;
-                //cout << surfels->at(i).point << endl;
-                //cout << corner << " + " << size << endl;
-                //cout << "i can fit " << couldContain(surfels->at(i).point) << endl;
-            //}
-		}
-
-
-
-        //cout << "ratio fit to no-fit : " << (fit / (double)(fit+dontFit)) << " of " << (fit+dontFit) << " " << I.size() << endl;
-		int numChildrenAlive = 0; for (int i = 0; i < ChildList.size(); i++) numChildrenAlive += ChildList[i].I.size() > 0 ? 1 : 0;
-		if (numChildrenAlive > 1)
-		{
-			for (int i = 0; i < ChildList.size(); i++)
-				if (ChildList[i].I.size() > 0) children.push_back(ChildList[i]);
-		}else return;
-		I.clear();
-		for (int i = 0; i < children.size(); i++) children[i].split(surfels, depthLevels - 1);
-
-	}
-
-
+string namesList[20] = {
+    "Apartment.Texture.rotate",
+    "Apartment.Texture.rotateXAxis",
+    "Boxes.Texture.arbitrarycamera",
+    "Boxes.Texture.rotate",
+    "Boxes.Texture.zoomOut",
+    "Desk.Texture.Translation",
+    "IndoorSpace.tc.translation",
+    "Kitchen.littleTexture.pan",
+    "Kitchen.littleTexture.zoom",
+    "OfficeDesk.Texture.rotationLift",
+    //"office.move1cm",
+    "Office.Texture.blindSpotRotation",
+    "Office.TexturedItems.Translation",
+    "Office.Texture.rotation",
+    "Office.Texture.rotationXAxis",
+    "Office.Texture.Translation",
+    "Outside.NoTexture.rotation",
+    "Outside.NoTexture.translation",
+    "Outside.TextureConfusion.rotation",
+    "Outside.TextureConfusion.Translation",
+    "PlantsOutdoors.tc.rotation"
 };
 
 
-
-class Surfels {
-public:
-	vector<Surfel> points;
-	SurfelOTCube ot;
-
-
-
-	Surfels()
-	{
-
-	}
-
-	Surfels(Pix3D & p) {
-		for (int y = 1; y < 480 - 1; y++)
-		{
-			for (int x = 1; x < 640 - 1; x++)
-			{
-				/*
-				4 3 2
-				5 0 1
-				6 7 8
-				*/
-				R3 n[9] = {
-					p.points[index(x,y)],
-					p.points[index(x + 1,y)],
-					p.points[index(x + 1,y - 1)],
-					p.points[index(x,y - 1)],
-					p.points[index(x - 1,y - 1)],
-					p.points[index(x - 1,y)],
-					p.points[index(x - 1,y + 1)],
-					p.points[index(x,y + 1)],
-					p.points[index(x + 1,y + 1)],
-				};
-				bool ne[9] = {
-					p.validDepth[index(x,y)],
-					p.validDepth[index(x + 1,y)],
-					p.validDepth[index(x + 1,y - 1)],
-					p.validDepth[index(x,y - 1)],
-					p.validDepth[index(x - 1,y - 1)],
-					p.validDepth[index(x - 1,y)],
-					p.validDepth[index(x - 1,y + 1)],
-					p.validDepth[index(x,y + 1)],
-					p.validDepth[index(x + 1,y + 1)],
-				};
-				vector<SI_FullTriangle> tris;
-				//get quad points from all around
-				if (!ne[0]) continue;
-				if (ne[2]) {
-					if (ne[1]) tris.push_back(SI_FullTriangle(n[0], n[1], n[2]));
-					if (ne[3]) tris.push_back(SI_FullTriangle(n[0], n[2], n[3]));
-				}
-				if (ne[4]) {
-					if (ne[3]) tris.push_back(SI_FullTriangle(n[0], n[3], n[4]));
-					if (ne[5]) tris.push_back(SI_FullTriangle(n[0], n[4], n[5]));
-				}
-
-				if (ne[6]) {
-					if (ne[5]) tris.push_back(SI_FullTriangle(n[0], n[5], n[6]));
-					if (ne[7]) tris.push_back(SI_FullTriangle(n[0], n[6], n[7]));
-				}
-
-				if (ne[8]) {
-					if (ne[7]) tris.push_back(SI_FullTriangle(n[0], n[7], n[8]));
-					if (ne[1]) tris.push_back(SI_FullTriangle(n[0], n[8], n[1]));
-				}
-				if (tris.size() <= 0) continue;
-				R3 normal;
-				float trisizeI = 1.0f / (float)tris.size();
-				for (int i = 0; i < tris.size(); i++) normal += (tris[i].normal() * trisizeI);
-				normal.normalize();
-				//compute normals and get average for the current point
-				//set color, normal and point and add to list
-				//if (tris.size() > 0) cout << "got some...\n";
-				points.push_back(Surfel(n[0], normal, p.colors[index(x, y)]));
-			}
-		}
-		computeOT();
-	}
-
-	void computeOT()
-	{
-        ot = SurfelOTCube(points);
-		ot.split(&points, 4);
-	}
-
-	Surfels(SIObj & ob)
-	{
-        vector<SI_Triangle> tris = ob._triangles;
-        vector<vector<SI_Triangle*>> ls(ob._points.size());
-        //cout << "ls.size() = " << ls.size() << endl;
-        for(int i = 0; i < tris.size(); i++) //for each triangle
-        {
-            ls[tris[i].a].push_back(&tris[i]);
-            ls[tris[i].b].push_back(&tris[i]);
-            ls[tris[i].c].push_back(&tris[i]);
-        }
-
-        for(int _ = 0; _ < ls.size(); _++)
-        {
-            vector<SI_Triangle*> L = ls[_];
-            if(L.size() <= 0) continue;
-            R3 norm;
-            float scalar = 1.0f / (float) L.size();
-            for(int i = 0; i < L.size(); i++)
-            {
-                SI_FullTriangle ft(ob._points[L[i]->a],
-                                    ob._points[L[i]->b],
-                                    ob._points[L[i]->c]);
-                norm += (ft.normal() * scalar);
-            }
-            norm.normalize();
-            points.push_back(Surfel(ob._points[_], norm, Vec3b(255,255,255)));
-        }
-
-        //cout << "points.size() = " << points.size() << endl;
-        computeOT();
-	}
-
-	vector<int> pointsWithinRadius(R3 & p, float radius)
-	{
-		vector<int> inds;
-		stack<SurfelOTCube*> st;
-		st.push(&ot);
-		while (!st.empty())
-		{
-			SurfelOTCube * that = st.top(); st.pop();
-			if (that->isLeaf()) //if it is a leaf...
-			{
-                for(int i = 0; i < that->I.size(); i++)
-                {
-                    int j = that->I[i]; // for each index, j
-                    R3 B = points[j].point; //B is the point to check
-                    if(B.dist(p) <= radius) //B's distance from p is within radius: add to inds
-                        inds.push_back(j);
-                }
-			}
-			else //if not leaf
-			{
-				for (int i = 0; i < that->children.size(); i++) //for each child
-				{
-					bool collides = that->children[i].sphereCollision(p, radius);
-					if (collides) st.push(&that->children[i]); //push back each child
-				}
-			}
-		}
-		return inds;
-	}
-
-	vector<int> pointsWithinRadiusSlow(R3 & p, float radius)
-	{
-		vector<int> inds;
-		for(int i = 0; i < points.size(); i++)
-            if(points[i].point.dist(p) <= radius) inds.push_back(i);
-        return inds;
-	}
-
-
-	static int index(int x, int y) {
-		return y * 640 + x;
-	}
-
-	float errorF(R3 x, float h) {
-		float sum = 0.0f;
-		vector<int> subs = pointsWithinRadius(x, 2.0f);
-		for (int j = 0; j < subs.size(); j++) {
-			int i = subs[j];
-			float _ = ((_k(subs, x, h)) * (x - points[i].point));
-			sum += _b(subs, i, x, h) *  _*_;
-		}
-		return sum;
-	}
-
-	float errorF(vector<int> & subs, R3 x, float h) {
-		float sum = 0.0f;
-		for (int j = 0; j < subs.size(); j++) {
-			int i = subs[j];
-			float _ = ((_k(subs, x, h)) * (x - points[i].point));
-			sum += _b(subs, i, x, h) *  _*_;
-		}
-		return sum;
-	}
-
-	float _b(vector<int> & subs, int i, R3 x, float h) {
-		float sum = 0.0f;
-		float h2 = h*h;
-		for (int _ = 0; _ < subs.size(); _++) {
-			int j = subs[_];
-			float d = x.dist(points[j].point);
-			sum += exp(-d*d / h2);
-		}
-		float d = x.dist(points[i].point);
-		return	exp(-d*d / h2) / sum;
-
-	}
-
-	R3 _k(vector<int>& subs, R3 x, float h) {
-		R3 sum;
-		for (int j = 0; j < subs.size(); j++) {
-			int i = subs[j];
-			sum += points[i].normal * _b(subs, i, x, h);
-		}
-        return sum.unit();
-	}
-
-	R3 blurNormal(vector<int> & subs, R3 x, float h)
-	{
-        return _k(subs, x, h);
-	}
-
-
-	static Mat R3ToColMat(R3 & input)
-	{
-        Mat m = Mat::zeros(Size(1, 3), CV_32FC1);
-        m.at<float>(0,0) = input.x, m.at<float>(1,0) = input.y, m.at<float>(2,0) = input.z;
-        return m.clone();
-	}
-
-
-	static Mat R3ToRowMat(R3 & input)
-	{
-        Mat m = Mat::zeros(Size(3, 1), CV_32FC1);
-        m.at<float>(0,0) = input.x, m.at<float>(0,1) = input.y, m.at<float>(0,2) = input.z;
-        return m.clone();
-	}
-
-    static float getFromMat(Mat & input, int r, int c)
-    {
-        return input.at<float>(r,c);
-    }
-
-    static R3 mat2R3(Mat & input)
-    {
-        if(input.size().width > input.size().height)
-            return R3(getFromMat(input, 0, 0), getFromMat(input, 0, 1), getFromMat(input, 0, 2));
-        return R3(getFromMat(input, 0, 0), getFromMat(input, 1, 0), getFromMat(input, 2, 0));
-    }
-
-    static Mat float2Mat(float x)
-    {
-        Mat m = Mat::zeros(Size(1, 1), CV_32FC1);
-        m.at<float>(0,0) = x;
-        return m.clone();
-    }
-
-    R3 blurPoint(R3 initialPoint, float scale, int maxIterations = -1)
-    {
-        maxIterations = maxIterations == -1 ? 200 : maxIterations;
-        R3 prev = initialPoint;
-        R3 bestPoint = prev;
-        float bestScore = errorF(bestPoint, scale);
-
-        //cout << "first error " << bestScore << endl;
-        float prevError = bestScore;
-        for(int i = 0; i < maxIterations; i++)
-        {
-
-            //cout << t1 << " -> " << t2 << " -> " << t3 << " = " << b0 << endl;
-            R3 b1 = prev;
-            float D = 0.2f;
-
-            R3 JacobianMatrixR3(
-                (errorF(b1 + R3(D, 0.0f, 0.0f),scale)-prevError) / D,
-                (errorF(b1 + R3(0.0f, D, 0.0f),scale)-prevError) / D,
-                (errorF(b1 + R3(0.0f, 0.0f, D),scale)-prevError) / D
-            );
-            Mat jacobian = R3ToRowMat(JacobianMatrixR3);
-            Mat jacobianT = jacobian.t();
-
-
-            Mat J = (jacobianT * jacobian);
-            J = J.inv();
-            J = J * jacobianT;
-
-            Mat b1_m = R3ToColMat(b1);
-            Mat current = float2Mat(prevError);
-
-            Mat change = J * current;
-
-            b1_m = b1_m - change;
-            //cout << change << endl;
-            b1 =  mat2R3(b1_m);
-            float newError = errorF(b1, scale);
-            if(bestScore > newError)
-            {
-                bestScore = newError;
-                bestPoint = b1;
-               //cout << "new error " << newError << endl;
-               //cout << "current point " << b1 << endl;
-            }else if(i > 20) break;
-
-            prev = b1;
-            prevError = newError;
-
-        }
-        return bestPoint;
-    }
-
-
-    R3 blurPoint2(vector<int> & subs, R3 initialPoint, float scale, int maxIterations = -1)
-    {
-        maxIterations = maxIterations == -1 ? 200 : maxIterations;
-        R3 prev = initialPoint;
-        R3 bestPoint = prev;
-        float bestScore = errorF(subs, bestPoint, scale);
-
-        //cout << "first error " << bestScore << endl;
-        float prevError = bestScore;
-        for(int i = 0; i < maxIterations; i++)
-        {
-
-            //cout << t1 << " -> " << t2 << " -> " << t3 << " = " << b0 << endl;
-            R3 b1 = prev;
-            float D = 0.2f;
-
-            R3 JacobianMatrixR3(
-                (errorF(subs, b1 + R3(D, 0.0f, 0.0f),scale)-prevError) / D,
-                (errorF(subs, b1 + R3(0.0f, D, 0.0f),scale)-prevError) / D,
-                (errorF(subs, b1 + R3(0.0f, 0.0f, D),scale)-prevError) / D
-            );
-            Mat jacobian = R3ToRowMat(JacobianMatrixR3);
-            Mat jacobianT = jacobian.t();
-
-
-            Mat J = (jacobianT * jacobian);
-            J = J.inv();
-            J = J * jacobianT;
-
-            Mat b1_m = R3ToColMat(b1);
-            Mat current = float2Mat(prevError);
-
-            Mat change = J * current;
-
-            b1_m = b1_m - change;
-            //cout << change << endl;
-            b1 =  mat2R3(b1_m);
-            float newError = errorF(subs, b1, scale);
-            if(bestScore > newError)
-            {
-                bestScore = newError;
-                bestPoint = b1;
-               //cout << "new error " << newError << endl;
-               //cout << "current point " << b1 << endl;
-            }else if(i > 20) break;
-
-            prev = b1;
-            prevError = newError;
-
-        }
-        return bestPoint;
-    }
-
-
-    float getH(int level)
-    {
-        float H0 = 1.0f;
-        float F = ot.cubeSize * 0.02;
-        return H0 * pow(F, (float) level);
-    }
-
-    Surfel project(int index, int level = 1)
-    {
-        R3 p = points[index].point;
-
-        vector<int> subs = pointsWithinRadius(p, ot.cubeSize * 0.001f);
-        //cout << "subs size: " << subs.size() << endl;
-        float H = getH(level);
-        R3 rv = blurPoint2(subs, p, H);
-        //cout << " p1 ein" << endl;
-        //p = rv;
-        return Surfel(rv, blurNormal(subs, p, H), Vec3b(255, 255, 255));
-    }
-
-    Surfels compute(int level)
-    {
-        Surfels ret;
-        for(int i = 0; i < points.size(); i++)
-        {
-            ret.points.push_back(project(i, level));
-
-            //if(i % 100 == 0)
-            {
-                //cout << (i / (float)points.size()) << "%%" << endl;
-            }
-        }
-        cout << endl;
-        ret.computeOT();
-        return ret;
-    }
-
-    SIObj toObj()
-    {
-        SIObj rt(points.size(), 0);
-        for(int i = 0; i < points.size(); i++) rt._points[i] = points[i].point;
-        return rt;
-    }
-
-    float featureMeasure(int index, int myLevel)
-    {
-        Surfel me = project(index, myLevel);
-        Surfel sub = project(index, myLevel - 1);
-        return me.normal * (me.point - sub.point);
-    }
-
-    bool isFeature(int index, int level)
-    {
-        Surfel p = project(index, level);
-        vector<int> inds = pointsWithinRadius(p.point, 0.5f * getH(level));
-        //cout << inds.size() << endl;
-        int numGt = 0;
-        int numLt = 0;
-        float m1 = featureMeasure(index, level);
-        for(int i = 0; i < inds.size(); i++)
-        {
-            int j = inds[i];
-            if(featureMeasure(j, level) < m1) numLt++;
-            if(featureMeasure(j, level-1) < m1) numLt++;
-            if(featureMeasure(j, level+1) < m1) numLt++;
-
-            if(featureMeasure(j, level) > m1) numGt++;
-            if(featureMeasure(j, level-1) > m1) numGt++;
-            if(featureMeasure(j, level+1) > m1) numGt++;
-            if(numGt >= 1 && numLt >= 1) return false;
-        }
-        return true;
-    }
-
-    vector<L3DFeat> genFeatures()
-    {
-        vector<L3DFeat> ret;
-
-        for(int sc = 1; sc <= 2; sc++)
-        {
-                for(int i = 0; i < points.size(); i++)
-                {
-                    if(isFeature(i, sc))
-                    {
-                        Surfel s = project(i, sc);
-                        ret.push_back(L3DFeat(s.point, s.normal, getH(sc)));
-                    }
-                }
-        }
-        return ret;
-    }
-};
-
-int main(int argc, char * * argv)
+VMat openDataVMat(string name, int index = 0)
 {
-    SIObj p; p.open_obj("/home/luke/gitProjects/loqur/monkey1.obj");
-    //cout << ob.stats() << endl;
-	//CapturePixel3DSet video = CapturePixel3DSet::openCustom("/home/luke/lcppdata/pix3dc/films", "Apartment.Texture.rotate", 3);
-	//Pix3D p; video.read(p);
-	Surfels s = p;
+    CapturePixel3DSet video = ll_experiments::openData(name, 1);
+    Pix3D frame;
+    video.read_frame(frame, index);
 
-    //Surfels s2 = s.compute(1);
+    Pixel3DSet pix3d = frame;
+    VMat vframe(256, pix3d, 0.0f, true);
 
-    vector<L3DFeat> fts = s.genFeatures();
-    vector<R3> ps;
-    for(int i = 0; i < fts.size(); i++)
-    {
-        ps.push_back(fts[i].p);
-    }
-
-    Pixel3DSet p3(ps);
-
-
-    p3.siobj().saveOBJ("/home/luke/Desktop/feats.obj");
-
-
-
-
-	return 0;
+    return vframe;
 }
 
 
 
+class VMatOctant
+{
+private:
+    Point3i         _corner;
+    int             _size;
+    VMatOctant *    _parent;
+    VMatOctant *    _children[8];
+    double          _mse;
 
+public:
+    VMatOctant(int defaultSize = 256)
+    {
+        //cout << "calling default constructor" << endl;
+        reset(defaultSize);
+    }
+    VMatOctant(const VMatOctant & input)
+    {
+        setCorner(input.getCorner());
+        setSize(input.getSize());
+        setParent(input.getParent());
+        for(int i = 0; i < 8; i++) setChild(i, input.getChild(i));
+        setMse(input.getMse());
+    }
+
+    VMatOctant & operator = (const VMatOctant & input)
+    {
+        freeChildren();
+        setCorner(input.getCorner());
+        setSize(input.getSize());
+        setParent(input.getParent());
+        for(int i = 0; i < 8; i++) setChild(i, input.getChild(i));
+        setMse(input.getMse());
+        return *this;
+    }
+
+    float getAverageColor(VMat & volume)
+    {
+        Point3i corner = getCorner();
+        int size = getSize();
+        int sum = 0;
+        int s3 = size * size * size;
+        for(int z = corner.z; z < corner.z + size; z++)
+        {
+            for(int y = corner.y; y < corner.y + size; y++)
+            {
+                for(int x = corner.x; x < corner.x + size; x++)
+                {
+                    if(volume.inbounds(x,y,z))
+                        sum += (int)(volume(x,y,z) * 255.0f);
+                    else s3--;
+                }
+            }
+        }
+        return ((sum / (double)s3));
+    }
+
+    virtual int countBits() = 0;
+
+    double bytes()
+    {
+        return countBits() / 8.0;
+    }
+
+    double kilobytes()
+    {
+        return bytes() / 1024.0;
+    }
+
+    double megabytes()
+    {
+        return kilobytes() / 1024.0;
+    }
+
+
+
+
+
+    ~VMatOctant()
+    {
+        //freeChildren();
+    }
+
+    void forEach(function<void(VMatOctant *, int index, int level)> f)
+    {
+        stack<tuple<VMatOctant*,int,int>> st;
+        st.push(tuple<VMatOctant*,int,int>(this, 0,0));
+        while(!st.empty())
+        {
+            //pop off stack
+            tuple<VMatOctant*,int,int> item = st.top();
+            st.pop();
+            //do
+            f(get<0>(item), get<1>(item), get<2>(item));
+            //for each child: put on stack
+            for(int i = 0; i < 8; i++)
+            {
+                VMatOctant * child = get<0>(item)->getChild(i);
+                if(child)
+                {
+                    st.push(tuple<VMatOctant*,int,int>(child, i,get<2>(item) + 1));
+                }
+            }
+        }
+    }
+
+    int height()
+    {
+        int h = 0;
+        forEach([&h](VMatOctant* o, int index, int level)->void
+        {
+            h = h > level ? h : level;
+        });
+        return h;
+    }
+
+    int count()
+    {
+        int c = 0;
+        forEach([&c](VMatOctant* o, int index, int level)->void
+        {
+            c++;
+        });
+        return c;
+    }
+
+    void freeChildren()
+    {
+        for(int i = 0; i < 8; i++)
+        {
+            VMatOctant * child = getChild(i);
+            if(child != NULL)
+            {
+                child->freeChildren();
+                delete child;
+                setChild(i, NULL);
+            }
+        }
+    }
+
+    static void getSubCubes(const Point3i & currentCorner, const int & currentSize, vector<Point3i> & corners, int & newSize)
+    {
+        //newSize is half the old size
+        newSize = currentSize / 2;
+
+        //clean and add corners
+        corners.clear();
+        //original corner
+        corners.push_back(Point3i(currentCorner.x, currentCorner.y, currentCorner.z));
+        corners.push_back(Point3i(currentCorner.x + newSize, currentCorner.y, currentCorner.z));
+        corners.push_back(Point3i(currentCorner.x + newSize, currentCorner.y + newSize, currentCorner.z));
+        corners.push_back(Point3i(currentCorner.x, currentCorner.y + newSize, currentCorner.z));
+
+        //add other corners which have a different z value
+        for(int i = 0; i < 4; i++)
+            corners.push_back(Point3i(corners[i].x, corners[i].y, corners[i].z + newSize));
+    }
+
+
+
+    void reset(int size = 256)
+    {
+        setSize(size);
+        setParent(NULL);
+        setCorner(Point3i(0,0,0));
+        setMse(0.0);
+        for(int i = 0; i < 8; i++) setChild(i, NULL);
+    }
+
+    bool isLeaf() const
+    {
+        for(int i = 0; i < 8; i++) if(getChild(i) != NULL) return false;
+        return true;
+    }
+
+    /*void split()
+    {
+        int newSize;
+        vector<Point3i> newCorners;
+        VMatOctant::getSubCubes(getCorner(), getSize(), newCorners, newSize);
+        for(int i = 0; i < 8; i++)
+        {
+            VMatOctant * child = new VMatOctant;
+            child->setSize(newSize);
+            child->setCorner(newCorners[i]);
+            setChild(i, child);
+        }
+    }
+    */
+    //setters and getters
+    VMatOctant * getParent() const { return _parent; }
+    void setParent(VMatOctant * parent) { _parent = parent; }
+    Point3i getCorner() const { return _corner; }
+    void setCorner(const Point3i & corner) { _corner = corner; }
+    int getSize() const { return _size; }
+    void setSize(const int & size) { _size = size; }
+
+    VMatOctant * getChild(int index) const { if(index >= 0 && index < 8) return _children[index]; return NULL; }
+    void setChild(int index, VMatOctant * child) { if(index >= 0 && index < 8) _children[index] = child; }
+
+    double getMse() const { return _mse; }
+    void setMse(const double & mse) { _mse = mse; }
+
+    static double psnr(VMat & v1, VMat & v2)
+    {
+        VMat a = v1;
+        VMat b = v2;
+        a *= 255.0f;
+        b *= 255.0f;
+
+        double mse = a.mse(b);
+
+        return 10.0f * log10((255.0f * 255.0f) / mse);
+    }
+};
+
+class LOctV : public VMatOctant
+{
+private:
+    unsigned char color;
+public:
+    LOctV() : VMatOctant()
+    {
+        color = 0x00;
+    }
+
+    LOctV(int defaultSize) : VMatOctant(defaultSize)
+    {
+        color = 0x00;
+    }
+
+
+
+    void computeRepresentation(VMat & volume)
+    {
+        setColor(getAverageColor((volume)));
+    }
+
+    void computeMse(VMat & volume)
+    {
+        Point3i corner = getCorner();
+        int size = getSize();
+        int sum = 0;
+        int s3 = size * size * size;
+        for(int z = corner.z; z < corner.z + size; z++)
+        {
+            for(int y = corner.y; y < corner.y + size; y++)
+            {
+                for(int x = corner.x; x < corner.x + size; x++)
+                {
+                    int difference = ((int)(volume(x,y,z) * 255.0f)) - color;
+                    sum += difference * difference;
+                }
+            }
+        }
+        setMse(sum / (double)s3);
+    }
+
+    void split(VMat & volume, double threshold, int minCube = 1)
+    {
+        computeRepresentation(volume);
+        computeMse(volume);
+        if(getMse() > threshold && getSize() > minCube) //split
+        {
+            vector<Point3i> corners; int newSize;
+            VMatOctant::getSubCubes(getCorner(), getSize(), corners, newSize);
+            for(int i = 0; i < 8; i++)
+            {
+                LOctV * child = new LOctV;
+                child->setCorner(corners[i]);
+                child->setSize(newSize);
+                setChild(i, child);
+                child->split(volume, threshold, minCube);
+            }
+
+        }else
+        {
+            //cout << "ending at" << getSize() << endl;
+        }
+    }
+
+    unsigned char getColor() const { return color; }
+    void setColor(unsigned char color) { this->color = color; }
+
+    int countBits()
+    {
+        int numberOfBits = 0;
+        stack<VMatOctant*> st;
+        st.push(this);
+
+        while(!st.empty())
+        {
+            VMatOctant* x = st.top(); st.pop();
+            numberOfBits++; //0 is leaf, 1 is parent
+            if(x->isLeaf())
+            {
+                numberOfBits += 8; //for the color
+            }else
+            {
+                numberOfBits += 8; //for the children locations
+                for(int i = 0; i < 8; i++)
+                {
+                    VMatOctant * c = x->getChild(i);
+                    if(c) st.push(c);
+                }
+            }
+
+        }
+
+        return numberOfBits;
+    }
+
+    VMat out()
+    {
+        VMat ret = getSize();
+
+        stack<LOctV*> st;
+        st.push(this);
+
+        while(!st.empty())
+        {
+            LOctV * self = st.top(); st.pop();
+            if(self->isLeaf())
+            {
+                //if it is a leaf: add it
+                Point3i corner = self->getCorner();
+                int size = self->getSize();
+                for(int z = corner.z; z < corner.z + size; z++)
+                    for(int y = corner.y; y < corner.y + size; y++)
+                        for(int x = corner.x; x < corner.x + size; x++)
+                        {
+                            ret(x,y,z) = self->getColor() / 255.0f;
+                        }
+            }else for(int i = 0; i < 8; i++) if(self->getChild(i)) st.push((LOctV*)self->getChild(i));
+        }
+
+        return ret;
+    }
+};
+
+class ILQV : public VMatOctant
+{
+private:
+    float colors[8];
+public:
+    ILQV() : VMatOctant()
+    {
+        for(int i = 0; i < 8; i++) colors[i] = 0.0f;
+    }
+
+    ILQV(int defaultSize) : VMatOctant(defaultSize)
+    {
+        for(int i = 0; i < 8; i++) colors[i] = 0.0f;
+    }
+
+    int getSubCornerIndex(int x, int y, int z, int hs)
+    {
+        int ret = 0;
+        if(y < hs)
+        {
+            if(x < hs) ret = 0;
+            else ret = 1;
+        }else
+        {
+            if(x < hs) ret = 3;
+            else ret = 2;
+        }
+        if(z >= hs) ret += 4;
+        return ret;
+    }
+
+    float interpolate(float a, float b, float t)
+    {
+        return a + (b-a) * t;
+    }
+
+    float getColor(int x, int y, int z, Point3i corner, int size)
+    {
+
+
+        float a = interpolate(colors[0], colors[3], (y-corner.y) / (float) size);
+        float b = interpolate(colors[1], colors[2], (y-corner.y) / (float) size);
+
+        float c1 = interpolate(a, b, (x-corner.x) / (float) size);
+
+        float c = interpolate(colors[4], colors[7], (y-corner.y) / (float) size);
+        float d = interpolate(colors[5], colors[6], (y-corner.y) / (float) size);
+
+        float c2 = interpolate(c, d, (x-corner.x) / (float) size);
+
+        return interpolate(c1, c2, (z-corner.z) / (float) size);
+
+
+    }
+
+
+    void computeRepresentation(VMat & volume)
+    {
+        Point3i corner = getCorner();
+        int size = getSize();
+
+
+
+
+
+        for(int i = 0; i < 8; i++) colors[i] = 0.0f;
+
+        //int hs = size / 2;
+        int newSize;
+        vector<Point3i> corners;
+        VMatOctant::getSubCubes(corner, size, corners, newSize);
+
+        for(int i = 0; i < corners.size(); i++)
+        {
+            ILQV tmp;
+            tmp.setSize(newSize);
+            tmp.setCorner(corners[i] - Point3i(newSize/2, newSize/2, newSize/2));
+            colors[i] = tmp.getAverageColor(volume);
+        }
+
+        /*int s3 = hs * hs * hs;
+        float scalar = 1.0f / (float) s3;
+        for(int z = corner.z, _z = 0; z < corner.z + size; z++, _z++)
+        {
+            for(int y = corner.y, _y = 0; y < corner.y + size; y++, _y++)
+            {
+                for(int x = corner.x, _x = 0; x < corner.x + size; x++, _x++)
+                {
+                    float V = volume(x,y,z) * 255.0f;
+                    int index = getSubCornerIndex(_x, _y, _z, hs);
+                    colors[index] += V * scalar;
+                }
+            }
+        }*/
+    }
+
+    void computeMse(VMat & volume)
+    {
+        Point3i corner = getCorner();
+        int size = getSize();
+        double sum = 0.0;
+        int s3 = size * size * size;
+        for(int z = corner.z; z < corner.z + size; z++)
+        {
+            for(int y = corner.y; y < corner.y + size; y++)
+            {
+                for(int x = corner.x; x < corner.x + size; x++)
+                {
+                    double difference = ((volume(x,y,z) * 255.0)) - getColor(x,y,z, corner, size);
+                    sum += difference * difference;
+                }
+            }
+        }
+        setMse(sum / (double)s3);
+    }
+
+    void split(VMat & volume, double threshold, int minChild)
+    {
+        computeRepresentation(volume);
+        computeMse(volume);
+        //cout << "mse: " << getMse() << endl;
+        //cout << "size: " << getSize() << endl;
+        //cout << "i asked for " << threshold << endl;
+        if(getMse() > threshold && getSize() > minChild && getSize() > 2) //split
+        {
+            vector<Point3i> corners; int newSize;
+            VMatOctant::getSubCubes(getCorner(), getSize(), corners, newSize);
+            for(int i = 0; i < 8; i++)
+            {
+                ILQV * child = new ILQV(newSize);
+                child->setCorner(corners[i]);
+                child->setSize(newSize);
+                child->split(volume, threshold, minChild);
+                setChild(i, child);
+            }
+
+        }
+    }
+
+    int countBits()
+    {
+        int numberOfBits = 0;
+        stack<ILQV*> st;
+        st.push(this);
+
+        while(!st.empty())
+        {
+            ILQV* x = st.top(); st.pop();
+            numberOfBits++; //0 is leaf, 1 is parent
+            if(x->isLeaf())
+            {
+                numberOfBits += 2*8; //for the colors
+            }else
+            {
+                numberOfBits += 8; //for the children locations
+                for(int i = 0; i < 8; i++)
+                {
+                    ILQV * c = (ILQV*)x->getChild(i);
+                    if(c) st.push(c);
+                }
+            }
+
+        }
+
+        return numberOfBits;
+    }
+
+
+    VMat out()
+    {
+        VMat ret = getSize();
+
+        stack<ILQV*> st;
+        st.push(this);
+
+        while(!st.empty())
+        {
+            ILQV * self = st.top(); st.pop();
+            if(self->isLeaf())
+            {
+                //if it is a leaf: add it
+                Point3i corner = self->getCorner();
+                int size = self->getSize();
+                for(int z = corner.z; z < corner.z + size; z++)
+                    for(int y = corner.y; y < corner.y + size; y++)
+                        for(int x = corner.x; x < corner.x + size; x++)
+                        {
+                            float oo = self->getColor(x,y,z, corner, size) / 255.0f;
+                            //oo *= 4.0f;
+                            //oo = floor(oo) / 4.0f;
+                            //oo *= 255.0f;
+                            ret(x,y,z) = oo;
+                        }
+            }else for(int i = 0; i < 8; i++) if(self->getChild(i)) st.push((ILQV*)self->getChild(i));
+        }
+
+        return ret;
+    }
+
+
+};
+
+
+class PlaneTreeV : public VMatOctant
+{
+private:
+    float scalars[6];
+public:
+    PlaneTreeV() : VMatOctant()
+    {
+        for(int i = 0; i < 6; i++) scalars[i] = 0.0f;
+    }
+
+    PlaneTreeV(int defaultSize) : VMatOctant(defaultSize)
+    {
+        for(int i = 0; i < 6; i++) scalars[i] = 0.0f;
+    }
+
+
+    float getColor(int x, int y, int z, Point3i corner)
+    {
+        if(getSize() <= 4.0f) return scalars[0];
+        float X = x - corner.x;
+        float Y = y - corner.y;
+        float Z = z - corner.z;
+        return scalars[0]*X + scalars[1] + scalars[2]*Y + scalars[3] + scalars[4]*Z + scalars[5];
+    }
+
+    void computeRepresentationBasic(VMat & volume)
+    {
+        scalars[0] = getAverageColor(volume);
+    }
+
+
+    void computeRepresentation(VMat & volume)
+    {
+        Point3i corner = getCorner();
+        int size = getSize();
+
+        if(size <= 2)
+        {
+            computeRepresentationBasic(volume);
+            return;
+        }
+
+        int s3 = size * size * size;
+        Mat X = Mat::zeros(Size(6, s3), CV_32FC1);
+        Mat Y = Mat::zeros(Size(1, s3), CV_32FC1);
+
+        int _ = 0;
+
+        for(int z = corner.z, _z = 0; z < corner.z + size; z++, _z++)
+        {
+            for(int y = corner.y, _y = 0; y < corner.y + size; y++, _y++)
+            {
+                for(int x = corner.x, _x = 0; x < corner.x + size; x++, _x++)
+                {
+                    float V = volume(x,y,z) * 255.0f;
+
+                    Y.at<float>(_, 0) = V;
+
+                    X.at<float>(_, 0) = (float)_x;
+                    X.at<float>(_, 1) = 1.0f;
+                    X.at<float>(_, 2) = (float)_y;
+                    X.at<float>(_, 3) = 1.0f;
+                    X.at<float>(_, 4) = (float)_z;
+                    X.at<float>(_, 5) = 1.0f;
+                    _++;
+                }
+            }
+        }
+
+        Mat B = least_squares(X, Y);
+        for(int i = 0; i < 6; i++) scalars[i] = B.at<float>(i, 0);
+    }
+
+
+
+    void computeMse(VMat & volume)
+    {
+        Point3i corner = getCorner();
+        int size = getSize();
+        double sum = 0.0;
+        int s3 = size * size * size;
+        for(int z = corner.z; z < corner.z + size; z++)
+        {
+            for(int y = corner.y; y < corner.y + size; y++)
+            {
+                for(int x = corner.x; x < corner.x + size; x++)
+                {
+                    double difference = ((double)(volume(x,y,z) * 255.0f)) - getColor(x,y,z, corner);
+                    sum += difference * difference;
+                }
+            }
+        }
+        setMse(sum / (double)s3);
+    }
+
+    void split(VMat & volume, double threshold, int minChild = 1)
+    {
+        computeRepresentation(volume);
+        computeMse(volume);
+        if(getMse() > threshold && getSize() > minChild) //split
+        {
+            vector<Point3i> corners; int newSize;
+            VMatOctant::getSubCubes(getCorner(), getSize(), corners, newSize);
+            for(int i = 0; i < 8; i++)
+            {
+                PlaneTreeV * child = new PlaneTreeV;
+                child->setCorner(corners[i]);
+                child->setSize(newSize);
+                setChild(i, child);
+                child->split(volume, threshold, minChild);
+            }
+
+        }
+    }
+
+    int countBits()
+    {
+        int numberOfBits = 0;
+        stack<PlaneTreeV*> st;
+        st.push(this);
+
+        while(!st.empty())
+        {
+            PlaneTreeV* x = st.top(); st.pop();
+            numberOfBits++; //0 is leaf, 1 is parent
+            if(x->isLeaf())
+            {
+                if(x->getSize() > 4) numberOfBits += 6*4; //for the colors
+                else numberOfBits += 4;
+            }else
+            {
+                numberOfBits += 8; //for the children locations
+                for(int i = 0; i < 8; i++)
+                {
+                    PlaneTreeV * c = (PlaneTreeV*)x->getChild(i);
+                    if(c) st.push(c);
+                }
+            }
+
+        }
+
+        return numberOfBits;
+    }
+
+
+    VMat out()
+    {
+        VMat ret = getSize();
+
+        stack<PlaneTreeV*> st;
+        st.push(this);
+
+        while(!st.empty())
+        {
+            PlaneTreeV * self = st.top(); st.pop();
+            if(self->isLeaf())
+            {
+                //if it is a leaf: add it
+                Point3i corner = self->getCorner();
+                int size = self->getSize();
+                for(int z = corner.z; z < corner.z + size; z++)
+                    for(int y = corner.y; y < corner.y + size; y++)
+                        for(int x = corner.x; x < corner.x + size; x++)
+                        {
+                            ret(x,y,z) = self->getColor(x,y,z, corner) / 255.0f;
+                        }
+            }else for(int i = 0; i < 8; i++) if(self->getChild(i)) st.push((PlaneTreeV*)self->getChild(i));
+        }
+
+        return ret;
+    }
+
+
+};
+
+
+int main(int argc, char * * argv)
+{
+
+    //todo:
+    /*
+        read in obj [done]
+        build octree for volumes [done]
+        build st for volumes
+        test differences at different psnrs
+        put in excel
+        put in graphs
+    */
+    VMat obj = openDataVMat(namesList[0], 0);
+
+    //5, 10, 20
+    vector<double> thresholds;
+    thresholds.push_back(20.0f);
+    thresholds.push_back(10.0f);
+    thresholds.push_back(7.0f);
+    thresholds.push_back(5.0f);
+    thresholds.push_back(3.0f);
+    thresholds.push_back(2.0f);
+    thresholds.push_back(1.0f);
+    thresholds.push_back(0.9f);
+    thresholds.push_back(0.8f);
+    thresholds.push_back(0.6f);
+    thresholds.push_back(0.5f);
+    thresholds.push_back(0.4f);
+    thresholds.push_back(0.2f);
+    thresholds.push_back(0.1f);
+    thresholds.push_back(0.08f);
+    thresholds.push_back(0.05f);
+    thresholds.push_back(0.02f);
+    thresholds.push_back(0.01f);
+
+    string type = "pt";
+    int minCube = 1;
+
+    for(int _j = 0, minCube = 1; _j < 4; _j++, minCube *= 2)
+    for(int i = 0; i < thresholds.size(); i++)
+    {
+        double threshold = thresholds[i];
+        VMat input = obj;
+        VMat output;
+        int numBits = 0;
+        double psnr = 0.0;
+
+        if(type == "ot")
+        {
+            LOctV _ = 256;
+            _.split(input, threshold, minCube);
+            output = _.out();
+            psnr = _.psnr(input, output);
+            numBits = _.countBits();
+        }else if(type == "ilqv")
+        {
+            ILQV _ = 256;
+            _.split(input, threshold, minCube);
+            output = _.out();
+            psnr = _.psnr(input, output);
+            numBits = _.countBits();
+        }else if(type == "pt")
+        {
+            PlaneTreeV _ = 256;
+            _.split(input, threshold, minCube);
+            output = _.out();
+            psnr = _.psnr(input, output);
+            numBits = _.countBits();
+        }
+
+        cout << threshold << endl;
+
+        cout << type << ": " << psnr << ", " << numBits << endl;
+        cout << "\n******\n";
+
+        stringstream outputFileName;
+        outputFileName << EXPS_DIR << "/compression/" << type << ".csv";
+        stringstream header;
+        header << "type,No. bits,psnr";
+        stringstream data;
+        data << type << "," << numBits << "," << psnr;
+        ll_experiments::appendData(outputFileName.str(), header.str(), data.str());
+
+
+    }
+
+	return 0;
+}

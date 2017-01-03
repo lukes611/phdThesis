@@ -1,0 +1,126 @@
+\begin{figure*}[t]
+\centering
+\includegraphics[width=6.0in]{images/results/Apartment_Texture_Rotate}
+\caption{Registration Error for the Apartment Y-Axis Rotation Data Set}
+\label{fig:PET0}
+\end{figure*}
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=6.0in]{images/results/Apartment_Texture_Rotate_XAxis}
+\caption{Registration Error for the Apartment X/Y-Axis Rotation Data Set}
+\label{fig:PET1}
+\end{figure*}
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=6.0in]{images/results/Boxes_Texture_Rotate}
+\caption{Registration Error for the Boxes Y-Axis Rotation Data Set}
+\label{fig:PET2}
+\end{figure*}
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=6.0in]{images/results/Boxes_Texture_ZoomOut}
+\caption{Registration Error for the Boxes Zoom Data Set}
+\label{fig:PET3}
+\end{figure*}
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=6.0in]{images/results/Desk_Texture_Translation}
+\caption{Registration Error for the Desk Translation Data Set}
+\label{fig:PET4}
+\end{figure*}
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=6.0in]{images/results/IndoorSpace_texture_confusion_translation}
+\caption{Registration Error for the Texture Confusion Indoor-Space Translation Data Set}
+\label{fig:PET5}
+\end{figure*}
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=6.0in]{images/results/Kitchen_LittleTexture_Pan}
+\caption{Registration Error for the Low-Texture Kitchen Translation Data Set}
+\label{fig:PET6}
+\end{figure*}
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=6.0in]{images/results/Kitchen_Little_Texture_Zoom}
+\caption{Registration Error for the Low-Texture Kitchen Zoom Data Set}
+\label{fig:PET7}
+\end{figure*}
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=6.0in]{images/results/Office_TexturedItems_Translation}
+\caption{Registration Error for the Office Translation Data Set}
+\label{fig:PET8}
+\end{figure*}
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=6.0in]{images/results/Office_Texture_blind_spot_rotation}
+\caption{Registration Error for the Office Centered Object Rotation Data Set}
+\label{fig:PET9}
+\end{figure*}
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=6.0in]{images/results/Office_Texture_Rotate_XAxis}
+\caption{Registration Error for the Office X/Y-Axis Rotation Data Set}
+\label{fig:PET10}
+\end{figure*}
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=6.0in]{images/results/Office_Texture_Rotation}
+\caption{Registration Error for the Office Y-Axis Rotation Data Set}
+\label{fig:PET11}
+\end{figure*}
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=6.0in]{images/results/Office_Texture_Translation}
+\caption{Registration Error for the Office Translation Data Set}
+\label{fig:PET12}
+\end{figure*}
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=6.0in]{images/results/Outside_No_Texture_Rotation}
+\caption{Registration Error for the Little Texture Outdoors Rotation Data Set}
+\label{fig:PET13}
+\end{figure*}
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=6.0in]{images/results/Outside_No_Texture_Translation}
+\caption{Registration Error for the Little Texture Outdoors Translation Data Set}
+\label{fig:PET14}
+\end{figure*}
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=6.0in]{images/results/Outside_TextureConfusion_Rotation}
+\caption{Registration Error for the Outdoors Texture Confusion Rotation Data Set}
+\label{fig:PET15}
+\end{figure*}
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=6.0in]{images/results/Outside_TextureConfusion_Translation}
+\caption{Registration Error for the Outdoors Texture Confusion Translation Data Set}
+\label{fig:PET16}
+\end{figure*}
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=6.0in]{images/results/Plants_Outdoors_Texture_Confusion_Rotation}
+\caption{Registration Error for the Outdoor Plants Texture Confusion Rotation Data Set}
+\label{fig:PET17}
+\end{figure*}
+

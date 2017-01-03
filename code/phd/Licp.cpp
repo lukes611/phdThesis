@@ -6,6 +6,8 @@ using namespace ll_pix3d;
 using namespace std;
 using namespace cv;
 
+//#define USE_KD
+
 namespace Licp
 {
 
@@ -100,24 +102,78 @@ double closestPointsf(vector<R3> & src, vector<R3> & dst, vector<int> & indexes,
 {
 	distances.clear();
 	indexes.clear();
+	#ifndef USE_KD
+
 	Mat srcm = asMatRows(src), dstm = asMatRows(dst);
 	vector<float> dists;
 	double error = (double) knn(dstm, srcm, indexes, dists);
 	for(int i = 0; i < dists.size(); i++) distances.push_back((double)dists[i]);
 	double divisor = src.size() > 0 ? (double)(src.size()) : 1.0;
 	return error / divisor;
+
+	#else
+
+    Pixel3DSet p1(src);
+    Pixel3DSet p2(dst);
+    LKDNode n; n.init(p2);
+    n.split(p2);
+
+    double error = 0.0;
+    for(int i = 0; i < src.size(); i++)
+    {
+        R3 p = src[i];
+        R3 w;
+        int index = 0;
+        n.NN(p2,p, index, w);
+        indexes.push_back(index);
+        float D = p.dist(p2[index]);
+        distances.push_back(D);
+        error += (D*D) / (float) src.size();
+    }
+    return error;
+	#endif
 }
 
 double closestPointsf(Pixel3DSet & src, Pixel3DSet & dst, vector<int> & indexes, vector<double> & distances)
 {
+    //cout << "timing " << endl;
+    double error;
+    //LTimer t; t.start();
 	distances.clear();
 	indexes.clear();
+	#ifndef USE_KD
 	Mat srcm = asMatRows(src), dstm = asMatRows(dst);
 	vector<float> dists;
-	double error = (double) knn(dstm, srcm, indexes, dists);
+	error = (double) knn(dstm, srcm, indexes, dists);
 	for(int i = 0; i < dists.size(); i++) distances.push_back((double)dists[i]);
 	double divisor = src.size() > 0 ? (double)(src.size()) : 1.0;
-	return error / divisor;
+	error /= divisor;
+	#else
+
+
+	LKDNode n; n.init(dst);
+    n.split(dst, 0, 15);
+    //cout << n.averageLeafSize() << endl;
+    error = 0.0;
+    for(int i = 0; i < src.size(); i++)
+    {
+        R3 p = src[i];
+        R3 w;
+        int index = 0;
+        n.NN(dst,p, index, w);
+        //if(i%1000 == 0 )cout << i << " / " << src.size() << endl;
+        indexes.push_back(index);
+        float D = p.dist(dst[index]);
+        distances.push_back(D);
+        error += (D*D) / (float) src.size();
+    }
+
+
+	#endif
+    //t.stop();
+    //cout << "took " << t.getSeconds() << endl;
+
+	return error;
 }
 
 Mat leastSquaresTransform(vector<R3> & src, vector<R3> & dst, vector<int> & indexes)

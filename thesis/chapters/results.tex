@@ -1,97 +1,72 @@
+\begin{savequote}[8cm]
+  ``I've always believed that if you put in the work, the results will come.''
+  \qauthor{Michael Jordan}
+\end{savequote}
+\makeatletter
+\chapter{Results}
+\label{ResultsSection}
+
 \section{Results}
 
-This section presents and analyses the results from experiments. The experiments used to evaluate the optimal LOD and DCL values are presented first. Then the SOT is compared with the OT codec and with the current state of the art codecs from the literature. Results include both, rate-distortion and qualitative quality tests. 
+In this section results are presented and discussed. First we present qualitative results comparing the proposed FVR method with other 3D-Reconstruction, then we present some qualitative results.  
 
-\subsection{LOD \& DCL Evaluation}
+%plan:
+%	qualitative results:
+%		old -towrite
+%		new -toadd
+%	quantitative:
+%		camera movement experiments -towrite
+%		pose estimation experiments -done
+%		noise experiments
+			% -toadd
+%	data representation experiments -toadd
+		
+		
 
-\subsubsection{Distance Code Length Evaluation}
+\section{Qualitative Results}
 
-DCL values tested include $1$, $2$, $3$, $4$, $5$ and $6$. First, rate-distortion graphs are presented, then visual results are discussed.
+\input{chapters/results/qualitative}
 
-\paragraph{Rate-Distortion Graphs}
+\section{Quantitative Results}
 
-Figure \ref{DistanceCodeRDGraphs} shows the rate-distortion graphs used to evaluate the different DCL values. The graphs in the top row use the $MSE$ metric and the graphs in the bottom row use the depth difference ($DD$) metric. The $MSE$ rate-distortion graphs suggest that DCL values of $5$ and $6$ perform slightly better than the others. The $DD$ rate-distortion graphs show that DCL values of $6$ and $3$ perform better, with $6$ performing well at high bit rates and $3$ performing well at lower to mid level bit rates. Overall, these results do not provide a clear indication of an optimal DCL value but it can be seen that values of $1$ and $2$ do not perform as well as the higher values.
+\input{chapters/results/quantitative}
 
+\section{3D Phase Correlation Performance}
 
-\paragraph{Visual Comparisons}
+The performance of the FVR method is shown theoretically in this section. The size of the volumes being registered is defined as $N^3$ and each frame is sampled at a resolution of $W$ $\times$ $H$. The projection process requires $12WH$ operations whilst re-sampling the point cloud requires $2WH$ operations. The Volume Registration process, $VolumeRegister{\theta \varphi t_x t_y t_z}(V_1, V_2)$ consists of 2 $\times$ Hanning windowing processes, 2 $\times$ 3D FFTs, 2 $\times$ volume-logs, 2 $\times$ log-spherical transforms, 2 $\times$ phase correlation processes and 1 $\times$ linear transformation and peak finding. 
 
+The Hanning windowing function requires 26 operations. The 3D FFT has complexity of $3N^3\log{N}$, the log and log-spherical transform functions require 3 and 58 operations per voxel respectively. Multiplying two frequency spectra together and transforming a volume requires 15 and 30 operations per voxel respectively. Finding the peak value requires $2N^3$ operations. The complexity in terms of number of operations for the phase correlation process is given in Eq. \ref{eqn:PCFULLPERFORMANCE} This process requires 2 $\times$ 3D FFTs, 1 $\times$ frequency spectra multiplication, and 1 $\times$ peak finding operation. 
+\begin{equation} \label{eqn:PCFULLPERFORMANCE}
+6N^3\log{N} + 2N^3 + 15
+\end{equation}
+The total complexity can then be found by taking into account the projection and re-sampling totals as well as the total for $VolumeRegister{\theta \varphi t_x t_y t_z}(V_1, V_2)$. Tallying the number of operations for each process and multiplying them by number of times the process is performed gives us the number of operations as a function of $W$, $H$ and $N$ in Eq. \ref{eqn:FULLPERFORMANCE}.
+\begin{equation} \label{eqn:FULLPERFORMANCE}
+6N^3 + 28WH + 18(N^3\log{N}) + 230
+\end{equation}
 
-Two sets of visual comparisons are presented to evaluate the optimal DCL value. Figure \ref{DistanceCodeVisualTests1} shows results at higher bit rates and figure \ref{DistanceCodeVisualTests2} shows results at lower bit rates. Both sets of results suggest that a DCL value of $1$ produces undesirable models with many holes. Results seem to be quite similar for DCL values of $3$ and above. A DCL value of $2$ provides a slight $MSE$ advantage at a higher bit cost, but in both figures, this quality difference is not noticeable.
+\subsection{Analysis of Speed Improvement}
 
+To compare performance of the generic volume registration method with the speed up, we use the complexity defined in equation \ref{eqn:FULLPERFORMANCE}. Here, we ignore the cost of projecting the depth map. The 3D DFT has complexity $3N^3log(N)$. This is the first step (see figure \ref{fig:PIPELINE3}), the next is the spherical-map transform which is complexity $45N^3$. If processed on the GPU the performance becomes 45 operations per voxel assuming that one voxel is assigned to one unit of processing. A 3D transform is 30 operations per voxel, 2D phase correlation requires 15 operations to multiply the frequency spectra and $2N^2log(N)$ operations to do the 2D FFT. Finally a projection map transform requires 1 operation per voxel. \\
 
-\paragraph{Conclusion}
+In total, the proposed method requires $2 \times$ 3D FFTs, $2 \times$ spherical-map transforms, $1 \times$ 3D geometrical transformation, $3 \times$ 2D phase correlations and $4 \times$ projection map transforms. The total complexity is added up for all of these functions and given in equation \ref{eqn:FULLPERF2}. \\
 
-Results shown that a DCL value of $1$ produces poor results, both in a rate-distortion and qualitative quality sense. A DCL value of $2$ produces a higher calibre model in the $MSE$ sense, at the expense of a higher bit rate. This $MSE$ quality advantage is unnoticeable in qualitative comparisons, compared to values of $3$ and above. Therefore it is generalized that, DCL values of $3$ and above, are the best choice for use in the SOT.
+\begin{equation} \label{eqn:FULLPERF2}
+6log(N)\times (N^3 + N^2) + 169
+\end{equation}
 
-\subsubsection{Level of Depth Threshold Evaluation}
+Figure \ref{fig:perfComp} provides a visualization of the performance improvement which the proposed method achieves over the original Fourier volume registration approach. It is clear that the proposed method is around 3 times faster
+than the original Fourier based volume registration approach. This is due to the reduction in the amount of data to process afforded by the novel spherical-map transform and orthogonal projection methods.
 
-LOD tests are used to evaluate the optimal choice of LOD threshold. Different LOD threshold comparisons include: $1$, $2$, $4$, $8$ and $16$.
+\begin{figure}[t]
+\centering
+\includegraphics[width=3.0in]{images/results/performance/comparison}
+\caption{Comparison of performance between volume registration and the proposed speed up for different volume sizes.}
+\label{fig:perfComp}
+\end{figure}
 
-\paragraph{Rate-Distortion Graphs}
+\section{Data Representation Experiments}
 
-Figure \ref{LevelsOfDepthRDGraphs} shows two rate-distortion graphs, the left graph uses the $MSE$ metric and the right graph uses the perceptual $DD$ metric. The $MSE$ graph suggests that an LOD threshold value of $8$ is optimal for higher bit rates and a value of $16$ is best for lower bit rate compression. The $DD$ metric graph suggests that the LOD of $8$ is the optimal threshold value. It produces the best results and is comparable to LOD $16$ even at low bit rates. Both graphs suggest that LOD values of $1$ and $2$ result in poor performance, this is due to the fact that these levels require more branches in the tree, increasing storage requirements. An SOT with a shallow tree that accurately accurately approximates the model is ideal.
-
-\paragraph{Visual Comparisons}
-
-
-Visual comparisons further provide an indication of the best LOD threshold to use. Figure \ref{LevelsOfDepthVisualTests1} shows high bit rate results using different LOD values, and figure \ref{LevelsOfDepthVisualTests2} shows the same tests for lower bit rates. In figure \ref{LevelsOfDepthVisualTests1}, the bit rate becomes lower and lower as the LOD value is raised, but only on the transition from $8$ to $16$ does this advantage wear off, as the LOD $16$ model is more distorted than the rest. This further suggests that the optimal LOD value is $8$. Figure \ref{LevelsOfDepthVisualTests2} also suggests this conclusion. Notice that with low bit rate compression, the models with LOD values ranging $1-8$ look similar, but $8$ has the lowest bit rate.
-
-
-\paragraph{Conclusion}
-
-The optimal LOD value is more obvious than the optimal DCL code. Both, rate-distortion graphs and visual results reveal that the optimal LOD threshold is level $8$. Since all models are bound to a $512\times 512 \times 512$ box, where the root node is defined as level $0$, the SOT should be decomposed until a maximum tree depth of $6$.
-
-\subsection{SOT vs. OT Results}
-
-This section presents results comparing the the SOT with the OT. Models tested include: Ball, Bunny, Horse, Rabbit, Dragon, Angel and Happy Buddha. Tabulated results for the SOT are provided in Appendix \ref{AppendixA}.
-
-\subsubsection{Rate-Distortion Graphs}
-
-RD results for the ball model are presented in figure \ref{ballRDGraphs}. The $MSE$ metric graph (left) shows that the SOT outperforms the OT codec, and the $DD$ metric graph supports this conclusion. In the $DD$ graph, the OT cannot reach the quality of the SOT, even at very high bit rates.
-
-Rate-distortion results for the bunny model are presented in figure \ref{bunnyRDGraphs}. These results are similar with those obtained using the ball model. In these results, the SOT outperforms the OT codec. In the rate-distortion graphs for the horse, the $MSE$ metric graph on the left of figure \ref{horseRDGraphs} shows that the OT comes close to the performance of the SOT, but still has worse performance. When considering the same figure where the $DD$ metric is used (right), the SOT produces much better results than the OT.
-
-Rate-distortion graphs for the: rabbit, angel, dragon and happy buddha are shown in figures: \ref{rabbitRDGraphs}, \ref{angelRDGraphs}, \ref{dragonRDGraphs} and \ref{happyRDGraphs} respectively. These results show similar findings in that the SOT is more efficient than the OT codec in terms of rate-distortion, especially in terms of quantitative perceptual quality (DD).
-
-\subsubsection{Visual comparisons}
-
-Visual comparisons make a case for the practicality of the SOT because this data is meant for human visual consumption. In figure \ref{ballVisualResults} the ball is coded with the SOT and OT, the outputs of these codecs are compared with the original model. These results show a large difference in quality between the SOT and the OT. The OT codec produces a blocky, spikey shape which does not correlate with the outline of the original model. The SOT produces a more visually pleasing result whilst using two thirds of the storage requirements of the OT. 
-
-
-The bunny visual results are shown in figure \ref{bunnyVisualResults}, these results show that for a similar bit rate, the SOT codec produces a higher quality model than the OT. The outline of the SOT coded model looks similar to the original model, but does have some holes. The holes are present because the SOT is rendered directly from the tree structure without being filtered. Despite this, it is still less distorted than the model compressed using the OT. 
-
-
-Visual results for the horse model are presented in figure \ref{horseVisualResults}. These results show that for a lower bit rate, the SOT codec produces a higher quality model compared with the OT. Results for the rabbit (figure \ref{rabbitVisualResults}) also show that for a lower bit rate, the SOT produces better quality models. In the rabbit results, the SOT coded model looks very similar to the original model whilst the OT coded model is blocky and distorted. It is clear that the OT has suffered from 3D aliasing. 
-
-Visual results for the angel, dragon and happy buddha are provided in figures, \ref{angelVisualResults}, \ref{dragonVisualResults} and \ref{happyVisualResults} respectively. These results show that, at low bit rates, the SOT produces models which fit the outline of the original model better.
+\input{chapters/results/datarepresentation}
 
 
-\subsubsection{Conclusion}
-
-Results show that the SOT outperforms the OT codec in both, rate-distortion tests and in qualitatively quality analysis. The SOT produces models which match the general shape of the original model well, however some filtering is required to fill infrequently occurring holes. The OT produces models which have aliasing and distortion, plus the OT produces higher bit rates.
-
-\subsection{Comparisons with the State of the Art}
-
-Codecs used for state of the art comparisons include: the progressive mesh OT by Peng \textit{et al.} \cite{Peng05Geometry-Guided}, the wavelet codec by Khodakovsky \textit{et al.} \cite{Khodakovsky00Progressive}, FOLProM by Peng \textit{et al.} \cite{Peng10Feature}, the hierarchical point cloud codec by Siddiqui \textit{et al.} \cite{Siddiqui07Octree}, the valence driven codec \cite{touma98triangle}, the spectral codec by Karni \& Gotsman \textit{et al.} \cite{Karni00Spectral} and the other spectral codec by Bayazit \textit{et al.} \cite{Bayazit103DMesh}. 
-
-\subsubsection{Rate-Distortion Graphs}
-
-Figure \ref{Peng05Geometry-GuidedRDGraph} shows a rate-distortion graph comparing the progressive OT codec by Peng et al. \cite{Peng05Geometry-Guided} with the SOT.  Results show that the SOT outperforms this codec. Results comparing the SOT and the wavelet codec by Khodakovsky \textit{et al.} \cite{Khodakovsky00Progressive} are shown in figure \ref{Khodakovsky00ProgressiveRDGraph}. This graph uses the $MSE$ as the quality metric and the bunny model as codec input. This graph shows that the SOT outperforms the wavelet codec.
-
-
-Peng \textit{et al.} have another, more recent codec called FOLProM  \cite{Peng10Feature}. Results are shown in figure \ref{Peng10FeatureRDGraph}. The left graph shows results for the dragon, and the right graph shows results for the rabbit model. In both graphs, the SOT has a better rate-distortion curve.
-
-\subsubsection{Visual comparisons}
-
-Figure \ref{SOTSiddiqui07OctreeVisualResults} shows visual results for the SOT and the codec by Siddiqui \textit{et al.} \cite{Siddiqui07Octree}. The two models on the left were compressed by the SOT, the middle model is the original and the models on the right were compressed by the point cloud OT codec. Results show that the SOT requires $2.840$ bpv to represent the original bunny model accurately, whilst the codec by Siddiqui \textit{et al.} requires at least $11.2$ bpv to to store the model at a similar quality level. At $8.3$ bpv their models become slightly distorted, and at $5.8$ bpv, they become very distorted, not reaching the quality of the SOT codec.
- 
-
-Figure \ref{SOTtouma98triangleKarni00SpectralVisualResults} shows visual results for the SOT, the valence driven approach \cite{touma98triangle} and the spectral codec \cite{Karni00Spectral}. The first two models are SOT outputs, the center model is the original bunny model, the center right model was produced by the spectral codec and the far right model was compressed using the valence driven approach. The SOT coded models look quite similar to the original model, the SOT model with a bit rate of $1.461$ does look a bit blocky, however it has a much lower bit rate compared with the other models. The far left codec with a bit rate of $3.984$ is similar to the original model but suffers from a missing patch on its left foot, however, the ears and legs correlate well with the original model. The valence driven codec produces undesirable results, its output model is lumpy and is quite distorted. The spectral coded model looks better but looks overly lumpy. The SOT's improvement over the spectral codec is somewhat arguable, but the SOT is a clear improvement over the valence driven approach.
-
-
-Figure \ref{SOTBayazit103DMeshVisualResults} shows results comparing the SOT with the recent spectral codec by Bayazit \textit{et al.} \cite{Bayazit103DMesh}. At a bit rate of $1.461$, the SOT codec produces a smoother version of the original model, whilst the spectral codec by Bayazit requires $2.523$ bpv to produce a model which is very lumpy and distorted. These results suggest the SOT is the better codec.
-
-\subsection{Conclusion}
-
-Experiments show that the optimal LOD threshold is $8$ and the best DCL values are above or equal to $3$. Results have also revealed that the SOT outperforms both the OT and other state of the art codecs from the literature in terms of rate-distortion and qualitative quality. The hierarchical SOT method produces models which accurately reflect the general shape of the original model and transform based codecs produce models which are lumpy. These results suggest that the SOT is among the current state of the art 3D data compression schemes available.
-
+\section{Conclusion}

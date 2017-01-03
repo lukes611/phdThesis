@@ -3,169 +3,74 @@
   \qauthor{Claude Shannon}
 \end{savequote}
 \makeatletter
-\chapter{Experiments and Results}
+\chapter{Experiments}
 
 \section{Experiments}
 
-This section discusses the types of experiments performed. First, a survey on codec evaluation and comparison techniques is presented, then those techniques used to evaluate the SOT are reported. Next, the experiment environment used is discussed, along with the data set used in experiments.
+In this section, various experiment set-ups and test data are discussed. Results are presented in the results section (\ref{ResultsSection}). In this section we first discuss the test data used in section \ref{TestDataSection}, then the tools we used for analysis are discussed (section \ref{ToolsSection}). The algorithms we evaluated and compared are listed in section \ref{AlgorithmsSection}. Finally in the later sections (\ref{QualExperimentsSection} and beyond) we discuss the quantitative and qualitative methods we used to test these algorithms. Finally section \ref{DataRepresentationExperimentsSection} describes the experiments evaluating the proposed Reconstruction data-representation. 
 
-\begin{figure*}[t] 
-        \centering
-        \begin{subfigure}[b]{2.0in}
-                \includegraphics[width=2.0in]{images/ch2/unit21}
-                \caption{Apartment}
-                \label{fig:RECON_UNIT}
-        \end{subfigure}%
-        \begin{subfigure}[b]{2.0in}
-                \includegraphics[width=2.0in]{images/ch2/officeA}
-                \caption{Office}
-                \label{fig:RECON_OFFICE}
-        \end{subfigure}%
-        \begin{subfigure}[b]{2.0in}
-                \includegraphics[width=2.0in]{images/ch2/outdoorA}
-                \caption{Garden}
-                \label{fig:RECON_GARDEN}
-        \end{subfigure}
-       \caption{Reconstructed Scenes.}
-       \label{fig:RECONSTRUCTIONS}
-\end{figure*}
+\section{Test Data}
 
+\label{TestDataSection}
 
-\subsection{Codec Evaluation \& Comparison Techniques}
+Test Data was generated based on the testing requirements for this research. In order to robustly test different pose-estimation procedures / 3D-registration methods we generated data from a variety of scenes. These scenes are of both in-door and out-door. Some include large amounts of texture whilst others have little or no texture. Some scenes in the data-set were captured purposefully to cause confusion for algorithms which rely on texture information. These scenes have texture confusion. These scenes have multiple items which look similar locally but are actually different objects within the scene and have unique global positions. \\
 
-Codec evaluation involves comparing storage requirements between the original model and codec output. In the case of lossy codecs, a quantitative quality metric is also required. Compression metrics are easy to compute, quality metrics are more involved and there have been many proposed techniques. Quality metrics compare the distortion created by the codec relative to the original model. Two measurements are usually performed, the distance from the compressed model to the original and the distance from the original to the compressed model. Quality metrics are split into empirical and perceptual based metrics. Empirical metrics measure geometric error and perceptual metrics estimate human perception. Perception based metrics are a part of psychophysics research. For a more in-depth survey of these methods, see work by Bubill \textit{et al.} \cite{Bulbul11Assessing}.
+Moreover, our test-data also measures the ability of each algorithm to register different camera movements. Each scene is captured by performing certain types of camera movement. Different camera transformations captured include: translation, zooming and rotation about different axes. \\
 
-\subsubsection{Compression Metrics}
+Some frames from the original test-set are shown in appendix \ref{AppendixA}. The first scene: the Apartment Texture Rotate scene was taken by rotating the camera around the y-axis across an apartment. This scene contains a lot of texture information. The Apartment Texture X Axis scene is similar in terms of texture but contains both x and y axis rotation. This tests the FVR's ability to handle multiple axes of rotation. \\
 
-In the context of 3D model compression, the file size of both, the compressed model and the original are compared. Alternatively, the file size of the compressed model from one codec can be compared to the file size of the same model compressed using another codec. The compression ratio ($CR$), defined as the original file size divided by the compressed file size, is a measure of compression performance. Another metric used is called the bit rate, different bit rates are used depending on the representation being compressed. The mesh representation uses bits per vertex (bpv) and bits per triangle (bpt), the volumetric representation uses bits per voxel and the point cloud representation uses bits per point.
+The boxes scene was captured under arbitrary-rotation, translation and zoom (in/out) camera motions. It contains some useful information on the boxes themselves, however the texture on the carpet is may cause texture confusion for feature based registration methods. The Desk Texture Translation scene contains a desk with a desktop computer and several items on it. The In-door space with texture-confusion contains a set of chairs and picture frames which look similar to each-other locally but may cause confusion for registration techniques which rely on local features.  \\
 
-\subsubsection{Empirical Error Metrics}
+The kitchen scene was captured with both translation and zoom camera movements. It contains very little texture and the color is predominantly white. The Office textured blind-spot rotation scene is a textured office scene where the camera is rotated about the y-axis. The scene is focused on a large divider which separates two desks. The divider may confuse registration methods which rely too heavily on minimization by aligning the large divider as a priority rather than taking into account the smaller details within the scene. \\
 
-The following metrics are used to assess the error between two data samples. For two points, $p$ \& $q$, in $\Re^3$ space, the basic euclidean distance metric,
-$$
-ED(q,p) = \sqrt{(q_x - p_x)^2 + (q_y - p_y)^2 + (q_z - p_z)^2}
-$$,
-the absolute error,
-$$
-AE(q,p) = \|q_x - p_x\| + \|q_y - p_y\| + \|q_z - p_z\|
-$$
-and the squared error $SE$, 
-$$
-SE(q,p) = (q_x - p_x)^2 + (q_y - p_y)^2 + (q_z - p_z)^2
-$$
-are often used as a basis for other metrics. 3D models can be sampled into a set of points in $\Re^3$. Using these samples, the following metrics can be used: sum of distances ($SOD$), sum of absolute differences ($SAD$), sum of squared errors ($SSE$), mean square error ($MSE$) and root mean square error ($RMS$). Since the two models may be sampled differently, the minimum error from one sample to the others is used. These metrics are defined below using two point sets, $A$ \& $B$ where the length of these sets is $M$ and $N$ respectively.
-$$
-SOD(A,B) = \sum_{k=0}^{M} \min_{b \in B}(ED(A_k,b))
-$$
+The Office scenes contain a decent amount of usable texture and different sets were created by translating, rotating about the y-axis and rotating about the x-axis. Other office scenes, where the camera captures objects in both the foreground and the background and where the camera is lifted and rotated whilst focussed on an office desk and chair combo. \\
 
-$$
-SAD(A,B) = \sum_{k=0}^{M} \min_{b \in B}(AE(A_k,b))
-$$
+Some out-door scenes were also captured around the university. They are captured with both rotation and translation camera movements and are also labelled as being susceptible to texture confusion.
 
-$$
-SSE(A,B) = \sum_{k=0}^{M} \min_{b \in B}(SE(A_k,b))
-$$
+\section{Analysis Tools}
+\label{ToolsSection}
 
-$$
-MSE(A,B) = \frac{1}{M}SSE(A,B)
-$$
+In order to test different registration methods. Algorithms were written in C/C++ using both Visual Studio (2012 and 2015) on a Windows (7 \& 10) machine and code-blocks 16 on an Ubuntu machine. All source code is made available online at: https://github.com/lukes611/phdThesis. In order to measure registration algorithms we use the error metrics described in the \ref{metricsSection} section.  
 
-$$
-RMS(A,B) = \sqrt{MSE(A,B)}
-$$
+\section{Algorithms}
+\label{AlgorithmsSection}
 
-For each of these metrics, $METRIC(A,B) \neq METRIC(B,A)$. Therefore, these methods are often averaged (below). This is termed the average metric (AM), as opposed to the minimum metric (MM) which is the smallest value of the two.
+\subsection{3D Reconstruction}
 
-$$
-AvgError = \frac{Metric(A,B)+Metric(B,A)}{2}
-$$
+Different 3D-registration algorithms were implemented to test the Fourier Volume Registration (FVR) method. Feature matching methods are important to compare with because they are still dominant and very successful in image processing and computer vision. In this research we show that FVR is competitive with feature matching methods whilst beating them in certain contexts (such as little textured scenes or scenes where texture confusion may occur). \\ 
 
-Another metric, the Hausdorff distance ($HD$) is a measure of overall shape similarity. It is defined as the largest value of the maximum distances between objects from $A$ to $B$ and from $B$ to $A$. For example, for two objects $A$ \& $B$, the Hausforff distance $HD$, from $A$ to $B$, is defined as,
-$$
-HD(A,B) = \max(D(A,B),D(B,A))
-$$
-where $D(A,B)$ is defined as,
-$$
-D(A,B) = \{a \in A \| \max(dist(a,B)\}
-$$
-and $dist(a,B)$ is defined below.
-$$
-dist(a,B) = \{b \in B \left| \min(\|a-b\|)\right.\}
-$$
+We test with both 2D feature matching and 3D feature matching. In 2D feature matching, the features are found and matched between a pair of 2D-images, then RANSAC is used with the corresponding matches and true 3D point to compute pose. The pose is then used to reconstruct the scene. We found that SURF performed best out of the other feature matching methods, so SURF was used in experiments. The 2D feature matching method is limited as it cannot register frames which have too few features or frames which contain texture confusion. It is also not able to handle wide base-lines. \\
 
-\subsubsection{Human Perception Based Metrics}
+We also test 3D-feature matching using an implementation of SIFT in 3D. This algorithm was tested and written in C/C++ and like the 2D counterpart, is also susceptible to failed registration in scenes with too few features and texture confusion but it is able to handle wide base-lines since it works in 3D. //
 
-Lavoue \textit{et al.} \cite{Lavoue06Perceptually} devised a metric based on structural distortion, this method correlates well with human perception. It is based on the SSIM method of Wang \textit{et al.} \cite{Wang04Image}, which is a popular image metric. Lavoue \textit{et al.} call their method the, Mesh Structural Distortion Measure (MSDM). An updated version of this metric was also developed \cite{Lavoue11Multiscale}.
+Another algorithm used in experiments is Iterative Closest Point or ICP. This method has become very popular in 3D reconstruction and works well on most scene types. One disadvantage is that this method may get stuck in a local minima and fail to register correctly. This typically occurs when registering against wide-baselines. \\
 
-\paragraph{Laplacian Metric}
+Another algorithm present in the experiments is Principal Components Analysis (PCA). This algorithm is used to find the mean and principal components of a multi-dimensional data set. This is useful for registration purposes as it works on wide-baselines, is very fast and provides additional information about a scene. The downside is that it is very susceptible to noise and misaligned data. The proposed FVR method makes use of information from PCA so it is important to compare the two to find out what improvements are made by FVR over PCA. \\
 
-Karni \& Gotsman \cite{Karni00Spectral} developed their own on-line metric for use during their spectral based codec. It is based on the laplacian and measures the difference between two objects in terms of their smoothness. 
+The final algorithm tested is the proposed FVR algorithm, which uses both PCA and Fourier Phase Correlation to find the registration transformation between two 3D data-sets as described in \ref{FullRecovery3DSection}. This algorithm was proposed to handle general transformations in terms of rotation, scaling and translation. It was also designed to be able to handle noisy data, data with texture-confusion and data with little or no texture. This makes it a viable option in the 3D registration and pose estimation research areas.
 
-\paragraph{Elastic Deformation Based Metric}
+\section{Qualitative Experiments}
 
-Bian \textit{et al.} \cite{Bian09Evaluation} developed a novel metric, useful for both on and off-line model comparison. The algorithm is based on the theory of strain fields. A strain field is a metric derived from elasticity, it is used to describe the deformation of some object which has elastic properties. Using this concept, both models are treated as having elastic properties in order to perform quality assessment.
+\label{QualExperimentsSection}
 
-\paragraph{Saliency Based Metrics}
+Qualitative experiments were performed by using different algorithms to generate 3D reconstructed scenes. The scenes include some indoor and out-door scenes. They are analysed visually in the results section. 
 
-Howlett \textit{et al.} \cite{Howlett04Experimental} and Lee \textit{et al.} \cite{Lee05Mesh} both presented work aimed at determining salient features in 3D models. They incorporated these findings in their own metrics. Howlett \textit{et al.} used a human gaze detection device to study the psychophysical effects of viewing 3D objects. Both of these metrics are based on preserving the sections of the object in which any distortion would be visibly noticeable to humans.
+\section{Quantitative Experiments}
 
-\paragraph{The Depth Difference Metric}
+\subsection{Pose Estimation Experiments}
 
-Krivokuca \textit{et al.} \cite{Krivokuca12New} developed a perceptual based metric for the off-line quality assessment of 3D models. This method is independent of model representation and is based on generating multiple depth maps from different orthographic perspectives. It improves upon both the Hausdorff distance and RMS error and is good at detecting both small and large geometric errors. Krivokuca \textit{et al.} call their method, the Depth Difference (DD). It works by comparing orthographic depth maps from both the original and compressed models. First a difference depth image is calculated ($DDI$) from orthographic depth maps of the original object ($DIO$) and of the compressed object ($DIC$). The $DDI$ is calculated using element-wise matrix subtraction,
-
-$$
-DDI = DIO - DIC
-$$
-
-Then the average depth distance value ($ADD$) is calculated from the $DDI$ matrix, this equation is presented below.
-
-$$
-ADD = \frac{1}{MN} \sum_{y=0}^{M} \sum_{x=0}^{N} DDI_{y,x}
-$$
-
-This $ADD$ value is then summed up and averaged over different orthographic views, this average is the Depth Difference.
-
-\subsection{Codec Performance Assessment}
-
-The experiments performed use a number of different metrics to quantify the performance of the SOT and compare it with other codecs. The quality metrics used include: mean distance, $RMS$, Depth Difference ($DD$), $MSE$, and qualitative perception. Most research uses the $MSE$ and $RMS$ because they are simple and provide an accurate measurement of quality. Since the data which the SOT is manipulating was designed for human visual consumption, the perceptual metric, DD is used. Our implementation of the DD metric uses five orthogonal projections corresponding to the sides of a cube (excluding the bottom face). Qualitative comparisons are also used to provide insight into the visual quality of the models which the SOT produces. The storage metrics used include: number of bytes and bpv. Bits per vertex is used most often because the input and output of the SOT is a polygonal mesh, and because it is widely used in the literature as part of rate-distortion graphs.
-
-Results provided for the OT use the MM and results for the SOT use the AM. This is because the SOT can represent both outside and inside views of the mesh, whilst the OT can only represents the outside view. All measurements are computed using a $512 \times 512 \times 512$ bounding box, but when comparing the SOT with other codecs, the error is converted to the same bounding box used by the other codec.
-
-\subsubsection{The Metro Program}
-
-In order to ensure the accuracy of geometric errors, the Metro software tool is used to independently assess the quality of models produced by the SOT. This tool takes two models as input and produces the forward and backward $RMS$, mean distance and Hausdorff distance between the two. Metro Version 4.06 was used in all experiments, details about this software can be found in work by Cignoni \textit{et al.} \cite{Cignoni98Metro}.
-
-\subsection{Experiment Environment}
-
-All experiments were performed on an ASUS computer with an Intel i5 CPU and 4 GB of RAM, this machine was running Windows 7. The SOT and OT were written in C++ using Microsoft's Visual Studio IDE, and OpenGL was used to provide visualizations of all models.
-
-\subsection{Data Set}
-
-Industry standard models are used to evaluate the SOT. Six widely used 3D models are used in experiments. These models contain relatively large amounts of geometric information making them a challenge for compression. Figure \ref{dataset} presents this data set. For each model the name, vertex and triangle count are given. With the exclusion of the ball model, these models are commonly used in compression and simplification research. This data set was obtained from the Georgia Institute of Technology's Large Geometric Models Archive \cite{LargeGeometricModelsArchive}. The ball model is included in experiments to provide insight into the compression of smaller 3D models. 
+Quantitative experiments were performed by registering multiple frames from the different scenes mentioned in the algorithms section. We use the test-data mentioned, and estimate pose for each frame. Results from a few metrics were gathered, including: Mean Squared Error, Percent Match and Hausdorff Error. We found that measuring the Hausdorff error relative to the Hausdorff error between the two un-registered frames provided the most clear indication of performance and accuracy. We provide results for each of the raw measurements in the Appendix \ref{RawQuantitative1}.
 
 
-\subsection{Shade-Octree Experiments}
+\subsection{Camera Movement Experiments}
 
-Some experiments are performed on the SOT for the sole purpose of evaluating the best LOD and distance code search length (DCL) to use. Since these variables directly affect he SOT's efficiency, experiment results are provided. Both of these experiment types are described in detail below.
+Experiments are performed where by the camera is translated or rotated and the registration transform is compared to the true camera movement and the error between the true and computed camera movement is presented. These experiments were performed to show the FVR's ability to register accurate camera movements in the presence of noise.
 
+\subsection{Noise Experiments}
 
-\subsubsection{Distance Code Length Tests}
-
-The SOT makes use of four distance codes per node. These distance codes are truncated to a multiple of the node's region size. This multiple is called the distance code length (DCL). To evaluate the optimal DCL, six sets of experiments are performed, each using DCL values ranging from one to six. For each experiment, $MSE$ threshold values of: $1$, $16$ and $512$ are used, these provide rate-distortion curves for each DCL experiment. In these experiments, the bunny model is used and both visual and graphical results are presented. This test is important because it reveals the best choice for the DCL. The optimal selection of the DCL may have an impact on codec efficiency. 
-
-\subsubsection{Maximum Level of Depth Tests}
-
-The level of depth (LOD) threshold represents the minimum leaf region size (how far the tree can be decomposed). A smaller LOD provides more accuracy but requires more storage size, a larger code results in a smaller file size with more distortion. To select the best LOD, five experiments are performed using LOD values of: 1, 2, 4, 8 and 16. All results are obtained using the bunny model and both numerical and graphical results are provided. These experiments are performed to find the optimal choice of the LOD threshold, which affects the efficiency of the SOT. 
-
-\subsection{Codec Comparisons}
-
-The SOT is compared with a generic implementation of the OT, as well as other state of the art codecs. These experiments are discussed in the sections below.
+Experiments determining each algorithm's robustness to noise are performed similarly to pose estimation experiments in that specific transforms are applied to real data. Each algorithm's ability to register against such transforms is evaluated. However, in these tests we apply different amounts of noise to data and compare each registration to that of the registration of data minus the noise. Raw results are provided in Appendix \ref{RaqQualitative2}
 
 
-\subsubsection{OT Comparison}
+\section{Data Representation Experiments}
 
-The OT algorithm is the main competitor of the SOT, it is a very well known and used 3D compression and representation structure. Rate-distortion curves are used to compare these codecs. In these experiments, $bpv$ is used as the bit rate, and both $DD$ and the $MSE$ metrics are used to measure quality. A qualitative quality analysis is also used to compare the two codecs. 
-
-\subsubsection{State of the Art Comparisons}
-
-The SOT is compared to other codecs which have been shown to have state of the art performance. The method by Peng \& Kuo \cite{Peng05Geometry-Guided} is compared with the SOT using a rate-distortion graph with the rabbit model. The progressive wavelet compression method by Khodakovsky \textit{et al.} \cite{Khodakovsky00Progressive} is also compared using a rate-distortion graph using the bunny model. Both the spectral codec by Karni \& Gotsman \cite{Karni00Spectral} and the state of the art single-rate codec by Touma \& Gotsman \cite{touma98triangle} are compared using a qualitative quality assessment of the bunny model. The hierarchical point-cloud codec by Siddiqui \textit{et al.} \cite{Siddiqui07Octree} is also compared with the SOT using a qualitative analysis. Recent state of the art codecs, including the FOLProM codec by Peng \textit{et al.} \cite{Peng10Feature} and the spectral codec by Bayazit \textit{et al.} \cite{Bayazit103DMesh} are also compared.
+Data representation experiments compare the compression of the Octree with the proposed data representation method. The mean squared error is used and graphs showing bit-rate vs error are shown comparing both methods.
