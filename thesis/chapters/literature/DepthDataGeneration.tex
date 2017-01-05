@@ -1,27 +1,23 @@
 \subsection{Sensors}
 
-camera technologies have also been evolving: enter the world of new depth cameras or rgb-d cameras,
-these have become available to consumers and may soon be found in mobile technologies \cite{Zhang12Microsoft}
-first real-time rgb-d depth sensor : with this system users can wave around the device to generate smooth, continuously updating, fully reconstructed data: using only depth, 6dof are tracked
+In 3D reconstruction, it is often ideal to use specialized sensors which capture reliable depth data on a per pixel basic. Once such camera is the RGB-D (Red, Green, Blue \& Depth) camera. These are becoming more accurate and less expensive and will soon be found in popular mobile technologies. \\
 
-works in full darkness : mitigating issues for passive cameras: [17 \cite{Klein07Parallel} /19 \cite{Newcombe10Live} /26 \cite{Stuhmer10Real}] and other rgb systems [14 \cite{Henry10Rgb}]
+Research by Zhang et al \cite{Zhang12Microsoft} used an RGB-D camera to generate smooth, continuously updating dense 3D reconstructions using only depth data. Here, using the data, 6 degrees of freedom were tracked. An advantage of this technique which only use depth data, is that it works in absence of visual light. Meaning it can work in the dark, unlike passive camera approaches \cite{Klein07Parallel, Newcombe10Live,Stuhmer10Real} and techniques which use color data along with depth data \cite{Henry10Rgb}. \\
 
-Kinect: incorporates a structured light based depth sensor, uses an on board ASIC generating an 11-bit 640x480 depth map at 30hz
+The Kinect is one such rgb-d camera. It uses a structured light based depth sensor along with an application specific integrated circuit to generate an 11-bit $640\times 480$ depth map at 30 times per second (real-time). \\
 
-depth images often contain holes : this is an issue (caused by no structured light could be read on the surface, certain materials, which do not reflect infra-red light (very thin structures or surfaces at incendence angles
+There is no double that these sensors are the easiest way to compute ready dense depth data for 3D reconstruction, but there are several drawbacks. Depth images contain holes. This is caused by a lack of structured light on a captured surface. Some materials simply do not reflect infra-red light (surfaces at steep angles or very thin objects). Also, when moving fast, the device easily experiences motion blur which leads to missing and incorrect data. \\
 
-when moving fast, the device can also experience motion blur, this leads to missing data
-
-
-DENSE TRACKING AND MAPPING by Scan Alignment
-dense sensor based 3d reconstruction research has continued using lasers and depth sensors
-typically : minimize distance measures between all data rather than feature extraction and matching
-
+Some 3D reconstruction techniques use the approach of dense mapping and tracking via depth sensors and lasers. These approaches usually compute feature matches to align the frames or some sort of error minimization function.
 
 
 \subsection{Stereo Cameras}
 
-algorithms to compute dense depth maps from image data [10 \cite{Hirschmuller05Accurate} , 21 \cite{Stuhmer10Real}]
+Stereo camera set-ups employ two cameras capturing a singular scene. Using a variety of techniques, depth data is computed from the stereo pair by measuring parallax.  
+
+\cite{Hirschmuller05Accurate} - proposed a semi-global matching method based on mutual information and approximation of a global smoothness constraint
+
+
 
 
 Scharstein and Szeliski \cite{Scharstein02Taxonomy} presented a survey and comparison technique for stereo matching research. For more details on methods prior to 2002, readers are encouraged to read this work. Sun et al \cite{Sun05Symmetric} presented an occlusion handling stereo matching algorithm. Their method incorporates a visibility constraint into the energy function for the belief propagation global optimisation method. Klaus et al \cite{Klaus06Segment} devised a stereo correspondence algorithm which uses colour segmentation combined with a self adapting matching score which minimizes the number of reliable occurrences. This method uses belief propagation to assign a single disparity to each segmented region.\\
