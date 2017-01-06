@@ -1,7 +1,9 @@
 
-\subsection{Fundamental Matrix}
+\subsection{Fundamental Matrix Method}
 
 \label{FundamentalMatrixSection}
+
+The Fundamental matrix method is used in systems where monocular cameras are used for 3D reconstruction. From 2D point correspondences, the fundamental matrix may be computed. This leads to the computation of not only the camera pose but also of stereo calibration (which is required to compute dense depth information from a monocular set of images). Here we describe the Fundamental and Essential matrices and their computation and use in camera pose estimation.
 
 In order to describe this technique, linear algebra is used. Firstly, all of the transforms required to represent imaging systems can be represented using $4 \times 4$ matrices and homogeneous vectors (with four rows and a single column). These important transforms include: 3D rotation, scaling, shearing/skewing, mirroring, translation and perspective. Rather than describing camera capture using projecting rays, we can use linear algebra which provides further capabilities and allows us to estimate the fundamental matrix. 
 
@@ -19,40 +21,44 @@ Using the steps described and looking at figure \ref{fig:INTRO_FMA1}, we now kno
 
 This formula is based on the assumption that no distortion present in the camera system. In this case, both of the cameras may have distortion. We represent this distortion here using matrices $G_1$ and $G_2$. If both shots are taken with the same camera, we may assume $G_1 = G_2$. We therefore relate the theoretically precise $P_1$ and $P_2$ with their real world equivalents (which have distortion) $D_1$ and $D_2$ by $P_1 = Q_1^{-1} * D_1$ and $P_2 = Q_2^{-1} * D_2$. Inserting this into the essential matrix formulation we have, $(Q_1^{-1} * D_1)^T * E * Q_2^{-1} * D_2 = D_{1}^{T} * {Q_1^{-1}}^{T} * E * Q_2^{-1} * D_2 = 0$. The presence of this distortion is the difference between the essential and fundamental matrices with the fundamental matrix being $F = {Q_1^{-1}}^{T} * E * Q_2^{-1}$. If no distortion is present, the fundamental matrix is equivalent to the essential matrix. \\
 
+Using the Essential or Fundamental matrices, we may compute both camera pose, and stereo calibration. If we take the essential matrix $E$ and break it down into 3 matrices ($W$, $U$ and $V$) using singular value decomposition (SVD). Here, translation may be computed using these matrices via equation \ref{eqn:FundaTrans} and the rotational part may be computed via equation \ref{eqn:FundaRote}
+
+
+\begin{equation} \label{eqn:FundaTrans}
+Translation Matrix = W\left[
+\begin{array}{ccc}
+0 & 1 & 0 \\
+-1 & 0 & 0 \\
+0 & 0 & 0 \\
+\end{array}
+\right]W^{T}
+\end{equation}
+
+\begin{equation} \label{eqn:FundaRote}
+Rotation Matrix = W\left[
+\begin{array}{ccc}
+0 & -1 & 0 \\
+1 & 0 & 0 \\
+0 & 0 & 0 \\
+\end{array}
+\right]V^{T}
+\end{equation}
+
 Looking at figure \ref{fig:INTRO_FMA1} again, line $E_1$ represents something called an epipolar line, this line lies on the plane in which both cameras and point $P$ sit on. Line $E_1$ is the epipolar line of the left frame and $E_2$ is the epipolar line of the right frame. Point $e_1$ is the epipole of the left frame and point $e_2$ is the epipole of the right frame. Epipoles are the projection of one camera's location onto the frame of another camera. The projection of $C_2$ onto the left frame by camera $C_1$ is the epipole $e_1$. If the fundamental matrix is multiplied by a particular point it produces a vector in $R^3$ which represents the epipolar line as $[a b c]^T$ in which $a,b$ and $c$ represent the line equation $ax^2 + bx + c$. We can see that the epipolar line corresponding to $Q$ and $Q_1$ passes through a common point with the other epipolar line $E_1$. In fact, all epipolar lines intersect at the epipole. Therefore, if the fundamental matrix can be computed, so can the epipolar lines and the epipoles. \\
 
-The fundamental matrix can be computed using around 8 point matches between images. Using the fundamental matrix, image rectification can be performed as well as 3D reconstruction. Using point $P$ in figure \ref{fig:INTRO_FMA1}, we already know the fundamental matrix, epipolar lines and epipoles can be computed from the point correspondences. If the epipoles are known, then we know the direction in which the other camera resides, in that case, all that is left is to triangulate the point correspondences in order to solve for the extrinsic camera parameters. The basic pipeline for the fundamental matrix method begins with feature matching, followed by fundamental matrix estimation. Then the extrinsic camera information is estimated and images are rectified and so that disparity information can be computed. Then depth maps can be projected through any of the two cameras and aligned. \\
+The fundamental matrix is computed using around 8 point matches between images. Using the fundamental matrix, image rectification can be performed as well as camera pose estimation. Using point $P$ in figure \ref{fig:INTRO_FMA1}, we already know the fundamental matrix, epipolar lines and epipoles can be computed from the point correspondences. If the epipoles are known, then we know the direction in which the other camera resides. The basic pipeline for the fundamental matrix method begins with feature matching, followed by fundamental matrix estimation via RANSAC. Then the extrinsic camera information is estimated and images are rectified and so that disparity information can be computed. Then depth maps can be projected through any of the two cameras and aligned. One downside to this method is that the scale of the translation computed is not to scale. \\
 
 
-Monocular Feature based SLAM systems use feature matches to estimate camera pose and location changes across frames \cite{Davison02Simultaneous}. Variations of this method use different features including: corners and lines \cite{Jeong06Visual}, image patches \cite{Silveira08Efficient} and exemplar feature matching \cite{Chekhlov07Robust}. SIFT features are used most often in SLAM \cite{Jensfelt06Framework,Pollefeys08Detailed,Beall11Bundle,Eudes10Fast}, in addition FAST features have been explored \cite{Kundu10Realtime,Leelasawassuk133d,Konolige10View,Konolige08Frameslam}. Beall et al \cite{Beall11Bundle} made use of both SIFT and SURF features in their underwater SLAM system. Real-time monocular SLAM systems based on this approach have also been proposed \cite{Chekhlov07Robust,Pollefeys08Detailed}. RANSAC is often used in monocular SLAM \cite{Eudes10Fast,Kundu10Realtime,Konolige10View,Konolige08Frameslam,Pradeep13Monofusion} to remove outliers which cause incorrect camera parameter estimates. Bundle adjustment is also used as an additional step to refine camera parameter estimation \cite{Eudes10Fast}. 
-
-
-in monocular setting, the scale of the map cannot be  determined \cite{Endres12Evaluation}
-
-SLAM has focused on real time markerless tracking and live scene reconstruction based on a single sensor RGB eg. MonoSLAM[8] \cite{Davison03Real} which is less accurate than PTAM [17] \cite{Klein07Parallel}  but these only produce sparse reconstructions
-some methods have grown to combine PTAM's camera tracking ability with MVS-style reconstructions [19/26] (\cite{Newcombe10Live}/\cite{Stuhmer10Real})
-recently: iterative image alignment has been used to replace features in tracking [20] \cite{Newcombe11Dtam}
-this scene is promising: but monocular based dense 3D reconstruction is difficult and requires suitable camera motion and scene illumination
-
-
-\subsection{Stereo based}
-
-Stereo based SLAM systems also use features to estimate camera parameters. However, stereo based systems are capable of generating dense depth data more easily using stereo algorithms. Miro et al \cite{Miro06Towards} proposed a stereo based method which uses SIFT and the extended Kalman filter. The method by Van Gool et al \cite{Pollefeys04Visual} works with un-calibrated stereo pairs. It uses Harris corner features and a multi-view stereo algorithm. Sim et al \cite{Sim05Vision} and Gil et al \cite{Gil06Improving} both presented stereo based SLAM systems which use SIFT.
-
-\cite{Endres12Evaluation}(
-in monocular setting, the scale of the map cannot be  determined 
-stereo slam [17 \cite{Konolige08Outdoor}, 24 \cite{Paz08Large}] -> does not suffer from this
-only accurate for textured surfaces, non-textured surfaces cannot be estimated with depth );
-
-SFM and MVS (multi view stereo) has given good results : camera tracking  and sparse reconstructions [10] \cite{Fitzgibbon98Automatic}, \cite{Seitz06Comparison} [24] 
-
-
-[19 \cite{Newcombe10Live}] uses dense optical flow with PTAM like tracking for dense recon
-this relies on camera poses coming from PTAM
-[26 \cite{Stuhmer10Real}] do the same with near real time depth map calculation
+Monocular Feature based SLAM systems use feature matches to estimate camera pose and location changes across frames \cite{Davison02Simultaneous}. Variations of this method use different features including: corners and lines \cite{Jeong06Visual}, image patches \cite{Silveira08Efficient} and exemplar feature matching \cite{Chekhlov07Robust}. SIFT features are used most often in SLAM \cite{Jensfelt06Framework,Pollefeys08Detailed,Beall11Bundle,Eudes10Fast}, in addition FAST features have been explored \cite{Kundu10Realtime,Leelasawassuk133d,Konolige10View,Konolige08Frameslam}. Beall et al \cite{Beall11Bundle} made use of both SIFT and SURF features in their underwater SLAM system. Real-time monocular SLAM systems based on this approach have also been proposed \cite{Chekhlov07Robust,Pollefeys08Detailed}. RANSAC is often used in monocular SLAM \cite{Eudes10Fast,Kundu10Realtime,Konolige10View,Konolige08Frameslam,Pradeep13Monofusion} to remove outliers which cause incorrect camera parameter estimates. Bundle adjustment is also used as an additional step to refine camera parameter estimation \cite{Eudes10Fast}.  \\
 
 
 \subsection{Feature Matching and RANSAC}
+
+Feature matching along with RANSAC may be used to compute the Fundamental/Essential matrices which leads to camera pose estimates. However, the computation of the correct Fundamental matrix is typically difficult. Furthermore, the intrinsic camera parameters must be known prior in order to use such a technique, else noise destroys the ability to accurately estimate camera pose. \\
+
+Another, more common way to use feature matching with RANSAC is to compute the camera pose directly using RGB-D data. As covered in section \ref{DepthDataGenSection}, dense depth information may be computed using monocular, stereo or sensor based camera set-ups. This method begins by computing feature matches between two given frames. These matches along with the 3D location of each corresponding match (projected using the dense depth data) are injected into the popular Random Sample Consensus Algorithm commonly known as RANSAC. RANSAC is an iterative algorithm which works by repeatedly selecting a subset of input data, computing a model on the subset and testing that model on the global superset. During this repeated process, the subset with the best classification (lowest error or greatest strength model) is chosen for the final model. \\
+
+In the case of camera pose estimation, the subset is used to compute the camera pose (using singular value decomposition) and the camera pose which minimizes the global error is chosen as the best camera pose. Here we describe how to compute the camera pose given a set of 3D points matched from one frame to another. 
 
 icp often not necessary and expensive
 icp only used if no keypoint matches found... \cite{Endres12Evaluation}

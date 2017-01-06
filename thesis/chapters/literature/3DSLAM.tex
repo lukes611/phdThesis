@@ -2,6 +2,14 @@
 SLAM used in robotics [30 \cite{Thrun02Robotic},22 \cite{Nuchter056d},10 \cite{Grisetti07Efficient}, 6 \cite{Dellaert06Square},15 \cite{Kaess08Isam},9 \cite{Frese05Multilevel},23 \cite{Olson06Fast}]
 
 
+in monocular setting, the scale of the map cannot be  determined \cite{Endres12Evaluation}
+
+SLAM has focused on real time markerless tracking and live scene reconstruction based on a single sensor RGB eg. MonoSLAM[8] \cite{Davison03Real} which is less accurate than PTAM [17] \cite{Klein07Parallel}  but these only produce sparse reconstructions
+some methods have grown to combine PTAM's camera tracking ability with MVS-style reconstructions [19/26] (\cite{Newcombe10Live}/\cite{Stuhmer10Real})
+recently: iterative image alignment has been used to replace features in tracking [20] \cite{Newcombe11Dtam}
+this scene is promising: but monocular based dense 3D reconstruction is difficult and requires suitable camera motion and scene illumination
+
+
 vslam [5 \cite{Davison03Real} , 16 \cite{Klein07Parallel}, 28 \cite{Strasdat10Real}, 14 \cite{Jin00Real}, 21 \cite{Nister05Preemptive}] => get sparse keypoints,  
 these simplify data association
 
@@ -22,3 +30,20 @@ some algorithms can use PTAM tracking in conjunction with dense reconstruction c
 
 
 early sfm algorithms: either accumulated drift (computing motion) [2 \cite{Beardsley97Sequential} ] or performed loop-closure using off-line optimization 
+
+SFM and MVS (multi view stereo) has given good results : camera tracking  and sparse reconstructions [10] \cite{Fitzgibbon98Automatic}, \cite{Seitz06Comparison} [24] 
+
+
+[19 Newcombe10Live] uses dense optical flow with PTAM like tracking for dense recon
+this relies on camera poses coming from PTAM
+[26  Stuhmer10Real] do the same with near real time depth map calculation
+
+
+STEREO BASED METHODS
+****************************
+
+Stereo based SLAM systems also use features to estimate camera parameters. However, stereo based systems are capable of generating dense depth data more easily using stereo algorithms. Miro et al \cite{Miro06Towards} proposed a stereo based method which uses SIFT and the extended Kalman filter. The method by Van Gool et al \cite{Pollefeys04Visual} works with un-calibrated stereo pairs. It uses Harris corner features and a multi-view stereo algorithm. Sim et al \cite{Sim05Vision} and Gil et al \cite{Gil06Improving} both presented stereo based SLAM systems which use SIFT. \\
+
+In monocular approaches, the scale of the map cannot be determined and although stereo methods \cite{Konolige08Outdoor, Paz08Large} do not suffer this issue, depth for these algorithms can only be computed accurately for highly textured surfaces \cite{Endres12Evaluation}.  Newcombe et al \cite{Newcombe10Live} uses the fundamental matrix technique but computes it using dense optical flow with PTAM like tracking for dense reconstruction. A similar technique was proposed by \cite{Stuhmer10Real} for real time reconstruction. \\
+
+******************************
