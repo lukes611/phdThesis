@@ -1,6 +1,8 @@
 
 \subsection{Fundamental Matrix}
 
+\label{FundamentalMatrixSection}
+
 In order to describe this technique, linear algebra is used. Firstly, all of the transforms required to represent imaging systems can be represented using $4 \times 4$ matrices and homogeneous vectors (with four rows and a single column). These important transforms include: 3D rotation, scaling, shearing/skewing, mirroring, translation and perspective. Rather than describing camera capture using projecting rays, we can use linear algebra which provides further capabilities and allows us to estimate the fundamental matrix. 
 
 In figure \ref{fig:INTRO_FMA1} there are two camera systems, for this part of the discussion we focus on the left camera $C_{1}$ and the left frame. Next we will describe how point $Q$ is projected from 3D onto the 2D point $Q_{1}$. First, $C_{1}$ is translated to the origin (later this allows rotation and perspective transforms to more easily be performed). In order to do this, $C_{1}$ can be subtracted from itself (to become the origin) and so it is also subtracted from $Q$ as well. Rather than performing this directly though, we will use a $4 \times 4$ translation matrix T instead. Next, rotation is performed in order to align the camera's axes with the x, y and z axes. The camera's axes can be defined using three vectors. One pointing directly ahead where the camera is facing (piercing the center of the projection frame), another points directly to the right perpendicularly (orthogonal to the first), the final points above the camera, aligned orthogonally with the previous two vectors. \\

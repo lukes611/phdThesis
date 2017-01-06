@@ -3,6 +3,7 @@ todo:
 	2. fix literature review: [Thursday]
 		+read & write about more
 		+add more
+		+reduce stereo method? back to basics with it?
 	3. more experiments: [Wednesday]
 
 		write OT, ST compress and generate psnr to coding rate graphs

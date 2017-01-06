@@ -6,3 +6,19 @@ vslam [5 \cite{Davison03Real} , 16 \cite{Klein07Parallel}, 28 \cite{Strasdat10Re
 these simplify data association
 
 \cite{Stuhmer10Real} - dense 3D mapping which is improved from multiple image integration, competes with newcombe10, but uses a variational method where depth maps are computed on the GPU and the scene is considered static as camera pose is computed independently on the cpu
+
+
+The first monocular slam system was presented by Davison in 2003 \cite{Davison03Real}. Davison's method uses a hand-held camera in real time to produce globally consistent sparse maps. It makes use of probabilistic filtering in its estimates of both camera pose (translation and rotation) as well as triangulation of sparse features. This method was successful but is limited to in-door office environments because it requires large state vectors which grow with scene size. Additionally, the use of sparse feature maps leads to poor accuracy. 
+
+maybe [3] from davison
+
+then systems which split tracking and mapping (global optimization) -> approach by PTAM system [17 \cite{Klein07Parallel}]
+: real time mono slam in work spaces -> basically it is just bundle adjustment (which is the least squares solution to camera and feature optimization (theirs chooses features dynamically over the frame range)
+their tracking system runs in parallel at frame-rate speeds, and performs robust n-point pose estimation with feature matching
+compared to filters much more features can be packed into the map[25 \cite{Strasdat10Real} ]
+PTAM = realtime results as accurate as off-line ones
+PTAM produces sparse maps - not like our project
+some algorithms can use PTAM tracking in conjunction with dense reconstruction computing module based on multi-view stereo 
+
+
+early sfm algorithms: either accumulated drift (computing motion) [2 \cite{Beardsley97Sequential} ] or performed loop-closure using off-line optimization 
