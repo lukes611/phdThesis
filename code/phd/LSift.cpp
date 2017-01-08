@@ -1108,6 +1108,7 @@ namespace LukeLincoln
             a = a * b;
             H += a;
         }
+	//H = sum of (a_{3,1} * b_{1,3}) = c_{3,3}
 
         Mat S, U, Vt, V;
         Mat Sm = Mat::eye(Size(3,3), CV_32FC1);
