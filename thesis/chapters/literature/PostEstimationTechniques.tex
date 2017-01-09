@@ -57,7 +57,7 @@ Monocular Feature based SLAM systems use feature matches to estimate camera pose
 
 Feature matching along with RANSAC  may be used to compute the Fundamental/Essential matrices which leads to camera pose estimates. However, the computation of the correct Fundamental matrix is typically difficult. Furthermore, the intrinsic camera parameters must be known prior in order to use such a technique, else noise destroys the ability to accurately estimate camera pose. \\
 
-Another, more common way to use feature matching with RANSAC \cite{Fischler81Random} is to compute the camera pose directly using RGB-D data. As covered in section \ref{DepthDataGenSection}, dense depth information may be computed using monocular, stereo or sensor based camera set-ups. This method begins by computing feature matches between two given frames. These matches along with the 3D location of each corresponding match (projected using the dense depth data) are injected into the popular Random Sample Consensus Algorithm commonly known as RANSAC. RANSAC is an iterative algorithm which works by repeatedly selecting a subset of input data, computing a model on the subset and testing that model on the global superset. During this repeated process, the subset with the best classification (lowest error or greatest strength model) is chosen for the final model. RANSAC is useful because it is capable of filtering out outliers. \\
+Another, more common way to use feature matching with RANSAC \cite{Fischler81Random,Chen99Ransac} is to compute the camera pose directly using RGB-D data. As covered in section \ref{DepthDataGenSection}, dense depth information may be computed using monocular, stereo or sensor based camera set-ups. This method begins by computing feature matches between two given frames. These matches along with the 3D location of each corresponding match (projected using the dense depth data) are injected into the popular Random Sample Consensus Algorithm commonly known as RANSAC. RANSAC is an iterative algorithm which works by repeatedly selecting a subset of input data, computing a model on the subset and testing that model on the global superset. During this repeated process, the subset with the best classification (lowest error or greatest strength model) is chosen for the final model. RANSAC is useful because it is capable of filtering out outliers. \\
 
 In the case of camera pose estimation, the subset is used to compute the camera pose (using singular value decomposition) and the camera pose which minimizes the global error is chosen as the best camera pose. Here we describe how to compute the camera pose given a set of 3D points matched from one frame to another. Given two identical length arrays of 3D points, $P$ and $Q$ where, for each index $i$, $P_i$ matches best with $Q_i$. Next, we compute covariance matrix $X$ based on $P$, $Q$ and their mean values. The calculation for $X$ is shown in figure \ref{eqn:CovarMatForFMRansac}.
 
@@ -109,7 +109,9 @@ Another issue that ICP is limited to small rotation, translation and scale. If l
 
 \subsubsection{Henry10Rgb}
 
-Henry et al presented work on a 3D mapping method which combines Feature Matching and RANSAC (similar to \cite{Endres12Evaluation}) with ICP. This method makes us of an RGB-D camera, and used the camera input for sparse feature matching. Features are used with RANSAC and the technique described in section \ref{FMANDFM}. ICP is used for refinement of the initial prediction. If Loop-closure is detected, a constraint is added to the 3D pose graph \cite{Kummerle11G} and is used to close the loop. A Surfel \cite{Pfister00Surfels} volumetric fusion method is used to represent and store the 3D reconstruction. This technique may be used for robot localization and path planning \cite{Hornung10Humanoid}. Endres et al \cite{Endres12Evaluation} compared this method with theirs using a standard benchmark \cite{Sturm12Benchmark}.  \\
+Some systems make use of feature matching with RANSAC (see section \ref{FMANDFM}) for pose estimation and ICP for further alignment \cite{Engelhard11Real, Henry10Rgb}. These methods are very similar and make use of the advantages of both the feature matching methods and ICP method. \\
+
+Henry et al \cite{Henry10Rgb} presented work on a 3D mapping method which combines Feature Matching and RANSAC (similar to \cite{Endres12Evaluation}) with ICP. This method makes us of an RGB-D camera, and used the camera input for sparse feature matching. Features are used with RANSAC and the technique described in section \ref{FMANDFM}. ICP is used for refinement of the initial prediction. If Loop-closure is detected, a constraint is added to the 3D pose graph \cite{Kummerle11G} and is used to close the loop. A Surfel \cite{Pfister00Surfels} volumetric fusion method is used to represent and store the 3D reconstruction. This technique may be used for robot localization and path planning \cite{Hornung10Humanoid}. Endres et al \cite{Endres12Evaluation} compared this method with theirs using a standard benchmark \cite{Sturm12Benchmark}.  \\
 
 
 \subsubsection{Kinect Fusion}
@@ -147,21 +149,14 @@ In computing the SDF for a given depth map, the exhaustive marching cubes algori
 
 \subsection{3D Features}
 
-\cite{Aiger084}
+3D feature matching works much in the same way as the 2D feature matching and RANSAC approach (section \ref{FMANDFM}) but uses 3D features rather than 2D only, so it can work independently to perspective changes which 2D feature matching methods are only robust to. Many techniques have been proposed \cite{Scovanner073Dimensional,Flitton10Object,Li05Multiscale}. Technically, registering against rigid transformations may be achieved with as little as 3 feature matches. These 3 matches can be found by 3D feature matching or geometric hashing \cite{Wolfson97Geometric}.
 
-4pcs - 4 points congruent sets for robust pairwise surface registration
-fast and robust registration of wide base 3d data
-resilient to noise and outliers
-data can be raw, noisy and full of outliers
-no need for pre-filtering or de-noising
-significantly reduces the number of trials required to get registration, has no assumption of prior alignment
-novel technique:
-extracts all co-planar 4 points sets from a 3D point set which are approximately congruent under rigid transformation to a given set of co-planar 4-points
-complexity O(n to power of 2 + k), n is number of points, k is number of 4 point sets
-in practice: when not too much noise and overlap is significant,
-using local descriptors allows for complexity O(n+k)
-an extension to perform affine transforms too
-demonstrates robustness over multiple range scans with varying levels of noise, outliers and overlap
+\subsubsection{4-Point Congruent Sets}
+
+Aiger et al \cite{Aiger084} developed a method for 3D registration (and pose estimation) named 4-Point Congruent Sets (4-PCS). This method is fast and robust to wide baselines in the registration of 3D data. It is resilient to noise and outliers and there is no pre-filtering or de-noising required prior to registration. It works as in a typical feature matching approach by significantly reducing the number of points to compare as features for use in a RANSAC approach to pose estimation. \\
+
+This method works by extracting all co-planar 4 point sets from a 3D point cloud which are congruent (under a rigid transformation) to a given set of co-planar 4-points. The complexity of this method is $O(N^{2k})$ where N is the number of points and k is the number of 4-point sets. When there is not too much noise, this method may use feature matching only which brings the complexity down to $O(N+k)$. Aiger et al also present an extension to register against affine transforms as well. This method was tested with varying levels of noise, outliers and and overlap. \\
+
 
 
 methods of 3d alignment under rigid transformation with 3d scans
@@ -175,14 +170,6 @@ Rusinkiewicz 2007 \cite{Brown07Global}].
 
 local descriptor 3d features : ors [Li and Guskov 2005 \cite{Li05Multiscale}] can be used to define an approximate transformation, then use ICP to align further ([Besl and McKay 1992 \cite{Besl92Method}, Chen and Medioni 1992 \cite{Chen92Object}])
 
-only need to know 3 point pairs
-
-local descriptors (invariant to rigid transformations) can be used to extract these 3 points
-
-geometric hashing may be used: [Wolfson and Rigoutsos 1997 \cite{Wolfson97Geometric}]
-
-RANSAC can be used with the set of matches to find the best transform [Fischler and Bolles 1981 \cite{Fischler81Random}], 
-these have been improved in by Chen and co-authors [1999] \cite{Chen99Ransac} which tradeoff speed for robustness
 
 PCA can be used to compute bases but in the case of partial overlap, this quickly breaks down
 
@@ -241,6 +228,9 @@ O($n^2$ + k) runtime to compute the 4 points
 
 
 icp was too far to converge on a solution [Mitra et al 04 \cite{Mitra04Registration}]
+
+
+\subsection{Principal Components Analysis}
 
 
 
