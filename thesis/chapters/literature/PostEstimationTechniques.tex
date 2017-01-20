@@ -153,30 +153,9 @@ In computing the SDF for a given depth map, the exhaustive marching cubes algori
 
 \subsubsection{4-Point Congruent Sets}
 
-Aiger et al \cite{Aiger084} developed a method for 3D registration (and pose estimation) named 4-Point Congruent Sets (4-PCS). This method is fast and robust to wide baselines in the registration of 3D data. It is resilient to noise and outliers and there is no pre-filtering or de-noising required prior to registration. It works as in a typical feature matching approach by significantly reducing the number of points to compare as features for use in a RANSAC approach to pose estimation. \\
+Aiger et al \cite{Aiger084} developed a method for 3D registration (and pose estimation) named 4-Point Congruent Sets (4-PCS). This method is fast and robust to wide baselines in the registration of 3D data. It is resilient to noise and outliers and there is no pre-filtering or de-noising required prior to registration. It improves the typical feature matching approach by significantly reducing the number of points required to compare as features for use in a RANSAC approach to pose estimation. \\
 
 This method works by extracting all co-planar 4 point sets from a 3D point cloud which are congruent (under a rigid transformation) to a given set of co-planar 4-points. The complexity of this method is $O(N^{2k})$ where N is the number of points and k is the number of 4-point sets. When there is not too much noise, this method may use feature matching only which brings the complexity down to $O(N+k)$. Aiger et al also present an extension to register against affine transforms as well. This method was tested with varying levels of noise, outliers and and overlap. \\
-
-
-
-methods of 3d alignment under rigid transformation with 3d scans
-ns [\cite{Callieri04Roboscan} Callieri et al. 2004, Gelfand et al. 2005 \cite{Gelfand04Shape}, Li and Guskov
-2005 \cite{Li05Multiscale}]
-
-non-rigid alignments:
-t [Pauly et al. 2005 \cite{Pauly05Example}, Brown and
-Rusinkiewicz 2007 \cite{Brown07Global}].
-
-
-local descriptor 3d features : ors [Li and Guskov 2005 \cite{Li05Multiscale}] can be used to define an approximate transformation, then use ICP to align further ([Besl and McKay 1992 \cite{Besl92Method}, Chen and Medioni 1992 \cite{Chen92Object}])
-
-
-PCA can be used to compute bases but in the case of partial overlap, this quickly breaks down
-
-local descriptors: [Johnson 1997 \cite{Johnson97Spin}, Li
-and Guskov 2005 \cite{Li05Multiscale}],: 
-
-under noisy conditions this may also be used : [Pottmann et al. 2007 \cite{Pottmann07Principal}],
 
 an alternative is relying on the principal of large numbers
 aka solving the largest common pointset (LCP) problem 
@@ -198,6 +177,28 @@ when simple reliable descriptors can be computed it is
 O(n+k)
 
 can also be used to handle similarity transforms
+
+
+\iffalse
+methods of 3d alignment under rigid transformation with 3d scans
+ns [\cite{Callieri04Roboscan} Callieri et al. 2004, Gelfand et al. 2005 \cite{Gelfand04Shape}, Li and Guskov
+2005 \cite{Li05Multiscale}]
+
+non-rigid alignments:
+t [Pauly et al. 2005 \cite{Pauly05Example}, Brown and
+Rusinkiewicz 2007 \cite{Brown07Global}].
+
+
+local descriptor 3d features : ors [Li and Guskov 2005 \cite{Li05Multiscale}] can be used to define an approximate transformation, then use ICP to align further ([Besl and McKay 1992 \cite{Besl92Method}, Chen and Medioni 1992 \cite{Chen92Object}])
+
+
+
+
+local descriptors: [Johnson 1997 \cite{Johnson97Spin}, Li
+and Guskov 2005 \cite{Li05Multiscale}],: 
+
+under noisy conditions this may also be used : [Pottmann et al. 2007 \cite{Pottmann07Principal}],
+
 
 bg
 partial matching is fundamental task for registration and recognition of 3d objects [Frome et al 04 \cite{Frome04Recognizing}]
@@ -223,16 +224,15 @@ or voted for [Ballard 87 \cite{Ballard91Generalizing}]
 variant of RANSAC , they use 4pcs for this step
 
 finds all 4point sets from p and matches with all 4 points from Q
-
 O($n^2$ + k) runtime to compute the 4 points
 
 
 icp was too far to converge on a solution [Mitra et al 04 \cite{Mitra04Registration}]
-
+\fi
 
 \subsection{Principal Components Analysis}
 
-
+PCA can be used to compute bases but in the case of partial overlap, this quickly breaks down \cite{Aiger084}
 
 
 
