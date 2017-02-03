@@ -198,24 +198,13 @@ Mori et al \cite{Mori05Efficient} proposed a matching method based on two levels
 
 Other 3D feature matching techniques which have been developed are based on images \cite{Wolfson97Geometric,Johnson97Spin}. In these techniques features are typically described using some sort of 2D image function rather than a single dimensional vector. Typically a normal is computed for a feature point and some projection is used to compute an image which is used as a descriptor. Then these features may be matched between 3D volumes using normalized cross-correlation or another image comparison method.  \\
 
+Some feature matching techniques are based on hashing or voting \cite{Germain97Fingerprint,Gal06Salient,Mitra04Registration,Ballard91Generalizing}. These techniques are out of the scope of this research but are none the less interesting areas which are still underdeveloped.
 
-
-\subsubsection{Hashing Techniques}
-
-hashing-versions:
-	[Germain et al 97 \cite{Germain97Fingerprint}
-	Gal and Cohen-Or 06 \cite{Gal06Salient}
-	Mitra 06 \cite{Mitra04Registration}]
-
-
-voting rather than ransac
-	[Ballard 87 \cite{Ballard91Generalizing}]
 
 \subsection{Principal Components Analysis}
 
-PCA can be used to compute bases but in the case of partial overlap, this quickly breaks down \cite{Aiger084}
+Principal Components Analysis (PCA) is an algorithm which divides a set of observed vector data into their principal component vectors and a centroid. The vectors along with the principal axes may be used to align 3D data. An issue with PCA is that in the case of partial overlap, the accuracy may break down \cite{Aiger084}. The Principal Components Analysis algorithm and it's use in the proposed technique is discussed in section \ref{FullRecovery3DSection}. \\
 
-	Pottmann et al. 2007 \cite{Pottmann07Principal}
-		shows that PCA on local neighbourhoods can be used to define pricipal directions and curvatures at a given scale (this can be used for feature matching
+Pottmann et al \cite{Pottmann07Principal} showed that PCA performed on local neighbourhoods is able to compute principal directions and curvatures at a given scale which can be used for feature matching. \\
 
 
