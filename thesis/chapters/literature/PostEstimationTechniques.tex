@@ -118,6 +118,18 @@ Some systems make use of feature matching with RANSAC (see section \ref{FMANDFM}
 
 Henry et al \cite{Henry10Rgb} presented work on a 3D mapping method which combines Feature Matching and RANSAC (similar to \cite{Endres12Evaluation}) with ICP. This method makes us of an RGB-D camera, and used the camera input for sparse feature matching. Features are used with RANSAC and the technique described in section \ref{FMANDFM}. ICP is used for refinement of the initial prediction. If Loop-closure is detected, a constraint is added to the 3D pose graph \cite{Kummerle11G} and is used to close the loop. A Surfel \cite{Pfister00Surfels} volumetric fusion method is used to represent and store the 3D reconstruction. This technique may be used for robot localization and path planning \cite{Hornung10Humanoid}. Endres et al \cite{Endres12Evaluation} compared this method with theirs using a standard benchmark \cite{Sturm12Benchmark}.  \\
 
+\subsubsection{Non-Rigid Alignment}
+
+In addition to rigid alignment ICP is used by Pauly et al \cite{Pauly05Example,Brown07Global} to 
+non-rigid alignments:
+	Pauly et al. 2005 \cite{Pauly05Example}
+	Brown and Rusinkiewicz 2007 \cite{}
+	
+ICP used, then global feature positions are found using a relaxation method 
+the 3d point sets are then warped to final positions using thin plate splines.
+
+outperforms rigid based alignments
+
 
 \subsubsection{Kinect Fusion}
 
@@ -181,30 +193,11 @@ Li and Guskov \cite{Li05Multiscale} developed a 3D feature matching technique ba
 
 Li and Guskov use their technique to find approximate transformations, then ICP is used for further alignment \cite{Besl92Method,Chen92Object}. This technique is slow for data-sets with large amounts of input data, yet it does not work well with sparse data-sets. \\
 
-
 	
 Mori et al \cite{Mori05Efficient} proposed a matching method based on two levels: a high level matching method which is used to compute a short-list for candidates and a low level method which is more computationally complex. This technique is simply used for matching and uses larger areas rather than local features like SIFT 3D. \\
 
 Other 3D feature matching techniques which have been developed are based on images \cite{Wolfson97Geometric,Johnson97Spin}. In these techniques features are typically described using some sort of 2D image function rather than a single dimensional vector. Typically a normal is computed for a feature point and some projection is used to compute an image which is used as a descriptor. Then these features may be matched between 3D volumes using normalized cross-correlation or another image comparison method.  \\
-	
-	
-	ballard 97 \cite{Ballard81Generalizing} - idea : possibly be used for template matching
-				
-	
-	Wolfson and Rigoutsos  97 - image based alignment
 
-
-
-\subsubsection{Non-Rigid Based Alignments}
-
-non-rigid alignments:
-	Pauly et al. 2005 \cite{Pauly05Example}
-	Brown and Rusinkiewicz 2007 \cite{Brown07Global}
-	
-ICP used, then global feature positions are found using a relaxation method 
-the 3d point sets are then warped to final positions using thin plate splines.
-
-outperforms rigid based alignments
 
 
 \subsubsection{Hashing Techniques}
