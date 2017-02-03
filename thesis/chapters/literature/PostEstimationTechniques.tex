@@ -1,4 +1,9 @@
 
+\subsection{Introduction}
+
+\cite{Callieri04Roboscan} Callieri et al. 2004 use robots input movements to project camera depth maps to the correct position
+
+
 \subsection{Fundamental Matrix Method}
 
 \label{FundamentalMatrixSection}
@@ -81,7 +86,7 @@ Computing 3D reconstructions using feature matching is often preferred as close 
 
 \subsubsection{RGB-D SLAM}
 
-Endres et al \cite{Endres12Evaluation} presented a dense 3D reconstruction technique using RGB-D data from the Kinect sensor based on feature matching and RANSAC. They also evaluated their technique under different illumination and camera movement speed conditions. It is able to operate at near real time speeds in small in-door environments. This method begins by feature matching RGB images across frames. Using the projected 3D points available for each pixel in the depth map, RANSAC \cite{Fischler81Random} is used to compute the camera pose across frames. These poses are optimized globally using the $g^2$o graph optimizer, the Octomap representation \cite{Wurm10Octomap} is used to voxelize the 3d points before storing them in a volumetric occupancy map. Since this system is based on feature matching, Endres et al evaluate 3 different feature matching techniques: SIFT \cite{Lowe04Distinctive} , SURF \cite{Bay06Surf,Bay08Speeded} and ORB \cite{Rublee11Orb}. ORB feature matching is tested because it is faster than SIFT and SURF with slightly less accuracy, the authors also evaluate a GPU implementation of SIFT \cite{Wu07Siftgpu}. Endres et al evaluate their algorithm using their own benchmark \cite{Sturm11Towards}. Results show it can handle up to 50 degrees of rotation per second, and speeds of up to 43 centimetres per second.  \\
+Endres et al \cite{Endres12Evaluation} presented a dense 3D reconstruction technique using RGB-D data from the Kinect sensor based on feature matching and RANSAC. They also evaluated their technique under different illumination and camera movement speed conditions. It is able to operate at near real time speeds in small in-door environments. This method begins by feature matching RGB images across frames. Using the projected 3D points available for each pixel in the depth map, RANSAC \cite{Fischler81Random,Huttenlocher91Fast} is used to compute the camera pose across frames. These poses are optimized globally using the $g^2$o graph optimizer, the Octomap representation \cite{Wurm10Octomap} is used to voxelize the 3d points before storing them in a volumetric occupancy map. Since this system is based on feature matching, Endres et al evaluate 3 different feature matching techniques: SIFT \cite{Lowe04Distinctive} , SURF \cite{Bay06Surf,Bay08Speeded} and ORB \cite{Rublee11Orb}. ORB feature matching is tested because it is faster than SIFT and SURF with slightly less accuracy, the authors also evaluate a GPU implementation of SIFT \cite{Wu07Siftgpu}. Endres et al evaluate their algorithm using their own benchmark \cite{Sturm11Towards}. Results show it can handle up to 50 degrees of rotation per second, and speeds of up to 43 centimetres per second.  \\
 
 
 This system is divided into a front-end and a back-end. The front-end performs feature detection, matching and sensor pose estimation via the RANSAC method whereas the back-end performs non-linear pose optimization using the $g^2o$ optimization procedure   and integrates these results into an occupancy grid based on the Octomap. A diagram of the combined front-end and back-end systems is given in figure \ref{Endres12EvaluationPipeline}. 
@@ -105,7 +110,7 @@ The points are then transformed by the computed transform and this process is re
 
 The first issue is that whilst computing the best transform based on "feature matches" based on closest points is relatively simple, computing these closest points for each input point is expensive. This can be improved using the projective data association algorithm \cite{Blais95Registering} usually used by exploiting a projected version of the 3D data. The efficiency issue can also be improved using a coarse to fine scheme. \\
 
-Another issue that ICP is limited to small rotation, translation and scale. If larger transforms are present (especially scale in the case of general registration) ICP will usually get stuck in a local minima and fail to register. Here we present some important algorithms which use ICP in 3D reconstruction.
+Another issue that ICP is limited to small rotation, translation and scale. If larger transforms are present (especially scale in the case of general registration) ICP will usually get stuck in a local minima and fail to register \cite{Mitra04Registration}. Here we present some important algorithms which use ICP in 3D reconstruction.
 
 \subsubsection{Henry10Rgb}
 
@@ -147,92 +152,77 @@ The SDF representation uses two volumes as in \cite{Curless96Volumetric}, one vo
 In computing the SDF for a given depth map, the exhaustive marching cubes algorithm is too slow, even the fast marching algorithm \cite{Baerentzen01Implementation} is not suited for real time discrete SDF generation. Instead, the SDF is approximated with either the point to point distance or point to plane distance functions. For final visualization, marching cubes is used \cite{Lorensen87Marching} on the final SDF. Colour is computed from the colour volume using a technique found used by Whelan et al \cite{Whelan13Robust}. Since the method by Bylow et al is based on optimizing the projection error using the SDF and only uses locations in its pose estimation procedure, it is independent to illumination. Given this, it will also fail in cases where only co-planar surfaces are visible, they mention that using colour information during tracking \cite{Kerl13Robust} may mitigate these concerns.
 
 
-\subsection{3D Features}
+\subsection{3D Feature Matching}
 
 3D feature matching works much in the same way as the 2D feature matching and RANSAC approach (section \ref{FMANDFM}) but uses 3D features rather than 2D only, so it can work independently to perspective changes which 2D feature matching methods are only robust to. Many techniques have been proposed \cite{Scovanner073Dimensional,Flitton10Object,Li05Multiscale}. Technically, registering against rigid transformations may be achieved with as little as 3 feature matches. These 3 matches can be found by 3D feature matching or geometric hashing \cite{Wolfson97Geometric}.
+
+
 
 \subsubsection{4-Point Congruent Sets}
 
 Aiger et al \cite{Aiger084} developed a method for 3D registration (and pose estimation) named 4-Point Congruent Sets (4-PCS). This method is fast and robust to wide baselines in the registration of 3D data. It is resilient to noise and outliers and there is no pre-filtering or de-noising required prior to registration. It improves the typical feature matching approach by significantly reducing the number of points required to compare as features for use in a RANSAC approach to pose estimation. \\
 
-This method works by extracting all co-planar 4 point sets from a 3D point cloud which are congruent (under a rigid transformation) to a given set of co-planar 4-points. The complexity of this method is $O(N^{2k})$ where N is the number of points and k is the number of 4-point sets. When there is not too much noise, this method may use feature matching only which brings the complexity down to $O(N+k)$. Aiger et al also present an extension to register against affine transforms as well. This method was tested with varying levels of noise, outliers and and overlap. \\
+This method works by extracting all co-planar 4 point sets from a 3D point cloud which are congruent (under a rigid transformation) to a given set of co-planar 4-points. The complexity of this method is $O(N^{2k})$ where N is the number of points and k is the number of 4-point sets. When there is not too much noise, this method may use feature matching only which brings the complexity down to $O(N+k)$. Aiger et al also presented an extension to register against affine transforms. This method was tested with varying levels of noise, outliers and and overlap. \\
 
-an alternative is relying on the principal of large numbers
-aka solving the largest common pointset (LCP) problem 
-given point sets P and Q, LCP under δ-congruency solves for a subset Pi of P
-having the largest cardinality such that the distance between T(Pi) and Q  is less than δ given an appropriate distance measure, given T is a rigid body transformation
+This method works based on the principal of large numbers, which means solving the largest common point-set (LCP) problem. This problem states, given to point-sets $P$ and $Q$, LCP under δ-congruency solves for a subset $P_i$ of $P$ having the largest cardinality such that the distance between $T(P_i)$ and $Q$  is less than δ given an appropriate distance measure (T is a rigid body transformation). \\
 
-the basic concept is to optimize the selection of the 3 points used as a base, choosing 3 then trying this out, then moving on,
-this is O($m^3$ x $n^3$) but can be reduced to:  O($mn^3$ log n) [Irani and Raghavan \cite{Irani96Combinatorial} 1996] and even O($n^3$ log n) , but this is still expensive for large point sets
-
-this paper introduces:
-a novel 3d alignment scheme which does a rough alignment of surfaces which may have little overlap
-this alignment may be refined using ICP  (cf. [Rusinkiewicz and Levoy 2001 \cite{Rusinkiewicz01Efficient}]). 
-
-this method is based on the novel technique of extracting all co-planar 4 point from a 3D set that are related by rigid transform to a given planar 4-points in O($n^2$ + k) time
-
-n is the number of points in Q and k is the number of 4-point sets
-
-when simple reliable descriptors can be computed it is 
-O(n+k)
-
-can also be used to handle similarity transforms
+The basic concept is to optimize the selection of the 3 points used as a base for alignment from one point-set to another. By choosing 3 matches, then measuring the distance between $T(P_i)$ and $Q_i$. This test is of complexity  O($m^3$ x $n^3$) but this can be reduced to  O($mn^3 log(n)$) \cite{Irani96Combinatorial} and even O($n^3 log(n)$). Despite these improvements, these complexities are still too large for practically sized point-sets. This novel 3D alignment scheme is capable of aligning surfaces with limited overlap and may be refined using ICP \cite{Rusinkiewicz01Efficient}. \\
 
 
-\iffalse
-methods of 3d alignment under rigid transformation with 3d scans
-ns [\cite{Callieri04Roboscan} Callieri et al. 2004, Gelfand et al. 2005 \cite{Gelfand04Shape}, Li and Guskov
-2005 \cite{Li05Multiscale}]
+\subsubsection{Base Shape Matching}
+
+Gelfand et al \cite{Gelfand04Shape} presented a method which segments input models into base shapes, simple geometric parts which may be modelled and matched. Using these base shapes, slippable components are found by computing local slippage signatures for a set of points in the input and iteratively clustering regions with matching slippable motions. This method is stable but appears to be limited to mechanical human made parts and shapes.
+
+\subsubsection{Multi-scale Features}
+
+Extensions to both SIFT and SURF have been extended to 3D \cite{Scovanner073Dimensional,Flitton10Object}. These methods follow the same overall technique as the 2D counterparts however some procedures and practices are altered to better suit 3D data input. First, a 3D-volume scale pyramid is produced for matching at different scales. Then features are detected using the corresponding feature detection method (by SIFT or SURF) and then a feature vector for each feature is produced. Features can be matched between volumes and a rigid or non-rigid alignment may be computed. \\
+
+Li and Guskov \cite{Li05Multiscale} developed a 3D feature matching technique based on 3D SIFT for SURFEL (3D point and normal) data. It computes a scale space pyramid using a per point scheme in which the next scale up for each point and corresponding normal is computed as the point which minimizes an error function. Salient features are then computed using the scale space. Features are those points which maximize (or minimize) a measurement based on dot product of the normal and the difference between points at adjacent scales. \\
+
+Li and Guskov use their technique to find approximate transformations, then ICP is used for further alignment \cite{Besl92Method,Chen92Object}. This technique is slow for data-sets with large amounts of input data, yet it does not work well with sparse data-sets. \\
+
+
+	
+Mori et al \cite{Mori05Efficient} proposed a matching method based on two levels: a high level matching method which is used to compute a short-list for candidates and a low level method which is more computationally complex. This technique is simply used for matching and uses larger areas rather than local features like SIFT 3D. \\
+
+Other 3D feature matching techniques which have been developed are based on images \cite{Wolfson97Geometric,Johnson97Spin}. In these techniques features are typically described using some sort of 2D image function rather than a single dimensional vector. Typically a normal is computed for a feature point and some projection is used to compute an image which is used as a descriptor. Then these features may be matched between 3D volumes using normalized cross-correlation or another image comparison method.  \\
+	
+	
+	ballard 97 \cite{Ballard81Generalizing} - idea : possibly be used for template matching
+				
+	
+	Wolfson and Rigoutsos  97 - image based alignment
+
+
+
+\subsubsection{Non-Rigid Based Alignments}
 
 non-rigid alignments:
-t [Pauly et al. 2005 \cite{Pauly05Example}, Brown and
-Rusinkiewicz 2007 \cite{Brown07Global}].
+	Pauly et al. 2005 \cite{Pauly05Example}
+	Brown and Rusinkiewicz 2007 \cite{Brown07Global}
+	
+ICP used, then global feature positions are found using a relaxation method 
+the 3d point sets are then warped to final positions using thin plate splines.
+
+outperforms rigid based alignments
 
 
-local descriptor 3d features : ors [Li and Guskov 2005 \cite{Li05Multiscale}] can be used to define an approximate transformation, then use ICP to align further ([Besl and McKay 1992 \cite{Besl92Method}, Chen and Medioni 1992 \cite{Chen92Object}])
+\subsubsection{Hashing Techniques}
+
+hashing-versions:
+	[Germain et al 97 \cite{Germain97Fingerprint}
+	Gal and Cohen-Or 06 \cite{Gal06Salient}
+	Mitra 06 \cite{Mitra04Registration}]
 
 
-
-
-local descriptors: [Johnson 1997 \cite{Johnson97Spin}, Li
-and Guskov 2005 \cite{Li05Multiscale}],: 
-
-under noisy conditions this may also be used : [Pottmann et al. 2007 \cite{Pottmann07Principal}],
-
-
-bg
-partial matching is fundamental task for registration and recognition of 3d objects [Frome et al 04 \cite{Frome04Recognizing}]
-
-typically based on matching local descriptors [Jonson 1997 \cite{Johnson97Spin}, Mori \cite{Mori05Efficient} et al 05]
-
-also integral invarients [Pottmann 07 \cite{Pottmann07Principal}]
-
-can be used to accelerate 3d scans aquired by range scanners [Li and Gusov 05 \cite{Li05Multiscale}]
-
-hough transform [ballard 97 \cite{Ballard81Generalizing}] ransac [fischler and bolles 81 \cite{Fischler81Random}]
-
-image based alignment : [Wolfson and Rigoutsos \cite{Wolfson97Geometric} 97]
-
-hashing based versions [Germain et al 97 \cite{Germain97Fingerprint}, Gal and Cohen-Or 06 \cite{Gal06Salient}, Mitra 06 \cite{Mitra04Registration}]
-
-steps: pick a base P where the number of points in the base is equal to the number of points required to uniquely compute the transformation,
-
-for each random base from Q, the corresponding alignment is vertified [Fischler and Bolles 81 \cite{Fischler81Random}, huttenlocher and ullman 90 \cite{Huttenlocher91Fast} ]
-
-or voted for [Ballard 87 \cite{Ballard91Generalizing}]
-
-variant of RANSAC , they use 4pcs for this step
-
-finds all 4point sets from p and matches with all 4 points from Q
-O($n^2$ + k) runtime to compute the 4 points
-
-
-icp was too far to converge on a solution [Mitra et al 04 \cite{Mitra04Registration}]
-\fi
+voting rather than ransac
+	[Ballard 87 \cite{Ballard91Generalizing}]
 
 \subsection{Principal Components Analysis}
 
 PCA can be used to compute bases but in the case of partial overlap, this quickly breaks down \cite{Aiger084}
 
+	Pottmann et al. 2007 \cite{Pottmann07Principal}
+		shows that PCA on local neighbourhoods can be used to define pricipal directions and curvatures at a given scale (this can be used for feature matching
 
 
