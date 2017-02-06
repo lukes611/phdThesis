@@ -1,6 +1,10 @@
 
 \subsection{$G^2$o}
 
+graph slam : uses the camera pose and 3d point positions, then rather than defining the points and poses as truth, adds relationships between successive frames and places the "set truths" as functions of gausians with the peak probability set to the initial measurement
+
+then using the constraints between each pose and camera location, the landmarks which are visible from multiple views are used to optimize the position and pose and the Gausian functions
+
 graph slam use motion estimates as input to construct and optimiza a pose graph[15 \cite{Kummerle11G}] these methods render a joint map only after pose graph optimization
 this map is generally not used for further optimization
 the resulting maps are often represented as occupancy grid maps or octrees [25 \cite{Wurm10Octomap}]
@@ -9,6 +13,14 @@ the resulting maps are often represented as occupancy grid maps or octrees [25 \
 
 
 \subsection{Bundle Adjustment}
+
+bundle - the bundle of light leaving 
+refines visual reconstruction
+requires knowlege of:
+sparse bundle adjustment requires knowlege of:
+camera pose, 3d point positions, the image coordinate location in each view
+
+using these, and solving for rigid motion and world coordinates, optimize using a non-linear optimization method
 
 Bundle adjustment \cite{Lourakis09Sba}
 

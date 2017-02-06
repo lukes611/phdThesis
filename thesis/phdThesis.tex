@@ -54,17 +54,46 @@ colorlinks = true, hyperindex = true, hyperfigures] {hyperref}
 %total: 173/180\\
 %refs : 181/200\\
 
-
-
+%re-factor plan
+%Intro
+%	3D reconstruction, aims & contributions, overview
+%Background
+%	Signal Registration
+%	Depth Data Generation
+%	Sensor Input Techniques
+%	Data Representations	
+%Pose Estimation
+%	Fundamental Matrix
+%	Feature Matching with RANSAC
+%	ICP
+%	SDF Optimization
+%	3D Feature Matching
+%	PCA
+% 	Fourier Volume Registration
+		%Recovery of Translation: overview, experiments
+		%recovery of Y-Rotation: overview, experiments
+		%A method for full 3D rotation recovery: overview, experiments
+		%filtering techniques
+		%speed improvements
+%A 3D reconstruction method based on the Fourier Approach
+	%pipeline,error metrics,reconstruction integration, advantages + disadvantages, experiments
+%Data representations Revisited
+	%octree
+	%3D shadetree
+	%plane-tree
+	%octree subdivision
+	%leaf node representation and computation
+	%compression + decompression
+	%experiments + analysis
+%conclusion
 %todo:
-%	finish methodology:
-%		representations
-%		sensors
-%		integrations
-		
-%	programming + write experiments
-%	do pictures
-%	re-write intro, results, concl 
+%research optimization methods
+%work in the rgb-research into the methods parts
+%put summary after the fft section
+%do some slam techniques
+%
+%do some 3d representation stuff
+
 
 \input{chapters/introduction} % The Introductory Chapter
 \input{chapters/literature} % The Literature Review
