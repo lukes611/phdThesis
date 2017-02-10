@@ -1,6 +1,6 @@
 
 \subsection{$G^2$o}
-
+\label{Sec:G20}
 The Graph SLAM algorithm sets relationships between camera poses and locations as nodes in a graph. Rather than defining camera pose estimations as truth, they are represented using a Gaussian in which the peak probability is the estimated value. Then using the visible landmarks (visible from multiple views) and the functions for the camera poses the joint graph is optimized for the improved pose estimates. Once this is complete, a 3D reconstruction map is produced. \\
 
 Typically an occupancy grid or octree is used to represent the map \cite{Wurm10Octomap}. Further detail about the Graph SLAM method is outside the scope of this work, more detail can be found in the original paper on Graph SLAM \cite{Kummerle11G}. \\
@@ -17,25 +17,39 @@ In the literature, Fioraio \cite{Fioraio11Realtime} presented a system which use
 
 
 
-[BG Bylow]
+ICP:
 
-? not sure where to put this yet [maybe icp...]
-whelan [24 \cite{Whelan13Robust}] estended with rolling reconstruction volume and color fusion, evaluated alternative methods for visual odometry estimation
-pure visual odometry induces significant drift, so matching with global model is their preference
-whelan integrated photometric + icp methods for kinect fusion [24 \cite{Whelan13Robust}]
-?
+[FM Section]
+Whelan et al \cite{Whelan12Kintinuous} extended Kinectfusion allowing it to map larger areas. They compared ICP with FOVIS and found that FOVIS contributed less drift but lack-luster models compared with ICP. Whelan et al also proposed a technique for incrementally creating a triangle mesh as the reconstruction was built. This method uses multi-threadeding, and uses pose graph optimization (see section \ref{Sec:G20}).
+
+[FOVIS in FM section]
+Another technique which is based on feature matching is the FOVIS (Fast Odometry from Vision) technique \cite{Huang17Visual}. In FOVIS works in 6 stages. In the first two stages, the RGB-D image data is collected and put through a low-pass filter, Gaussian scale space is computed and then FAST features \cite{Rosten06Machine,Rosten05Fusing} are computed. In the next stage, initial camera rotation estimation is computed by minimizing the sum of squared errors between down sampled versions of consecutive image frames. In the 4th stage, feature matching is performed, using the SAD (sum of absolute differences) metric and sub-pixel resolution. In the 5th stage, outliers are removed using a feature match graph and a greedy algorithm to find maximal cliques \cite{Hirschmuller02Fast,Howard08Real}. \\
+
+In the final stage, the full camera pose is estimated by first computing it using Horns method \cite{Horn87Closed} This technique minimizes an error function in computing the camera rotation and translation. The FOVIS method then optimizes this by minimizing the re-projection error using a non-linear least squares method.
+
+2.  
+Whelan et al improved \cite{Whelan13Robust} upon their previous method \cite{Whelan12Kintinous} by integrating FOVIS and ICP together on the GPU, and adding an advanced colour fusion model to the technique. The main improvement lies in switching between FOVIS and ICP whenever the error using FOVIS is too high, ICP is used. They also integrate using a global model rather than a local one. 
 
 
+icp slips on planar environments or environments with little texture \cite{Whelan13Robust}
 
+3,4
+\cite{Stuckler12Robust} - use an efficient and robust version of ICP
 
-
-
-\ref{Newcombe11Kinectfusion}
 
 \subsection{RGB-D Sensor Feature Based Systems}
-RGB-D SLAM systems use both depth and image data and are capable of generating dense 3D reconstructions. Many of these methods rely on feature matching techniques \cite{Engelhard11Real,Henry10Rgb,Endres12Evaluation}. RANSAC is often used to filter outliers for the estimation of camera parameters\cite{Engelhard11Real,Henry10Rgb,Endres12Evaluation}. Another method which has also been used extensively in the area is Iterative Closest Point (ICP) \cite{Engelhard11Real,Henry10Rgb,Bylow13Real,Newcombe11Kinectfusion,Stuckler12Robust,Izadi11Kinectfusion}. ICP iteratively registers point cloud data, and is used to refine camera parameter estimates. A method named KinectFusion was proposed by Newcombe et al \cite{Newcombe11Kinectfusion} which uses RANSAC and a GPU implementation of IPC. Whelan et al \cite{Whelan12Kintinuous} extended this method allowing it to map larger areas using Fast Odometry From Vision (FOVIS) over ICP. Bylow et al \cite{Bylow13Real} improved the ICP approach by registering data using a signed distance function.
+
+
+
+
 \subsection{Non-Feature Based Methods}
-Several RGB-D SLAM systems are also non-feature based \cite{Weikersdorfer14Event,Izadi11Kinectfusion,Kerl13Dense}. Weikersdorfer et al \cite{Weikersdorfer14Event} presented a novel sensor system named D-eDVS along with an event based SLAM algorithm. The D-eDVS sensor combines depth and event driven contrast detection. Rather than using features, it uses all detected data for registration. Kerl et al \cite{Kerl13Dense} proposed a dense RGB-D SLAM system which uses a probabilistic camera parameter estimation procedure. It uses the entire image rather than features to perform SLAM.
+
+
+Weikersdorfer et al \cite{Weikersdorfer14Event} presented a novel sensor system named D-eDVS along with an event based SLAM algorithm. The D-eDVS sensor combines depth and event driven contrast detection. Rather than using features, it uses all detected data for registration. - aligns event transmitting device with Asus-xtion pro rgb-d camera. then using the transform is computed by solving a least squares algorithm
+
+Kerl et al \cite{Kerl13Dense} proposed a dense RGB-D SLAM system which uses a probabilistic camera parameter estimation procedure, it formulates the projection error as an image warping function and solves it using taylors expansion optimization. It uses the entire image rather than features to perform SLAM.
+
+
 \subsection{Summary}
 As is evident from the current literature, SLAM typically relies on feature matching and RANSAC. However, these approaches fail when there are too few features, when feature confusion occurs or, when features are non-stationary due to object motion. As the extent of random feature displacement becomes more global the effectiveness of these approaches diminishes. Feature matching also dominates in image registration. However, Fourier based methods have been shown to work well under larger rotations and scales \cite{Gonzalez11Improving} whilst being closed form, insensitive to object motion and scaling naturally to GPU implementations. Accordingly, we propose a novel, closed form Fourier based SLAM method.
 
