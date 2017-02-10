@@ -101,15 +101,25 @@ This system is divided into a front-end and a back-end. The front-end performs f
 
 The front-end uses OpenCV \cite{Bradski08Learning} for feature matching. During the feature detection process, the Hessian threshold is used to keep the total number of features constant. This is required because pose may not be able to be computed if there aren't enough features, but on the other hand, too many features typically lead to many false positives in the feature matching schema. As mentioned, these matched features (and thus matched 3d points) are used with RANSAC to compute pose \cite{Umeyama91Least}. During the RANSAC process, corresponding points with distances below 3cm are considered inliers. The inliers are then used exclusively to compute a finer pose. This method of pose estimation is fast but computational complexity depends on the number of features computed. For each frame, the pose relationship with 20 previous frames (including the most recent 3) is computed in parallel on the GPU. Then the final computed pose is given to the back-end. If accurate pose cannot be compute, constant motion is assumed. \\
 
+\subsubsection{Fast Odometry from Vision: FOVIS}
+
+Another technique which is based on feature matching is the FOVIS (Fast Odometry from Vision) technique \cite{Huang17Visual}. In FOVIS works in 6 stages. In the first two stages, the RGB-D image data is collected and put through a low-pass filter, Gaussian scale space is computed and then FAST features \cite{Rosten06Machine,Rosten05Fusing} are computed. In the next stage, initial camera rotation estimation is computed by minimizing the sum of squared errors between down sampled versions of consecutive image frames. In the 4th stage, feature matching is performed, using the SAD (sum of absolute differences) metric and sub-pixel resolution. In the 5th stage, outliers are removed using a feature match graph and a greedy algorithm to find maximal cliques \cite{Hirschmuller02Fast,Howard08Real}. \\
+
+In the final stage, the full camera pose is estimated by first computing it using Horns method \cite{Horn87Closed} This technique minimizes an error function in computing the camera rotation and translation. The FOVIS method then optimizes this by minimizing the re-projection error using a non-linear least squares method. \\
+
+Whelan et al \cite{Whelan12Kintinuous} extended Kinectfusion allowing it to map larger areas. They compared ICP with FOVIS and found that FOVIS contributed less drift but lack-luster models compared with ICP. Whelan et al also proposed a technique for incrementally creating a triangle mesh as the reconstruction was built. This method uses multi-threadeding, and uses pose graph optimization (see section \ref{Sec:G20}).
+
+
+
 \subsection{ICP}
 
-Iterative Closest Point (ICP) \cite{Besl92Method,Rusinkiewicz01Efficient,Segal09Generalized} is a non-linear optimization method used to register 3D data. It works by iteratively minimizing registration error given two sets of point clouds and is a popular method for estimating 6-dof (6 degrees of freedom) camera alignment in 3D reconstruction. The algorithm works by computing the closest point using some metric (usually euclidean distance) for each of the points in the first point cloud. Then computing a transform which minimizes either the euclidean distance error or some other error metric (\cite{Steinbrucker11Real,Tykkala11Direct,Kerl13Robust,Chen92Object}. \\
+Iterative Closest Point (ICP) \cite{Besl92Method,Rusinkiewicz01Efficient,Segal09Generalized} is a non-linear optimization method used to register 3D data. It works by iteratively minimizing registration error given two sets of point clouds and is a popular method for estimating 6-dof (6 degrees of freedom) camera alignment in 3D reconstruction. The algorithm works by computing the closest point using some metric (usually euclidean distance) for each of the points in the first point cloud. Then computing a transform which minimizes either the euclidean distance error or some other error metric (\cite{Steinbrucker11Real,Tykkala11Direct,Kerl13Robust,Chen92Object,Stuckler12Robust}. \\
 
 The points are then transformed by the computed transform and this process is repeated which is supposed to continually decrease registration error. The 6-dof are commonly computed using the method described in section \ref{FMANDFM}. Various distance metrics have been researched including the point-plane metric \cite{Chen92Object}. This metric improves convergence rates and is used for surface reconstructions which contain additional information about the normal of each points. This algorithm is highly successful in generating accurate 3D reconstructions but it does have a few issues. \\
 
 The first issue is that whilst computing the best transform based on "feature matches" based on closest points is relatively simple, computing these closest points for each input point is expensive. This can be improved using the projective data association algorithm \cite{Blais95Registering} usually used by exploiting a projected version of the 3D data. The efficiency issue can also be improved using a coarse to fine scheme. \\
 
-Another issue that ICP is limited to small rotation, translation and scale. If larger transforms are present (especially scale in the case of general registration) ICP will usually get stuck in a local minima and fail to register \cite{Mitra04Registration}. Here we present some important algorithms which use ICP in 3D reconstruction.
+Another issue that ICP is limited to small rotation, translation and scale. If larger transforms are present (especially scale in the case of general registration) ICP will usually get stuck in a local minima and fail to register \cite{Mitra04Registration}. The final issue is that of slippage \cite{Whelan13Robust}. ICP tends to fail in environments with little texture. Here we present some important algorithms which use ICP in 3D reconstruction.
 
 \subsubsection{Henry10Rgb}
 
@@ -119,15 +129,7 @@ Henry et al \cite{Henry10Rgb} presented work on a 3D mapping method which combin
 
 \subsubsection{Non-Rigid Alignment}
 
-In addition to rigid alignment ICP is used by Pauly et al \cite{Pauly05Example,Brown07Global} to 
-non-rigid alignments:
-	Pauly et al. 2005 \cite{Pauly05Example}
-	Brown and Rusinkiewicz 2007 \cite{}
-	
-ICP used, then global feature positions are found using a relaxation method 
-the 3d point sets are then warped to final positions using thin plate splines.
-
-outperforms rigid based alignments
+In addition to rigid alignment ICP is used by Pauly et al \cite{Pauly05Example,Brown07Global} to align depth maps using non-rigid transforms. In the method by Brown and Rusinkiewicz \cite{Brown07Global}, ICP is used to first align the point clouds using a rigid alignment, then global feature positions are found using a relaxation method. Then 3D point sets are warped to final positions using thin plate splines. Brown and Rusinkiewicz state that this outperforms rigid based alignments.
 
 
 \subsubsection{Kinect Fusion}
@@ -152,7 +154,14 @@ After estimating camera pose relating to the globally fused model, each frame mu
 As mentioned, Kinect fusion uses pose prediction and fuses each depth map into the TSDF representation. In this way, they align and fuse each depth map to the global 3d reconstruction. In this way, a global loop closure method is not required. This may have a negative side effect by which some frames which have larger resolutions may be heavily quantized in order to fuse with the SDF, especially very thin surfaces/objects. These features may also be advantageous for ICP in estimating pose. 
 
 
-\subsection{SDF Optimization}
+\subsubsection{FOVIS and ICP Integration}
+
+Whelan et al improved \cite{Whelan13Robust} upon their previous method \cite{Whelan12Kintinous} by integrating FOVIS and ICP together on the GPU, and adding an advanced colour fusion model to the technique. The main improvement lies in switching between FOVIS and ICP whenever the error using FOVIS is too high, ICP is used. They also integrate using a global model rather than a local one. 
+
+
+\subsection{Direct Optimization Methods}
+
+\subsubsection{Optimization over a Signed Distance Function}
 
 In 2013, Bylow et al \cite{Bylow13Real} presented a novel method which reconstructs static indoor environments in real time using RGB-D data captured using the Asus Xtion Pro Live sensor. Their system is able to generate accurate 3D RGB coloured models of the environment in real-time by optimizing for 6 degrees of freedom in terms of accurate projection of new depth map frames into an existing global signed distance function model of the scene. Their method uses several Gauss Newton optimization with a signed distance function representation, these techniques are represented and processed using a laptop with an NVIDIA GPU. Unlike Kinect Fusion \cite{Newcombe11Kinectfusion}, this method optimizes directly in the signed distance representation, in which camera pose is computed by finding a rotation and translation (6-DoF) which minimizes the error of projecting depth images into the SDF. Compared with the ICP based method used by Kinect Fusion, this technique is shown to be more robust and accurate. It compares favourably to bundle adjustment but is much faster for small to mid sized scenes. Results are generated using the TUM RGB-D benchmark and SDF volume sizes $256^3$ and $512^3$ are used in evaluations. The authors note the algorithm may be able to handle large scale scenes if used in conjunction with other techniques \cite{Kaess11Isam2,Kummerle11G}. \\
 
@@ -161,6 +170,14 @@ This technique is efficient because the error to minimize can be checked using s
 The SDF representation uses two volumes as in \cite{Curless96Volumetric}, one volume stores the average distances, the other stores the cumulative weights for each voxel. Bylow et al use these weights to handle occlusion and sensor uncertainty. When integrating a point into the SDF, tri-linear interpolation is used between eight neighbours to handle point coordinated made up of floating point numbers. During integration, each voxel is projected onto the image plane rather than ray case from the center of projection as in \cite{Newcombe11Kinectfusion}. This ensures that each voxel is visited once when updating the SDF, whereas in the ray casting approach, this may not necessarily be the case. \\
 
 In computing the SDF for a given depth map, the exhaustive marching cubes algorithm is too slow, even the fast marching algorithm \cite{Baerentzen01Implementation} is not suited for real time discrete SDF generation. Instead, the SDF is approximated with either the point to point distance or point to plane distance functions. For final visualization, marching cubes is used \cite{Lorensen87Marching} on the final SDF. Colour is computed from the colour volume using a technique found used by Whelan et al \cite{Whelan13Robust}. Since the method by Bylow et al is based on optimizing the projection error using the SDF and only uses locations in its pose estimation procedure, it is independent to illumination. Given this, it will also fail in cases where only co-planar surfaces are visible, they mention that using colour information during tracking \cite{Kerl13Robust} may mitigate these concerns.
+
+\subsubsection{Warp Function Optimization} 
+
+Kerl et al \cite{Kerl13Dense} proposed a dense RGB-D SLAM system which uses a probabilistic camera parameter estimation procedure. Rather than strictly using feature matching, RANSAC and a linear pose estimator, it formulates the projection error as an image warping function (between two frames) and optimizes it using Taylor's expansion.
+
+\subsubsection{Event Feature Optimization}
+
+Weikersdorfer et al \cite{Weikersdorfer14Event} presented a novel sensor system named D-eDVS along with an event based SLAM algorithm. The D-eDVS sensor combines depth and event driven contrast detection. The event emitting sensor can be thought of as emitting points which may be used like features. After aligning pixels generated from the event transmitting device with depth information from the Asus Xtion pro RGB-D camera, it computes pose by optimizing the re-projection error using least squares optimization.
 
 
 \subsection{3D Feature Matching}
@@ -205,5 +222,14 @@ Some feature matching techniques are based on hashing or voting \cite{Germain97F
 Principal Components Analysis (PCA) is an algorithm which divides a set of observed vector data into their principal component vectors and a centroid. The vectors along with the principal axes may be used to align 3D data. An issue with PCA is that in the case of partial overlap, the accuracy may break down \cite{Aiger084}. The Principal Components Analysis algorithm and it's use in the proposed technique is discussed in section \ref{FullRecovery3DSection}. \\
 
 Pottmann et al \cite{Pottmann07Principal} showed that PCA performed on local neighbourhoods is able to compute principal directions and curvatures at a given scale which can be used for feature matching. \\
+
+\subsection{Pose Estimation So Far}
+
+As is evident from the current literature, SLAM and 3D reconstruction typically rely on feature matching and RANSAC or ICP. However, these approaches fail when there are too few features, when feature confusion occurs or, when features are non-stationary due to object motion. As the extent of random feature displacement becomes more global the effectiveness of these approaches diminishes. Feature matching also dominates in image registration. However, Fourier based methods have been shown to work well under larger rotations and scales \cite{Gonzalez11Improving} whilst being closed form, insensitive to object motion and scaling naturally to GPU implementations. Accordingly, we propose a novel, closed form Fourier based SLAM method. \\
+
+Simultaneous localization and mapping (SLAM) has applications in many fields including: robotics, business, architecture and engineering, and science. Its goal is to generate a map (2D birds-eye view, or 3D) of an environment captured by camera and/or other means. In this work we focus on monocular systems, or systems which generate location and mapping data using information generated by a single basic video camera. To this end, current methods rely on the computation of the fundamental and essential matrices. These feature matching techniques fail in cases where features are not stable or where feature confusion occurs. 
+
+%It has been shown \cite{Lincoln16Dense} that using volume registration to compute dense 3D maps is not only independent of feature matching, but it is a closed form solution and is robust to noise and object motion. However, this method requires RGB-D video input provided by special hardware. In this paper we present preliminary results in applying volume registration to generate dense 3D maps from monocular video data. To achieve this, disparity maps are generated between video frames. This data is then used as input for the RGB-D volume registration method.
+
 
 
