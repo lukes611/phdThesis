@@ -6,7 +6,7 @@ The Graph SLAM algorithm sets relationships between camera poses and locations a
 Typically an occupancy grid or octree is used to represent the map \cite{Wurm10Octomap}. Further detail about the Graph SLAM method is outside the scope of this work, more detail can be found in the original paper on Graph SLAM \cite{Kummerle11G}. \\
 
 \subsection{Bundle Adjustment}
-
+\label{sec:ba}
 Bundle Adjustment is another optimization technique used in SLAM and 3D reconstruction \cite{Lourakis09Sba}. In this context bundle refers to the light leaving each camera projected into world coordinates. This techniques refines both camera pose and visual reconstruction. It requires some estimates for camera pose, 3D world point positions and image point locations for each view. \\
 
 Using these data and any non-linear optimization method (such as Gauss-Newton or the Levenberg–Marquardt algorithm) the rigid motion based camera movement and the 3D world-coordinates of the points are optimized. \\

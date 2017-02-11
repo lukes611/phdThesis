@@ -1,36 +1,124 @@
 
 \subsection{Mesh}
+
+Mesh data is popular due to its simplicity and integration into GPU technology. The 3D data is made of connected polygons which in turn are made of vertices. Edge information is typically defined implicitly. An example can be seen in figure \ref{MeshExamples}, vertices are represented using black dots, edges by lines, and polygons are labelled $F_0, F_1, F_2, F_3, F_4$. Here, vertex data define geometric information whilst edge and polygon data forms topological information. \\
+
+For processing purposes, polygons are usually triangulated, which means all polygons are sub-divided into triangles. Any mesh may be triangulated, an example of this is provided on the right hand side in figure \ref{MeshExamples}. In a typical data representation, vertices are stored in a list and triangles are stored using three references to this list. The number of bits per vertex (bpv) is typically used to measure storage requirements for mesh data. \\
+
+\begin{figure}[!h]
+\centering
+\includegraphics[width=6cm]{images/ch1/PolygonMeshExample}
+\includegraphics[width=6cm]{images/ch1/TriangleMeshExample}
+\caption{Left: Polygonal Mesh, Right: Triangulated Mesh}
+\label{MeshExamples}
+\end{figure}
+
+\subsection{The Point Cloud Representation}
+
+The point cloud structure stores a list of 3D points. This representation can be thought of as discrete samples of the surface of a real 3D object. Figure \ref{PointCloudExample} shows an example. This structure can be sampled using a variety of methods. These methods include both dense and sparse sampling, and sample steps can be either regular or irregular. Along with each vertex, a variety of attribute information can be stored. Point cloud data may be obtained via a 3D scanner or RGB-D camera. 
+
+\begin{figure}[!h]
+\centering
+\includegraphics[width=6cm]{images/ch1/PointCloudExample}
+\caption{A densely sampled point cloud of the Stanford Bunny.}
+\label{PointCloudExample}
+\end{figure}
+
+
+\subsection{Volumetric Representation}
+
+[23 \cite{Rusinkiewicz02Real}] used frame-by-frame ICP with occupancy grid, users can scan in small objects by rotating the objects with their hand
+works @ 10hz, issue: does not do global optimization, cannot do large scenes . final models are optimized using [7 \cite{Curless96Volumetric}]
+
+
+\subsection{Signed Distance Functions}
+
+A Signed Distance Function \cite{Curless96Volumetric} is a function which describes a 3D geometric space. Such a function takes a 3D location as $x,y,z$ coordinates as input and returns a single number value. The value describes the geometric detail of a particular object. Zero values are surface interfaces, positive values increase relative to the distance to the nearest surface and negative values represent the interior of the object. \\
+
+SDFs may take the form of an equation or may be made discrete by means of discretization. In the context of 3D reconstruction we refer to the discrete SDF and example of which is show in figure [WARNING : insert a figure]. The SDF may be visualized by converting to mesh and rendering (by means of the marching cubes algorithm \cite{Cubes87High}) ray cast directly \cite{Parker98Interactive}. In the case of ray-casting a significant advantage over the volumetric representation, that is the step size may be adjusted dynamically reducing render time. \\
+
+Canelhas \cite{Canelhas12Scene} did a masters thesis on an approach for camera tracking which makes use of an SDF. Similar to the work by Bylow et al \cite{Bylow13Real} the project concentrates on object detection and recognition in an SDF although little evaluation was performed. Additionally storage was not considered. Kubacki \cite{Kubacki12Registration} proved the SDF is useful in estimating camera pose but only showed proof using synthetic data performing no comparative evaluation. Ren and Reid \cite{Ren12Unified}  demonstrated SDF based object tracking based on prior known models. \\
+
+[WARNING check these citations first:::]
+Elfes et al \cite{Elfes87Sensor} use a Baysian probability of occupancy measure to decide if a point should be added to the grid and showed that SDFs can be used to fuse partial depth scans whilst impeding problems with mesh based reconstruction algorithms. The SDF representation was modified by Zach et al \cite{Zach07Globally} to be more robust to noise. Bylow et al noted that the SDF may be used for real time processing and produce globally satisfied reconstructions.
+
+
+
 \subsection{Octree}
+
+http://ais.informatik.uni-freiburg.de/projects/datasets/octomap/
+
+approach for modelling 3d data,
+models data probabalistically whilst reducing memory size
+other methods: point clouds [], elevation maps [7], multi-level surface maps [19],
+
+octomap: updatable, maps occupancy
+can be expanded if needed
+2.5d maps and poiint clouds cannot store unknown and known areas of occupancy in a volumetric way
+[9 \cite{}] is another octree for occupancy
+[4 \cite{Fournier07Mapping},13 \cite{Meagher82Geometric}] also did, these methods don't address memory requirements
+[3 \cite{Fairfield07Real}] -> is for map copying and updates
+octomap is lossless
+their lossless compression may halve the file size, typically 3/4
+[22 \cite{Yguel07Dense}]->wavelet compression, 
+
 
 \cite{Wurm10Octomap}
 Octomap [29 \cite{Wurm10Octomap}] -> 3d reconstruction using occupancy grid style 
 
-\subsection{Volume}
+The Octree is a 3D data representation method which may be tailored for different situations which may require compression, processing or visualization. Other hierarchical structures exist (such as K-D tree and BSP-tree) \cite{Samet06Foundations} but these are not as useful for compression as the Octree, which is the aim of this research. 
 
-\subsection{Signed Distance Functions}
+\subsubsection{Octree Description}
 
-sdf[7 \cite{Curless96Volumetric}]
+In order to understand the OT structure, the Quad-Tree (QT) is explained first. This is done because the QT is the 2D equivalent of the OT and is easier to explain. The QT is a hierarchical data structure used for processing and compressing 2D data. Figure \ref{QuadtreeExample} shows an example of a QT used to represent an image. In this figure, the original image is on the left. The QT first uses a single coloured square to represent the entire image, then using some error metric it decides whether or not to, a) represent the image more accurately using more memory or b) stop decomposition and represent the image with a single colour. If option b) is chosen, the image will look like the second left picture. If option a) is chosen, the image is divided into four sub-images each with its own colour. From here the whole process begins again, with each sub-image given the same options. The final product of the QT is shown on the far right in figure \ref{QuadtreeExample} and a visualization of a QT hierarchy is shown in figure \ref{QuadTreeHierarchy}.
+\begin{figure}[!h]
+\centering
+\includegraphics[width=12cm]{images/ch1/QuadtreeExample}
+\caption{Quadtree Image Representation, left to right: Original Image, 1st Level of Decomposition, 2nd Level of Decomposition, 3rd Level of Decomposition, QT codec Image.}
+\label{QuadtreeExample}
+\end{figure}
+\begin{figure}[!h]
+\centering
+\includegraphics[width=6cm]{images/ch1/QuadTreeHierarchy}
+\caption{A visualization of the QT hierarchy}
+\label{QuadTreeHierarchy}
+\end{figure}
 
-Canelhas [6 \cite{Canelhas12Scene}] did masters thesis an approach for camera tracking, similar to this
-his focus concentrates on object detection and recognition in an sdf and no thorough evaluation was performed
+The OT works similarly to the QT, however, instead of beginning with a square encompassing the entire region, a cube is used to enclose a 3D space. Similarly to the QT, an error metric is used to decide whether to split up the space or leave it unchanged. Each split operation divides each coordinate ($x,y,z$) by two, leaving 8 subspaces. Figure \ref{OctreeExample} shows this decomposition. The further each cube is split, the more the OT resembles the model being compressed. In the QT and OT, nodes which have not been split are called leaf nodes and the function which decides whether a node should be split is called the leaf criterion. 
 
-Kubacki [14 \cite{Kubacki12Registration}] showed how an sdf can be used to estimate camera pose, only on synthetic data without a comparative evaluation
-[19 \cite{Ren12Unified}] demonstrated sdf based object tracking, based on known models
+\begin{figure}[!h]
+\centering
+\includegraphics[width=16cm]{images/ch1/OctreeExample}
+\caption{Visualization of OT Decomposition}
+\label{OctreeExample}
+\end{figure}
 
-Dense 3D scene representations:
-occupancy mapping : use a grid to store data
-[9 \cite{Elfes87Sensor}] uses a Bayesian probability of occupancy to measure whether should be added to the grid
-also can used signed distance functions [9 \cite{Elfes87Sensor}] (SDF), it can be used to fuse partial depth scans, whilst mitigating
-issues relating mesh-based reconstruction algorithms
-SDF represents : surface interfaces as 0, positive values that increase with distance from the nearest surface
-and occupied space using a negative value
-more robust to noise version of SDF -> [30 \cite{Zach07Globally} ]
-SDF can be visualized by first converting to mesh and rendering ( use marching cubes [18 \cite{Cubes87High}]) or it can be directly ray cast [21 \cite{Parker98Interactive}]
-[23 \cite{Rusinkiewicz02Real}] used frame-by-frame ICP with occupancy grid, users can scan in small objects by rotating the objects with their hand
-works @ 10hz, issue: does not do global optimization, cannot do large scenes . final models are optimized using [7 \cite{Curless96Volumetric}]
-sdf fusion in real time may be possible
-sdf can be used for globally satisfying reconstruction
-small scale reconstructions:
-	[28 \cite{Weise09Hand}] -> produces high quality scans using a fixed ToF sensor
-	[6 \cite{Cui103d} ] demonstrate a moving handheld ToF scanner
+
+The goal of the OT and the QT is to store the size and attributes of each node implicitly. There are two main methods of representation, a packed traversal of the tree and a linear tree. The packed traversal method stores the hierarchy using a pre-defined traversal of the tree, and typically follows one of two orderings. These are, breadth-first traversal and depth-first traversal, these orderings are shown in figure \ref{TreeTraversalExample}. The depth-first traversal starts at the root, then works it's way down, top to bottom, then left to right of the tree. In essence, it travels to a node's children before considering its neighbours. In contrast, the breadth-first traversal goes to all nodes which are at the same depth before continuing on to lower levels. 
+
+\begin{figure}[!h]
+\centering
+\includegraphics[width=12cm]{images/ch1/TreeTraversalExample}
+\caption{Tree Traversals, Left: Depth First Traversal, Right Breadth First Traversal}
+\label{TreeTraversalExample}
+\end{figure}
+
+Encoding these two tree traversal methods requires one nibble (4 bits) for a QT node, and one byte (8 bits) for an OT node, where the bits represent the structure of the sub-node. For example, the QT node bit sequence, $1001_2$ means that the node has two children (corresponding to the ones), the sequence $0000_2$ means the node is a leaf node. Each bit position indexes a child node using a pre-determined ordering. An example of a possible ordering for a quadrant and an octant is shown in figure \ref{ChildOrderExample}, both breadth-first and depth-first traversals use the same index method, the difference lies only in the order which nodes are visited. 
+
+\begin{figure}[!h]
+\centering
+\includegraphics[width=12cm]{images/ch1/ChildOrderExample}
+\caption{A possible child ordering for the QT (left), and the OT (right).}
+\label{ChildOrderExample}
+\end{figure}
+
+The linear tree representation stores each leaf node individually. Each leaf is encoded as the pathway from the root to the leaf itself. This method was investigated in the 1980s \cite{Gargantini82Effective,Yufei88Octcodes}, but has not been used much in modern compression algorithms due to its inefficiency compared with the packed traversal method. An example of this structure is shown in figure \ref{LinearCellCodeRepresentation}, where each node: $a$, $b$, $c$, $\dots$ , $m$  is encoded as a variable length traversal path. The QT and OT are widely used in image \cite{Varma12Application} and 3D compression \cite{Schnabel06Octree}. Hanan Samet \cite{Samet88Fund1} presents an introduction to both of these structures, he also describes both tree storage methods in depth. 
+
+\begin{figure}[!h]
+\centering
+\includegraphics[width=12cm]{images/ch1/LinearCellCodeRepresentation}
+\caption{A Linear Tree Code Representation Example}
+\label{LinearCellCodeRepresentation}
+\end{figure}
+
 

@@ -1,7 +1,12 @@
 \subsection{Introduction}
 
-\cite{Callieri04Roboscan} Callieri et al. 2004 use robots input movements to project camera depth maps to the correct position
+This section introduces several techniques used in SLAM and 3D Reconstruction for estimating pose. As mentioned, both of these research areas employ techniques to compute camera pose. Once camera pose is known, in the case of RGB-D methods, depth data may be integrated to generate dense 3D reconstructions. \\
 
+There are many examples of camera pose being computedby robots \cite{Olson06Fast,Frese05Multilevel,Dellaert06Square,Thrun02Robotic,Nuchter056d,Grisetti07Efficient,Kaess08Isam}, in these cases, pose may be estimated by taking input from sensors (measuring wheel spins or thrust) \cite{Callieri04Roboscan}. It can also be more complex and be based primarily on visual data \cite{Davison03Real,Klein07Parallel,Strasdat10Real,Jin00Real,Nister05Preemptive}. In the monocular setting, the scale of the map cannot be determined so true measurement based reconstructions are not possible \cite{Endres12Evaluation,Konolige08Outdoor, Paz08Large}. Furthermore many monocular algorithms only produce sparse reconstructions \cite{Davison03Real,Klein07Parallel}.  \\
+
+The first monocular slam system was presented by Davison in 2003 \cite{Davison03Real}. Davison's method uses a hand-held camera in real time to produce globally consistent sparse maps. It makes use of probabilistic filtering in its estimates of both camera pose (translation and rotation) as well as triangulation of sparse features. It was successful but is limited to in-door office environments because it requires large state vectors which grow with scene size. Additionally, the use of sparse feature maps leads to poor accuracy. \\
+
+Then systems which split tracking and mapping (global optimization) came along, such as the Parallel tracking and mapping algorithm (PTAM) \cite{Klein07Parallel}. This techniques performs camera tracking in real-time in small work spaces. It is essentially bundle adjustment (which is the least squares solution to camera and feature optimization see section \ref{sec:ba}). The tracking system runs in parallel at frame-rate speeds, performing robust n-point pose estimation with feature matching. In comparison to filters based methods much more features can be packed into the map \cite{Strasdat10Real}. Approaches such as these typically accumulate drift \cite{Beardsley97Sequential} or perform off-line loop-closure optimization. \\
 
 \subsection{Fundamental Matrix Method}
 
