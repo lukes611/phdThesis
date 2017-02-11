@@ -176,6 +176,11 @@ The SDF representation uses two volumes as in \cite{Curless96Volumetric}, one vo
 
 In computing the SDF for a given depth map, the exhaustive marching cubes algorithm is too slow, even the fast marching algorithm \cite{Baerentzen01Implementation} is not suited for real time discrete SDF generation. Instead, the SDF is approximated with either the point to point distance or point to plane distance functions. For final visualization, marching cubes is used \cite{Lorensen87Marching} on the final SDF. Colour is computed from the colour volume using a technique found used by Whelan et al \cite{Whelan13Robust}. Since the method by Bylow et al is based on optimizing the projection error using the SDF and only uses locations in its pose estimation procedure, it is independent to illumination. Given this, it will also fail in cases where only co-planar surfaces are visible, they mention that using colour information during tracking \cite{Kerl13Robust} may mitigate these concerns.
 
+\subsubsection{ICP + SDF Optimization}
+
+Rusinkiewicz [WARNING : check cite et al?] \cite{Rusinkiewicz02Real} developed a 3D reconstruction technique based on frame-by-frame ICP and integration using an occupancy grid. Users scan small objects by rotating them by hand. Output models are optimized using an SDF \cite{Curless96Volumetric}.
+
+
 \subsubsection{Warp Function Optimization} 
 
 Kerl et al \cite{Kerl13Dense} proposed a dense RGB-D SLAM system which uses a probabilistic camera parameter estimation procedure. Rather than strictly using feature matching, RANSAC and a linear pose estimator, it formulates the projection error as an image warping function (between two frames) and optimizes it using Taylor's expansion.
