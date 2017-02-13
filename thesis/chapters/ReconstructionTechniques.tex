@@ -3,33 +3,20 @@
   \qauthor{George Orwell, 1984}
 \end{savequote}
 \makeatletter
-\chapter{Literature Review}
+\chapter{Reconstruction Techniques}
 
 \section{Introduction}
 
 In this section we review some of the crucial areas and techniques involved in both Simultaneous Localization and Mapping (SLAM) and registration. First, some important registration techniques are covered including both feature matching and phase correlation. Then, depth data generation is covered. These techniques assist with the generation of dense 3D data used for 3D reconstruction. Another important area: Pose estimation is also We begin with an overal tutorial on 3D-SLAM before covering registration. Next, 3D reconstruction data-representations and compression schemes are covered. 
 
-
-%registration techniques [basics]
-\section{Signal Registration}
-\subsection{feature matching}
-\input{chapters/literature/featureMatching}
-\subsection{phase correlation}
-\input{chapters/literature/phaseCorrelation}
-
 %depth data generation and pose estimation
-\section{Depth Data Generation} \label{DepthDataGenSection}
-\input{chapters/literature/DepthDataGeneration}
-\section{Pose Estimation Techniques}
-\input{chapters/literature/PoseEstimationTechniques}
+\input{chapters/ReconstructionTechniques/PoseEstimationTechniques}
 %optimization techniques
-\section{Global Optimization}
-\input{chapters/literature/Optimization}
+\section{Further Optimization}
+\input{chapters/ReconstructionTechniques/Optimization}
 
-%data compression and representation
-\section{3D Reconstruction Data Representations}
-\input{chapters/literature/3DReconstructionDataRepresentations}
-
+\section{Pose Estimation So Far}
+\input{chapters/ReconstructionTechniques/PoseEstimationSummary}
 
 
 \section{Conclusion}
