@@ -118,6 +118,8 @@ Whelan et al \cite{Whelan12Kintinuous} extended Kinectfusion allowing it to map 
 
 \section{ICP}
 
+\label{ICPSection}
+
 Iterative Closest Point (ICP) \cite{Besl92Method,Rusinkiewicz01Efficient,Segal09Generalized} is a non-linear optimization method used to register 3D data. It works by iteratively minimizing registration error given two sets of point clouds and is a popular method for estimating 6-dof (6 degrees of freedom) camera alignment in 3D reconstruction. The algorithm works by computing the closest point using some metric (usually euclidean distance) for each of the points in the first point cloud. Then computing a transform which minimizes either the euclidean distance error or some other error metric (\cite{Steinbrucker11Real,Tykkala11Direct,Kerl13Robust,Chen92Object,Stuckler12Robust}. \\
 
 The points are then transformed by the computed transform and this process is repeated which is supposed to continually decrease registration error. The 6-dof are commonly computed using the method described in section \ref{FMANDFM}. Various distance metrics have been researched including the point-plane metric \cite{Chen92Object}. This metric improves convergence rates and is used for surface reconstructions which contain additional information about the normal of each points. This algorithm is highly successful in generating accurate 3D reconstructions but it does have a few issues. \\
@@ -126,7 +128,7 @@ The first issue is that whilst computing the best transform based on "feature ma
 
 Another issue that ICP is limited to small rotation, translation and scale. If larger transforms are present (especially scale in the case of general registration) ICP will usually get stuck in a local minima and fail to register \cite{Mitra04Registration}. The final issue is that of slippage \cite{Whelan13Robust}. ICP tends to fail in environments with little texture. Here we present some important algorithms which use ICP in 3D reconstruction.
 
-\subsection{Henry10Rgb}
+\subsection{Feature Matching, RANSAC and ICP Refinement}
 
 Some systems make use of feature matching with RANSAC (see section \ref{FMANDFM}) for pose estimation and ICP for further alignment \cite{Engelhard11Real, Henry10Rgb}. These methods are very similar and make use of the advantages of both the feature matching methods and ICP method. \\
 

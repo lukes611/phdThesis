@@ -1,24 +1,33 @@
 
 CH: Fourier Pose Registration
-Intro
-Translation Estimation
-Y-Axis Rotation + Scale Estimation
-Full 3D Recovery of rotation
-Speed Improvements
+Introduction
+Volume Registration: (first paper)
+	Translation Estimation
+	Y-Axis Rotation + Scale Estimation
+Fourier Volume Registration
+	Pipeline
+	Algorithm
+	Experiments:
+		Data
+		Qualitative
+		Camera Movement Tests
+		Moving Object Tests
+Monocular FVR:
+	Methods of Depth Information Capture
+	Data
+	Experiments:
+Speed Improvements:
 	spherical map transform
 	projection-map transform
-Reconstruction Pipeline
-Error Metrics
-Advantages Disadvantage
-Sensor Input
-	RGB-D
-	Monocular
-
-CH: FVR Experiments
-Data
-Tools
-Algorithms
-Results
+	Experiments
+Full 3D Recovery of rotation:
+	pipeline
+	Algorithm
+	Experiments:
+		Data
+		Qualitative
+		Camera Movement Tests
+		Moving Object Tests
 
 
 CH: Plane-Tree

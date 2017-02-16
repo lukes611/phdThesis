@@ -83,5 +83,128 @@ $frameCenter$ is the center of the projected frame space and $volumeCenter$ is t
 
 \subsection{Advantages and Disadvantages}
 
+\subsection{Full Recovery of 3D Rotation}
+
+\label{FullRecovery3DSection}
+
+In order to recover full 3D rotation (as well as scale and translation) the model must first be aligned by some common axis. PCA or Principals Component Analysis is a well known technique for recovering the primary axes of an N-dimensional signal. In this case, we can use the most accurate axis (the eigen-vector with the largest corresponding eigen-value) to align two volumes, then y-axis rotation, scale and translation values can be recovered by the described FFT based volume registration method. \\
+
+WARNING: SHOW picture of this PCA procedure
+
+PCA is a capable registration technique on its own, but when faced with non-overlapping, missing or noisy data it typically fails on its own. The technique of alignment is discussed in the following sections. \\
+
+Given a 3-dimensional signal $A$ of length $N$, the co-variance of the signals between two of the dimensions ($x$ and $y$) is given as a function in equation \ref{eqn:Covariance3DSignal}.
+
+\begin{equation} \label{eqn:Covariance3DSignal}
+Cov(A_x,A_y) = \sum_{i=0}^{N}(A_{x_i} - A_{x_{mean}})(A_{y_i} - A_{y_{mean}})
+\end{equation}
+
+Here, $A_{x_{mean}}$ and $A_{y_{mean}}$ are the mean values of these x and y dimensions of $A$. 
+
+Using the voxel locations of volume $A$ we can generate the covariance matrix \ref{eqn:CovarMatrix}. This matrix describes the how each coordinate changes with respect to each other.
+
+\begin{equation} \label{eqn:CovarMatrix}
+\left[
+\begin{array}{ccc}
+Cov(A_x, B_x) & Cov(A_x, A_y) & Cov(A_x, A_z) \\
+Cov(A_y, B_x) & Cov(A_y, A_y) & Cov(A_y, A_z) \\
+Cov(A_z, B_x) & Cov(A_z, A_y) & Cov(A_z, A_z) \\
+\end{array}
+\right]
+\end{equation}
+
+The 3 eigen-vectors of the covariance matrix describe the primary axis of the signal $A$ and the 3 corresponding eigen-values describe the strength of these axes. The eigen-vector/axis with the largest corresponding eigen-value is the principal component. The principal component is used to align data to a common axis. Here we define the principal axis (component) of a 3D signal $A$ as $A_{pa}$. \\
+
+Given a 3D volume $V$, with a computed principal axis $V_{pa}$ and mean $V_{mean_location}$, we can construct a matrix to normalize the 3D data in terms of the principal axis.
+
+Given $V_{pa}$ a vector pointing along the principal axis of $V$, we compute the forward vector as 
+
+
+\begin{equation} \label{eqn:fwdVector}
+Fwd = \left(\left[
+\begin{array}{c}
+V_{pa_{x}}\\
+V_{pa_{y}}\\
+V_{pa_{z}}\\
+\end{array}
+\right] \times \left(\left[
+\begin{array}{c}
+1\\
+0\\
+0\\
+\end{array}
+\right] \times \left[
+\begin{array}{c}
+V_{pa_{x}}\\
+V_{pa_{y}}\\
+V_{pa_{z}}\\
+\end{array}
+\right]\right)\right) \times \left[
+\begin{array}{c}
+V_{pa_{x}}\\
+V_{pa_{y}}\\
+V_{pa_{z}}\\
+\end{array}
+\right]
+\end{equation}
+
+Here, $\times$ is the cross-product of the vectors. The right pointing vector is computed as orthogonal to the forward vector and the common vertical axis $V_{pa}$,
+
+
+\begin{equation} \label{eqn:fwdVector}
+Rgt = \left[
+\begin{array}{c}
+V_{pa_{x}}\\
+V_{pa_{y}}\\
+V_{pa_{z}}\\
+\end{array}
+\right] \times \left[
+\begin{array}{c}
+Fwd_x\\
+Fwd_y\\
+Fwd_z\\
+\end{array}
+\right]
+\end{equation}
+
+Then the volume can be normalized to an axis based on the input data. This is done using a matrix which transforms the data to the origin, then corrects the vector $V_{pa}$ to be the new up axis, then transforms back. The matrix in equation \ref{eqn:CorrectUpMat} computes this,
+
+
+\begin{equation} \label{eqn:CorrectUpMat}
+CorrectMat(V) = \left[
+\begin{array}{cccc}
+1 & 0 & 0 & V_{mean_x} \\
+0 & 1 & 0 & V_{mean_y} \\
+0 & 0 & 1 & V_{mean_z} \\
+0 & 0 & 0 & 1 \\
+\end{array}
+\right] \left[
+\begin{array}{cccc}
+Rgt_x & Rgt_y & Rgt_z & 0 \\
+V_{pa_x} & V_{pa_y} & V_{pa_z} & 0 \\
+Fwd_x & Fwd_y & Fwd_z & 0 \\
+0 & 0 & 0 & 1 \\
+\end{array}
+\right] \left[
+\begin{array}{cccc}
+1 & 0 & 0 & -V_{mean_x} \\
+0 & 1 & 0 & -V_{mean_y} \\
+0 & 0 & 1 & -V_{mean_z} \\
+0 & 0 & 0 & 1 \\
+\end{array}
+\right]
+\end{equation}
+
+
+To recover a matrix for full 3D rotation, scale and translation for given volumes $Volume_A$ and $Volume_B$, we first compute the correction matrices using PCA and the technique described above for both $Volume_A$ and $Volume_B$ as $C_A = CorrectMat(Volume_A)$ and $C_B = CorrectMat(Volume_B)$. The transformation matrix relating $Transform(Volume_A, C_A)$ and $Transform(Volume_B, C_B)$ is computed as $RST$. The final transform then relating $Volume_A$ to $Volume_B$ is computed as,
+
+\begin{equation} \label{eqn:FullRSTTransform}
+R_{x,y,z}ST Matrix = C_{B}^{-1} \times RST \times C_A
+\end{equation}
+
+This technique is capable of extending Fourier registration to take into account full 3D rotation. The technique simply requires a single iteration over the data to compute the principal components then a rotation-scale-translation phase correlation technique is used to compute the scale, translation and y-axis rotation. 
+
+WARNING: show an example of this working
+
 
 

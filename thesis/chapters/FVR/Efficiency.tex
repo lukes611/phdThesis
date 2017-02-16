@@ -1,6 +1,3 @@
-
-\subsection{Filtering Techniques}
-
 \subsection{Fast Fourier Volume Registration}
 
 3D phase correlation is CPU and GPU intensive, so in order to reduce complexity we tried to minimize processing in areas which require the most computation time. In out Fourier based volume registration method defined in the previous section, this occurs in the two 3D phase correlations which need to be computed. We describe the method of reduction here; a block diagram for this technique is given in figure \ref{fig:PIPELINE3} WARNING:Given a picture for the sped up version too!. We refer to this method as fast volume registration (FVR) in reference to general volume registration (VR). The speedup begins by computing the 3D DFT of both input volumes and taking the magnitude of these. Rather than directly performing a 3D log-spherical transform and a 3D phase correlation operation on these volumes, we use a novel transform we call a spherical-map transform (details in \ref{SMTransform}).\\
@@ -97,4 +94,3 @@ than the original Fourier based volume registration approach. This is due to the
 \caption{Comparison of performance between volume registration and the proposed speed up for different volume sizes.}
 \label{fig:perfComp}
 \end{figure}
-
