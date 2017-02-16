@@ -27,7 +27,8 @@ Methodology:
 		Speed Improvements
 			Spherical Map Transform
 			Projection Map Transform
-		Full 3D Reconvery of rotation
+		Fourier Volume Reconstruction
+			3D rotation recovery
 			Pipeline
 			Algorithm
 	Plane-Tree:
@@ -44,6 +45,9 @@ Experiments + Results:
 	Monocular Camera Translation Tracking
 	Speed Improvement Tests
 	FVR vs. Existing Techniques
+		algorithms
+		Results
+		Noise Experiments
 	Plane-Tree vs. Octree
 	Plane-Tree vs. Existing Techniques
 	Plane-Tree Qualitative Results

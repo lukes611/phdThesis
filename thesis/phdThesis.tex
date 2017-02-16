@@ -34,67 +34,36 @@ colorlinks = true, hyperindex = true, hyperfigures] {hyperref}
 \setlength{\marginparwidth}{57pt}
 \setlength{\footskip}{30pt}
 \openup 1em
-\input{chapters/title}
+\input{chapters/Title}
 \frontmatter
 %\includepdf[pages={2}]{titlePDF2}
-\input{chapters/abstract} % Abstract
-\input{chapters/acknowledgements}
+\input{chapters/Abstract} % Abstract
+\input{chapters/Acknowledgements}
 \tableofcontents
 \listoffigures
 \listoftables
 \mainmatter
 %item : complete / required
 
-%intro : 6/10\\
-%lit-rev: 52/60\\
-%meth : 28/60\\
-%exps : 42/40\\
-%conc : 2/10\\
+%intro : 5/10\\
+%lit-rev: 51/60\\
+%meth : 24/60\\
+%exps : 40/40\\
+%conc : 1/10\\
 
 %total: 180/180\\
 %refs : 185/200\\
 
-%re-factor plan
-%Reconstruction Techniques
-%	Fundamental Matrix
-%	Feature Matching with RANSAC
-%	ICP
-%	SDF Optimization
-%	3D Feature Matching
-%	PCA
-%	Optimization
-% 	Fourier Volume Registration
-		%Recovery of Translation: overview, experiments
-		%recovery of Y-Rotation: overview, experiments
-		%A method for full 3D rotation recovery: overview, experiments
-		%filtering techniques
-		%speed improvements
-%A 3D reconstruction method based on the Fourier Approach
-	%pipeline,error metrics,reconstruction integration, advantages + disadvantages, experiments
-%Data representations Revisited
-	%octree
-	%3D shadetree
-	%plane-tree
-	%octree subdivision
-	%leaf node representation and computation
-	%compression + decompression
-	%experiments + analysis
-%conclusion
-%todo:
-%put summary after the fft section
 
 
-\input{chapters/introduction} % The Introductory Chapter
-\input{chapters/background}
-\input{chapters/ReconstructionTechniques} % The Literature Review
-\input{chapters/FourierRegistration} % Fourier Volume Registration
-\input{chapters/DataRepresentationAndCompression} % Methodology
-\input{chapters/experiments} % Experiments &
-\input{chapters/results} % Results
-\input{chapters/conclusion} % Conclusion
+\input{chapters/Introduction} % The Introductory Chapter
+\input{chapters/Literature} % The Literature Review
+\input{chapters/Methodology} % Methodology
+\input{chapters/Experiments} % Experiments & Results
+\input{chapters/Conclusion} % Conclusion
 \appendix
 none
-\input{chapters/appendix} % Appendix A
+\input{chapters/Appendix} % Appendix A
 \backmatter
 \openup -0.5em
 %\bibliographystyle{plain}

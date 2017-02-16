@@ -1,3 +1,4 @@
+\subsection{Summary}
 
 As is evident from the current literature, SLAM and 3D reconstruction typically rely on feature matching and RANSAC or ICP. However, these approaches fail when there are too few features, when feature confusion occurs or, when features are non-stationary due to object motion. As the extent of random feature displacement becomes more global the effectiveness of these approaches diminishes. Feature matching also dominates in image registration. However, Fourier based methods have been shown to work well under larger rotations and scales \cite{Gonzalez11Improving} whilst being closed form, insensitive to object motion and scaling naturally to GPU implementations. Accordingly, we propose a novel, closed form Fourier based SLAM method. \\
 

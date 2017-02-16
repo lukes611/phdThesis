@@ -1,4 +1,3 @@
-\section{Introduction}
 
 This section introduces several techniques used in SLAM and 3D Reconstruction for estimating pose. As mentioned, both of these research areas employ techniques to compute camera pose. Once camera pose is known, in the case of RGB-D methods, depth data may be integrated to generate dense 3D reconstructions. \\
 
@@ -8,7 +7,7 @@ The first monocular slam system was presented by Davison in 2003 \cite{Davison03
 
 Then systems which split tracking and mapping (global optimization) came along, such as the Parallel tracking and mapping algorithm (PTAM) \cite{Klein07Parallel}. This techniques performs camera tracking in real-time in small work spaces. It is essentially bundle adjustment (which is the least squares solution to camera and feature optimization see section \ref{sec:ba}). The tracking system runs in parallel at frame-rate speeds, performing robust n-point pose estimation with feature matching. In comparison to filters based methods much more features can be packed into the map \cite{Strasdat10Real}. Approaches such as these typically accumulate drift \cite{Beardsley97Sequential} or perform off-line loop-closure optimization. \\
 
-\section{Fundamental Matrix Method}
+\subsection{Fundamental Matrix Method}
 
 \label{FundamentalMatrixSection}
 
@@ -61,7 +60,7 @@ The fundamental matrix is computed using around 8 point matches between images. 
 Monocular Feature based SLAM systems use feature matches to estimate camera pose and location changes across frames \cite{Davison02Simultaneous}. Variations of this method use different features including: corners and lines \cite{Jeong06Visual}, image patches \cite{Silveira08Efficient} and exemplar feature matching \cite{Chekhlov07Robust}. SIFT features are used most often in SLAM \cite{Jensfelt06Framework,Pollefeys08Detailed,Beall11Bundle,Eudes10Fast}, in addition FAST features have been explored \cite{Kundu10Realtime,Leelasawassuk133d,Konolige10View,Konolige08Frameslam}. Beall et al \cite{Beall11Bundle} made use of both SIFT and SURF features in their underwater SLAM system. Real-time monocular SLAM systems based on this approach have also been proposed \cite{Chekhlov07Robust,Pollefeys08Detailed}. RANSAC is often used in monocular SLAM \cite{Eudes10Fast,Kundu10Realtime,Konolige10View,Konolige08Frameslam,Pradeep13Monofusion} to remove outliers which cause incorrect camera parameter estimates. Bundle adjustment is also used as an additional step to refine camera parameter estimation \cite{Eudes10Fast}.  \\
 
 
-\section{Feature Matching and RANSAC}
+\subsection{Feature Matching and RANSAC}
 \label{FMANDFM}
 
 Feature matching along with RANSAC  may be used to compute the Fundamental/Essential matrices which leads to camera pose estimates. However, the computation of the correct Fundamental matrix is typically difficult. Furthermore, the intrinsic camera parameters must be known prior in order to use such a technique, else noise destroys the ability to accurately estimate camera pose. \\
@@ -88,7 +87,7 @@ Computing 3D reconstructions using feature matching is often preferred as close 
 
 
 
-\subsection{RGB-D SLAM}
+\subsubsection{RGB-D SLAM}
 
 Endres et al \cite{Endres12Evaluation} presented a dense 3D reconstruction technique using RGB-D data from the Kinect sensor based on feature matching and RANSAC. They also evaluated their technique under different illumination and camera movement speed conditions. It is able to operate at near real time speeds in small in-door environments. This method begins by feature matching RGB images across frames. Using the projected 3D points available for each pixel in the depth map, RANSAC \cite{Fischler81Random,Huttenlocher91Fast} is used to compute the camera pose across frames. These poses are optimized globally using the $g^2$o graph optimizer, the Octomap representation \cite{Wurm10Octomap} is used to voxelize the 3d points before storing them in a volumetric occupancy map. Since this system is based on feature matching, Endres et al evaluate 3 different feature matching techniques: SIFT \cite{Lowe04Distinctive} , SURF \cite{Bay06Surf,Bay08Speeded} and ORB \cite{Rublee11Orb}. ORB feature matching is tested because it is faster than SIFT and SURF with slightly less accuracy, the authors also evaluate a GPU implementation of SIFT \cite{Wu07Siftgpu}. Endres et al evaluate their algorithm using their own benchmark \cite{Sturm11Towards}. Results show it can handle up to 50 degrees of rotation per second, and speeds of up to 43 centimetres per second.  \\
 
@@ -106,7 +105,7 @@ This system is divided into a front-end and a back-end. The front-end performs f
 
 The front-end uses OpenCV \cite{Bradski08Learning} for feature matching. During the feature detection process, the Hessian threshold is used to keep the total number of features constant. This is required because pose may not be able to be computed if there aren't enough features, but on the other hand, too many features typically lead to many false positives in the feature matching schema. As mentioned, these matched features (and thus matched 3d points) are used with RANSAC to compute pose \cite{Umeyama91Least}. During the RANSAC process, corresponding points with distances below 3cm are considered inliers. The inliers are then used exclusively to compute a finer pose. This method of pose estimation is fast but computational complexity depends on the number of features computed. For each frame, the pose relationship with 20 previous frames (including the most recent 3) is computed in parallel on the GPU. Then the final computed pose is given to the back-end. If accurate pose cannot be compute, constant motion is assumed. \\
 
-\subsection{Fast Odometry from Vision: FOVIS}
+\subsubsection{Fast Odometry from Vision: FOVIS}
 
 Another technique which is based on feature matching is the FOVIS (Fast Odometry from Vision) technique \cite{Huang17Visual}. In FOVIS works in 6 stages. In the first two stages, the RGB-D image data is collected and put through a low-pass filter, Gaussian scale space is computed and then FAST features \cite{Rosten06Machine,Rosten05Fusing} are computed. In the next stage, initial camera rotation estimation is computed by minimizing the sum of squared errors between down sampled versions of consecutive image frames. In the 4th stage, feature matching is performed, using the SAD (sum of absolute differences) metric and sub-pixel resolution. In the 5th stage, outliers are removed using a feature match graph and a greedy algorithm to find maximal cliques \cite{Hirschmuller02Fast,Howard08Real}. \\
 
@@ -116,7 +115,7 @@ Whelan et al \cite{Whelan12Kintinuous} extended Kinectfusion allowing it to map 
 
 
 
-\section{ICP}
+\subsection{ICP}
 
 \label{ICPSection}
 
@@ -128,18 +127,18 @@ The first issue is that whilst computing the best transform based on "feature ma
 
 Another issue that ICP is limited to small rotation, translation and scale. If larger transforms are present (especially scale in the case of general registration) ICP will usually get stuck in a local minima and fail to register \cite{Mitra04Registration}. The final issue is that of slippage \cite{Whelan13Robust}. ICP tends to fail in environments with little texture. Here we present some important algorithms which use ICP in 3D reconstruction.
 
-\subsection{Feature Matching, RANSAC and ICP Refinement}
+\subsubsection{Feature Matching, RANSAC and ICP Refinement}
 
 Some systems make use of feature matching with RANSAC (see section \ref{FMANDFM}) for pose estimation and ICP for further alignment \cite{Engelhard11Real, Henry10Rgb}. These methods are very similar and make use of the advantages of both the feature matching methods and ICP method. \\
 
 Henry et al \cite{Henry10Rgb} presented work on a 3D mapping method which combines Feature Matching and RANSAC (similar to \cite{Endres12Evaluation}) with ICP. This method makes us of an RGB-D camera, and used the camera input for sparse feature matching. Features are used with RANSAC and the technique described in section \ref{FMANDFM}. ICP is used for refinement of the initial prediction. If Loop-closure is detected, a constraint is added to the 3D pose graph \cite{Kummerle11G} and is used to close the loop. A Surfel \cite{Pfister00Surfels} volumetric fusion method is used to represent and store the 3D reconstruction. This technique may be used for robot localization and path planning \cite{Hornung10Humanoid}. Endres et al \cite{Endres12Evaluation} compared this method with theirs using a standard benchmark \cite{Sturm12Benchmark}.  \\
 
-\subsection{Non-Rigid Alignment}
+\subsubsection{Non-Rigid Alignment}
 
 In addition to rigid alignment ICP is used by Pauly et al \cite{Pauly05Example,Brown07Global} to align depth maps using non-rigid transforms. In the method by Brown and Rusinkiewicz \cite{Brown07Global}, ICP is used to first align the point clouds using a rigid alignment, then global feature positions are found using a relaxation method. Then 3D point sets are warped to final positions using thin plate splines. Brown and Rusinkiewicz state that this outperforms rigid based alignments.
 
 
-\subsection{Kinect Fusion}
+\subsubsection{Kinect Fusion}
 
 Newcombe et al \cite{Newcombe11Kinectfusion,Izadi11Kinectfusion} proposed an accurate, real-time dense 3d reconstruction algorithm which works well on complex indoor environments. This algorithm computes relationships between depth map frames generated using the Microsoft Kinect \cite{Zhang12Microsoft} sensor. By aligning depth maps this method is capable of tracking both camera pose and location as well as generating dense 3d reconstructions. Only depth data is used in alignment computations thus, consequently because the Kinect is a structured light based depth sensor Kinect Fusion works under any lighting condition, including complete darkness. Since they use the Kinect and GPU (both considered commodity hardware these days) the technique may be considered inexpensive. \\
 
@@ -161,14 +160,14 @@ After estimating camera pose relating to the globally fused model, each frame mu
 As mentioned, Kinect fusion uses pose prediction and fuses each depth map into the TSDF representation. In this way, they align and fuse each depth map to the global 3d reconstruction. In this way, a global loop closure method is not required. This may have a negative side effect by which some frames which have larger resolutions may be heavily quantized in order to fuse with the SDF, especially very thin surfaces/objects. These features may also be advantageous for ICP in estimating pose. 
 
 
-\subsection{FOVIS and ICP Integration}
+\subsubsection{FOVIS and ICP Integration}
 
 Whelan et al improved \cite{Whelan13Robust} upon their previous method \cite{Whelan12Kintinous} by integrating FOVIS and ICP together on the GPU, and adding an advanced colour fusion model to the technique. The main improvement lies in switching between FOVIS and ICP whenever the error using FOVIS is too high, ICP is used. They also integrate using a global model rather than a local one. 
 
 
-\section{Direct Optimization Methods}
+\subsection{Direct Optimization Methods}
 
-\subsection{Optimization over a Signed Distance Function}
+\subsubsection{Optimization over a Signed Distance Function}
 
 In 2013, Bylow et al \cite{Bylow13Real} presented a novel method which reconstructs static indoor environments in real time using RGB-D data captured using the Asus Xtion Pro Live sensor. Their system is able to generate accurate 3D RGB coloured models of the environment in real-time by optimizing for 6 degrees of freedom in terms of accurate projection of new depth map frames into an existing global signed distance function model of the scene. Their method uses several Gauss Newton optimization with a signed distance function representation, these techniques are represented and processed using a laptop with an NVIDIA GPU. Unlike Kinect Fusion \cite{Newcombe11Kinectfusion}, this method optimizes directly in the signed distance representation, in which camera pose is computed by finding a rotation and translation (6-DoF) which minimizes the error of projecting depth images into the SDF. Compared with the ICP based method used by Kinect Fusion, this technique is shown to be more robust and accurate. It compares favourably to bundle adjustment but is much faster for small to mid sized scenes. Results are generated using the TUM RGB-D benchmark and SDF volume sizes $256^3$ and $512^3$ are used in evaluations. The authors note the algorithm may be able to handle large scale scenes if used in conjunction with other techniques \cite{Kaess11Isam2,Kummerle11G}. \\
 
@@ -178,27 +177,27 @@ The SDF representation uses two volumes as in \cite{Curless96Volumetric}, one vo
 
 In computing the SDF for a given depth map, the exhaustive marching cubes algorithm is too slow, even the fast marching algorithm \cite{Baerentzen01Implementation} is not suited for real time discrete SDF generation. Instead, the SDF is approximated with either the point to point distance or point to plane distance functions. For final visualization, marching cubes is used \cite{Lorensen87Marching} on the final SDF. Colour is computed from the colour volume using a technique found used by Whelan et al \cite{Whelan13Robust}. Since the method by Bylow et al is based on optimizing the projection error using the SDF and only uses locations in its pose estimation procedure, it is independent to illumination. Given this, it will also fail in cases where only co-planar surfaces are visible, they mention that using colour information during tracking \cite{Kerl13Robust} may mitigate these concerns.
 
-\subsection{ICP + SDF Optimization}
+\subsubsection{ICP + SDF Optimization}
 
 Rusinkiewicz et al \cite{Rusinkiewicz02Real} developed a 3D reconstruction technique based on frame-by-frame ICP and integration using an occupancy grid. Users scan small objects by rotating them by hand. Output models are optimized using an SDF \cite{Curless96Volumetric}.
 
 
-\subsection{Warp Function Optimization} 
+\subsubsection{Warp Function Optimization} 
 
 Kerl et al \cite{Kerl13Dense} proposed a dense RGB-D SLAM system which uses a probabilistic camera parameter estimation procedure. Rather than strictly using feature matching, RANSAC and a linear pose estimator, it formulates the projection error as an image warping function (between two frames) and optimizes it using Taylor's expansion.
 
-\subsection{Event Feature Optimization}
+\subsubsection{Event Feature Optimization}
 
 Weikersdorfer et al \cite{Weikersdorfer14Event} presented a novel sensor system named D-eDVS along with an event based SLAM algorithm. The D-eDVS sensor combines depth and event driven contrast detection. The event emitting sensor can be thought of as emitting points which may be used like features. After aligning pixels generated from the event transmitting device with depth information from the Asus Xtion pro RGB-D camera, it computes pose by optimizing the re-projection error using least squares optimization.
 
 
-\section{3D Feature Matching}
+\subsection{3D Feature Matching}
 
 3D feature matching works much in the same way as the 2D feature matching and RANSAC approach (section \ref{FMANDFM}) but uses 3D features rather than 2D only, so it can work independently to perspective changes which 2D feature matching methods are only robust to. Many techniques have been proposed \cite{Scovanner073Dimensional,Flitton10Object,Li05Multiscale}. Technically, registering against rigid transformations may be achieved with as little as 3 feature matches. These 3 matches can be found by 3D feature matching or geometric hashing \cite{Wolfson97Geometric}.
 
 
 
-\subsection{4-Point Congruent Sets}
+\subsubsection{4-Point Congruent Sets}
 
 Aiger et al \cite{Aiger084} developed a method for 3D registration (and pose estimation) named 4-Point Congruent Sets (4-PCS). This method is fast and robust to wide baselines in the registration of 3D data. It is resilient to noise and outliers and there is no pre-filtering or de-noising required prior to registration. It improves the typical feature matching approach by significantly reducing the number of points required to compare as features for use in a RANSAC approach to pose estimation. \\
 
@@ -209,11 +208,11 @@ This method works based on the principal of large numbers, which means solving t
 The basic concept is to optimize the selection of the 3 points used as a base for alignment from one point-set to another. By choosing 3 matches, then measuring the distance between $T(P_i)$ and $Q_i$. This test is of complexity  O($m^3$ x $n^3$) but this can be reduced to  O($mn^3 log(n)$) \cite{Irani96Combinatorial} and even O($n^3 log(n)$). Despite these improvements, these complexities are still too large for practically sized point-sets. This novel 3D alignment scheme is capable of aligning surfaces with limited overlap and may be refined using ICP \cite{Rusinkiewicz01Efficient}. \\
 
 
-\subsection{Base Shape Matching}
+\subsubsection{Base Shape Matching}
 
 Gelfand et al \cite{Gelfand04Shape} presented a method which segments input models into base shapes, simple geometric parts which may be modelled and matched. Using these base shapes, slippable components are found by computing local slippage signatures for a set of points in the input and iteratively clustering regions with matching slippable motions. This method is stable but appears to be limited to mechanical human made parts and shapes.
 
-\subsection{Multi-scale Features}
+\subsubsection{Multi-scale Features}
 
 Extensions to both SIFT and SURF have been extended to 3D \cite{Scovanner073Dimensional,Flitton10Object}. These methods follow the same overall technique as the 2D counterparts however some procedures and practices are altered to better suit 3D data input. First, a 3D-volume scale pyramid is produced for matching at different scales. Then features are detected using the corresponding feature detection method (by SIFT or SURF) and then a feature vector for each feature is produced. Features can be matched between volumes and a rigid or non-rigid alignment may be computed. \\
 
@@ -229,7 +228,7 @@ Other 3D feature matching techniques which have been developed are based on imag
 Some feature matching techniques are based on hashing or voting \cite{Germain97Fingerprint,Gal06Salient,Mitra04Registration,Ballard91Generalizing}. These techniques are out of the scope of this research but are none the less interesting areas which are still underdeveloped.
 
 
-\section{Principal Components Analysis}
+\subsection{Principal Components Analysis}
 
 Principal Components Analysis (PCA) is an algorithm which divides a set of observed vector data into their principal component vectors and a centroid. The vectors along with the principal axes may be used to align 3D data. An issue with PCA is that in the case of partial overlap, the accuracy may break down \cite{Aiger084}. The Principal Components Analysis algorithm and it's use in the proposed technique is discussed in section \ref{FullRecovery3DSection}. \\
 

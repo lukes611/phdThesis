@@ -10,67 +10,41 @@
 In this section, various experiment set-ups and test data are discussed. Results are presented in the results section (\ref{ResultsSection}). In this section we first discuss the test data used in section \ref{TestDataSection}, then the tools we used for analysis are discussed (section \ref{ToolsSection}). The algorithms we evaluated and compared are listed in section \ref{AlgorithmsSection}. Finally in the later sections (\ref{QualExperimentsSection} and beyond) we discuss the quantitative and qualitative methods we used to test these algorithms. Finally section \ref{DataRepresentationExperimentsSection} describes the experiments evaluating the proposed Reconstruction data-representation. 
 
 \section{Test Data}
-
 \label{TestDataSection}
+\input{chapters/Experiments/Experiments/Data}
 
-Test Data was generated based on the testing requirements for this research. In order to robustly test different pose-estimation procedures / 3D-registration methods we generated data from a variety of scenes. These scenes are of both in-door and out-door. Some include large amounts of texture whilst others have little or no texture. Some scenes in the data-set were captured purposefully to cause confusion for algorithms which rely on texture information. These scenes have texture confusion. These scenes have multiple items which look similar locally but are actually different objects within the scene and have unique global positions. \\
-
-Moreover, our test-data also measures the ability of each algorithm to register different camera movements. Each scene is captured by performing certain types of camera movement. Different camera transformations captured include: translation, zooming and rotation about different axes. \\
-
-Some frames from the original test-set are shown in appendix \ref{AppendixA}. The first scene: the Apartment Texture Rotate scene was taken by rotating the camera around the y-axis across an apartment. This scene contains a lot of texture information. The Apartment Texture X Axis scene is similar in terms of texture but contains both x and y axis rotation. This tests the FVR's ability to handle multiple axes of rotation. \\
-
-The boxes scene was captured under arbitrary-rotation, translation and zoom (in/out) camera motions. It contains some useful information on the boxes themselves, however the texture on the carpet is may cause texture confusion for feature based registration methods. The Desk Texture Translation scene contains a desk with a desktop computer and several items on it. The In-door space with texture-confusion contains a set of chairs and picture frames which look similar to each-other locally but may cause confusion for registration techniques which rely on local features.  \\
-
-The kitchen scene was captured with both translation and zoom camera movements. It contains very little texture and the color is predominantly white. The Office textured blind-spot rotation scene is a textured office scene where the camera is rotated about the y-axis. The scene is focused on a large divider which separates two desks. The divider may confuse registration methods which rely too heavily on minimization by aligning the large divider as a priority rather than taking into account the smaller details within the scene. \\
-
-The Office scenes contain a decent amount of usable texture and different sets were created by translating, rotating about the y-axis and rotating about the x-axis. Other office scenes, where the camera captures objects in both the foreground and the background and where the camera is lifted and rotated whilst focussed on an office desk and chair combo. \\
-
-Some out-door scenes were also captured around the university. They are captured with both rotation and translation camera movements and are also labelled as being susceptible to texture confusion.
-
-\section{Analysis Tools}
+\section{Tools}
 \label{ToolsSection}
+\input{chapters/Experiments/Experiments/Tools}
 
-In order to test different registration methods. Algorithms were written in C/C++ using both Visual Studio (2012 and 2015) on a Windows (7 \& 10) machine and code-blocks 16 on an Ubuntu machine. All source code is made available online at: https://github.com/lukes611/phdThesis. In order to measure registration algorithms we use the error metrics described in the \ref{metricsSection} section.  
+%the basic tracking stuff
+\input{chapters/Experiments/FVR/BasicTracking}
 
-\section{Algorithms}
-\label{AlgorithmsSection}
+\section{Monocular Camera Translation Tracking}
+\section{Speed Improvement Tests}
+\input{chapters/Experiments/FVR/SpeedImprovements}
 
-\subsection{3D Reconstruction}
+\section{FVR vs. Existing Techniques}
+\subsection{Algorithms} \label{AlgorithmsSection} \input{chapters/Experiments/FVR/Algorithms}
+\input{chapters/Experiments/FVR/SOTA}
+\input{chapters/Experiments/FVR/SOTANoise}
 
-Different 3D-registration algorithms were implemented to test the Fourier Volume Registration (FVR) method. Feature matching methods are important to compare with because they are still dominant and very successful in image processing and computer vision. In this research we show that FVR is competitive with feature matching methods whilst beating them in certain contexts (such as little textured scenes or scenes where texture confusion may occur). \\ 
+%PTPTPT
 
-We test with both 2D feature matching and 3D feature matching. In 2D feature matching, the features are found and matched between a pair of 2D-images, then RANSAC is used with the corresponding matches and true 3D point to compute pose. The pose is then used to reconstruct the scene. We found that SURF performed best out of the other feature matching methods, so SURF was used in experiments. The 2D feature matching method is limited as it cannot register frames which have too few features or frames which contain texture confusion. It is also not able to handle wide base-lines. \\
+plane tree is compared with sota mesh compression - proven by my paper published and in terms of compressing 3d reconstructions we compare it to the common OT representation. \\
 
-We also test 3D-feature matching using an implementation of SIFT in 3D. This algorithm was tested and written in C/C++ and like the 2D counterpart, is also susceptible to failed registration in scenes with too few features and texture confusion but it is able to handle wide base-lines since it works in 3D. //
+Experiments reveal the Plane-Tree outperforms the original octree and outperforms some state of the art transform methods at low-bitrates. We compare our method with several state of the art algorithms which correspond to transform based methods \cite{Khodakovsky00Progressive,Bayazit103DMesh} and low-bitrate codecs \cite{Peng10Feature}. To compare algorithms quantitatively, we employ rate distortion graphs. Since our algorithm is lossy, this indicates the amount of distortion (in the decoded model compared with the original) given a particular bitrate. To measure distortion, we employ the mean error and root mean squared error, to measure bitrate we use the number of bits per vertex. All measurements are scaled by the main diagonal of the input model. We also provide qualitative results showing the effectiveness of our method. \\
 
-Another algorithm used in experiments is Iterative Closest Point or ICP. This method has become very popular in 3D reconstruction and works well on most scene types. One disadvantage is that this method may get stuck in a local minima and fail to register correctly. This typically occurs when registering against wide-baselines. \\
+In experiments we use 4 models which are popular amongst researchers in the area. These models are chosen both because they are readily available and because there are available results for these models generated by other state of the art methods. Figure \ref{fig:MODSUSED} shows each model along with its reference name and number of vertices. \\
 
-Another algorithm present in the experiments is Principal Components Analysis (PCA). This algorithm is used to find the mean and principal components of a multi-dimensional data set. This is useful for registration purposes as it works on wide-baselines, is very fast and provides additional information about a scene. The downside is that it is very susceptible to noise and misaligned data. The proposed FVR method makes use of information from PCA so it is important to compare the two to find out what improvements are made by FVR over PCA. \\
-
-The final algorithm tested is the proposed FVR algorithm, which uses both PCA and Fourier Phase Correlation to find the registration transformation between two 3D data-sets as described in \ref{FullRecovery3DSection}. This algorithm was proposed to handle general transformations in terms of rotation, scaling and translation. It was also designed to be able to handle noisy data, data with texture-confusion and data with little or no texture. This makes it a viable option in the 3D registration and pose estimation research areas.
-
-\section{Qualitative Experiments}
-
-\label{QualExperimentsSection}
-
-Qualitative experiments were performed by using different algorithms to generate 3D reconstructed scenes. The scenes include some indoor and out-door scenes. They are analysed visually in the results section. 
-
-\section{Quantitative Experiments}
-
-\subsection{Pose Estimation Experiments}
-
-Quantitative experiments were performed by registering multiple frames from the different scenes mentioned in the algorithms section. We use the test-data mentioned, and estimate pose for each frame. Results from a few metrics were gathered, including: Mean Squared Error, Percent Match and Hausdorff Error. We found that measuring the Hausdorff error relative to the Hausdorff error between the two un-registered frames provided the most clear indication of performance and accuracy. We provide results for each of the raw measurements in the Appendix \ref{RawQuantitative1}.
-
-
-\subsection{Camera Movement Experiments}
-
-Experiments are performed where by the camera is translated or rotated and the registration transform is compared to the true camera movement and the error between the true and computed camera movement is presented. These experiments were performed to show the FVR's ability to register accurate camera movements in the presence of noise.
-
-\subsection{Noise Experiments}
-
-Experiments determining each algorithm's robustness to noise are performed similarly to pose estimation experiments in that specific transforms are applied to real data. Each algorithm's ability to register against such transforms is evaluated. However, in these tests we apply different amounts of noise to data and compare each registration to that of the registration of data minus the noise. Raw results are provided in Appendix \ref{RaqQualitative2}
+\section{Plane-Tree vs. Octree}
+\input{chapters/Experiments/PT/OT}
+\section{Plane-Tree vs. Existing Techniques}
+\input{chapters/Experiments/PT/SOTA}
+\section{Plane-Tree: Qualitative Results}
+\input{chapters/Experiments/PT/Qualitative}
+\section{Plane-Tree: Reconstruction Compression}
+\input{chapters/Experiments/PT/Recon}
 
 
-\section{Data Representation Experiments}
 
-Data representation experiments compare the compression of the Octree with the proposed data representation method. The mean squared error is used and graphs showing bit-rate vs error are shown comparing both methods.

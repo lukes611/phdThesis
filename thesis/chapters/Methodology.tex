@@ -3,24 +3,29 @@
   \qauthor{Thomas Edison}
 \end{savequote}
 \makeatletter
-\chapter{Fourier Volume Registration}
+\chapter{Methodology}
+
+
+\section{Fourier Volume Reconstruction}
 \label{FVRSectionA}
 
 Here we present several techniques used to extract dense 3D reconstruction from image/video data. In the first section we describe techniques in addition to Fourier volume registration. These include the recovery of translation, y-axis rotation and scale information as well as a technique for the recovery of a so called 7 degrees of freedom transform. \\
 
 We also list notable speed-ups for volume registration which reduce the amount of processing by over a third. After this, a full 3D reconstruction technique based on the principles of phase correlation is presented. Then we also present two novel reconstruction data representations which may be used to efficiently represent and fuse 3D reconstructions. Lastly, different sensor inputs are discussed and some conclusions are given about the usefulness of this technique in the context of these sensors is presented.
 
+\subsection{Volume Registration}
+\input{chapters/Methodology/FVR/VolumeRegistration}
+\subsection{Fourier Volume Reconstruction}
+\input{chapters/Methodology/FVR/FourierVolumeReconstruction}
+\subsection{Monocular FVR}
+\input{chapters/Methodology/FVR/Monocular}
+\subsection{Improving Efficiency in FVR}
+\input{chapters/Methodology/FVR/Efficiency}
+\subsection{Full 3D Rotation Recovery and Reconstruction}
+\input{chapters/Methodology/FVR/3DReconstruction}
 
-\section{Volume Registration}
-\input{chapters/FVR/VolumeRegistration}
-\section{Fourier Volume Reconstruction}
-\input{chapters/FVR/FourierVolumeReconstruction}
-\section{Monocular FVR}
-\input{chapters/FVR/Monocular}
-\section{Improving Efficiency in FVR}
-\input{chapters/FVR/Efficiency}
-\section{Full 3D Rotation Recovery and Reconstruction}
-\input{chapters/FVR/3DReconstruction}
+\section{Plane-Tree Data Compression}
+\input{chapters/Methodology/DataRepresentation/DataRepresentation}
 
 
 \section{Conclusion}

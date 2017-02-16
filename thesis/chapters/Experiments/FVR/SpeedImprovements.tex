@@ -1,38 +1,3 @@
-\begin{savequote}[8cm]
-  ``I've always believed that if you put in the work, the results will come.''
-  \qauthor{Michael Jordan}
-\end{savequote}
-\makeatletter
-\chapter{Results}
-\label{ResultsSection}
-
-\section{Results}
-
-In this section results are presented and discussed. First we present qualitative results comparing the proposed FVR method with other 3D-Reconstruction, then we present some qualitative results.  
-
-%plan:
-%	qualitative results:
-%		old -towrite
-%		new -toadd
-%	quantitative:
-%		camera movement experiments -towrite
-%		pose estimation experiments -done
-%		noise experiments
-			% -toadd
-%	data representation experiments -toadd
-		
-		
-
-\section{Qualitative Results}
-
-\input{chapters/results/qualitative}
-
-\section{Quantitative Results}
-
-\input{chapters/results/quantitative}
-
-\section{3D Phase Correlation Performance}
-
 The performance of the FVR method is shown theoretically in this section. The size of the volumes being registered is defined as $N^3$ and each frame is sampled at a resolution of $W$ $\times$ $H$. The projection process requires $12WH$ operations whilst re-sampling the point cloud requires $2WH$ operations. The Volume Registration process, $VolumeRegister{\theta \varphi t_x t_y t_z}(V_1, V_2)$ consists of 2 $\times$ Hanning windowing processes, 2 $\times$ 3D FFTs, 2 $\times$ volume-logs, 2 $\times$ log-spherical transforms, 2 $\times$ phase correlation processes and 1 $\times$ linear transformation and peak finding. 
 
 The Hanning windowing function requires 26 operations. The 3D FFT has complexity of $3N^3\log{N}$, the log and log-spherical transform functions require 3 and 58 operations per voxel respectively. Multiplying two frequency spectra together and transforming a volume requires 15 and 30 operations per voxel respectively. Finding the peak value requires $2N^3$ operations. The complexity in terms of number of operations for the phase correlation process is given in Eq. \ref{eqn:PCFULLPERFORMANCE} This process requires 2 $\times$ 3D FFTs, 1 $\times$ frequency spectra multiplication, and 1 $\times$ peak finding operation. 
@@ -44,7 +9,6 @@ The total complexity can then be found by taking into account the projection and
 6N^3 + 28WH + 18(N^3\log{N}) + 230
 \end{equation}
 
-\subsection{Analysis of Speed Improvement}
 
 To compare performance of the generic volume registration method with the speed up, we use the complexity defined in equation \ref{eqn:FULLPERFORMANCE}. Here, we ignore the cost of projecting the depth map. The 3D DFT has complexity $3N^3log(N)$. This is the first step (see figure \ref{fig:PIPELINE3}), the next is the spherical-map transform which is complexity $45N^3$. If processed on the GPU the performance becomes 45 operations per voxel assuming that one voxel is assigned to one unit of processing. A 3D transform is 30 operations per voxel, 2D phase correlation requires 15 operations to multiply the frequency spectra and $2N^2log(N)$ operations to do the 2D FFT. Finally a projection map transform requires 1 operation per voxel. \\
 
@@ -63,10 +27,3 @@ than the original Fourier based volume registration approach. This is due to the
 \caption{Comparison of performance between volume registration and the proposed speed up for different volume sizes.}
 \label{fig:perfComp}
 \end{figure}
-
-\section{Data Representation Experiments}
-
-\input{chapters/results/datarepresentation}
-
-
-\section{Conclusion}

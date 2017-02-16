@@ -1,0 +1,27 @@
+Figure \ref{fig:OTEXPS} shows rate-distortion graphs comparing the Plane-Tree with the Octree compression method. In these rate-distortion graphs we use the mean error between the decoded and input model as the distortion metric. Results show that for the Bunny and Fandisk experiments (figures \ref{fig:OG_BUNNY} and \ref{fig:OG_FANDISK}) the Plane-Tree has better quality for a given bitrate compared to the Octree. It is also evident that the Octree is unable to reach the level of quality the Plane-Tree reaches. \\
+
+In the Horse model graph in figure \ref{fig:OG_HORSE} there is some overlap in distortion levels. This shows, for a given level of quality the Octree requires around 8 times more storage space compared with the Plane-Tree. \\
+
+\begin{figure}[t!] 
+        \centering
+        \begin{subfigure}[b]{2.8in}
+                \includegraphics[width=2.5in]{images/results/compression/OTbunny}
+                \caption{Bunny Model}
+                \label{fig:OG_BUNNY}
+        \end{subfigure}
+        
+        \begin{subfigure}[b]{2.8in}
+                \includegraphics[width=2.5in]{images/results/compression/OTFandisk}
+                \caption{Fandisk Model}
+                \label{fig:OG_FANDISK}
+        \end{subfigure}
+        
+        \begin{subfigure}[b]{2.8in}
+                \includegraphics[width=2.5in]{images/results/compression/OTHorse}
+                \caption{Horse Model}
+                \label{fig:OG_HORSE}
+        \end{subfigure}%
+
+       \caption{Rate-distortion graphs comparing the Plane-Tree with the Octree.}
+       \label{fig:OTEXPS}
+\end{figure}
