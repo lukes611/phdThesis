@@ -1,48 +1,54 @@
 
 CH: Fourier Pose Registration
 Introduction
-Volume Registration: (first paper)
-	Translation Estimation
-	Y-Axis Rotation + Scale Estimation
-Fourier Volume Registration
-	Pipeline
-	Algorithm
-	Experiments:
-		Data
-		Qualitative
-		Camera Movement Tests
-		Moving Object Tests
-Monocular FVR:
-	Methods of Depth Information Capture
-	Data
-	Experiments:
-Speed Improvements:
-	spherical map transform
-	projection-map transform
-	Experiments
-Full 3D Recovery of rotation:
-	pipeline
-	Algorithm
-	Experiments:
-		Data
-		Qualitative
-		Camera Movement Tests
-		Moving Object Tests
-
-
-CH: Plane-Tree
-Octree Decomposition
-Coding
-Subdivision
-Leaf Nodes
-Compression + Decompression
-
-CH: Plane-Tree Experiments
-Data
-Tools
-Algorithms
-Results
-
-
+Literature Review:
+	Background
+		Feature Matching
+		Phase Correlation
+		Data Representations
+		Depth Data Generation
+	Feature Matching and Ransac
+	ICP
+	Direct Optimization
+	3D Feature Matching
+	Principal Components Analysis
+	Further Optimization
+	Summary
+Methodology:
+	Fourier Volume Registration
+		Volume Registration:
+			Translation Estimation
+			Y-Axis Rotation + Scale Estimation
+		Fourier Volume Registration:
+			Pipeline
+			Algorithm
+		Monocular FVR:
+			Depth Capture
+		Speed Improvements
+			Spherical Map Transform
+			Projection Map Transform
+		Full 3D Reconvery of rotation
+			Pipeline
+			Algorithm
+	Plane-Tree:
+		Introduction to Octree
+		Subdivision
+		Coding + Plane Representation
+Experiments + Results:
+	Test Data
+	Analysis Tools
+	Camera Translation Tracking
+	Camera Rotation Tracking
+	Object Motion Experiments
+	Reconstructed Scenes
+	Monocular Camera Translation Tracking
+	Speed Improvement Tests
+	FVR vs. Existing Techniques
+	Plane-Tree vs. Octree
+	Plane-Tree vs. Existing Techniques
+	Plane-Tree Qualitative Results
+	Plane-Tree 3D Reconstruction Compression
+	
+	
 
 
