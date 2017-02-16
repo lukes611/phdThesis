@@ -2,7 +2,7 @@
 In 3D reconstruction, dense depth data is very important, without it there is no dense 3D reconstruction, only sparse mapping. This section introduces some techniques and research on different methods (both hardware and software) of depth data generation. In the first section the use of sensors which are capable of generating depth data is introduced. Next, methods using stereo camera pairs are discussed. Finally, monocular techniques are discussed. \\
 
 
-\subsection{Sensors}
+\subsubsection{Sensors}
 
 In 3D reconstruction, it is often ideal to use specialized sensors which capture reliable and dense depth data on a per pixel basis. One such camera is the RGB-D (Red, Green, Blue \& Depth) camera. These sensors are becoming more accurate and less expensive and are now found in mobile technologies. \\
 
@@ -15,7 +15,7 @@ There is no doubt that these sensors are the easiest way to compute ready dense 
 Some 3D reconstruction techniques use the approach of dense mapping and tracking via depth sensors and lasers. These approaches usually compute feature matches to align the frames or some sort of error minimization function.
 
 
-\subsection{Stereo Cameras}
+\subsubsection{Stereo Cameras}
 
 \label{StereoMethodsSection}
 
@@ -63,7 +63,7 @@ Yang \cite{Yang14Pattern} first developed a non-local disparity calculation algo
 
 
 
-\subsection{Monocular Approaches}
+\subsubsection{Monocular Approaches}
 
 Monocular depth generation includes any and all systems which use a single colour or grey-scale camera to generate dense depth data. Dense depth data is often computed using consecutive frames of a video sequence. If a relationship between frames is known, then the depth data may be either triangulated (given camera pose) or computed as in other stereo methods by calibrating image pairs first. The most popular technique is the computation of the essential matrix in order to perform stereo calibration. Once stereo calibration is performed, generic disparity computation methods (reviewed in \ref{StereoMethodsSection}. \\
 

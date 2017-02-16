@@ -4,6 +4,61 @@ In this section we introduce two data representations for recording 3D reconstru
 
 In this section we explain Octree decomposition. This strategy forms a cube shaped space around some 3D volumetric data. A data representation is then computed using the location and size of the cube. A measurement system is used to decide if the current data representation fits the data within the cube well or not. If so, then the data representation is used instead of the data. If not, the cube is broken down into 8 sub-cubes and the process is repeated. At each level of decomposition, the data representation achieves finer detail, but more nodes must be stored which means less compression. An example of the Octree is illustrated in figure [INSERT IT HERE].
 
+\subsubsection{Octree Description}
+\label{OTDesc}
+
+In order to understand the OT structure, the Quad-Tree (QT) is explained first. This is done because the QT is the 2D equivalent of the OT and is easier to explain. The QT is a hierarchical data structure used for processing and compressing 2D data. Figure \ref{QuadtreeExample} shows an example of a QT used to represent an image. In this figure, the original image is on the left. The QT first uses a single coloured square to represent the entire image, then using some error metric it decides whether or not to, a) represent the image more accurately using more memory or b) stop decomposition and represent the image with a single colour. If option b) is chosen, the image will look like the second left picture. If option a) is chosen, the image is divided into four sub-images each with its own colour. From here the whole process begins again, with each sub-image given the same options. The final product of the QT is shown on the far right in figure \ref{QuadtreeExample} and a visualization of a QT hierarchy is shown in figure \ref{QuadTreeHierarchy}.
+\begin{figure}[!h]
+\centering
+\includegraphics[width=12cm]{images/ch2/quadtreeexample}
+\caption{Quadtree Image Representation, left to right: Original Image, 1st Level of Decomposition, 2nd Level of Decomposition, 3rd Level of Decomposition, QT codec Image.}
+\label{QuadtreeExample}
+\end{figure}
+\begin{figure}[!h]
+\centering
+\includegraphics[width=6cm]{images/ch2/QuadTreeHierarchy}
+\caption{A visualization of the QT hierarchy}
+\label{QuadTreeHierarchy}
+\end{figure}
+
+The OT works similarly to the QT, however, instead of beginning with a square encompassing the entire region, a cube is used to enclose a 3D space. Similarly to the QT, an error metric is used to decide whether to split up the space or leave it unchanged. Each split operation divides each coordinate ($x,y,z$) by two, leaving 8 subspaces. Figure \ref{OctreeExample} shows this decomposition. The further each cube is split, the more the OT resembles the model being compressed. In the QT and OT, nodes which have not been split are called leaf nodes and the function which decides whether a node should be split is called the leaf criterion. 
+
+\begin{figure}[!h]
+\centering
+\includegraphics[width=16cm]{images/ch2/OctreeExample}
+\caption{Visualization of OT Decomposition}
+\label{OctreeExample}
+\end{figure}
+
+
+The goal of the OT and the QT is to store the size and attributes of each node implicitly. There are two main methods of representation, a packed traversal of the tree and a linear tree. The packed traversal method stores the hierarchy using a pre-defined traversal of the tree, and typically follows one of two orderings. These are, breadth-first traversal and depth-first traversal, these orderings are shown in figure \ref{TreeTraversalExample}. The depth-first traversal starts at the root, then works it's way down, top to bottom, then left to right of the tree. In essence, it travels to a node's children before considering its neighbours. In contrast, the breadth-first traversal goes to all nodes which are at the same depth before continuing on to lower levels. 
+
+\begin{figure}[!h]
+\centering
+\includegraphics[width=12cm]{images/ch2/TreeTraversalExample}
+\caption{Tree Traversals, Left: Depth First Traversal, Right Breadth First Traversal}
+\label{TreeTraversalExample}
+\end{figure}
+
+Encoding these two tree traversal methods requires one nibble (4 bits) for a QT node, and one byte (8 bits) for an OT node, where the bits represent the structure of the sub-node. For example, the QT node bit sequence, $1001_2$ means that the node has two children (corresponding to the ones), the sequence $0000_2$ means the node is a leaf node. Each bit position indexes a child node using a pre-determined ordering. An example of a possible ordering for a quadrant and an octant is shown in figure \ref{ChildOrderExample}, both breadth-first and depth-first traversals use the same index method, the difference lies only in the order which nodes are visited. 
+
+\begin{figure}[!h]
+\centering
+\includegraphics[width=12cm]{images/ch2/ChildOrderExample}
+\caption{A possible child ordering for the QT (left), and the OT (right).}
+\label{ChildOrderExample}
+\end{figure}
+
+The linear tree representation stores each leaf node individually. Each leaf is encoded as the pathway from the root to the leaf itself. This method was investigated in the 1980s \cite{Gargantini82Effective,Yufei88Octcodes}, but has not been used much in modern compression algorithms due to its inefficiency compared with the packed traversal method. An example of this structure is shown in figure \ref{LinearCellCodeRepresentation}, where each node: $a$, $b$, $c$, $\dots$ , $m$  is encoded as a variable length traversal path. The QT and OT are widely used in image \cite{Varma12Application} and 3D compression \cite{Schnabel06Octree}. Hanan Samet \cite{Samet88Fund1} presents an introduction to both of these structures, he also describes both tree storage methods in depth. 
+
+\begin{figure}[!h]
+\centering
+\includegraphics[width=12cm]{images/ch2/LinearCellCodeRepresentation}
+\caption{A Linear Tree Code Representation Example}
+\label{LinearCellCodeRepresentation}
+\end{figure}
+
+
 
 \subsection{3D ShadeTree Coding}
 
