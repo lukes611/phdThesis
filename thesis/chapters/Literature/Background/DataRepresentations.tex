@@ -7,7 +7,7 @@ Mesh data is popular due to its simplicity and integration into GPU technology. 
 
 For processing purposes, polygons are usually triangulated, which means all polygons are sub-divided into triangles. Any mesh may be triangulated, an example of this is provided on the right hand side in figure \ref{MeshExamples}. In a typical data representation, vertices are stored in a list and triangles are stored using three references to this list. The number of bits per vertex (bpv) is typically used to measure storage requirements for mesh data. \\
 
-\begin{figure}[!h]
+\begin{figure}[!htb]
 \centering
 \includegraphics[width=6cm]{images/ch2/PolygonMeshExample}
 \includegraphics[width=6cm]{images/ch2/TriangleMeshExample}
@@ -27,7 +27,7 @@ A lossy wavelet based compression system was proposed by Khodakovsky et al \cite
 
 The point cloud structure stores a list of 3D points. This representation can be thought of as discrete samples of the surface of a real 3D object. Figure \ref{PointCloudExample} shows an example. This structure can be sampled using a variety of methods. These methods include both dense and sparse sampling, and sample steps can be either regular or irregular. Along with each vertex, a variety of attribute information can be stored. Point cloud data may be obtained via a 3D scanner or RGB-D camera. 
 
-\begin{figure}[!h]
+\begin{figure}[!htb]
 \centering
 \includegraphics[width=6cm]{images/ch2/PointCloudExample}
 \caption{A densely sampled point cloud of the Stanford Bunny.}
@@ -37,14 +37,30 @@ The point cloud structure stores a list of 3D points. This representation can be
 
 \subsubsection{3D Volume}
 
-In this representation, points are sampled into a 3D cubic space of sub-cubes called voxels. Such a space may have separate dimensions for width, height and depth or the space may be a true cube. In the context of 3D reconstruction, this data-representation is common and is used to store boolean values describing the occupancy of a space \cite{Rusinkiewicz02Real}. A visualization of a 3D volume showing a reconstruction is shown in figure [WARNING: Insert Graphic here]. This data type is useful because it allows for quick updates. Downsides include, large storage space and the fact that 3D space represented cannot be dynamically changed without significant cost. \\
+In this representation, points are sampled into a 3D cubic space of sub-cubes called voxels. Such a space may have separate dimensions for width, height and depth or the space may be a true cube. In the context of 3D reconstruction, this data-representation is common and is used to store boolean values describing the occupancy of a space \cite{Rusinkiewicz02Real}. A visualization of a 3D volume showing a reconstruction is shown in figure \ref{fig:VolExamples}. This data type is useful because it allows for quick updates. Downsides include, large storage space and the fact that 3D space represented cannot be dynamically changed without significant cost. \\
+
+\begin{figure}[!htb]
+\centering
+\includegraphics[width=6cm]{images/literature/bunnyVol32}
+\includegraphics[width=6cm]{images/literature/bunnyVol128}
+\caption{Left: Bunny sampled into a ${32}^3$ volume, Right: Bunny sampled into a ${128}^3$ volume. Both images credit: \cite{Passalis07General}}
+\label{fig:VolExamples}
+\end{figure}
 
 
 \subsubsection{Signed Distance Functions}
 
 A Signed Distance Function \cite{Curless96Volumetric} is a function which describes a 3D geometric space. Such a function takes a 3D location as $x,y,z$ coordinates as input and returns a single number value. The value describes the geometric detail of a particular object. Zero values are surface interfaces, positive values increase relative to the distance to the nearest surface and negative values represent the interior of the object. \\
 
-SDFs may take the form of an equation or may be made discrete by means of discretization. In the context of 3D reconstruction we refer to the discrete SDF, an example of which is show in figure [WARNING : insert a figure]. The SDF may be visualized by converting it to a mesh and rendering (by means of the marching cubes algorithm \cite{Cubes87High}) or by directly ray-casting the structure \cite{Parker98Interactive}. In the case of ray-casting, there is a significant advantage over the volumetric representation, that is the step size may be adjusted dynamically reducing render time. \\
+SDFs may take the form of an equation or may be made discrete by means of discretization. In the context of 3D reconstruction we refer to the discrete SDF, an example of which is show in figure \ref{fig:SDFExample}. The SDF may be visualized by converting it to a mesh and rendering (by means of the marching cubes algorithm \cite{Cubes87High}) or by directly ray-casting the structure \cite{Parker98Interactive}. In the case of ray-casting, there is a significant advantage over the volumetric representation, that is the step size may be adjusted dynamically reducing render time. \\
+
+
+\begin{figure}[!htb]
+\centering
+\includegraphics[width=6cm]{images/literature/SDFExample}
+\caption{Distance Field Slices of the Stanford Bunny \cite{Sigg03Signed}.}
+\label{fig:SDFExample}
+\end{figure}
 
 Canelhas \cite{Canelhas12Scene} did a masters thesis on an approach for camera tracking which makes use of an SDF. Similar to the work by Bylow et al \cite{Bylow13Real} the project concentrates on object detection and recognition in an SDF although little evaluation was performed. Additionally storage was not considered. Kubacki \cite{Kubacki12Registration} proved the SDF is useful in estimating camera pose but only showed proof using synthetic data performing no comparative evaluation. Ren and Reid \cite{Ren12Unified}  demonstrated SDF based object tracking based on prior known models. \\
 
@@ -53,7 +69,15 @@ Elfes et al \cite{Elfes87Sensor} use a Baysian probability of occupancy measure 
 
 \subsubsection{Image Based Representations}
 
-3D reconstructions may also be represented by means of elevation maps \cite{Herbert89Terrain} and multi-level surface maps \cite{Triebel06Multi} however these methods cannot store known and unknown areas of occupancy in a volumetric way. Additionally compression is often not considered and these methods do not have the search capabilities which the Octree and volumetric representations have, nor the fine detail available in a mesh or point cloud representation. An example of an elevation map is shown in figure [WARNING: insert figure here]\\
+3D reconstructions may also be represented by means of elevation maps \cite{Herbert89Terrain} and multi-level surface maps \cite{Triebel06Multi} however these methods cannot store known and unknown areas of occupancy in a volumetric way. Additionally compression is often not considered and these methods do not have the search capabilities which the Octree and volumetric representations have, nor the fine detail available in a mesh or point cloud representation. An example of an elevation map is shown in figure \ref{fig:HeightMapExample}.\\
+
+
+\begin{figure}[!htb]
+\centering
+\includegraphics[width=6cm]{images/literature/HeightMap}
+\caption{A Height Map of the Stanford Bunny.}
+\label{fig:HeightMapExample}
+\end{figure}
 
 Gu et al \cite{Gu02Geometry} devised a solution for representing 3D models as 2D images which are then compressed using state of the art image compression methods (based on wavelets). To form this representation, the mesh is cut along a network of edge paths, opening the mesh into a topological disk, which is then sampled onto a 2D grid. Each pixel in the image has a corresponding coordinate in the model, with pixel neighbourhoods describing connectivity. Comparisons with the method by Khodakovsky et al reveal the geometry image codec does not have as high compression performance. \\
 

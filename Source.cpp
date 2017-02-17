@@ -53,13 +53,35 @@ string namesList[20] = {
 };
 
 
-
-
-
 int main(){
     //read in bunny
-    //put into volume
-    //view volume
+    SIObj ob; ob.open_obj(LCPPDATA_DIR + string("/obj/bunny_simplified2.obj"));
+    ob.normalize(256.0f);
+    vector<R3> pnts;
+    for(int i = 0; i < ob._triangles.size(); i++)
+    {
+        SI_FullTriangle T = ob.getTriangle(i);
+        T.rasterize(pnts, 0.25);
+    }
+    VMat a(256, pnts, 0.0f, 1.0f);
+    a.box_filter(2);
+    Mat im = Mat::zeros(Size(256,256), CV_8UC1);
+    //put into picture
+    for(int z = 0; z < 256; z++)
+    {
+        for(int x = 0; x < 256; x++)
+        {
+            int dist = 0;
+            for(int y = 255; y >= 0; y--, dist++)
+            {
+                if(a.at(x,y,z) > 0.5f){ im.at<unsigned char>(z,x) = dist; break; }
+            }
+        }
+    }
+
+    //view im
+    imshow("i",im);
+    waitKey();
     return 0;
 }
 
