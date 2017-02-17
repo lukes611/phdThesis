@@ -68,39 +68,41 @@ Monocular Feature based SLAM systems use feature matches to estimate camera pose
 \subsection{Feature Matching and RANSAC}
 \label{FMANDFM}
 
-Feature matching along with RANSAC  may be used to compute the Fundamental/Essential matrices which leads to camera pose estimates. However, the computation of the correct Fundamental matrix is typically difficult. Furthermore, the intrinsic camera parameters must be known prior in order to use such a technique, else noise destroys the ability to accurately estimate camera pose. \\
+Feature matching together with RANSAC may be used to compute the Fundamental and Essential matrices which leads to camera pose estimates. The process of estimating the Fundamental matrix simple, but in practice noise often makes accurate estimation difficult. Furthermore, the intrinsic camera parameters must be known prior in order to apply such a technique, else noise decimates the ability to accurately estimate camera pose and calibrate frames for stereo correspondence. \\
 
-Another, more common way to use feature matching with RANSAC \cite{Fischler81Random,Chen99Ransac} is to compute the camera pose directly using RGB-D data. As covered in section \ref{DepthDataGenSection}, dense depth information may be computed using monocular, stereo or sensor based camera set-ups. This method begins by computing feature matches between two given frames. These matches along with the 3D location of each corresponding match (projected using the dense depth data) are injected into the popular Random Sample Consensus Algorithm commonly known as RANSAC. RANSAC is an iterative algorithm which works by repeatedly selecting a subset of input data, computing a model on the subset and testing that model on the global superset. During this repeated process, the subset with the best classification (lowest error or greatest strength model) is chosen for the final model. RANSAC is useful because it is capable of filtering out outliers. \\
+Another, more common way to use feature matching with RANSAC \cite{Fischler81Random,Chen99Ransac} is to compute the camera pose directly using multi-frame RGB-D data. Alternatively (as mentioned in section \ref{DepthDataGenSection}), dense depth information may be recovered using monocular and stereo camera set-ups as well. \\
 
-In the case of camera pose estimation, the subset is used to compute the camera pose (using singular value decomposition) and the camera pose which minimizes the global error is chosen as the best camera pose. Here we describe how to compute the camera pose given a set of 3D points matched from one frame to another. Given two identical length arrays of 3D points, $P$ and $Q$ where, for each index $i$, $P_i$ matches best with $Q_i$. Next, we compute covariance matrix $X$ based on $P$, $Q$ and their mean values. The calculation for $X$ is shown in figure \ref{eqn:CovarMatForFMRansac}.
+This method first computes feature matches between two given frames. These matches along with the 3D location of each corresponding match (projected using the dense depth data) are used as input for the popular RANSAC algorithm.\\
+
+RANSAC is an iterative algorithm which works by repeatedly selecting a subset of input data, computing a model on the subset and testing that model on the global superset. During this repeated process, the subset with the best classification (lowest error or greatest strength model) is chosen for the final model. RANSAC is useful because it is an effective and capable algorithm for filtering out outliers. \\
+
+In the case of camera pose estimation, the subset is used to compute the camera pose (using singular value decomposition) and the camera pose which minimizes the global error is chosen as the best camera pose. Here we describe how to compute the camera pose given a set of 3D points matched from one frame to another. Given two identical length arrays of 3D points, $P$ and $Q$, for each point in $P$, $P_i$ matches best with point $Q_i$. The covariance matrix $X$ is then computed based on $P$, $Q$ and their mean values. The calculation for $X$ is shown in figure \ref{eqn:CovarMatForFMRansac}.
 
 
 \begin{equation} \label{eqn:CovarMatForFMRansac}
 X = \sum_{i=1}^{N} (P_i - P_{mean}) \times (Q_i - Q_{mean})^T
 \end{equation}
 
-Given the covariance matrix $X$ we compute its singular value decomposition matrices $W$, $U$ and $V$ (was usv). Then the rotation part of the pose may be computed as $R = V^T \times U^T$. The camera movement can be computed by $T = -R \times P_{mean} + Q_{mean}$. If scale must be computed, it can be computed as $S = (Q_i - Q_{mean}) / (R \times(P_i - P_{mean}))$ for any $i$. \\
+Given the covariance matrix $X$ we compute its singular value decomposition matrices $W$, $U$ and $V$. Then the rotation part of the pose may be computed as $R = V^T \times U^T$. The camera movement can be computed by $T = -R \times P_{mean} + Q_{mean}$. If scale must be computed, it can be computed as $S = (Q_i - Q_{mean}) / (R \times(P_i - P_{mean}))$ for any $i$. \\
 
-Computing 3D reconstructions using feature matching is often preferred as close competitor ICP (Iterative Closest Point) is often unnecessary and expensive \cite{Endres12Evaluation}. However, the computation of pose without ICP with feature matching only is non-trivial because the system may suffer from the following issues:
+Computing 3D reconstructions using feature matching is often preferred as close competitor ICP is often unnecessary and expensive \cite{Endres12Evaluation}. However, the computation of pose without ICP with feature matching only is still non-trivial because of the following issues:
 
 
 \begin{itemize}
-\item Synchronization problems between the RGB camera and Infrared camera shutters
-\item depth jump interpolation - the interpolation of computed depth at object boundaries
-\item feature matches often occur at depth jumps
+\item Synchronization problems between the RGB camera and infra-red camera shutters cause inaccurate pose estimates. 
+\item Feature matches often occur at depth jumps (the interpolation of computed depth at object boundaries). This also leads to inaccurate pose estimates.
 \end{itemize}
-
 
 
 \subsubsection{RGB-D SLAM}
 
-Endres et al \cite{Endres12Evaluation} presented a dense 3D reconstruction technique using RGB-D data from the Kinect sensor based on feature matching and RANSAC. They also evaluated their technique under different illumination and camera movement speed conditions. It is able to operate at near real time speeds in small in-door environments. This method begins by feature matching RGB images across frames. Using the projected 3D points available for each pixel in the depth map, RANSAC \cite{Fischler81Random,Huttenlocher91Fast} is used to compute the camera pose across frames. These poses are optimized globally using the $g^2$o graph optimizer, the Octomap representation \cite{Wurm10Octomap} is used to voxelize the 3d points before storing them in a volumetric occupancy map. Since this system is based on feature matching, Endres et al evaluate 3 different feature matching techniques: SIFT \cite{Lowe04Distinctive} , SURF \cite{Bay06Surf,Bay08Speeded} and ORB \cite{Rublee11Orb}. ORB feature matching is tested because it is faster than SIFT and SURF with slightly less accuracy, the authors also evaluate a GPU implementation of SIFT \cite{Wu07Siftgpu}. Endres et al evaluate their algorithm using their own benchmark \cite{Sturm11Towards}. Results show it can handle up to 50 degrees of rotation per second, and speeds of up to 43 centimetres per second.  \\
+Endres et al \cite{Endres12Evaluation} presented a dense 3D reconstruction technique using RGB-D data from the Kinect sensor based on feature matching and RANSAC. They also evaluated their technique under different illumination and camera movement speed conditions. It is able to operate at near real time speeds in small in-door environments. This method begins by feature matching RGB images across frames. Using the projected 3D points available for each pixel in the depth map, RANSAC \cite{Fischler81Random,Huttenlocher91Fast} is used to compute the camera pose across frames. These poses are optimized globally using the $g^2$o graph optimizer (see section \ref{Sec:G20}), the Octomap representation \cite{Wurm10Octomap} is used to voxelize the 3d points before storing them in a volumetric occupancy map. Since this system is based on feature matching, Endres et al evaluated three different feature matching techniques: SIFT \cite{Lowe04Distinctive} , SURF \cite{Bay06Surf,Bay08Speeded} and ORB \cite{Rublee11Orb}. ORB feature matching is used because it is faster than SIFT and SURF with slightly less accuracy, the authors also evaluate a GPU implementation of SIFT \cite{Wu07Siftgpu}. Endres et al evaluate their algorithm using their own benchmark \cite{Sturm11Towards}. Results show it can handle up to 50 degrees of rotation per second, and speeds of up to 43 centimetres per second.  \\
 
 
-This system is divided into a front-end and a back-end. The front-end performs feature detection, matching and sensor pose estimation via the RANSAC method whereas the back-end performs non-linear pose optimization using the $g^2o$ optimization procedure   and integrates these results into an occupancy grid based on the Octomap. A diagram of the combined front-end and back-end systems is given in figure \ref{Endres12EvaluationPipeline}. 
+This system is divided into a front-end and a back-end. The front-end performs feature detection, matching and sensor pose estimation via the RANSAC method whereas the back-end performs non-linear pose optimization using the $g^2o$ optimization procedure and integrates these results into an occupancy grid based on the Octomap. A diagram of the combined front-end and back-end systems is given in figure \ref{Endres12EvaluationPipeline}. 
 
 
-\begin{figure}[!h]
+\begin{figure}[!htb]
 \centering
 \includegraphics[width=12cm]{images/ch1/Endres12EvaluationPipeline}
 \caption{RGB-D SLAM Pipeline used by Endres et al \cite{Endres12Evaluation}}
@@ -108,7 +110,7 @@ This system is divided into a front-end and a back-end. The front-end performs f
 \end{figure}
 
 
-The front-end uses OpenCV \cite{Bradski08Learning} for feature matching. During the feature detection process, the Hessian threshold is used to keep the total number of features constant. This is required because pose may not be able to be computed if there aren't enough features, but on the other hand, too many features typically lead to many false positives in the feature matching schema. As mentioned, these matched features (and thus matched 3d points) are used with RANSAC to compute pose \cite{Umeyama91Least}. During the RANSAC process, corresponding points with distances below 3cm are considered inliers. The inliers are then used exclusively to compute a finer pose. This method of pose estimation is fast but computational complexity depends on the number of features computed. For each frame, the pose relationship with 20 previous frames (including the most recent 3) is computed in parallel on the GPU. Then the final computed pose is given to the back-end. If accurate pose cannot be compute, constant motion is assumed. \\
+The front-end uses OpenCV \cite{Bradski08Learning} for feature matching. During the feature detection process, the Hessian threshold is used to keep the total number of features constant. This is required because pose may not be able to be computed if there aren't enough features, on the other hand, too many features typically lead to many false positives in the feature matching schema, resulting in a slower pose estimation procedure. As mentioned, these matched features (and thus matched 3d points) are used with RANSAC to compute pose \cite{Umeyama91Least}. During the RANSAC process, corresponding points with distances below 3cm are considered inliers. The inliers are then used exclusively to compute a finer pose. This method of pose estimation is fast but computational complexity depends on the number of features computed. For each frame, the pose relationship with 20 previous frames (including the most recent 3) is computed in parallel on the GPU. Then the final computed pose is given to the back-end. If accurate pose cannot be compute, constant motion is assumed. \\
 
 \subsubsection{Fast Odometry from Vision: FOVIS}
 
