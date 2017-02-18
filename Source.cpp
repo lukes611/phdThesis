@@ -53,6 +53,7 @@ string namesList[20] = {
 };
 
 
+
 int main(){
     //read in bunny
     SIObj ob; ob.open_obj(LCPPDATA_DIR + string("/obj/bunny_simplified2.obj"));
