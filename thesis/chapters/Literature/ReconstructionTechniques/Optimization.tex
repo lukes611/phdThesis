@@ -1,14 +1,14 @@
 
+Further optimization of camera pose estimates has also been a popular area of research. Methods which work in global space do not technically require the use of such methods, but others, especially those working on a frame by frame basis require some sort of global optimization procedure. Here we briefly mention two of the most popular camera pose optimization methods mentioned in the literature.
+
 \subsubsection{$G^2$o}
 \label{Sec:G20}
-The Graph SLAM algorithm sets relationships between camera poses and locations as nodes in a graph. Rather than defining camera pose estimations as truth, they are represented using a Gaussian in which the peak probability is the estimated value. Then using the visible landmarks (visible from multiple views) and the functions for the camera poses the joint graph is optimized for the improved pose estimates. Once this is complete, a 3D reconstruction map is produced. \\
+The Graph SLAM algorithm defines relationships between camera poses and locations as nodes in a graph. Rather than defining camera pose estimations as truth, they are represented using a Gaussian in which the peak probability is the estimated value. Then using the visible landmarks (visible from multiple views) and the functions for the camera poses the joint graph is optimized to improve pose estimates. Once this is complete, a 3D reconstruction map is produced. \\
 
 Typically an occupancy grid or octree is used to represent the map \cite{Wurm10Octomap}. Further detail about the Graph SLAM method is outside the scope of this work, more detail can be found in the original paper on Graph SLAM \cite{Kummerle11G}. \\
 
 \subsubsection{Bundle Adjustment}
 \label{sec:ba}
-Bundle Adjustment is another optimization technique used in SLAM and 3D reconstruction \cite{Lourakis09Sba}. In this context bundle refers to the light leaving each camera projected into world coordinates. This techniques refines both camera pose and visual reconstruction. It requires some estimates for camera pose, 3D world point positions and image point locations for each view. \\
+Bundle Adjustment is another optimization technique used in SLAM and 3D reconstruction \cite{Lourakis09Sba}. In this context a bundle refers to the light leaving each camera projected into world coordinates. This technique refines both camera pose and visual reconstruction. Bundle Adjustment requires some estimate for camera pose, 3D world point positions and image point locations for each view as input. \\
 
-Using these data and any non-linear optimization method (such as Gauss-Newton or the Levenberg–Marquardt algorithm) the rigid motion based camera movement and the 3D world-coordinates of the points are optimized. \\
-
-In the literature, Fioraio \cite{Fioraio11Realtime} presented a system which uses bundle adjustment to align rgb-d data. It has also been used in conjunction with feature matching to produce sparse 3D reconstructions \cite{Klein07Parallel,Agarwal09Building}.
+Using these data and any non-linear optimization method (such as Gauss-Newton or the Levenberg–Marquardt algorithm) the rigid motion based camera movement and the 3D world-coordinates of the points are optimized. In the literature, Fioraio \cite{Fioraio11Realtime} presented a system which uses bundle adjustment to align RGB-D data. It has also been used in conjunction with feature matching to produce sparse 3D reconstructions \cite{Klein07Parallel,Agarwal09Building}.

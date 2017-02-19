@@ -2,7 +2,7 @@
 
 3D phase correlation is CPU and GPU intensive, so in order to reduce complexity we tried to minimize processing in areas which require the most computation time. In out Fourier based volume registration method defined in the previous section, this occurs in the two 3D phase correlations which need to be computed. We describe the method of reduction here; a block diagram for this technique is given in figure \ref{fig:PIPELINE3} WARNING:Given a picture for the sped up version too!. We refer to this method as fast volume registration (FVR) in reference to general volume registration (VR). The speedup begins by computing the 3D DFT of both input volumes and taking the magnitude of these. Rather than directly performing a 3D log-spherical transform and a 3D phase correlation operation on these volumes, we use a novel transform we call a spherical-map transform (details in \ref{SMTransform}).\\
 
-\begin{figure*}[t]
+\begin{figure*}[!htb]
 \centering
 \includegraphics[width=6.0in]{images/ch2/pipeline3}
 \caption{System Diagram for Fast Volume Registration}
@@ -30,7 +30,7 @@ Im_{x,y} = \sum_{r=1}^{(2^{-1}N)^{1.5}}{Vol(Ray_x(x,y)r, Ray_y(y)r, Ray_z(x,y)r)
 
 This process essentially sums up the values along a given ray defined by scaling spherical coordinates and adding up the values intersecting the ray. The resulting image, maps 3D y-axis rotation to 2D x-axis translation.  \\
 
-\begin{figure*}[t] 
+\begin{figure*}[!htb] 
         \centering
         \begin{subfigure}[b]{4.2in}
                 \includegraphics[width=4.2in]{images/ch2/bunny}
@@ -88,7 +88,7 @@ In total, the proposed method requires $2 \times$ 3D FFTs, $2 \times$ spherical-
 Figure \ref{fig:perfComp} provides a visualization of the performance improvement which the proposed method achieves over the original Fourier volume registration approach. It is clear that the proposed method is around 3 times faster
 than the original Fourier based volume registration approach. This is due to the reduction in the amount of data to process afforded by the novel spherical-map transform and orthogonal projection methods.
 
-\begin{figure}[t]
+\begin{figure}[!htb]
 \centering
 \includegraphics[width=4.0in]{images/ch2/perfcomp}
 \caption{Comparison of performance between volume registration and the proposed speed up for different volume sizes.}
