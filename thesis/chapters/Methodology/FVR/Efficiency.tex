@@ -2,12 +2,12 @@
 
 3D phase correlation is CPU and GPU intensive, so in order to reduce complexity we tried to minimize processing in areas which require the most computation time. In out Fourier based volume registration method defined in the previous section, this occurs in the two 3D phase correlations which need to be computed. We describe the method of reduction here; a block diagram for this technique is given in figure \ref{fig:PIPELINE3} WARNING:Given a picture for the sped up version too!. We refer to this method as fast volume registration (FVR) in reference to general volume registration (VR). The speedup begins by computing the 3D DFT of both input volumes and taking the magnitude of these. Rather than directly performing a 3D log-spherical transform and a 3D phase correlation operation on these volumes, we use a novel transform we call a spherical-map transform (details in \ref{SMTransform}).\\
 
-\begin{figure*}[!htb]
+\begin{figure}[!htb]
 \centering
-\includegraphics[width=6.0in]{images/ch2/pipeline3}
+\includegraphics[width=5.0in]{images/ch2/pipeline3}
 \caption{System Diagram for Fast Volume Registration}
 \label{fig:PIPELINE3}
-\end{figure*}
+\end{figure}
 
 This transform converts rotation into translation whilst simultaneously unfolding the 3D space down to 2-dimensions. After this, a 2D phase correlation that requires significantly less processing compared with the 3D counterpart is used to compute the rotation. Next, having obtained the rotation parameter, the rotation is eliminated from the transformation by rotating the first volume by this parameter. The two volumes are then passed through two orthogonal projection mapping functions. This also converts the volumes to 2D space. We use two transforms for both volumes, one projection along the x-axis, another along the z-axis. Once the x-axis projections of both volumes are complete, we can do another 2D phase correlation to give us the z-translation. The 2D phase correlation of the z-axis projections gives us the x and y axis translations separating the original volumes. The final output of this method gives the rotation and translational shifts between the input volumes. The projections add little complexity to the overall algorithm and since 2D phase correlation operations are used in place of 3D ones, much computation time is reduced.
 
@@ -30,21 +30,21 @@ Im_{x,y} = \sum_{r=1}^{(2^{-1}N)^{1.5}}{Vol(Ray_x(x,y)r, Ray_y(y)r, Ray_z(x,y)r)
 
 This process essentially sums up the values along a given ray defined by scaling spherical coordinates and adding up the values intersecting the ray. The resulting image, maps 3D y-axis rotation to 2D x-axis translation.  \\
 
-\begin{figure*}[!htb] 
+\begin{figure}[!htb] 
         \centering
-        \begin{subfigure}[b]{4.2in}
-                \includegraphics[width=4.2in]{images/ch2/bunny}
+        \begin{subfigure}[b]{2.5in}
+                \includegraphics[width=2.5in]{images/ch2/bunny}
                 \caption{original}
                 \label{fig:bunnyOrig}
         \end{subfigure}
-        \begin{subfigure}[b]{4.2in}
-                \includegraphics[width=4.2in]{images/ch2/spherical2DMap}
+        \begin{subfigure}[b]{2.5in}
+                \includegraphics[width=2.5in]{images/ch2/spherical2DMap}
                 \caption{transform}
                 \label{fig:bunnySPTed}
         \end{subfigure}%
         \caption{The Spherical Map Transform.}
        \label{fig:smtExample}
-\end{figure*}
+\end{figure}
 
 
 \subsubsection{Projection-map transform}
