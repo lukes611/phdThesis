@@ -1,6 +1,13 @@
 
-Based on the conclusions from 
+It is evident from the literature that many algorithms compute satisfactory 3D reconstructions in simple man made environments. These environments are ideal because there is often suitable levels of texture and features. This works well for both feature matching approaches and ICP. In some environments however, textures are few and far between. These environments often do not produce enough accurate textures for 3D reconstruction or SLAM. \\
 
+Other environments may have an abundance of similar textures (grassy meadows, out-door environments which include plants). These environments contain plenty of texture and thus generate many features. Feature matching is difficult though, as features tend to look identical within a local frame. \\
+
+Some algorithms such as the method by Bylow et al (see section \ref{BylowsSection}) work on finding the optimal solution using the entire data. Finding the best solution given all of the data mitigates issues with feature confusion and incomplete feature sets. However this algorithm as well as other iterative methods for SLAM and 3D reconstruction (feature matching + RANSAC, ICP, using the Fundamental Matrix) may still get stuck in local extrama. This is the nature of iterative methods. \\
+
+In this section we propose using Fourier and Phase Correlation approaches to compute camera pose as an alternative to these iterative and feature based methods. 
+
+ 
 Here we present several techniques used to extract dense 3D reconstruction from image/video data. In the first section we describe techniques in addition to Fourier volume registration. These include the recovery of translation, y-axis rotation and scale information as well as a technique for the recovery of a so called 7 degrees of freedom transform. \\
 
 We also list notable speed-ups for volume registration which reduce the amount of processing by over a third. After this, a full 3D reconstruction technique based on the principles of phase correlation is presented. Then we also present two novel reconstruction data representations which may be used to efficiently represent and fuse 3D reconstructions. Lastly, different sensor inputs are discussed and some conclusions are given about the usefulness of this technique in the context of these sensors is presented.
