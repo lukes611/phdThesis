@@ -1,22 +1,65 @@
+Fourier volume Registration within the context of a 3D reconstruction procedure requires two frames of 3D data. These two frames may be input as any 3D representation: mesh, volume, point-cloud, SDF or in a compressed format (eg. Octree). However, the input must be converted to a 3D signal or volume representation for phase correlation. Moreover, the size of the volume should be cubic and the data should be scaled to fit. If the two frames are scaled un-evenly then the method must also be registered against scale. This section details some of these issues and more within the context of video sensor input from sensors.  \\
+ 
 
+\subsubsection{Camera Translation}
 
+To describe camera translation, let's say a camera produces 3D scans of a scene from a particular pose. This may be performed implicitly (in the case of stereo or monocular depth estimation procedures) or explicitly (through the use of such sensors eg. Kinect, Asus Xtion Pro Live) and normalizes them into a 3D volume frames. If the camera captured frame 1, then moves 20 units to the left, then captures frame 2. Visualizing these frames in conjunction with each-other, it would appear the data was shifted to the right by $20$ units ($20\theta$ if the resolution of the 3D volume differs by a scale of $\theta$). If the volumes were to be registered (assuming no error), it would be found that the data from frame 1 to frame 2 had been translated by $T_{frame-1,frame-2} = [20,0,0]^T$, or the translation matrix in equation \ref{eqn:TransRegMatrix}.
 
-\subsubsection{Translation Registration}
+\begin{equation} \label{eqn:TransRegMatrix}
+\left[
+\begin{array}{cccc}
+1 & 0 & 0 & 20 \\
+0 & 1 & 0 & 0 \\
+0 & 0 & 1 & 0 \\
+0 & 0 & 0 & 1 \\
+\end{array}
+\right]
+\end{equation}
 
-Given a volume $V_1$ and a spatially shifted version of it $V_2$, the offset along each axis, $(x,y,z)$ may be recovered if a suitable correlation between the two volumes can be found. \\
+That is, the data has shifted in the opposite direction. Therefore to register the data, frame 1 may be transformed by the matrix in equation \ref{eqn:TransRegMatrix} to align it with frame 2. Conversely, the camera pose may be updated by adding $T_{frame-1,frame-2} \times -1$ to the camera's location.  \\
 
-The measure of correlation between $V_1$ and $V_2$ can be found by shifting $V_1$ and $V_2$'s mean values to zero, then summing the element-wise multiplication of $V_1$ by $V_2$. Equation \ref{eqn:CorrelationEquation} computes this correlation measure.
+Generalizing this, we define a volume $V_1$ captured as the first frame and a second volume $V_2$ which is captured after moving the camera in a particular direction (up, down, left, right, forward or backward) scaled by a magnitude (a vector). The translation from $V_1$ to $V_2$, $(x,y,z)$ can easily be recovered via phase correlation. As described, the camera pose may be updated by $-1 \times (x,y,z) = (-x,-y,-z)$. \\
+
+Here we step into the detail of phase correlation with deeper insight with respect to the superficial introduction from section \ref{Sec:SuperficialPCSection} and with a focus on 3D data and pose estimation. Firstly, we define the correlation measure process. Correlation in the context of signal processing measures signal shape similarity between two signals. \\
+
+In this measure, large correlation values signify a greater similarity in terms of shape, where as a smaller value signifies the signals have very different shapes. Note, large negative values signify the shapes may be similar but mirrored. Following the doctrine of DSP, that all signals, no matter what dimension may be processed similarly with similar operations and measures, this technique can be applied to measure similarities between volumes.  \\
+
+The measure of correlation between $V_1$ and $V_2$ can be found by shifting $V_1$ and $V_2$'s mean values to zero. By doing this, the mean value doesn't affect the correlation measure. For example, if the first frame was captured in low light and the second in a brighter light. The resulting values for frame 2 may look like those from frame 1 in terms of values fluctuating about the mean, however the change in lighting may affect the voxel values by increasing them by a uniform value or scaling them by some scalar. Therefore, by subtracting the mean we place the signals in states where by their shape, rather than their raw values may be compared. The procedure can then be completed by summing the element-wise multiplication of $V_1$ by $V_2$. When $V_1$ has a positive voxel value (a voxel value above the mean) and so does $V_2$'s corresponding voxel in the same position, the multiplication value is positive, and this is summed into the correlation measure. This is the same situation as if both voxel values were negative (both below the mean). On the other hand, if one voxel value was positive and the other were negative, the correlation measure would be rectified accordingly. Equation \ref{eqn:CorrelationEquation} computes this correlation measure. 
 
 \begin{equation} \label{eqn:CorrelationEquation}
 \sum_{z=0}^{N}\sum_{y=0}^{N}\sum_{x=0}^{N}(V_1(x,y,z)-avg(V_1)) \times (V_2(x,y,z)-avg(V_2))
 \end{equation}
 
-Using this measurement, two volumes which are similar in signal shape (element-wise-value to location correspondence) will give a larger measure of correlation than two volumes with a differing signal shape. If the volumes are first normalized we can regard volume $x$ is more aligned with volume $y$ than with volume $z$ given $x$ correlated with $y$ gives a larger value than $x$ correlated with $z$. \\
+As mentioned, correlation may be used to measure the similarity between two volume's shapes. In the context of registration for 3D reconstruction algorithms, it can be used to measure the accuracy of a registration. Again using $V_1$ as frame 1 and $V_2$ as frame 2, given a supposed transform $T_{est}$ to register $V_1$ to $V_2$. The measure of registration may be defined as $correlate(T_{est}(V_1), V_2)$. The measure may be used to compare two registrations, possibly in order to select the better registration in terms of correlation measure. The two frames may be captured under different lighting conditions and the correlation measure will still be able to be used to select the best transform. \\
 
-Cross-correlation searches over a space of translation parameters and outputs the optimal translation to align two volumes. It is optimal in the sense of correlation measurement. This is used as a best guess in terms of the alignment of the two volumes. It can be thought of as the optimization of parameters $x,y,z$ in equation \ref{eqn:CrossCorrelationEquation}.
+Within the framework of measuring camera pose, the cross-correlation algorithm may be used to measure the correlation values for each possible camera movement, and define the camera location as the location with the largest correlation value. This algorithm is shown in listing \ref{algorithm:CrossCorrelationAlgorithm}.
 
-\begin{equation} \label{eqn:CrossCorrelationEquation}
-CrossCorrelate(Transform(V_1, x,y,z), V_2)
+\begin{figure}
+\begin{lstlisting}[language=c++,caption=Cross-Correlation based camera location estimation,label=algorithm:CrossCorrelationAlgorithm,mathescape,basicstyle=\ttfamily]
+$V_1$ = CaptureFrame();
+//shift camera
+$V_2$ = CaptureFrame();
+$highest-correlation$ = $infty $;
+camera-location = $[0,0,0]$;
+for($z$ in $[0,N]$){
+  for($y$ in $[0,N]$){
+    for($x$ in $[0,N]$){
+      $V_{temp}$ = translate(V_1, x, y, z);
+	  $tempMeasure$ = correlate($V_{temp}$, $V_2$);
+	  if($tempMeasure$ > $highest-correlation$){
+	    $highest-correlation$ = $tempMeasure$;
+		$camera-location$ = $[-x,-y,-z]$;
+	  }		
+	}
+  }
+}
+\end{lstlisting}
+\end{figure}
+
+Cross correlation is typically used in signal processing to compute the best alignment for two signals. In this context it has been used to compute the best camera location change, notice in the algorithm the $camera-location$ variable is set to be the inverse of the translation amount being tested ($[-x,-y,-z]$). Again this is because when the optimal translation value aligning frame 1 to frame 2 is defined as vector $v$, then the camera location change is equivalent to the inverse. The cross-correlation function in this context may be thought of as an exhaustive optimization procedure which optimizes the camera location change (equation \ref{eqn:CrossCorrelationEquation11}) in terms of the correlation function.  \\
+
+\begin{equation} \label{eqn:CrossCorrelationEquation11}
+correlate(translate(V_1, x,y,z), V_2)
 \end{equation}
 
 Since we typically do not know the range of translation values $x,y,z$ to optimize for, we take into account the range from $[0,N]$ where $N$ is the width/height/depth of the volume. This gives a complexity of $N^6$. This is too computationally complex for practical volume sizes. Therefore, we use the properties of the Fourier Transform to reduce computational complexity. \\
