@@ -616,14 +616,15 @@ namespace ll_pix3d
 				float d = depthImage.at<float>(y, x);
 				if(d >= cutOff)
 				{
-					d = 1.0f-d;
-					d += 0.3f;
+					//d = 1.0f-d;
+					//d += 0.3f;
 					d *= 10000.0f;
 					R3 point(
 						((float)x - 319.5f) * (d / 525.0f),
 						((float)y - 239.5f) * (d / 525.0f),
 						d
 					);
+					//cout << d << endl;
 					point.x = maxDepth - (point.x-minX) * maxi;
 					point.y = maxDepth - (point.y-minY) * maxi;
 					point.z = maxDepth - (point.z-minZ) * maxi;

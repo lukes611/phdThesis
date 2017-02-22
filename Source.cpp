@@ -17,6 +17,8 @@
 #include "code/phd/LSift.h"
 #include "code/basics/BitReaderWriter.h"
 #include "code/compression/LCompression.h"
+#include <sstream>
+#include <string>
 
 using namespace std;
 using namespace cv;
@@ -55,8 +57,44 @@ string namesList[20] = {
 
 
 int main(){
+
+
+    stringstream path;
+    path << LCPPDATA_DIR << "/pix3dc/films";
+	CapturePixel3DSet video = CapturePixel3DSet::openCustom(path.str(), namesList[0], 1);
+
+    Pix3D cc;
+    video.read_frame(cc, 0);
+
+
+    Mat dm;
+    video.read_frame(cc, 0);
+    cc.depthImage(dm);
+    Mat dm2;
+    ll_transform_image(dm, dm2, 0.0, 2.5, 0.0, 0.0);
+
+    //imshow("dm", dm);
+    //imshow("dm2", dm2);
+    //waitKey();
+
+    cout << ll_type(dm.type()) << endl;
+    Point2d mnx;
+    minMaxLoc(dm, &mnx.x, &mnx.y);
+    cout << mnx << endl;
+
+
+    Pixel3DSet p1 = Pixel3DSet::openDepthMap(dm, 1.0f);
+    Pixel3DSet p2 = Pixel3DSet::openDepthMap(dm2, 1.0f);
+
+    string pathOut = DESKTOP_DIR;
+
+    p1.save_obj(pathOut + string("/p1.obj"));
+    p2.save_obj(pathOut + string("/p2.obj"));
+
+
+
     //read in bunny
-    SIObj ob; ob.open_obj(LCPPDATA_DIR + string("/obj/bunny_simplified2.obj"));
+    /*SIObj ob; ob.open_obj(LCPPDATA_DIR + string("/obj/bunny_simplified2.obj"));
     ob.normalize(256.0f);
     vector<R3> pnts;
     for(int i = 0; i < ob._triangles.size(); i++)
@@ -82,7 +120,10 @@ int main(){
 
     //view im
     imshow("i",im);
-    waitKey();
+    waitKey();*/
+
+    VMat obj = openDataVMat(namesList[0], 0);
+
     return 0;
 }
 
