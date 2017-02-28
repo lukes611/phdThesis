@@ -72,52 +72,59 @@ These methods all require frame by frame rectification. To do this, the fundamen
 
 The spatial filtering technique used is basic Gaussian convolution. Temporal filtering was performed on a per pixel basis, where the output depth map is computed based on the previous depth map and the most recent depth map. Each depth map value is set to a value of $\delta \times prior-depth + (1-\delta) \times current-depth$. The best value for $\delta$ was judged based on qualitative analysis of experiment data sets. This method, although simpler and less accurate than other stereo methods, was used to test the FVR methods robustness to noisy and inaccurate 3D frame input. \\
 
- 
 
-The method presented here is named MVVR (Monocular View Volume Registration). The method takes in a set of monocular video frames, generates dense depth information from these frames before registering them geometrically and adding them into an output database. This output database is the dense 3D map. Pseudo code for this method is given in figure 1. Here, we go over the general algorithm. \\
+For best performance, RGB-D information from alternative sources may be used in the FVR 3D reconstruction algorithm such as depth computed via active camera (Kinect, Asus Xtion LIVE PRO sensors) or disparity computed via stereo device. An alternative method is proposed here named Monocular View Volume Registration ($MVVR$). This algorithm takes consecutive RGB frames as input from a monocular camera sensor and computes depth data from them using the simple block matching method. The depth data is not aligned and because of camera speeds projection may not be consistent across frames. The depth maps are computed under the assumption of temporal camera translation. By performing block matching on frames taken from different camera locations, depth map be computed but only if the camera displacement is large enough. Therefore a $skip$ variable is used in order to block match frames with a distance from each other. \\
 
-The algorithm begins by reading in one frame at a time and placing frames in a queue structure. Once the queue has some pre-determined size, we pop the next frame and generate a disparity map from it and the current next frame. The threshold variable, skip is the amount of frames skipped when generating each disparity map. This is done so that there is sufficient change between frames to produce a reliable result without requiring subpixel accuracy. From the disparity maps a depth map is generated and added to a list called Input. Then for each depth map in Input and the next corresponding depth map after it, frames are projected and sampled into volumes for which translation, scaling and rotational information is computed using volume registration. This information allows us to merge depth data and generate a dense 3D map of the environment. \\
+Using the computed depth maps, the algorithm projects consecutively computed depth maps into frames, which are then voxelized. Once the two frames are voxelized, the FVR technique proposed in sections \ref{FVRSectionA} and \ref{Sec:VolumeRegistrationSection}. A registration matrix may then be used to update camera parameters and to register and integrate the 3D frames. 
+
+The algorithm is detailed in listings \ref{algorithm:MVVRAlgorithm}. A queue is used named $frameQueue$ to keep track of input RGB frames in order to generate depth data using frames which have a predefined temporal separation. A stack, $depthMapStack$ is used to keep track of the next two consecutive depth maps to register. $GlobalReconstruction$ is an automatic dynamically resizeable occupancy grid. \\
+
+The matrix $M$ is used to keep track of the accumulation of transforms used to register and integrate each depth map into the global reconstruction output. Both $Camera_{location}$ and $Camera_{pose}$ keep track of the camera's location and pose information on a per frame basis. The list, $Cameras$ keeps track of the list of camera location and pose information for each frame.\\
 
 \begin{figure}
 \begin{lstlisting}[language=c++,caption=Monocular View Volume Reconstruction,label=algorithm:MVVRAlgorithm,mathescape,basicstyle=\ttfamily]
-let Input and q be Queues
-let skip be an ℤ  [1,8]
-let Pose be [0 0 0 ]T
-let Camera be [0 0 0]T
-let Cameras and Poses be Lists
-let M be an Identity Matrix
-Start
-if no more frames then goto Part-2
-f1 = readFrame()
-q.add(f1)
-if q.length < skip then goto Start
-Input.add(BlockMatch(f1, queue.pop()))
-goto Start
-Part-2
-PointCloud = project (Input[0])
-Index = 0
-Part-2-Start
-if index == Input.length-1 then goto End
-f1 = Input[index], f2 = Input[index+1]
-points¬¬¬1 = project (f2), points2 = project (f1)
-V1 = ResampleVolume (points¬¬¬1)
-V2 = ResampleVolume (points2)
-θ, φ, tx, ty, tz = VRθ,φ,tx,ty,tz (V1; V2)
-M = M  TransformMatrix (θ, φ, tx, ty, tz)
-Points1 = Transform (points1, M)
-PointCloud = PointCloud  points1
-Camera = M -1  Camera
-Pose = M -1  Pose
-Cameras.add(Camera)
- 
-Index++
-goto Part-2-Start
-End
+$frameQueue$ = newQueue();
+$depthMapStack$ = newStack();
+$GlobalReconstruction$.clear();
+$M$ = IdentityMatrix();
+$Camera_{location}$ = $[0, 0, 0]^T$;
+$Camera_{pose}$ = $[[1, 0, 0]^T,[0, 1, 0]^T,[0, 0, 1]^T]$;
+$Cameras$ = $\left[\left[Camera_{location}, Camera_{pose}\right] \right]$;
+while(more frames){
+	$f$ = ReadRGBFrame();
+	$frameQueue$.push($f$);
+	if($frameQueue$.length >= skip)
+		$depthMapStack$.push(BlockMatch($f$, $frameQueue$.pop()))
+	if($depthMapStack$.length >= 2){
+		$f_2$ = $depthMapStack$.pop();
+		$f_1$ = $depthMapStack$.pop();
+		$points_1$ = project($f_2$);
+		$points_2$ = project($f_1$);
+		$V_1$ = Voxelize($points_1$);
+		$V_2$ = Voxelize($points_2$);
+		$(\theta, \varphi, t_x, t_y, t_z) = FVR_{\theta \varphi t_x t_y t_z}(V_1, V_2)$;
+		$Temp = $TransformMat($(\theta, \varphi, t_x, t_y, t_z)$);
+		$M = M \times Temp$;
+		$points_1$ = Transform($points_1$, $M$);
+		$GlobalReconstruction$.integrate($points_1$);
+		$Camera_{location}$ = $Temp^{-1} \times Camera_{location}$;
+		$Camera_{pose}$ = $Temp^{-1} \times (Camera_{pose} + Camera_{location})$;
+		$Camera_{pose}$ = $\frac{Camera_{pose} - Camera_{location}}{Camera_{pose} - Camera_{location}}$;
+		$Cameras.add(\left[Camera_{location}, Camera_{pose}\right])$;
+		$depthMapStack$.push($f_2$);
+	}
+}
 \end{lstlisting}
 \end{figure}
 
-In order to generate depth maps, dense block matching is used to compute the camera motion induced disparity between frames. In our experiments we processed each framei with the 4th most recent frame, framei-4. For each image block in a frame, the displacement vector to the matching block in the next frame is computed. Using the concept of parallax we know that the magnitude of the displacement vector is an approximation to the actual depth at the corresponding location in the images. Due to noise the resulting displacement vectors can be very noisy. Figure 2 shows how noisy this estimated depth information can be compared with input from an RGB-D device. The noise can be largely eliminated using spatiotemporal filtering. \\
 
+Then a loop processes the frames whilst there are still frames available for input. For each new frame $f$, $f$ is added to the queue of frames, $frameQueue$. If there are more frames in the queue than variable $skip$ (typically set to 4 to ensure enough camera translation is present to obtain measurable depth) then block matching is performed between the current frame and the oldest item in the queue which is removed. The corresponding RGB-D image obtained from the $BlockMatch$ function is inserted into the $depthMapStack$ stack. \\
+
+Also during the loop, if there are two or more RGB-D images within the stack, they are popped out and projected into the $points_1$ and $points_2$ 3D point clouds. Both point clouds are then voxelized into two volumes for input into the FVR method. A matrix representing the transform between the two volumes is then computed. \\
+
+The accumulation matrix $M$ is then updated using this information and $points_1$ is aligned with $points_2$ using it. The transformed $points_1$ may then be integrated into the global reconstruction occupancy grid. Next the camera pose and location are updated. Finally, the most recently computed depth map, $f_2$ is inserted back into the stack for comparison with the next depth map computed. \\ 
+
+Using the concept of parallax, we know that the magnitude of the displacement vector computed using block matching is an approximation to the actual depth for each corresponding location in both images. However, due to noise the resulting displacement vectors can be very noisy. Figure \ref{fig:DepthGenerationExample} shows how noisy this estimated depth information can be compared with input from an RGB-D device. As mentioned, the noise can be largely eliminated using spatiotemporal filtering. \\
 
 
 \begin{figure}[!htb]
@@ -128,7 +135,3 @@ In order to generate depth maps, dense block matching is used to compute the cam
 \label{fig:DepthGenerationExample}
 \end{figure}
  
-
-
-Figure 3 shows a functional block diagram of the volume registration method from [1]. The input data are two 3D volumes (Volume1 and Volume2), the output is the transformation matrix required to register them. The volumes are first Hanning windowed, reducing the effects of noise generated when transforming into the frequency domain. Next, a translation independent representation of each volume is obtained by taking the magnitude of their 3D FFTs. A log function is then applied to the resulting magnitude values; this improves estimation of scale and rotation [18]. \\
-
