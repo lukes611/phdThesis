@@ -80,19 +80,24 @@ This process essentially sums up the values along a given ray defined by scaling
 
 \subsubsection{Projection-map transform}
 \label{sec:PMTramsform}
-The projection map transform is similar to an orthogonal projection of the volume along some given axis. For the projection map transform, given an output image $Im_a$ and an input volume $Vol_a$, each pixel in $Im_a$ is defined mathematically as the summation of values along a particular axis given the image coordinates. The x-axis transform and the z-axis transform are defined in equations \ref{eqn:xPMT} and \ref{eqn:zPMT} respectively. \\
+
+The projection map transform is similar in spirit to an orthogonal projection of the volume along a particular axis. Instead of simply projecting the closest point as in projection for visualization purposes, the sum of values computed along the ray is used for representation. The projection map transform is described here in terms of an output projection map image $Im$ and an input 3D volume frame $Vol$, which may be input from a sensor or software system which is able to generate 3D frames of the environment. Each pixel in $Im$ has its value defined mathematically as the summation of values along a particular axis given the x,y coordinates. The Projection-map x-axis transform and the Projection-map z-axis transform are defined in equations \ref{eqn:xPMT} and \ref{eqn:zPMT} respectively. \\
 
 WARNING: add in a picture here
 
 \begin{equation} \label{eqn:xPMT}
-Im(z,y) = \sum_{x=0}^{N}{Vol_a(x,y,z)}
+Im(z,y) = \sum_{x=0}^{N}{Vol(x,y,z)}
 \end{equation}
 
 \begin{equation} \label{eqn:zPMT}
-Im(x,y) = \sum_{z=0}^{N}{Vol_a(x,y,z)}
+Im(x,y) = \sum_{z=0}^{N}{Vol(x,y,z)}
 \end{equation}
 
-The process defined by equation \ref{eqn:xPMT} maps 3D z-axis translation to 2D x-axis translation, whilst equation \ref{eqn:zPMT} maps 3D x-axis and y-axis translation into 2D x-axis and y-axis translation.
+In these equations the Projection map transform along the x-axis is computed via summing up values along the x-axis in the input 3D frame,. In this was, any 3D z-axis translation in $Vol$ maps to 2D x-axis translation in the output image $Im$. Additionally any y-axis translation in the input 3D frame $Vol$ is mapped to a corresponding y-axis translation in the output 2D Projection map domain $Im$. If both the width and height of the output image $Im$ is equal to the width, height and depth of the input 3D frame then the relationship is a $1:1$ mapping between 3D z-axis translation and 2D x-axis translation as well as 3D y-axis translation to 2D y-axis translation. \\
+
+The corresponding z-axis Projection map transform sums up values along the z-axis. Here, 3D y-axis translations within the original 3D frame also produce 2D y-axis translations in the output Projection map domain. However, all x-axis translations occurring within the 3D frame domain are mapped to 2D x-axis translations in the output Projection map domain image $Im$. \\
+
+Given both of these Projection map transforms, the 3D translation separating two 3D frames may be registered with respect to 3D translation. This 3D translation also has an inverse relationship to the camera location separation between the two frames. Both 3D frames are transformed into the z-axis Projection map domain. By phase correlating these domains, both the x and y axis translation may be retrieved which map directly to the 3D translation x and y coodinates separating the input frames. The 3D z-axis translation may be computed by transforming both 
 
 
 To assess the performance of our method, the size of the volumes being registered is defined as $N^3$ whilst each frame is sampled at a resolution of $W$ $\times$ $H$. The projection process requires $12WH$ operations whilst re-sampling the point cloud requires $2WH$ operations. The Volume Registration process, $VolumeRegister{\theta \varphi t_x t_y t_z}(V_1, V_2)$ consists of 2 $\times$ Hanning windowing processes, 2 $\times$ 3D FFTs, 2 $\times$ volume-logs, 2 $\times$ log-spherical transforms, 2 $\times$ phase correlation processes and 1 $\times$ linear transformation and peak finding. 
