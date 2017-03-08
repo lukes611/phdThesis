@@ -103,22 +103,24 @@ Given both of these Projection map transforms, the 3D translation separating two
 
 In order to assess the efficiency gain between the Fast Fourier Volume Registration method over the original FVR method, the computational complexity of the FVR is assessed. The computational complexity is dependent on two factors: the size of the input depth map $W \times H$ and the width/height/depth of the 3D volumes used in the volume registration procedure. Since the computational complexity is fixed no matter the input data (depending only on the sizes specified by the user), this method is considered a closed form solution. \\
 
-The FVR method makes use of several sub-procedures including: projection of the depth frame to a 3D volume frame, 2 $\times$ Hanning window filters, 2 $\times$ 3D FFTs, 2 $\times$ element-wise Log filters, 2 $\times$ Log-spherical transforms, 2 $\times$ 3D phase correlation processes, 1 $\times$ linear transformation and 1 $\times$ peak search. The number of operations required by each of these methods are listed in table \ref{table:complexities} \\
+The FVR method makes use of several sub-procedures including: 2 $\times$ 3D projections (of the depth frame to a 3D volume frame), 2 $\times$ Hanning window filters, 2 $\times$ 3D FFTs, 2 $\times$ element-wise Log filters, 2 $\times$ Log-spherical transforms, 2 $\times$ 3D phase correlation processes and 2 $\times$ linear transformations. The 3D phase correlation method makes use of several sub-procedures including: 3 $\times$ 3D FFTs, 1 $\times$ spectra multiplication and 1 $\times$ 3D peak finding operation. The number of operations required by each of these methods are listed in table \ref{table:complexities}. \\
 
-%translation
+
 \begin{table}[ht]
 \centering
 \scalebox{0.75}{
 \begin{tabular}{cc}
 \hline
 \textbf{Procedure} & \textbf{Complexity}\\ \hline
+3D Projection & $14WH$ \\
 Hanning window & 26 (GPGPU)\\
 3D FFT & $N^3\log{N^3}$ (GPGPU)\\
 Log & 3 (GPGPU) \\
 Log-Spherical & 58 (GPGPU)\\
 Multiplying Spectra & 15 (GPGPU)\\
 Geometric Transform & 30 (GPGPU)\\
-Peak Search & $2N^3$\\
+3D Peak Search & $2N^3$\\
+3D Phase Correlation & $3N^3\log{N^3} + 2N^3 + 44$\\
 \\
 \end{tabular}}
 \\
@@ -126,25 +128,47 @@ Peak Search & $2N^3$\\
 \label{table:complexities}
 \end{table}[ht]
 
-The Hanning windowing function requires 26 operations. The 3D FFT has complexity of $3N^3\log{N}$, the log and log-spherical transform functions require 3 and 58 operations per voxel respectively. Multiplying two frequency spectra together and transforming a volume requires 15 and 30 operations per voxel respectively. Finding the peak value requires $2N^3$ operations. The complexity in terms of number of operations for the phase correlation process is given in Eq. \ref{eqn:PCFULLPERFORMANCE} This process requires 2 $\times$ 3D FFTs, 1 $\times$ frequency spectra multiplication, and 1 $\times$ peak finding operation. 
-\begin{equation} \label{eqn:PCFULLPERFORMANCE}
-6N^3\log{N} + 2N^3 + 15
-\end{equation}
-The total complexity can then be found by taking into account the projection and re-sampling totals as well as the total for $VolumeRegister{\theta \varphi t_x t_y t_z}(V_1, V_2)$. Tallying the number of operations for each process and multiplying them by number of times the process is performed gives us the number of operations as a function of $W$, $H$ and $N$ in Eq. \ref{eqn:FULLPERFORMANCE}.
+
+Adding these operations up whilst scaling them by the number of times they are used gives the total complexity for the FVR method. This complexity is given in equation \ref{eqn:FULLPERFORMANCE}. The complexity of the 3D Phase Correlation procedure adds up to the complexity shown in equation \ref{eqn:PCFULLPERFORMANCE}. \\
+
 \begin{equation} \label{eqn:FULLPERFORMANCE}
-6N^3 + 28WH + 18(N^3\log{N}) + 230
+8N^3\log{N^3} + 4N^3 + 28WH + 322
 \end{equation}
 
-To compare performance of the generic volume registration method with the speed up, we use the complexity defined in equation \ref{eqn:FULLPERFORMANCE}. Here, we ignore the cost of projecting the depth map. The 3D DFT has complexity $3N^3log(N)$. This is the first step (see figure \ref{fig:PIPELINE3}), the next is the spherical-map transform which is complexity $45N^3$. If processed on the GPU the performance becomes 45 operations per voxel assuming that one voxel is assigned to one unit of processing. A 3D transform is 30 operations per voxel, 2D phase correlation requires 15 operations to multiply the frequency spectra and $2N^2log(N)$ operations to do the 2D FFT. Finally a projection map transform requires 1 operation per voxel. \\
+\begin{equation} \label{eqn:PCFULLPERFORMANCE}
+3N^3\log{N^3} + 2N^3 + 15
+\end{equation}
 
-In total, the proposed method requires $2 \times$ 3D FFTs, $2 \times$ spherical-map transforms, $1 \times$ 3D geometrical transformation, $3 \times$ 2D phase correlations and $4 \times$ projection map transforms. The total complexity is added up for all of these functions and given in equation \ref{eqn:FULLPERF2}. \\
+
+The full complexity of the FVR method (equation \ref{eqn:FULLPERFORMANCE}) is next compared to the performance of the FFVR method to assess performance gain. The FFVR methods makes use of several of the procedures found in table \ref{table:complexities} as well as a few others. These include: 2 $\times$ 3D FFTs, 2 $\times$ Spherical-Map transforms, 3 $\times$ 2D Phase Correlation procedures, 1 $\times$ 3D geometric transform and 4 $\times$ Projection-Map transforms. The 2D phase correlation method makes use of several sub-procedures including: 3 $\times$ 2D FFTs, 1 $\times$ spectra multiplication and 1 $\times$ 2D peak finding operation. Table \ref{table:complexities2} cites the complexities for the additional operations including: the Spherical-Map transform, the Projection-Map transform, 2D Peak finding, 2D FFT and 2D Phase Correlation (made up of multiple sub-procedures). \\
+
+
+
+\begin{table}[!htb]
+\centering
+\scalebox{0.75}{
+\begin{tabular}{cc}
+\hline
+\textbf{Procedure} & \textbf{Complexity}\\ \hline
+Spherical-Map Transform & 45 (GPGPU) \\
+Projection-Map Transform & 1 (GPGPU) \\
+2D Peak Search & $2N^2$ \\
+2D FFT & $N^2\log{N^2}$ (GPGPU) \\
+2D Phase Correlation & $3N^2\log{N^2} + 2N^2 + 15$ (GPGPU) \\
+\\
+\end{tabular}}
+\\
+\caption{Complexities for given Procedures}
+\label{table:complexities2}
+\end{table}[!htb]
+
+From figure \ref{fig:PIPELINE3} we can see that the FFVR method is made up of multiple sub-procedures. These include: 2 $\times$ 3D projections, $2 \times$ 3D FFTs, $2 \times$ Spherical-Map transforms, $1 \times$ 3D geometrical transformation, $3 \times$ 2D phase correlations and $4 \times$ Projection-Map transforms. The total complexity is added up for all of these functions and given in equation \ref{eqn:FULLPERF2}. \\
 
 \begin{equation} \label{eqn:FULLPERF2}
-6log(N)\times (N^3 + N^2) + 169
+2N^3\log{N^3} + 9N^2\log{N^2} + 6N^2 + 28WH + 169
 \end{equation}
 
-Figure \ref{fig:perfComp} provides a visualization of the performance improvement which the proposed method achieves over the original Fourier volume registration approach. It is clear that the proposed method is around 3 times faster
-than the original Fourier based volume registration approach. This is due to the reduction in the amount of data to process afforded by the novel spherical-map transform and orthogonal projection methods.
+Figure \ref{fig:perfComp} provides a visualization of the performance improvement which the FFVR method achieves over the original FVR approach. The FFVR method is around 3 times faster than the original approach. This is due to the reduction in the amount of data to process afforded by the novel spherical-map transform and projection map transform methods.
 
 \begin{figure}[!htb]
 \centering
