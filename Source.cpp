@@ -1,217 +1,50 @@
+#include <string>
 #include <iostream>
-#include <string>
-#include <vector>
-#include <stack>
+#include "code/basics/SIObj.h"
 #include "code/basics/locv3.h"
-#include "code/phd/experiments.h"
-#include "code/basics/R3.h"
 #include "code/basics/llCamera.h"
+#include "code/phd/experiments.h"
 #include "code/basics/VMatF.h"
-#include "code/basics/LTimer.h"
-#include "code/phd/Licp.h"
-#include "code/phd/measurements.h"
-#include "code/phd/fmRansac.h"
-#include "code/pc/TheVolumePhaseCorrelator.h"
-#include "code/phd/Lpcr.h"
-#include "code/script/LScript.h"
-#include "code/phd/LSift.h"
-#include "code/basics/BitReaderWriter.h"
-#include "code/compression/LCompression.h"
-#include <sstream>
-#include <string>
 
 using namespace std;
 using namespace cv;
 using namespace ll_R3;
 using namespace ll_cam;
-using namespace ll_measure;
-using namespace ll_fmrsc;
-using namespace ll_experiments;
-
-using namespace ll_compression;
-
-string namesList[20] = {
-    "Apartment.Texture.rotate",
-    "Apartment.Texture.rotateXAxis",
-    "Boxes.Texture.arbitrarycamera",
-    "Boxes.Texture.rotate",
-    "Boxes.Texture.zoomOut",
-    "Desk.Texture.Translation",
-    "IndoorSpace.tc.translation",
-    "Kitchen.littleTexture.pan",
-    "Kitchen.littleTexture.zoom",
-    "OfficeDesk.Texture.rotationLift",
-    //"office.move1cm",
-    "Office.Texture.blindSpotRotation",
-    "Office.TexturedItems.Translation",
-    "Office.Texture.rotation",
-    "Office.Texture.rotationXAxis",
-    "Office.Texture.Translation",
-    "Outside.NoTexture.rotation",
-    "Outside.NoTexture.translation",
-    "Outside.TextureConfusion.rotation",
-    "Outside.TextureConfusion.Translation",
-    "PlantsOutdoors.tc.rotation"
-};
+using namespace ll_siobj;
 
 
 
 int main(){
 
 
-    stringstream path;
-    path << LCPPDATA_DIR << "/pix3dc/films";
-	CapturePixel3DSet video = CapturePixel3DSet::openCustom(path.str(), namesList[0], 1);
+	string fn = string(LCPPDATA_DIR) + string("/obj/") + "bunny_simplified2.obj";
 
-    Pix3D cc;
-    video.read_frame(cc, 0);
+	SIObj obIn;
+	obIn.open_obj(fn);
+	obIn.normalize(256.0f);
+	vector<R3> points;
+	for (int i = 0; i < obIn._triangles.size(); i++) obIn.getTriangle(i).rasterize(points);
+	
 
+	VMat ob(256, points, 0.0f);
 
-    Mat dm;
-    video.read_frame(cc, 0);
-    cc.depthImage(dm);
-    Mat dm2;
-    ll_transform_image(dm, dm2, 0.0, 2.5, 0.0, 0.0);
+	Mat im = ob.luke_dimension_reduce_2a(0.005f, 2, Size(256, 256));
+	ll_normalize(im);
+	//cout << ll_type(im.type()) << endl;
+	//imshow("im1", im);
+	//waitKey();
 
-    //imshow("dm", dm);
-    //imshow("dm2", dm2);
-    //waitKey();
+	ll_32F1_to_UCF1(im);
+	ll_transform_image(im, im, 180.0, 1.0, 0, 0);
 
-    cout << ll_type(dm.type()) << endl;
-    Point2d mnx;
-    minMaxLoc(dm, &mnx.x, &mnx.y);
-    cout << mnx << endl;
+	imwrite(
+"C:/Users/s2807774/Documents/Visual Studio 2015/Projects/PhD project 16/Ocv3 Basic with ll_ libraries/thesis/images/methodology/FVR/zaxis.png", im);
 
+	
 
-    Pixel3DSet p1 = Pixel3DSet::openDepthMap(dm, 1.0f);
-    Pixel3DSet p2 = Pixel3DSet::openDepthMap(dm2, 1.0f);
+	cout << obIn._points.size() << endl;
 
-    string pathOut = DESKTOP_DIR;
-
-    p1.save_obj(pathOut + string("/p1.obj"));
-    p2.save_obj(pathOut + string("/p2.obj"));
-
-
-
-    //read in bunny
-    /*SIObj ob; ob.open_obj(LCPPDATA_DIR + string("/obj/bunny_simplified2.obj"));
-    ob.normalize(256.0f);
-    vector<R3> pnts;
-    for(int i = 0; i < ob._triangles.size(); i++)
-    {
-        SI_FullTriangle T = ob.getTriangle(i);
-        T.rasterize(pnts, 0.25);
-    }
-    VMat a(256, pnts, 0.0f, 1.0f);
-    a.box_filter(2);
-    Mat im = Mat::zeros(Size(256,256), CV_8UC1);
-    //put into picture
-    for(int z = 0; z < 256; z++)
-    {
-        for(int x = 0; x < 256; x++)
-        {
-            int dist = 0;
-            for(int y = 255; y >= 0; y--, dist++)
-            {
-                if(a.at(x,y,z) > 0.5f){ im.at<unsigned char>(z,x) = dist; break; }
-            }
-        }
-    }
-
-    //view im
-    imshow("i",im);
-    waitKey();*/
-
-    VMat obj = openDataVMat(namesList[0], 0);
 
     return 0;
 }
 
-int main2(int argc, char * * argv)
-{
-
-    //todo:
-    /*
-        read in obj [done]
-        build octree for volumes [done]
-        build st for volumes
-        test differences at different psnrs
-        put in excel
-        put in graphs
-    */
-    VMat obj = openDataVMat(namesList[0], 0);
-
-    //5, 10, 20
-    vector<double> thresholds;
-    thresholds.push_back(20.0f);
-    thresholds.push_back(10.0f);
-    thresholds.push_back(7.0f);
-    thresholds.push_back(5.0f);
-    thresholds.push_back(3.0f);
-    thresholds.push_back(2.0f);
-    thresholds.push_back(1.0f);
-    thresholds.push_back(0.9f);
-    thresholds.push_back(0.8f);
-    thresholds.push_back(0.6f);
-    thresholds.push_back(0.5f);
-    thresholds.push_back(0.4f);
-    thresholds.push_back(0.2f);
-    thresholds.push_back(0.1f);
-    thresholds.push_back(0.08f);
-    thresholds.push_back(0.05f);
-    thresholds.push_back(0.02f);
-    thresholds.push_back(0.01f);
-
-    string type = "pt";
-    int minCube = 1;
-
-    for(int _j = 0, minCube = 1; _j < 4; _j++, minCube *= 2)
-    for(int i = 0; i < thresholds.size(); i++)
-    {
-        double threshold = thresholds[i];
-        VMat input = obj;
-        VMat output;
-        int numBits = 0;
-        double psnr = 0.0;
-
-        if(type == "ot")
-        {
-            LOctV _ = 256;
-            _.split(input, threshold, minCube);
-            output = _.out();
-            psnr = _.psnr(input, output);
-            numBits = _.countBits();
-        }else if(type == "ilqv")
-        {
-            ILQV _ = 256;
-            _.split(input, threshold, minCube);
-            output = _.out();
-            psnr = _.psnr(input, output);
-            numBits = _.countBits();
-        }else if(type == "pt")
-        {
-            PlaneTreeV _ = 256;
-            _.split(input, threshold, minCube);
-            output = _.out();
-            psnr = _.psnr(input, output);
-            numBits = _.countBits();
-        }
-
-        cout << threshold << endl;
-
-        cout << type << ": " << psnr << ", " << numBits << endl;
-        cout << "\n******\n";
-
-        stringstream outputFileName;
-        outputFileName << EXPS_DIR << "/compression/" << type << ".csv";
-        stringstream header;
-        header << "type,No. bits,psnr";
-        stringstream data;
-        data << type << "," << numBits << "," << psnr;
-        ll_experiments::appendData(outputFileName.str(), header.str(), data.str());
-
-
-    }
-
-	return 0;
-}
