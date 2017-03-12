@@ -1,25 +1,44 @@
-
-In this section we describe the general technique of recovering pose estimation via Fourier volume registration techniques. Several methods may be used and each has its own advantages and disadvantages and suitability depends on pose restriction, camera accuracy, noise levels and input data. 
-
-\subsubsection{Full Recovery of 3D Rotation}
-
 \label{FullRecovery3DSection}
 
-In order to recover full 3D rotation (as well as scale and translation) the model must first be aligned by some common axis. PCA or Principals Component Analysis is a well known technique for recovering the primary axes of an N-dimensional signal. In this case, we can use the most accurate axis (the eigen-vector with the largest corresponding eigen-value) to align two volumes, then y-axis rotation, scale and translation values can be recovered by the described FFT based volume registration method. \\
+
+This section explains how the Fourier Volume Reconstruction algorithm may be extended to recover full 3D camera pose rotation in addition to translation and scale differences between a pair of captured 3D frames. Proposed is a novel method which uses Principal Components Analysis as a pre-processing step in order to achieve full 3D rotation estimation. For convenience the method is named FVR-3D. Both the FVR method, the FFVR method and the FVR-3D method have unique advantages and disadvantages. FVR is designed to be a robust and efficient method of estimating camera pose and location. It is robust to 3D rotations but cannot register them, if 3D rotation recovery is required, the FVR-3D method discussed in this section provides an efficient solution, but is less robust to noise. The FFVR method may be used with both 3D rotation via PCA pre-processing and without. It is much less robust to noise however it is up to 4 times more efficient for realistic volume sizes. \\
+
+In order to integrate 3D rotation into the standard FVR method, a single axis relating the two 3D models must be known. If such an axis is known prior to executing the FVR method, both 3D frames may be aligned vertically (along the y-axis) with respect to the found axis. Once aligned, the FVR method may be used to register both relative to the final y-axis rotational separation which can be used to recover rotation and scale factors so translation may also be recovered. \\
+
+Several techniques were explored to compute this axis. These include computing the average normal value, the axis defined as the furthest two points and some basic feature matching techniques. The use of Principal Components Analysis (PCA) was also tested. Based on preliminary results PCA was chosen to compute the common axis for use in the FVR-3D method. PCA of course may be used to compute the full rotation separating two 3D frames but this typically fails when noise or non-overlapping parts of the frames are present. To be more robust to noise and non-overlapping features within the frame, only the primary axis is used to align both frames with their primary axis pointing directly up. This is more robust because the primary axis has a stronger presence within the data. This leaves the y-axis rotation to be solved. After which, the full 3D rotation factors may be computed via the FVR method. \\ 
+
+\subsubsection{Computing a Principal Axis}
+
+
+START HERE:
+
+%Mat m1 = v1.pca_correct_up();
+%Mat m2 = v2.pca_correct_up();
+%Mat m2i = m2.inv();
+
+%Mat pcm; float rotation, scale; R3 translation;
+%phase_correlate_rst(v1, v2, rotation, scale, translation); 
+%pcm = VMat::transformation_matrix(v1.s, 0.0f, rotation, 0.0f, scale, translation.x, translation.y, translation.z);
+%//un-transform v1 according to the return value of v2's up correction
+%//return proper matrix
+%return (m2i * pcm * m1);
+		
+
+, we can use the most accurate axis (the eigen-vector with the largest corresponding eigen-value) to align two volumes, then y-axis rotation, scale and translation values can be recovered by the described FFT based volume registration method. \\
 
 WARNING: SHOW picture of this PCA procedure
 
-PCA is a capable registration technique on its own, but when faced with non-overlapping, missing or noisy data it typically fails on its own. The technique of alignment is discussed in the following sections. \\
+END HERE
 
-Given a 3-dimensional signal $A$ of length $N$, the co-variance of the signals between two of the dimensions ($x$ and $y$) is given as a function in equation \ref{eqn:Covariance3DSignal}.
+Computing the principal axis used in FVR-3D is discussed in this section. As mentioned, PCA is used to compute this axis. Both 3D frames have their axis computed separately before they are used to align both frames to a common axis. To compute the common axis using PCA, both the eigen-values and eigen-vectors of the covariance matrix of the 3D frames must be computed. The eigen-vector with the largest corresponding eigen-value is set to be the primary axis. The procedure works as follows. \\
+
+Given a 3D point cloud $A$ of $N$ points, which may be generated via monocular methods, stereo disparity estimation or active sensor (Kinect, Asus XTion Pro-LIVE), the co-variance of the points between two of the dimensions ($x$ and $y$) is computed as the summation of each $x$ component subtracted by the mean $x$ value multiplied by the $y$ component subtracted by the mean $y$ component value (see equation \ref{eqn:Covariance3DSignal}, $A_{x_{mean}}$ and $A_{y_{mean}}$ refer to the mean values of these x and y dimensions of $A$). \\
 
 \begin{equation} \label{eqn:Covariance3DSignal}
 Cov(A_x,A_y) = \sum_{i=0}^{N}(A_{x_i} - A_{x_{mean}})(A_{y_i} - A_{y_{mean}})
 \end{equation}
 
-Here, $A_{x_{mean}}$ and $A_{y_{mean}}$ are the mean values of these x and y dimensions of $A$. 
-
-Using the voxel locations of volume $A$ we can generate the covariance matrix \ref{eqn:CovarMatrix}. This matrix describes the how each coordinate changes with respect to each other.
+Using the formula for covariance the covariance matrix may be computed for an $N$ dimensional signal. In the case of 3D construction, this matrix is a $3 \times 3$ covariance matrix where each column/row index represents a covariance relationship. This covariance matrix is shown in equation \ref{eqn:CovarMatrix}. This matrix forms a description about how each coordinate axis changes with respect to each other coordinate. The eigen-vectors of this matrix constitute the principal components of the 3D point cloud frame. \\
 
 \begin{equation} \label{eqn:CovarMatrix}
 \left[
@@ -31,11 +50,13 @@ Cov(A_z, B_x) & Cov(A_z, A_y) & Cov(A_z, A_z) \\
 \right]
 \end{equation}
 
-The 3 eigen-vectors of the covariance matrix describe the primary axis of the signal $A$ and the 3 corresponding eigen-values describe the strength of these axes. The eigen-vector/axis with the largest corresponding eigen-value is the principal component. The principal component is used to align data to a common axis. Here we define the principal axis (component) of a 3D signal $A$ as $A_{pa}$. \\
+The 3 eigen-vectors of the covariance matrix describe the primary axis of the 3D frame $A$ and the 3 corresponding eigen-values describe the dominance of these vectors. The eigen-vector/axis with the largest corresponding eigen-value is the principal component in PCA and is used as the aligning axis in the FVR-3D method. Here this principal axis is used to align data to a common axis defined to be the vertical y-axis. For simplicity, the principal axis of a 3D frame $A$ is written as $A_{pa}$. During the process of PCA the centroid of the point cloud is also computed. This is simply the average point location within the input point cloud. For simplicity in later discussions, the centroid of a 3D frame $A$ is written as $A_{mean_location}$. A visualization of the principal axis and centroid may be seen in figure WARNING_INSERT_FIGURE_HERE \\
 
-Given a 3D volume $V$, with a computed principal axis $V_{pa}$ and mean $V_{mean_location}$, we can construct a matrix to normalize the 3D data in terms of the principal axis.
+\subsubsection{Alignment Pre-Process}
 
-Given $V_{pa}$ a vector pointing along the principal axis of $V$, we compute the forward vector as 
+Using the PCA method, for each input 3D frame $V$, the procedure to compute $V_{pa}$, the principal axis of $V$ computed and used along with the centroid $V_{mean_location}$ to align the input 3D frame using the principal axis $V_{pa}$ as the new vertical axis. To this end, a transformation matrix is formed and is used to rotate the volume such that the principal axis $V_{pa}$ points up. This is useful because if a 3D frame pair are both rotated with respect to their principal axis, and both frames share enough overlap, then only 3D y-axis rotation, 3D translation (and possibly 3D scale) separate the two frames. As discussed in section \ref{Sec:AFVRApproach}, these parameters may be recovered using the FVR method. The matrix used to normalize the 3D frames in terms of their principal axis is discussed here. \\
+
+If $V_{pa}$ (the vector pointing along the principal axis of $V$) is to be set at the new y-axis for the volume, then the other axes must also be computed (x-axis and z-axis). The z-axis, named the forward ($Fwd$) axis is computed based on the cross product between the then x-axis and the principal axis $V_{pa}$ (taken as the y-axis) which gives a psuedo z-axis. The cross product between the principal axis and this pseudo z-axis gives an accurate x-axis. Lastly the cross product between this x-axis and the y-axis (the principal axis) gives the corresponding z-axis in the form of the variable $Fwd$. This is shown in equation \ref{eqn:fwdVector}. \\
 
 
 \begin{equation} \label{eqn:fwdVector}
@@ -66,10 +87,10 @@ V_{pa_{z}}\\
 \right]
 \end{equation}
 
-Here, $\times$ is the cross-product of the vectors. The right pointing vector is computed as orthogonal to the forward vector and the common vertical axis $V_{pa}$,
+The final axis completing the new space is the x-axis defined at the cross product between the principal axis (the new y-axis) and the z-axis (the $Fwd$ vector) and is named $Rgt$ (standing for right facing axis). Equation \ref{eqn:rgtVector} shows this calculation. This completes the new space defined by x-axis $Rgt$, y-axis $V_{pa}$ and z-axis $Fwd$. A rotation matrix transforming original space to the new space given by these axes may be computed using the $Rgt$, $V_{pa}$ and $Fwd$ axes as the column vectors of the rotation matrix. The inverse, that is the transformation from the new space to the original space may computed using the transpose of that rotation matrix. The rotation of the point cloud from the new space defined by the principal axis to the original space is useful as it aligns the principal axis to the y-axis leaving only 3D y-axis rotation, 3D translation and possibly scale to be registered. \\ 
 
 
-\begin{equation} \label{eqn:fwdVector}
+\begin{equation} \label{eqn:rgtVector}
 Rgt = \left[
 \begin{array}{c}
 V_{pa_{x}}\\
@@ -85,8 +106,7 @@ Fwd_z\\
 \right]
 \end{equation}
 
-Then the volume can be normalized to an axis based on the input data. This is done using a matrix which transforms the data to the origin, then corrects the vector $V_{pa}$ to be the new up axis, then transforms back. The matrix in equation \ref{eqn:CorrectUpMat} computes this,
-
+The input 3D frame $V$ may be aligned by its principal axis as the new y-axis by first transforming the centroid to the origin. Next the 3D frame may be rotated from the new space to the default identity space. This sets $Rgt$ to be the new x-axis, $V_{pa}$ to be the new y-axis and $Fwd$ to be the new z-axis. The rotation matrix may be computed as the row vectors of these axes. Finally, after the rotation the 3D frame $V$ may be transformed back to the centroid. This aligns the 3D frame so that $V_{pa}$ points towards the y-axis. The compounded transformation to perform this alignment is fully defined in equation \ref{eqn:CorrectUpMat}. \\
 
 \begin{equation} \label{eqn:CorrectUpMat}
 CorrectMat(V) = \left[
@@ -113,11 +133,12 @@ Fwd_x & Fwd_y & Fwd_z & 0 \\
 \right]
 \end{equation}
 
+\subsubsection{3D Rotation Registration}
 
-To recover a matrix for full 3D rotation, scale and translation for given volumes $Volume_A$ and $Volume_B$, we first compute the correction matrices using PCA and the technique described above for both $Volume_A$ and $Volume_B$ as $C_A = CorrectMat(Volume_A)$ and $C_B = CorrectMat(Volume_B)$. The transformation matrix relating $Transform(Volume_A, C_A)$ and $Transform(Volume_B, C_B)$ is computed as $RST$. The final transform then relating $Volume_A$ to $Volume_B$ is computed as,
+To recover a matrix for full 3D rotation separating two input 3D frames $A$ and $B$ which have been taken from two different locations (translation separation) with two different poses (3D rotational separation) and possibly projected differently (scale separation), the first step is to align both frames by their principal axis. The alignment matrix for $A$ can be computed as $C_A = CorrectMat(A)$ and the alignment matrix for $B$ may be computed as $C_B = CorrectMat(B)$. Transforming both $A$ and $B$ by their alignment matrix gives two volumes $A_{aligned} = Transform(A, C_A)$ and $B_{aligned} = Transform(B, C_B)$ which are now only separated by 3D y-axis rotation, 3D translation and 3D scaling factors. As discussed in sections \ref{Sec:VolumeRegistrationSection} and \ref{Sec:AFVRApproach} these factors may be computed and a registration matrix aligning $A_{aligned}$ and $B_{aligned}$. This matrix is computed as $R_{y}ST = FVR(A_{aligned},B_{aligned})$. Using this registration matrix and the alignment matrices $C_{A}$ and $C_{B}$, the full 3D rotation, 3D scale and 3D translation registration matrix, $R_{x,y,z}ST$ transforming $A$ to $B$ may be computed  may be recovered by trans
 
 \begin{equation} \label{eqn:FullRSTTransform}
-R_{x,y,z}ST Matrix = C_{B}^{-1} \times RST \times C_A
+R_{x,y,z}ST Matrix = C_{B}^{-1} \times R_{y}ST \times C_A
 \end{equation}
 
 This technique is capable of extending Fourier registration to take into account full 3D rotation. The technique simply requires a single iteration over the data to compute the principal components then a rotation-scale-translation phase correlation technique is used to compute the scale, translation and y-axis rotation. 
