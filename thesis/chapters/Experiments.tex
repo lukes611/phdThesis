@@ -18,6 +18,25 @@ In this section, various experiment set-ups and test data are discussed. Results
 \label{ToolsSection}
 \input{chapters/Experiments/Experiments/Tools}
 
+\section{Error metrics}
+
+\label{metricsSection}
+
+In order to evaluate the accuracy of volume registration we use several error metrics including: Hausdorff error, mean squared error and the percentage of matched voxels. We describe mathematically those techniques here. All measurements are based on a simple function which computes the nearest neighbour for a given 3D point or voxel given a volume (or collection of 3D points). We define such a function, named nearest-neighbour in equation \ref{eqn:NN}.
+
+\begin{equation} \label{eqn:NN}
+NN(p, V) =  \{ q \in V | (Dist(q, p) < Dist(k, p))  \forall k \in V \}
+\end{equation}
+
+This function retrieves the closest corresponding point given a query point $p$ and a volume or point cloud of points, $V$. This function can be used to provide omni-directional error functions based on Hausdorff, mean squared and percentage accuracy error metrics.
+
+Here some one-way error functions are described. The one was Hausdorff error is defined in \ref{eqn:HDOW} 
+
+\begin{equation} \label{eqn:HDOW}
+\sum_{k=0}^{N} Dist(P_k, NN(P_k, Q))
+\end{equation}
+
+
 %the basic tracking stuff
 \input{chapters/Experiments/FVR/BasicTracking}
 
