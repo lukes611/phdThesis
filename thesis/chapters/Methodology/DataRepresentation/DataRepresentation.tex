@@ -1,14 +1,41 @@
-In this section we introduce two data representations for recording 3D reconstructions. These novel representations are based on the Octree method. The representations are both designed to compress the data. These methods are inspired by the Shade-Tree and Interpolated Leaf Quad-Tree representations \cite{Gonzalez07ShadeTree, Lincoln13Interpolating} which are used for image compression. These techniques make use of Quad-Tree decomposition and have been shown to outperform several transform based methods of compression. 
+In this section a novel 3D frame data representation and compression method is described. It was designed to help reduce data size whilst facilitating data processing. This novel representation is named Plane-Tree and is a modification of the basic Octree 3D data representation method. \\
+
+The Shade-Tree is designed primarily to compress 3D data. It is based on the Octree but was inspired by the Shade-Tree and Interpolated Leaf Quad-Tree representations \cite{Gonzalez07ShadeTree, Lincoln13Interpolating} which are used for image compression. These techniques make use of Quad-Tree decomposition and have been shown to outperform several transform based methods of compression. 
 
 \subsection{Octree Decomposition}
 
-In this section we explain Octree decomposition. This strategy forms a cube shaped space around some 3D volumetric data. A data representation is then computed using the location and size of the cube. A measurement system is used to decide if the current data representation fits the data within the cube well or not. If so, then the data representation is used instead of the data. If not, the cube is broken down into 8 sub-cubes and the process is repeated. At each level of decomposition, the data representation achieves finer detail, but more nodes must be stored which means less compression. An example of the Octree is illustrated in figure [INSERT IT HERE].
+In this section Octree decomposition is explained. This strategy forms a cubic shaped space around some 3D data. In the case of 3D reconstruction, it may be the 3D frame input from an active sensor, stereo method or monocular depth estimation procedure. A geometric representation is then computed for the data contained within the cubic space. This representation may be as simplistic as recording the cube's center or using the cube to represent the space, or may be complex, employing splines and curvature representation techniques to represent the space. \\
+
+Whatever the representation, a measurement system must be used to decide whether the computed geometric representation fits the data within the space adequately. If the geometric representation is accurate enough for application purposes, then it may be used in place of the data. This representation is typically designed such that the amount of data required for representation of a space is less than the amount which would be used otherwise. Alternatively, the representation may make use of known correlations which may be more easily compressed compared with the initial representation. \\
+
+
+\begin{figure}[!htb]
+\centering
+\includegraphics[width=8cm]{images/methodology/pt/octreeVis}
+\caption{Visualization of cubic space being split \cite{Hornung13Octomap}.}
+\label{fig:SpaceVis}
+\end{figure}
+
+If, by the error generated via the measurement system, it is decided the representation is not suitable, the cubic space is broken down into 8 sub-cubes and the process is repeated. For an example of the space broken down into sub-cubes see figure \ref{fig:SpaceVis}. \\
+
+At each level of decomposition, the data representation achieves finer detail, but more nodes must be stored which means less compression. This is a classic trade-off between compression and accuracy in representing the underlying object. An example of the Octree's use in representing an object at differing levels of accuracy is shown in figure \ref{fig:octreeaccuracy}. In the next section, the decomposition procedure is discussed further. Section \ref{sec:dr:coding} describes the geometric representation employed by the Plane-Tree.
+
+
+\begin{figure}[!htb]
+\centering
+\includegraphics[width=14cm]{images/ch2/OctreeExample}
+\caption{An Example of an Octree used to represent an object at differing levels of accuracy \cite{Hornung13Octomap}. Left: Original model, Middle: few node splits used to represent the model. Right: many node splits used to more accurately represent the model.}
+\label{fig:octreeaccuracy}
+\end{figure}
+
 
 \subsubsection{Octree Description}
 \label{OTDesc}
 
-In order to understand the OT structure, the Quad-Tree (QT) is explained first. This is done because the QT is the 2D equivalent of the OT and is easier to explain. The QT is a hierarchical data structure used for processing and compressing 2D data. Figure \ref{QuadtreeExample} shows an example of a QT used to represent an image. In this figure, the original image is on the left. The QT first uses a single coloured square to represent the entire image, then using some error metric it decides whether or not to, a) represent the image more accurately using more memory or b) stop decomposition and represent the image with a single colour. If option b) is chosen, the image will look like the second left picture. If option a) is chosen, the image is divided into four sub-images each with its own colour. From here the whole process begins again, with each sub-image given the same options. The final product of the QT is shown on the far right in figure \ref{QuadtreeExample} and a visualization of a QT hierarchy is shown in figure \ref{QuadTreeHierarchy}.
-\begin{figure}[!h]
+The Octree, the Quad-Tree (QT) is explained first. This is done because the QT is the 2D equivalent of the OT and is easier to explain. The QT is a hierarchical data structure used for processing and compressing 2D data. Figure \ref{QuadtreeExample} shows an example of a QT used to represent an image. In this figure, the original image is on the left. The QT first uses a single coloured square to represent the entire image, then using some error metric it decides whether or not to, a) represent the image more accurately using more memory or b) stop decomposition and represent the image with a single colour. If option b) is chosen, the image will look like the second left picture. If option a) is chosen, the image is divided into four sub-images each with its own colour. From here the whole process begins again, with each sub-image given the same options. The final product of the QT is shown on the far right in figure \ref{QuadtreeExample} and a visualization of a QT hierarchy is shown in figure \ref{QuadTreeHierarchy}. \\
+
+
+\begin{figure}[!htb]
 \centering
 \includegraphics[width=12cm]{images/ch2/quadtreeexample}
 \caption{Quadtree Image Representation, left to right: Original Image, 1st Level of Decomposition, 2nd Level of Decomposition, 3rd Level of Decomposition, QT codec Image.}
@@ -23,7 +50,7 @@ In order to understand the OT structure, the Quad-Tree (QT) is explained first. 
 
 The OT works similarly to the QT, however, instead of beginning with a square encompassing the entire region, a cube is used to enclose a 3D space. Similarly to the QT, an error metric is used to decide whether to split up the space or leave it unchanged. Each split operation divides each coordinate ($x,y,z$) by two, leaving 8 subspaces. Figure \ref{OctreeExample} shows this decomposition. The further each cube is split, the more the OT resembles the model being compressed. In the QT and OT, nodes which have not been split are called leaf nodes and the function which decides whether a node should be split is called the leaf criterion. 
 
-\begin{figure}[!h]
+\begin{figure}[!htb]
 \centering
 \includegraphics[width=16cm]{images/ch2/OctreeExample}
 \caption{Visualization of OT Decomposition}
@@ -61,7 +88,7 @@ The linear tree representation stores each leaf node individually. Each leaf is 
 
 
 \subsection{3D ShadeTree Coding}
-
+\label{sec:dr:coding}
 The Shade-Tree compression system CITE HERE, was designed for the compression of 2D image data. However, this method is easily extended to 3D Volumetric data. In this system, octants are decomposed in the same manner as with a regular octree but the leaf node representation is different. In the Shade-Tree, the corner values in the volume are sampled for each node. Figure XXXXFFG shows an example of these corners given an Octree. The corner values are stored instead of the data within the cube. \\
 
 
