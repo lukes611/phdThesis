@@ -2,7 +2,7 @@ In this section a novel 3D frame data representation and compression method is d
 
 The Shade-Tree is designed primarily to compress 3D data. It is based on the Octree but was inspired by the Shade-Tree and Interpolated Leaf Quad-Tree representations \cite{Gonzalez07ShadeTree, Lincoln13Interpolating} which are used for image compression. These techniques make use of Quad-Tree decomposition and have been shown to outperform several transform based methods of compression. 
 
-\subsection{Octree Decomposition}
+\subsection{Octree Overview}
 
 In this section Octree decomposition is explained. This strategy forms a cubic shaped space around some 3D data. In the case of 3D reconstruction, it may be the 3D frame input from an active sensor, stereo method or monocular depth estimation procedure. A geometric representation is then computed for the data contained within the cubic space. This representation may be as simplistic as recording the cube's center or using the cube to represent the space, or may be complex, employing splines and curvature representation techniques to represent the space. \\
 
@@ -32,7 +32,9 @@ At each level of decomposition, the data representation achieves finer detail, b
 \subsubsection{Octree Description}
 \label{OTDesc}
 
-The Octree, the Quad-Tree (QT) is explained first. This is done because the QT is the 2D equivalent of the OT and is easier to explain. The QT is a hierarchical data structure used for processing and compressing 2D data. Figure \ref{QuadtreeExample} shows an example of a QT used to represent an image. In this figure, the original image is on the left. The QT first uses a single coloured square to represent the entire image, then using some error metric it decides whether or not to, a) represent the image more accurately using more memory or b) stop decomposition and represent the image with a single colour. If option b) is chosen, the image will look like the second left picture. If option a) is chosen, the image is divided into four sub-images each with its own colour. From here the whole process begins again, with each sub-image given the same options. The final product of the QT is shown on the far right in figure \ref{QuadtreeExample} and a visualization of a QT hierarchy is shown in figure \ref{QuadTreeHierarchy}. \\
+The Octree is the three dimensional extension to the two dimensional Quad-Tree (QT) technique. First we provide some information about the QT and the idea behind using planes or shading the cubic (or square in the case of the QT) nodes to improve compression and efficiency. This was the fundamental idea behind the Shade-Tree and ILQT algorithms \cite{Gonzalez07ShadeTree, Lincoln13Interpolating}. Both these techniques have been shown to improve compression in comparison to state of the art transforms and form the basis of reasoning behind the Plane-Tree. \\
+
+The QT is a hierarchical data structure used for processing and compressing 2D data. Figure \ref{QuadtreeExample} shows an example of a QT used to represent an image. In this figure, the original image is on the left. The QT first uses a single coloured square to represent the entire image, then using some error metric it decides whether or not to, a) represent the image more accurately using more memory or b) stop decomposition and represent the image with a single colour. If option b) is chosen, the image will look like the second left picture. If option a) is chosen, the image is divided into four sub-images each with its own colour. From here the whole process begins again, with each sub-image given the same options. The final product of the QT is shown on the far right in figure \ref{QuadtreeExample} and a visualization of a QT hierarchy is shown in figure \ref{QuadTreeHierarchy}. \\
 
 
 \begin{figure}[!htb]
@@ -41,14 +43,18 @@ The Octree, the Quad-Tree (QT) is explained first. This is done because the QT i
 \caption{Quadtree Image Representation, left to right: Original Image, 1st Level of Decomposition, 2nd Level of Decomposition, 3rd Level of Decomposition, QT codec Image.}
 \label{QuadtreeExample}
 \end{figure}
-\begin{figure}[!h]
+
+
+\begin{figure}[!htb]
 \centering
 \includegraphics[width=6cm]{images/ch2/QuadTreeHierarchy}
 \caption{A visualization of the QT hierarchy}
 \label{QuadTreeHierarchy}
 \end{figure}
 
-The OT works similarly to the QT, however, instead of beginning with a square encompassing the entire region, a cube is used to enclose a 3D space. Similarly to the QT, an error metric is used to decide whether to split up the space or leave it unchanged. Each split operation divides each coordinate ($x,y,z$) by two, leaving 8 subspaces. Figure \ref{OctreeExample} shows this decomposition. The further each cube is split, the more the OT resembles the model being compressed. In the QT and OT, nodes which have not been split are called leaf nodes and the function which decides whether a node should be split is called the leaf criterion. 
+The ILQT and Shade-Tree use small amounts of memory at the corners of the quadrants and interpolate to generate the underlying structure. The small data structures used for representation are very small 
+
+The OT works identically to the QT, however, instead of beginning with a square encompassing the entire region, a cube is used to enclose a 3D space. Similarly to the QT, an error metric is used to decide whether to split up the space or leave it unchanged. Each split operation divides each coordinate ($x,y,z$) by two, leaving 8 subspaces. Figure \ref{OctreeExample} shows this decomposition. The further each cube is split, the more the OT resembles the model being compressed. In the QT and OT, nodes which have not been split are called leaf nodes and the function which decides whether a node should be split is called the leaf criterion. 
 
 \begin{figure}[!htb]
 \centering
