@@ -1,4 +1,5 @@
 \section{Camera Translation Tracking}
+\label{Sec:CamTransTrackExp}
 
 In this section, camera parameters found by the FVR method are compared to ground truth data under various levels of noise. The Signal to Noise Ratio (SNR) metric is used to describe the noise added to the data prior to registration. A noise value of $x$\% means random noise was added in the range [$-0.5x$, $0.5x$]. Camera registration error is measured in centimetres and voxel error (the error in the phase correlation volume). Table \ref{table:trans} shows the FVR's robustness to noise whilst the camera was moved at different intervals. Results indicate that for camera movements of up to 15cm and SNR higher than 6.0 the FVR method is robust to noise. In video frame rates, a displacement of 10cm per frame equates to camera velocity of 3 m/s (roughly twice normal walking speed).  \\
 
@@ -31,6 +32,7 @@ In this section, camera parameters found by the FVR method are compared to groun
 \end{table}[ht]
 
 \section{Camera Rotation Tracking}
+\label{Sec:CamRoteTrackExp}
 
 Table \ref{table:rote} shows results for camera rotation experiments. Degrees of separation tested include: 10, 20 and 30 degrees. Twelve degrees per frame is almost a full rotation per second in video rates. Given 10 degrees of separation, the error was below 1 degree for noise levels less than or equal to 30\%. This base line error is due to the sampling resolution of the volume, as voxel error was in fact zero. As with pure translation, the effect of noise increases with camera disparity. At 30 degrees, little matching information is available. However, for noise levels of 10\% or less, voxel distance error was as low as 4 with an angular error less than $3.8$. Rotations of this magnitude are unlikely as motion blur would occur.
 
@@ -58,7 +60,8 @@ $30^{\circ}$ & 15 & 16.5db & 30 & 32\\
 \label{table:rote}
 }
 
-\subsection{Object Motion Experiments}
+\section{Object Motion Experiments}
+\label{Sec:FVRMotionExp}
 
 \hfill
 \parbox{.45\linewidth}{
@@ -87,6 +90,7 @@ $30^{\circ}$ & 15 & 16.5db & 30 & 32\\
 To assess robustness to object motion, experiments were conducted by moving the camera backwards along the z-axis by 5cm per frame whilst moving objects were placed in and out of the scene so that they only appear in one of the volumes being registered. Various sized objects including stacks of CDs, large boxes, people and several pieces of furniture were used and are measured by the percentage of the frame they occupy. Results from Table \ref{table:OBJECT_MOVE_EXP} show the proposed method was accurate upto an object size of 31\%, but failed for objects taking up over 48.23\%.
 
 \section{Reconstructed Scenes}
+\label{Sec:FVRQual1Exp}
 
 \begin{figure*}[t] 
         \centering

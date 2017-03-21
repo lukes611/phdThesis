@@ -8,9 +8,10 @@
 
 \section{Experiments}
 
-Several experiments were designed in order to evaluate both the FVR method as well as the Plane-Tree and 3D Shade-Tree method. The types of these experiments as well as their conditions and results are presented in this section. 
+Several experiments were designed in order to evaluate both the FVR method as well as the Plane-Tree and 3D Shade-Tree method. The types of these experiments as well as their conditions and results are presented in this section. In the next section (section \ref{TestDataSection}) the test data used in experimentation is introduced. Following that (in section \ref{ToolsSection}), the tools used to run these experiments are also introduced along with various error metrics (section \ref{metricsSection}) which provide means for comparisons between algorithms. \\
 
-In this section, various experiment set-ups and test data are discussed. Results are presented in the results section (\ref{ResultsSection}). In this section we first discuss the test data used in section \ref{TestDataSection}, then the tools we used for analysis are discussed (section \ref{ToolsSection}). The algorithms we evaluated and compared are listed in section \ref{AlgorithmsSection}. Finally in the later sections (\ref{QualExperimentsSection} and beyond) we discuss the quantitative and qualitative methods we used to test these algorithms. Finally section \ref{DataRepresentationExperimentsSection} describes the experiments evaluating the proposed Reconstruction data-representation. 
+Then different results for experiments analysing the performance of FVR and comparing it to methods used in the current literature are presented. These experiments compare the FVR's ability to track camera movements (sections \ref{Sec:CamTransTrackExp} and \ref{Sec:CamRoteTrackExp}), its qualitative performance (section \ref{Sec:FVRQual1Exp}) and its robustness to noise (section \ref{Sec:FVRMotionExp}). Experiments evaluating the performance of Monocular FVR are then presented in section \ref{Sec:MonocularExperimentsSection} followed by experiments comparing FVR-3D to commonly used procedures from the literature. After these experiments, the Plane-Tree is compared to the Octree. These experiments compare both method's efficacy in compressing 3D mesh data. The Plane-Tree is also compared to various state-of-the-art compression techniques from the literature. Next, qualitative compression results are presented comparing the Plane-Tree to several other methods. Finally, the Plane-Tree is compared to both the Octree and the 3D-ShadeTree in compressing 3D reconstructions. \\
+
 
 \section{Test Data}
 \label{TestDataSection}
@@ -21,30 +22,15 @@ In this section, various experiment set-ups and test data are discussed. Results
 \input{chapters/Experiments/Experiments/Tools}
 
 \section{Error metrics}
-
 \label{metricsSection}
-
-In order to evaluate the accuracy of volume registration we use several error metrics including: Hausdorff error, mean squared error and the percentage of matched voxels. We describe mathematically those techniques here. All measurements are based on a simple function which computes the nearest neighbour for a given 3D point or voxel given a volume (or collection of 3D points). We define such a function, named nearest-neighbour in equation \ref{eqn:NN}.
-
-\begin{equation} \label{eqn:NN}
-NN(p, V) =  \{ q \in V | (Dist(q, p) < Dist(k, p))  \forall k \in V \}
-\end{equation}
-
-This function retrieves the closest corresponding point given a query point $p$ and a volume or point cloud of points, $V$. This function can be used to provide omni-directional error functions based on Hausdorff, mean squared and percentage accuracy error metrics.
-
-Here some one-way error functions are described. The one was Hausdorff error is defined in \ref{eqn:HDOW} 
-
-\begin{equation} \label{eqn:HDOW}
-\sum_{k=0}^{N} Dist(P_k, NN(P_k, Q))
-\end{equation}
+\input{chapters/Experiments/Experiments/Metrics}
 
 
 %the basic tracking stuff
 \input{chapters/Experiments/FVR/BasicTracking}
 
 \section{Monocular Camera Translation Tracking}
-\section{Speed Improvement Tests}
-\input{chapters/Experiments/FVR/SpeedImprovements}
+\label{Sec:MonocularExperimentsSection}
 
 \section{FVR vs. Existing Techniques}
 \subsection{Algorithms} \label{AlgorithmsSection} \input{chapters/Experiments/FVR/Algorithms}
