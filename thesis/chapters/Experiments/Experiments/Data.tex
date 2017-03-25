@@ -17,3 +17,15 @@ The boxes scene was captured under arbitrary-rotation, translation and zoom (in/
 The kitchen scene was captured with both translation and zoom camera movements. It contains very little texture with most of the scene containing a plain/flat white textured surface. The Office textured blind-spot rotation scene is a textured office scene where the camera is rotated about the y-axis. The scene is focused on a large divider which separates two desks. The divider may confuse registration methods which rely too heavily on minimization by aligning the large divider as a priority rather than taking into account the smaller details within the scene. An example of such an algorithm would be ICP and its derivatives. \\
 
 The Office scenes contain a plenty of usable texture and different sets were created by translating, rotating about the y-axis and rotating about the x-axis. Other office scenes, where the camera captures objects in both the foreground and the background and where the camera is lifted and rotated whilst focussed on an office desk and chair combo. Some out-door scenes were also captured around the university. They are captured with both rotation and translation camera movements and are also labelled as being susceptible to texture confusion. \\
+
+\begin{figure}[!htb]
+\centering
+\includegraphics[width=4.0in]{images/experiments/test_data/modelsused}
+\caption{Models used to assess the Plane-Tree compression algorithm.}
+\label{fig:MODELSUSEDA}
+\end{figure}
+
+To test the Plane-Tree algorithm, several 3D objects commonly used within the literature were used to compare with known state of the art compression methods in terms of 3D mesh compression. The models used for testing are shown in figure \ref{fig:MODELSUSEDA}. These include: the bunny model with 34835 vertices, the rabbit model with 67039 vertices, the fandisk model with 6475 vertices and the horse model with 19851 vertices. \\
+
+Several 3D reconstructions generated from the data set in appendix \ref{AppendixA} were used also to assess the Plane-Tree in compressing 3D reconstructions for storage and transmission. \\
+

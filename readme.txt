@@ -1,7 +1,7 @@
 
 todo:
 	1 [x] re-write test data section
-	2 [o] re-write tools section
+	2 [x] re-write tools section
 	3 [o] re-write metrics section
 	4 [o] re-write basic tracking section
 	5 [o] write mvvr section
