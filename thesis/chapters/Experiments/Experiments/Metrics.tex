@@ -1,13 +1,60 @@
-In order to evaluate the accuracy of volume registration we use several error metrics including: Hausdorff error, mean squared error and the percentage of matched voxels. We describe mathematically those techniques here. All measurements are based on a simple function which computes the nearest neighbour for a given 3D point or voxel given a volume (or collection of 3D points). We define such a function, named nearest-neighbour in equation \ref{eqn:NN}.
+
+In order to properly assess the set of proposed 3D reconstruction algorithms as well as the proposed Plane-Tree and other compression methods, several metrics are used. These metrics are presented and defined mathematically here. Assessing both the 3D reconstruction algorithms as well as the lossy 3D data compression techniques requires comparing output 3D models. In the case of 3D reconstructions we can compare the error between the registered frame and the ground truth, the larger the error, the worse the registration. Alternatively a measurement may be used to measure the difference between two frames before and after they are registered, if the error is reduced or almost zero after registration, then the registration method may be deemed correct. If the error is larger or almost the same post registration, the registration maybe considered incorrect or there possibly was little camera movement. \\
+
+
+In both cases, a fair way to measure the difference between two 3D objects must be used. To compute this error we use nearest neighbour functions to measure the closest point in one model to the closest point in the next model. For example, given model A and model B, the closest point $B_j$ in $B$ for point $A_i$ in $A$, is used in summation of the total error. The closest point $B_j$ to $A_i$ is simply the nearest neighbour of $A_i$. This can be formally described as a function of 3D point list $V$ and a given point $p$ likely from some other model. This is described mathematically in equation \ref{eqn:NN}. Here, the result is a point $q$ in $V$, in which the distance between according to function $Dist(x,y)$ is lesser for $q$ given $p$ than any other point $k$ in $V$.  \\
 
 \begin{equation} \label{eqn:NN}
 NN(p, V) =  \{ q \in V | (Dist(q, p) < Dist(k, p))  \forall k \in V \}
 \end{equation}
 
-This function retrieves the closest corresponding point given a query point $p$ and a volume or point cloud of points, $V$. This function can be used to provide omni-directional error functions based on Hausdorff, mean squared and percentage accuracy error metrics.
+For all purposes within this research, the function $Dist(x,y)$ is simply the euclidean distance between the two input points. Using definition of nearest neighbour, several metrics may be used to compute the distance between two models. The one-way distance between two models is defined as the summation of distances for each point in one model to its nearest neighbour from the other model. The one-way mean error between two 3D models, $P$ and $Q$ is given in equation \ref{eqn:HDOW}. The full mean error between two objects is then computed as the average of the $Mean-Error_{one-way}$ function from models $P$ to $Q$ and $Q$ to $P$. This is defined in equation \ref{eqn:MEANERRORMETRIC1}. \\
 
-Here some one-way error functions are described. The one was Hausdorff error is defined in \ref{eqn:HDOW} 
 
 \begin{equation} \label{eqn:HDOW}
-\sum_{k=0}^{N} Dist(P_k, NN(P_k, Q))
+ME_{1-way}(P, Q) = \frac{1}{N}\sum_{k=0}^{N} Dist(P_k, NN(P_k, Q))
 \end{equation}
+
+
+\begin{equation} \label{eqn:MEANERRORMETRIC1}
+ME(P, Q) = \frac{ME_{1-way}(P,Q) + ME_{1-way}(Q,P)}{2}
+\end{equation}
+
+Other metrics may also be used, for example the mean squared error can be used instead of mean error. The mean squared error (MSE) may then be swapped in place for the mean error used in equation \ref{eqn:HDOW}. The one-way and full error functions based on the MSE are provided in equations \ref{eqn:MSEOW} and \ref{eqn:MEANSQERRORMETRIC1}. \\
+
+
+\begin{equation} \label{eqn:MSEOW}
+MSE_{1-way}(P, Q) = \frac{1}{N}\sum_{k=0}^{N} Dist(P_k, NN(P_k, Q))^2
+\end{equation}
+
+
+\begin{equation} \label{eqn:MEANSQERRORMETRIC1}
+MSE(P,Q) = \frac{MSE_{1-way}(P,Q) + MSE_{1-way}(Q,P)}{2}
+\end{equation}
+
+
+The mean error based on the nearest neighbour is often referred to as the Hausdorff error. In this research we used the Hausdorff error as well as the Mean Squared Error based on the nearest neighbour technique, as well as a percentage of total matches. The one-way percentage of total matches is the computation of the percent of points from one model which have a nearest neighbour which has a distance below a given threshold. This metric is defined in equation \ref{eqn:PERCMATCHOW}. \\
+
+\begin{equation} \label{eqn:PERCMATCHOW}
+PM_{1-way}(P, Q) = \frac{100}{N}\sum_{k=0}^{N} x, where
+  \begin{cases}
+    x=1       & \quad \text{if } Dist(P_k,NN(P_k,Q)) < \text{threshold}\\
+    x=0  & \quad otherwise\\
+  \end{cases}
+\end{equation}
+
+Following this, the full Percent-Match function may be defined as the average of the $PM_{1-way}$ function in both directions. These 3 metrics are used along with several others in 3D reconstruction experiments. Additionally, the camera tracking error is computed as the euclidean distance between the ground truth camera movement from one frame to another with the estimated camera movement computed via the FVR method. Besides this, the voxel error is also measured. Since the camera distance metric measures the real positions moved by the camera, it theoretically has the accuracy of the real number system. Conversely, FVR uses voxel spaces (3D volumes) to find the translation and rotation (location and pose) between frames. So the result is quantized. By quantizing the ground truth prior to comparison, the accuracy up to the resolution of the voxel grid may be computed. This is important since it measures the error of the FVR 3D reconstruction method without penalizing it based on the effects of quantization which reduce the larger the volume. \\
+
+In experiments comparing the Plane-Tree with state-of-the-art algorithms, the root mean squared error is also used. The root mean squared error is simply the square root of the mean squared error function defined in equation \ref{eqn:MEANSQERRORMETRIC1}, that is $RMS(P,Q) = \sqrt{MSE(P,Q)}$. The Plane-Tree is also assessed in terms of 3D reconstruction occupancy grid compression. To assess the difference between the original 3D occupancy grid and the lossy compressed version, the Peak Signal to Noise Ratio metric (PSNR) is used. This is a function of the voxel-wise mean squared error function. Given the entire 3D volume, the mean squared error is computed between the original 3D reconstruction and the compressed 3D reconstruction. The mean squared error over two 3D volumes is defined in equation \ref{eqn:MEANSQERRORMETRIC2} as the summation of the voxel-wise squared error divided by the number of voxels.
+
+\begin{equation} \label{eqn:MEANSQERRORMETRIC2}
+MSE_{volume}(V_1,V_2) = \frac{1}{N^3}\sum_{z=0}^{N}\sum_{y=0}^{N}\sum_{x=0}^{N} \left(V_1(x,y,z) - V_2(x,y,z)\right)^2
+\end{equation}
+
+The PSNR metric is then defined as in equation \ref{eqn:PSNR1}. This metric is commonly used in image compression comparisons, since 3D images are being compared in this test, it is used here also. The PSNR metric is inversely related to error, so the larger the PSNR the lower the error between the two models.
+
+\begin{equation} \label{eqn:PSNR1}
+PSNR(V_1,V_2) = 10 \times \log10{\frac{255^2}{MSE_{volume}(V_1, V_2)}}
+\end{equation}
+
+
