@@ -51,7 +51,7 @@ In experiments comparing the Plane-Tree with state-of-the-art algorithms, the ro
 MSE_{volume}(V_1,V_2) = \frac{1}{N^3}\sum_{z=0}^{N}\sum_{y=0}^{N}\sum_{x=0}^{N} \left(V_1(x,y,z) - V_2(x,y,z)\right)^2
 \end{equation}
 
-The PSNR metric is then defined as in equation \ref{eqn:PSNR1}. This metric is commonly used in image compression comparisons, since 3D images are being compared in this test, it is used here also. The PSNR metric is inversely related to error, so the larger the PSNR the lower the error between the two models.
+The PSNR metric is then defined as in equation \ref{eqn:PSNR1}. This metric is commonly used in image compression comparisons, since 3D images are being compared in this test, it is used here also. The PSNR metric is inversely related to error, so the larger the PSNR the lower the error between the two models. 
 
 \begin{equation} \label{eqn:PSNR1}
 PSNR(V_1,V_2) = 10 \times \log10{\frac{255^2}{MSE_{volume}(V_1, V_2)}}
