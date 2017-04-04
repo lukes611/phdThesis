@@ -8,5 +8,5 @@ todo:
 	6 [x] re-write fvr vs other section
 	7 [x] figure out a more compact way to represent the graphs
 	8 [x] re-write pt section
-	9 [o] write conclusion
+	9 [x] write conclusion
 	10[o] add some pics (pca + pt)
