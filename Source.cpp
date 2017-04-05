@@ -64,16 +64,23 @@ int main(){
 
 	
 
-	VMat p1v(256, p2, 0.0f, true);
-	Mat m = p1v.pca_correct_up();
+	VMat p1v(256, p1, 0.0f, true);
+	VMat p2v(256, p2, 0.0f, true);
+	Mat m1 = p1v.pca_correct_up();
+	Mat m2 = p2v.pca_correct_up();
 	double ss;
 	//Mat m = ll_pc::pc_register_pca(p1, p2, ss, true, 256);
-	p2.transform_set(m);
+	p1.transform_set(m1);
+	p2.transform_set(m2);
+
+	Mat m = ll_pc::pc_register(p1, p2, ss, true, 256);
+	p1.transform_set(m);
+	p1 += p2;
 	//p1 += p2;
 	//p1 = p1v.pixel3dset();
 	//p1.transform_set(xx);
 	//LLPointers::setPtr<ll_algorithms::ll_pca_3d::LPCA>("pca", &pc2);
-	LLPointers::setPtr<Pixel3DSet>("object", &p2);
+	LLPointers::setPtr<Pixel3DSet>("object", &p1);
 
 	
 
