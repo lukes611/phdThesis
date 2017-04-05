@@ -1,12 +1,16 @@
 \section{Camera Translation Tracking}
+\label{Sec:CamTransTrackExp}
 
-In this section, camera parameters found by the FVR method are compared to ground truth data under various levels of noise. The Signal to Noise Ratio (SNR) metric is used to describe the noise added to the data prior to registration. A noise value of $x$\% means random noise was added in the range [$-0.5x$, $0.5x$]. Camera registration error is measured in centimetres and voxel error (the error in the phase correlation volume). Table \ref{table:trans} shows the FVR's robustness to noise whilst the camera was moved at different intervals. Results indicate that for camera movements of up to 15cm and SNR higher than 6.0 the FVR method is robust to noise. In video frame rates, a displacement of 10cm per frame equates to camera velocity of 3 m/s (roughly twice normal walking speed).  \\
+Experiments measuring the difference between the ground-truth camera movement and the registered camera movement using the FVR method are presented in this section. For these experiments, one camera frame of an office environment was captured using the ASUS Xtion PRO LIVE active camera. The camera was then moved (translated) by different amounts including: 5 centimeters, 10 centimeters and 15 centimeters. These distances were measured using a measuring tool, and a second frame was then captured. The FVR method was used to register both frames in order to measure the camera location separation between the frames. \\
+
+Different levels of noise were added to both frames prior to 3D registration in order to measure the FVR registration method's ability to register frames with large amounts of noise. The Signal to Noise Ratio (SNR) metric is used to describe the noise added to both captured frames, prior to any registration. This noise effects any registration method's ability to accurately estimate the transformation separating two sets of data. A noise range value of $x$\% means random noise was added in the range [$\frac{-x}{2}$, $\frac{x}{2}$]. Camera registration error is measured in both centimetres (cm) and voxel error (the error in the phase correlation volume without taking into account the effects of quantization). Table \ref{table:trans} shows the results of these tests, they illustrate the FVR's robustness to noise whilst registering frames which are captured during different camera translation intervals. \\
+
 
 
 %translation
-\begin{table}[ht]
+\begin{table}[!htb]
 \centering
-\scalebox{0.75}{
+\scalebox{1.0}{
 \begin{tabular}{ccccc}
 \hline
 \textbf{translation (cm)} & \textbf{noise range (\%)} & \textbf{SNR} & \textbf{error (cm)} & \textbf{error (voxel)}\\ \hline
@@ -28,19 +32,25 @@ In this section, camera parameters found by the FVR method are compared to groun
 \\
 \caption{Translation Tracking}
 \label{table:trans}
-\end{table}[ht]
+\end{table}
+
+Results show that the FVR method is accurately able to register frames up to 15 centimeters apart and for camera movements below 5 centimeters per frame, the FVR method can accurately register them. Results also indicate that, for these camera movements the FVR method can handle up to 75\% noise within the frame, which is a Signal to Noise (SNR) ratio of as little as 2.5 decibels. \\
+
+It can be shown that the registration of camera movements using the FVR can handle movements up to 15cm as long as the SNR is higher than or equal to 6.0, meaning the FVR method is highly robust to noise. To put these camera translations into perspective at video frame rates, a displacement of 10 centimeters per frame equates to camera velocity of 3 meters per second which is about twice the normal walking speed. This is suitable for a majority of applications. \\
+
 
 \section{Camera Rotation Tracking}
+\label{Sec:CamRoteTrackExp}
 
-Table \ref{table:rote} shows results for camera rotation experiments. Degrees of separation tested include: 10, 20 and 30 degrees. Twelve degrees per frame is almost a full rotation per second in video rates. Given 10 degrees of separation, the error was below 1 degree for noise levels less than or equal to 30\%. This base line error is due to the sampling resolution of the volume, as voxel error was in fact zero. As with pure translation, the effect of noise increases with camera disparity. At 30 degrees, little matching information is available. However, for noise levels of 10\% or less, voxel distance error was as low as 4 with an angular error less than $3.8$. Rotations of this magnitude are unlikely as motion blur would occur.
+Table \ref{table:rote} shows results for camera rotation experiments. The experiments, also captured with the ASUS Xtion PRO LIVE active camera, were created by capturing the first frame befroe rotating the camera about the y-axis by a number of degrees. The degrees were measured between rotations. Degrees of separation tested include: 10, 20 and 30 degrees. \\
 
+Again, different levels of noise were added to both frames prior to registration. This experiment was designed to test the robustness of the FVR method in registering camera pose. The scene captured was the same office environment used in the translation experiment from section \ref{Sec:CamTransTrackExp}. \\
 
-
-\begin{table*}[ht]
-\parbox{.45\linewidth}{
+\begin{table}[!htb]
 \centering
-\scalebox{0.75}{
-\begin{tabular}{ccccc}\hline
+\scalebox{1.0}{
+\begin{tabular}{ccccc}
+\hline
 \textbf{rotation} & \textbf{noise (\%)} & \textbf{SNR} & \textbf{error ($\theta$)} & \textbf{error (voxel)}\\ \hline
 $10^{\circ}$ & 0 & $\infty$ & 0.31 & 0\\
 $10^{\circ}$ & 10 & 20db & 0.31 & 0\\
@@ -54,17 +64,24 @@ $30^{\circ}$ & 10 & 20db & 3.28 & 3\\
 $30^{\circ}$ & 15 & 16.5db & 30 & 32\\
 \\
 \end{tabular}}
+\\
 \caption{Rotation Tracking}
 \label{table:rote}
-}
+\end{table}
 
-\subsection{Object Motion Experiments}
+Twelve degrees per frame is almost a full rotation per second in video rates. This is so fast that most cameras would acquire too much motion blur for registration to be possible. Therefore this test indicates the robustness of the FVR method within the context of camera pose estimation. \\
 
-\hfill
-\parbox{.45\linewidth}{
+Given 10 degrees of separation, the error was below 1 degree for noise levels less than or equal to 30\%. This base line error is due to the sampling resolution of the volume, as voxel error was in fact zero. This metric removes the error which is primarily due to quantization noise. As with the translation experiments, the effect of noise increases with camera disparity. At 30 degrees of camera rotation, little matching information is available in order to perform a registration for most techniques. However, for noise levels of 10\% or less, voxel distance error was as low as 4 with an angular error less than $3.8$ degrees. As mentioned, rotations of this magnitude are unlikely as motion blur would occur. Therefore these results show both the effectiveness of the FVR in terms of pose registration, as well as robustness to noise interference. \\
+
+
+\section{Object Motion Experiments}
+\label{Sec:FVRMotionExp}
+
+\begin{table}[!htb]
 \centering
-\scalebox{0.75}{
-\begin{tabular}{ccc}\hline
+\scalebox{1.0}{
+\begin{tabular}{ccc}
+\hline
 \textbf{Object Size} & \textbf{error (cm)} & \textbf{error (voxel)}\\ \hline
 0.35 & 0 & 0\\
 2.95 & 0 & 0\\
@@ -78,40 +95,45 @@ $30^{\circ}$ & 15 & 16.5db & 30 & 32\\
 74.32 & 113.57 & 44\\
 \\
 \end{tabular}}
+\\
 \caption{Object Motion Test}
 \label{table:OBJECT_MOVE_EXP}
-}
-\end{table*}[ht]
+\end{table}
 
 
-To assess robustness to object motion, experiments were conducted by moving the camera backwards along the z-axis by 5cm per frame whilst moving objects were placed in and out of the scene so that they only appear in one of the volumes being registered. Various sized objects including stacks of CDs, large boxes, people and several pieces of furniture were used and are measured by the percentage of the frame they occupy. Results from Table \ref{table:OBJECT_MOVE_EXP} show the proposed method was accurate upto an object size of 31\%, but failed for objects taking up over 48.23\%.
+In order to assess robustness to object motion, experiments were conducted by moving the ASUS Xtion PRO LIVE active camera backwards along the z-axis by 5 centimeters per frame whilst moving objects were placed in and out of the scene so that they only appear in one of the volumes being registered. Various sized objects including stacks of CDs, large boxes, people and several pieces of furniture were used and are measured by the percentage of the frame they occupy. Results from table \ref{table:OBJECT_MOVE_EXP} show the proposed method was accurate upto an object size of 31\%, but failed for objects taking up over 48.23\%.
 
 \section{Reconstructed Scenes}
+\label{Sec:FVRQual1Exp}
 
-\begin{figure*}[t] 
+\begin{figure}[!htb] 
         \centering
-        \begin{subfigure}[b]{2.0in}
-                \includegraphics[width=2.0in]{images/ch2/unit21}
+        \begin{subfigure}[b]{3.0in}
+                \includegraphics[width=3.0in]{images/ch2/unit21}
                 \caption{Apartment}
                 \label{fig:RECON_UNIT}
-        \end{subfigure}%
-        \begin{subfigure}[b]{2.0in}
-                \includegraphics[width=2.0in]{images/ch2/officeA}
+        \end{subfigure}
+        \begin{subfigure}[b]{3.0in}
+                \includegraphics[width=3.0in]{images/ch2/officeA}
                 \caption{Office}
                 \label{fig:RECON_OFFICE}
-        \end{subfigure}%
-        \begin{subfigure}[b]{2.0in}
-                \includegraphics[width=2.0in]{images/ch2/outdoorA}
+        \end{subfigure}
+        \begin{subfigure}[b]{3.0in}
+                \includegraphics[width=3.0in]{images/ch2/outdoorA}
                 \caption{Garden}
                 \label{fig:RECON_GARDEN}
         \end{subfigure}
        \caption{Reconstructed Scenes.}
        \label{fig:RECONSTRUCTIONS}
-\end{figure*}
+\end{figure}
 
-Two indoor environments (Apartment and Office) as well as one outdoor environment (Garden) were reconstructed and are shown in figures \ref{fig:RECON_UNIT}, \ref{fig:RECON_OFFICE} and \ref{fig:RECON_GARDEN} respectively. \\
+Qualitative experiments also show the ability of the FVR registration method to reconstruct 3D scenes. In these experiments, two indoor environments (Apartment and Office) as well as one outdoor environment (Garden) were reconstructed and are shown in figures \ref{fig:RECON_UNIT}, \ref{fig:RECON_OFFICE} and \ref{fig:RECON_GARDEN} respectively. \\
 
-The Apartment reconstruction was recorded by moving through a room and rotating the camera. Some frames contain featureless walls whilst others had contrast shifts due to the camera's automatic contrast feature. Despite these obstacles, accurate reconstruction was achieved. \\
+The Apartment reconstruction was recorded by moving the ASUS Xtion PRO LIVE active camera through a room and rotating the camera. Each frame was registered using the FVR algorithm. Some of the frames in the apartment scene contain walls which have few features. Between frames, walls also had colour contrast shifts. These shifts are due to the ASUS camera's automatic contrast feature which adjusts contrast based on colour histograms. Despite these setbacks, accurate 3D reconstruction was achieved by the FVR method as illustrated in figure \ref{fig:RECON_UNIT}. \\
 
-The office reconstruction was also generated by rotating the camera about the y-axis while moving backwards. FVR is a closed form solution yet its accuracy is still comparable to existing feature based SLAM methods. Typical feature based methods work well with indoor environments where local features are readily distinguishable and easy to match. They do not tend to work as well with complex outdoor scenes where feature confusion is likely. To assess performance in such outdoor scenes, a garden scene containing bushes, plants and a ground covering of bark and rocks was used. In the case of a feature matching approach this scene would likely result in feature confusion, making camera tracking difficult. The proposed method was able to produce a good quality reconstruction. Hence, the FVR approach readily overcomes difficulties common to feature matching methods.   
+
+The office reconstruction was also generated by rotating the ASUS Xtion PRO LIVE active camera about the y-axis while moving the camera around the room. This time, during rotation, the camera was focused on both foreground and background objects. Here, the entire video sequence was accurately registered. It can be seen that despite the foreground and background focus, the global reconstruction is accurate. This scene, as in the apartment scene has usable texture which should not cause large amounts of texture confusion. These qualitative experiments show that despite being a closed form solution, the FVR has reconstruction accuracy comparable to existing feature based SLAM methods. \\
+
+
+Typical feature based methods work well with indoor environments where local features are readily distinguishable and easy to match. They do not tend to work as well in complex outdoor scenes where feature confusion is likely. To assess performance in such outdoor scenes, a garden scene containing bushes, plants and a ground covering of bark and rocks was captured for testing. Again, this scene was captured using the ASUS Xtion PRO LIVE active camera moving around the out-door garden. The proposed FVR method was able to produce a good quality reconstruction of this garden scene, as shown in figure \ref{fig:RECON_GARDEN}. This shows that reconstruction approaches which integrate or make use of the FVR registration method may have an advantage in performing 3D reconstructions in these types of scenes, scenes which are of common disturbance to many existing feature matching methods, as expressed in the literature.   
 

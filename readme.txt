@@ -1,8 +1,5 @@
 
 todo:
-	1. add in references and let them know you published a journal
-	2. finish methodology
-	3. finish experiments
-	4. more experiments?
-	5. write conclusion
-		
+	1 [o] add correct axis pic (PCA)
+	2 [o] add FVR-3D example pic
+	

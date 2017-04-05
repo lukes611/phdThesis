@@ -83,7 +83,32 @@ This process essentially sums up the values along a given ray defined by scaling
 
 The projection map transform is similar in spirit to an orthogonal projection of the volume along a particular axis. Instead of simply projecting the closest point as in projection for visualization purposes, the sum of values computed along the ray is used for representation. The projection map transform is described here in terms of an output projection map image $Im$ and an input 3D volume frame $Vol$, which may be input from a sensor or software system which is able to generate 3D frames of the environment. Each pixel in $Im$ has its value defined mathematically as the summation of values along a particular axis given the x,y coordinates. The Projection-map x-axis transform and the Projection-map z-axis transform are defined in equations \ref{eqn:xPMT} and \ref{eqn:zPMT} respectively. \\
 
-WARNING: add in a picture here
+\begin{figure}[!htb]
+        \centering
+        \begin{subfigure}[b]{1.5in}
+                \includegraphics[width=1.5in]{images/ch2/bunny}
+                \caption{original}
+                \label{fig:bunnyOrigAA2}
+        \end{subfigure}%
+        \begin{subfigure}[b]{1.5in}
+                \includegraphics[width=1.5in]{images/methodology/FVR/xaxis}
+                \caption{X-Axis Projection Map Domain}
+                \label{fig:xaxPMDOM}
+        \end{subfigure}
+        \begin{subfigure}[b]{1.5in}
+                \includegraphics[width=1.5in]{images/methodology/FVR/yaxis}
+                \caption{Y-Axis Projection Map Domain}
+                \label{fig:yaxPMDOM}
+        \end{subfigure}%
+        \begin{subfigure}[b]{1.5in}
+                \includegraphics[width=1.5in]{images/methodology/FVR/zaxis}
+                \caption{Z-Axis Projection Map Domain}
+                \label{fig:zaxPMDOM}
+        \end{subfigure}
+        \caption{The Projection Map Transform.}
+       \label{fig:pmtExample}
+\end{figure}
+
 
 \begin{equation} \label{eqn:xPMT}
 Im(z,y) = \sum_{x=0}^{N}{Vol(x,y,z)}
@@ -168,11 +193,11 @@ From figure \ref{fig:PIPELINE3} we can see that the FFVR method is made up of mu
 2N^3\log{N^3} + 9N^2\log{N^2} + 6N^2 + 28WH + 169
 \end{equation}
 
-Figure \ref{fig:perfComp} provides a visualization of the performance improvement which the FFVR method achieves over the original FVR approach. The FFVR method is around 3 times faster than the original approach. This is due to the reduction in the amount of data to process afforded by the novel spherical-map transform and projection map transform methods.
+Figure \ref{fig:perfComp} provides a visualization of the performance improvement which the FFVR method achieves over the original FVR approach. The graph exposes the performance of both methods at different volume sizes increasing logarithmically. The FFVR method is around ~1.8 times faster for $64^3$ volumes, ~3.4 times faster for $128^3$ volumes, ~4.1 times faster for $256^3$ volumes and ~4.2 times faster for $512^3$ volumes. This is due to the reduction in the amount of data to process afforded by the novel spherical-map transform and projection map transform methods.
 
 \begin{figure}[!htb]
 \centering
-\includegraphics[width=4.0in]{images/ch2/perfcomp}
-\caption{Comparison of performance between volume registration and the proposed speed up for different volume sizes.}
+\includegraphics[width=4.0in]{images/methodology/FVR/performanceImprovement}
+\caption{Comparison of performance between FVR and FFVR.}
 \label{fig:perfComp}
 \end{figure}

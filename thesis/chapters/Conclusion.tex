@@ -5,10 +5,44 @@
 \makeatletter
 \chapter{Conclusion}
 
+In this thesis, a novel set of techniques were proposed to improve the accuracy, noise robustness, speed and storage, quantitative quality and perceptual quality of the 3D data generated when performing 3D reconstruction. To this end, several novel algorithms, data structures and techniques were proposed. First, to improve the accuracy, noise robustness, speed and qualitative and quantitative quality of 3D reconstructions, the Fourier Volume Registration algorithm and set of techniques were proposed. These techniques were tested both quantitatively and qualitatively, findings were presented in section \ref{ch:Experiments}, the conclusions made about those results and how they tie in with the research aims are discussed in the below section (section \ref{Sec:ConcFVR}). \\
+
+Additionally, in order to reduce storage requirements for 3D models reconstructed via a 3D reconstruction algorithm, as well as 3D models in general, a novel 3D data compression system was presented. The technique proposed, named the Plane-Tree representation, is based on Octree decomposition. Conclusions about experiments using this technique are discussed below (section \ref{Sec:ConcPT}) along with their place in the research aims and contributions for this research. \\
+
+\section{Fourier Volume Registration}
+\label{Sec:ConcFVR}
+
+The Fourier Volume Registration technique was developed as a novel accurate and noise robust closed form solution to the 3D frame registration problem within 3D reconstruction. Several techniques were proposed in this thesis. The first was the application of 3D phase correlation in registering 3D camera frames in order to align frames for reconstruction. The second was a novel 3D reconstruction / SLAM algorithm based on these 3D Fourier Phase Correlation techniques. \\
+
+Results showed that the Fourier Volume Reconstruction method was robust to noise, and produced accurate 3D reconstructions both quantitatively and qualitatively. Results also showed robustness to moving objects within the frames, which would otherwise prevent feature matching and ICP based methods from generating accurate 3D reconstructions. \\
+
+Then, a novel speed improvement based on projections was proposed. This was shown to improve speed up to 3 times. This novel speed up reduces the time it takes to find both the translation between a pair of frames as well as the scale and rotation separating them. The FVR method was also tested on Monocular data in which depth was generated implicitly using stereo/optical flow based methods. These results showed that the FVR method could register some of these frames, despite the high levels of inaccuracy in the input depth maps. It is expected that the closer the depth maps are to the ground truth, the more accurate the FVR method will be in terms of generating pleasant 3D reconstructions of the scene based on this input. \\
+
+Finally, a novel technique was proposed to allow methods based on Fourier techniques to register 3D rotation. This allows the FVR method to solve for arbitrary rigid transforms which is useful for 3D reconstruction. Experiments comparing the FVR techniques in terms of quantitative accuracy in comparison to current methods from the literature, including: ICP, PCA and both 2D and 3D feature matching + RANSAC, show the FVR method performs as well as these techniques or better a majority of the time.  \\
+
+\section{Plane-Tree 3D Data Compression}
+\label{Sec:ConcPT}
+
+The Plane-Tree 3D data compression scheme was developed in order to reduce the overall storage and transmission requirements of 3D data. This method was based on Octree decomposition and this technique is shown successfully to be able to reduce the storage and transmission requirements of 3D data, such as that generated via 3D reconstruction algorithms. \\
+
+The Plane-Tree was shown to both improve upon the Octree data representation technique as well as several state of the art 3D model compression algorithms. It is also shown to improve upon the Octree in terms of specialized compression of 3D frame reconstruction data. \\
+
 \section{Research Aims Revisited}
 
-The primary aim of this research was to improve the storage, quantitative quality and perceptual quality of 3D models. Hierarchical methods were investigated and this led to a new image codec, ILQT \cite{Lincoln13Interpolating} as well as the proposed scheme, the Shade-Octree. The research question was, ``Do hierarchical techniques bring state of the art compression performance to 3D data?'' Results from chapter 4 show that the SOT outperforms the OT compression scheme as well as several state of the art methods in terms of rate-distortion and perceptual quality. The primary aim of this research has been accomplished because the SOT produces models which have improved storage efficiency, whilst improving quantitative quality and perceptual quality compared with other compression schemes. The proposed research question can also be answered. The SOT, a hierarchical codec, does achieve state of the art performance in the field of 3D data compression.
+The primary aim of this research is to improve the accuracy, noise robustness, speed and storage, quantitative quality and perceptual quality of 3D models generated from image data. Both the FVR set of techniques as well as the Plane-Tree 3D data representation method were proposed in order to make these improvements. The research questions were: \\
+
+1. ``Can Fourier based registration techniques improve accuracy and noise robustness in 3D reconstruction applications?'' \\
+
+and \\
+
+2. ``Can hierarchical techniques improve compression, storage and processing of 3D reconstruction data?'' \\
+
+
+Results from chapter \ref{ch:Experiments} show that the FVR method is accurate, robust to noise and produces qualitatively pleasant 3D reconstructions. Quantitative tests reveal that the FVR method improves upon existing solutions in terms of both accuracy and noise robustness. Therefore the answer to question 1. is yes, Fourier based registration techniques can improve accuracy and noise robustness in and for 3D reconstruction applications. \\
+
+
+Results also reveal that hierarchical technique, the Plane-Tree improves upon existing storage and compression solutions for both 3D data and specifically for 3D data produced by 3D reconstruction algorithms. Therefore the answer to the second research question is yes, hierarchical techniques can improve compression, storage and processing of 3D reconstruction data. \\
 
 \section{Future Work}
 
-There is still much work to be done in the area of hierarchical 3D data compression. One possible project could be to improve the SOT. Currently the SOT can produce holes in the output mesh, an investigation of this may lead to improved results. Other projects could investigate the extension of the PJQ, wedglet, BSP-tree and QB tree to 3D model compression.
+There is still much work to be done in the both the area of Fourier 3D reconstruction techniques as well hierarchical data storage, processing and transmission. Further development of the FVR technique is required as presently it relies on the fact that no frame to frame registrations fail. That is there should be some filtering of registration data via Kalman filter or something similar in order to reduce the error in case an accurate registration cannot be produced. Secondly, there are still many octant representation methods to test and develop within the field of Hierarchical data compression. Further research could also be performed in terms of integrating each frame efficiently into the structure as it is registered. \\

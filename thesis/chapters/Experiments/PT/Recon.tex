@@ -1,10 +1,16 @@
-here we compare the volumetric plane-tree to the ot, the other methods are designed for mesh compression and since the ot is one of the most common representations used for 3d reconstruction we compare with it. we also have an implementation of ilqt extended to 3d called the ilot (interpolating leaf oct-tree) we compare with. Results show that for low bit-rates the ilot outperforms the ot. However as higher quality is required, OT outperforms this. The plane-tree which was the original envisionment of iqlt for 3D data is shown to improve upon the OT and ILOT at both low and high bit-rates. \\
 
-\begin{figure*}[t]
+In this section, experiments comparing the Plane-Tree with the Octree in terms of 3D frame or 3D occupancy reconstruction grid compression. Essentially this experiments compares the performance of the Plane-Tree and Octree in 3D occupancy grid compression. \\
+
+The Octree is used for comparison since it is the closest relative of the Plane-Tree and existing methods which use the Octree are presently used in 3D reconstruction research. There is also a 3D implementation of the Interpolating Leaf Quad-Tree \ref{Lincoln13Interpolating} compression algorithm used in the comparison. Being the 3D extension it is therefore referred to as the Interpolating Leaf Octree algorithm (ILOT). \\
+
+In this experiment, Rate-Distortion is measured in PSNR (Peak Signal to Noise Ratio) which is a measurement of the amount of accuracy between the original model and the compressed version for a given algorithm and level of compression. The larger the PSNR, the higher the quality in which the compression system produces for a given bitrate. \\
+
+A Rate-Distortion graph comparing the Plane-Tree, Octree and ILOT is presented in figure \ref{fig:3DReconCompression1}. Results show that for low bit-rates the ILOT outperforms the Octree method. However as higher quality is required, the Octree in turn outperforms the ILOT method. The Plane-Tree algorithm proposed in this work is shown to be dominant compared to both algorithms. For each algorithm, at any bitrate, the Plane-Tree has a much larger Peak-Signal-To-Noise ratio. \\
+
+\begin{figure}[!htb]
 \centering
-\includegraphics[width=6.0in]{images/results/compression/psnr1}
+\includegraphics[width=4.0in]{images/results/compression/psnr1}
 \caption{PSNR vs Bitrate comparing the ILOT, OT and PT compression methods.}
-\label{fig:PSNR1}
-\end{figure*}
+\label{fig:3DReconCompression1}
+\end{figure}
 
-By reducing the size of 3D reconstructions processing speed and storage will be advanced. This is advantageous in 3D reconstruction as we may want to transmit reconstructions over a network (from a robot to a base station for example). By using an advanced compression scheme we can transmit this data faster. 
