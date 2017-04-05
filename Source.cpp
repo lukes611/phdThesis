@@ -8,6 +8,8 @@
 #include "code/basics/ll_gl.h"
 #include "code/basics/locv_algorithms.h"
 
+#include "code/phd/Lpcr.h"
+
 using namespace std;
 using namespace cv;
 using namespace ll_R3;
@@ -55,12 +57,16 @@ int main(){
 
 	
 
-	VMat p1v(256, p2, 0.0f, true);
+	VMat p1v(256, p1, 0.0f, true);
 	Mat xx = p1v.pca_correct_up();
+	double ss;
+	//Mat m = ll_pc::pc_register_pca(p1, p2, ss, true, 256);
+	//p1.transform_set(m);
+	//p1 += p2;
 	//p1 = p1v.pixel3dset();
-	p2.transform_set(xx);
+	//p1.transform_set(xx);
 	//LLPointers::setPtr<ll_algorithms::ll_pca_3d::LPCA>("pca", &pc2);
-	LLPointers::setPtr<Pixel3DSet>("object", &p2);
+	LLPointers::setPtr<Pixel3DSet>("object", &p1);
 
 	
 
