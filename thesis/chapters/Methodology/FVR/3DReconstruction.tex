@@ -29,7 +29,7 @@ Cov(A_z, B_x) & Cov(A_z, A_y) & Cov(A_z, A_z) \\
 \right]
 \end{equation}
 
-The 3 eigen-vectors of the covariance matrix describe the primary axis of the 3D frame $A$ and the 3 corresponding eigen-values describe the dominance of these vectors. The eigen-vector/axis with the largest corresponding eigen-value is the principal component in PCA and is used as the aligning axis in the FVR-3D method. Here this principal axis is used to align data to a common axis defined to be the vertical y-axis. For simplicity, the principal axis of a 3D frame $A$ is written as $A_{pa}$. During the process of PCA the centroid of the point cloud is also computed. This is simply the average point location within the input point cloud. For simplicity in later discussions, the centroid of a 3D frame $A$ is written as $A_{mean_{location}}$. A visualization of the principal axis and centroid may be seen in figure WARNING INSERT FIGURE HERE \\
+The 3 eigen-vectors of the covariance matrix describe the primary axis of the 3D frame $A$ and the 3 corresponding eigen-values describe the dominance of these vectors. The eigen-vector/axis with the largest corresponding eigen-value is the principal component in PCA and is used as the aligning axis in the FVR-3D method. Here this principal axis is used to align data to a common axis defined to be the vertical y-axis. For simplicity, the principal axis of a 3D frame $A$ is written as $A_{pa}$. During the process of PCA the centroid of the point cloud is also computed. This is simply the average point location within the input point cloud. For simplicity in later discussions, the centroid of a 3D frame $A$ is written as $A_{mean_{location}}$. A visualization of the principal axis and centroid may be seen in figure \ref{fig:FVR3D111}. Here two input frames (\ref{fig:fvr3DINA} and \ref{fig:fvr3DINB}) are corrected such that their mean is translated to the center of the volume and their principal axis is aligned with the vertical axis (figures \ref{fig:fvr3DAAlign} and \ref{fig:fvr3DBAlign}). \\
 
 \subsubsection{Alignment Pre-Process}
 
@@ -114,7 +114,11 @@ Fwd_x & Fwd_y & Fwd_z & 0 \\
 
 \subsubsection{3D Rotation Registration}
 
-To recover a matrix for full 3D rotation separating two input 3D frames $A$ and $B$ which have been taken from two different locations (translation separation) with two different poses (3D rotational separation) and possibly projected differently (scale separation), the first step is to align both frames by their principal axis. The alignment matrix for $A$ can be computed as $C_A = CorrectMat(A)$ and the alignment matrix for $B$ may be computed as $C_B = CorrectMat(B)$. Transforming both $A$ and $B$ by their alignment matrix gives two volumes $A_{aligned} = Transform(A, C_A)$ and $B_{aligned} = Transform(B, C_B)$ which are now only separated by 3D y-axis rotation, 3D translation and 3D scaling factors. As discussed in sections \ref{Sec:VolumeRegistrationSection} and \ref{Sec:AFVRApproach} these factors may be computed and a registration matrix aligning $A_{aligned}$ and $B_{aligned}$. This matrix is computed as $R_{y}ST = FVR(A_{aligned},B_{aligned})$. Using this registration matrix and the alignment matrices $C_{A}$ and $C_{B}$, the full 3D rotation, 3D scale and 3D translation registration matrix, $R_{x,y,z}ST$ transforming $A$ to $B$ may be computed may be recovered as the the matrix which aligns $A$, registers it using $R_{y}ST$ (which aligns it with $B_{aligned}$) then inverse transforms it by $C_{B}$ which un-aligns it according to the alignment matrix $C_B$. This can be followed as in equation \ref{eqn:FullRSTTransform}. \\ 
+To recover a matrix for full 3D rotation separating two input 3D frames $A$ and $B$ which have been taken from two different locations (translation separation) with two different poses (3D rotational separation) and possibly projected differently (scale separation), the first step is to align both frames by their principal axis. The alignment matrix for $A$ can be computed as $C_A = CorrectMat(A)$ and the alignment matrix for $B$ may be computed as $C_B = CorrectMat(B)$. Transforming both $A$ and $B$ by their alignment matrix gives two volumes $A_{aligned} = Transform(A, C_A)$ and $B_{aligned} = Transform(B, C_B)$ which are now only separated by 3D y-axis rotation, 3D translation and 3D scaling factors. As discussed in sections \ref{Sec:VolumeRegistrationSection} and \ref{Sec:AFVRApproach} these factors may be computed and a registration matrix aligning $A_{aligned}$ and $B_{aligned}$. This matrix is computed as $R_{y}ST = FVR(A_{aligned},B_{aligned})$. Using this registration matrix and the alignment matrices $C_{A}$ and $C_{B}$, the full 3D rotation, 3D scale and 3D translation registration matrix, $R_{x,y,z}ST$ transforming $A$ to $B$ may be computed may be recovered as the the matrix which aligns $A$, registers it using $R_{y}ST$ (which aligns it with $B_{aligned}$) then inverse transforms it by $C_{B}$ which un-aligns it according to the alignment matrix $C_B$. This can be followed as in equation \ref{eqn:FullRSTTransform}. \\
+
+
+Additionally, figure \ref{fig:FVR3D222} (along with figure \ref{fig:FVR3D111}) shows the output at different stages of the FVR-3D technique. Once two input frames (figures \ref{fig:fvr3DINA} and \ref{fig:fvr3DINB}) are aligned via PCA (figures \ref{fig:fvr3DAAlign} and \ref{fig:fvr3DAAlign}), they must be registered using the FVR method. This is shown in figure \ref{fig:fvr3DFVRPCAAB}, without any further registration, the reconstruction would not be correct (see figure \ref{fig:fvr3DPCAAB}). By reversing Frame B's PCA alignment stage on the frame in figure \ref{fig:fvr3DFVRPCAAB} the full FVR-3D registration output is revealed (figure \ref{fig:fvr3DFVRPCAAB}). This registration is very accurate in comparison to zero registration being performed prior to integration, which is shown in figure \ref{fig:fvr3DPCAAB}. \\
+ 
 
 \begin{equation} \label{eqn:FullRSTTransform}
 R_{x,y,z}ST Matrix = C_{B}^{-1} \times R_{y}ST \times C_A
@@ -123,7 +127,74 @@ R_{x,y,z}ST Matrix = C_{B}^{-1} \times R_{y}ST \times C_A
 This explanation completes the FVR-3D technique. FVR-3D is a capable registration method which extends Fourier registration to take into account full 3D rotation. The complexity of the technique adds a single layer of complexity over the FVR method. The additional computational complexity is primarily made up of computing the covariance matrix, which adds a complexity of $N^3$ which is minimal compared to the rest of the FVR technique. \\
 
 
-WARNING: show an example of this working
+\begin{figure}[!htb] 
+        \centering
+        \begin{subfigure}[b]{3.0in}
+               \centering
+                \includegraphics[width=2.0in]{images/methodology/FVR/fvr3d/frameA}
+                \caption{Frame A}
+                \label{fig:fvr3DINA}
+        \end{subfigure}%
+        \begin{subfigure}[b]{3.0in}
+        		\centering
+                \includegraphics[width=2.0in]{images/methodology/FVR/fvr3d/frameB}
+                \caption{Frame B}
+                \label{fig:fvr3DINB}
+        \end{subfigure}
+        
+         \begin{subfigure}[b]{3.0in}
+         		       \centering
+                \includegraphics[width=2.0in]{images/methodology/FVR/fvr3d/PCAFrameA}
+                \caption{Frame A, PCA aligned}
+                \label{fig:fvr3DAAlign}
+        \end{subfigure}%
+         \begin{subfigure}[b]{3.0in}
+                \centering
+                \includegraphics[width=2.0in]{images/methodology/FVR/fvr3d/PCAFrameB}
+				\caption{Frame B, PCA aligned}
+                \label{fig:fvr3DBAlign}
+        \end{subfigure}
+        
+
+       \caption{Early stages of FVR-3D}
+       \label{fig:FVR3D111}
+\end{figure}
+
+
+\begin{figure}[!htb] 
+        \centering
+        
+		\begin{subfigure}[b]{3.0in}
+				       \centering
+                \includegraphics[width=2.0in]{images/methodology/FVR/fvr3d/PCAFrameAB}
+                \caption{\ref{fig:fvr3DAAlign} and \ref{fig:fvr3DBAlign} integrated}
+                \label{fig:fvr3DPCAAB}
+        \end{subfigure}%
+        \begin{subfigure}[b]{3.0in}
+               \centering
+                \includegraphics[width=2.0in]{images/methodology/FVR/fvr3d/FVRPCAFrameAB}
+                \caption{\ref{fig:fvr3DAAlign} registered with \ref{fig:fvr3DBAlign} using FVR}
+                \label{fig:fvr3DFVRPCAAB}
+        \end{subfigure}        
+        
+        \begin{subfigure}[b]{3.0in}
+               \centering
+                \includegraphics[width=2.0in]{images/methodology/FVR/fvr3d/noRegistration}
+                \caption{\ref{fig:fvr3DINA} and \ref{fig:fvr3DINB} integrated}
+                \label{fig:fvr3DPCAAB}
+        \end{subfigure}%
+        \begin{subfigure}[b]{3.0in}
+               \centering
+                \includegraphics[width=2.0in]{images/methodology/FVR/fvr3d/FVR3DReg}
+                \caption{\ref{fig:fvr3DFVRPCAAB} un-aligned (full FVR-3D registration)}
+                \label{fig:fvr3DFVRPCAAB}
+        \end{subfigure}        
+        
+       \caption{Final stages of FVR-3D}
+       \label{fig:FVR3D222}
+\end{figure}
+
+
 
 \subsubsection{Algorithm and Pipeline}
 
@@ -166,12 +237,12 @@ Next, the FVR-3D method is used in place of the FVR method computing the full si
 
 Figure \ref{fig:PIPELINE8} shows a pipe-line for the FVR-3D technique. Here, two 3D frames are input as $Volume_1$ and $Volume_2$. The seconds frame may be taken after the camera has changed location and pose. The two frames may also be taken by different cameras with differing projection procedures projecting depth map values into frames. First the alignment matrices $C_a$ and $C_b$ based on the principal axis computed by the PCA algorithm. These are then used to align $Volume_1$ and $Volume_2$ to a common axis. Only then can the proposed FVR be used to register the final axis of rotation along with scale and translation changes. Finally a full registration matrix may be formed by the alignments matrices and the output registration matrix via the FVR procedure. \\
 
-\begin{figure*}[!htb]
+\begin{figure}[!htb]
 \centering
 \includegraphics[width=6.0in]{images/methodology/FVR/pipeline8}
 \caption{System Diagram for Registration Process}
 \label{fig:PIPELINE8}
-\end{figure*}
+\end{figure}
 
 
 
