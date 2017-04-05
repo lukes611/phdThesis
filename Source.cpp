@@ -48,12 +48,12 @@ int main(){
 	//default[-5.12343, 60, 4.23075] , angle_y: 62.000000, angle_x: 108.000000
 	//correct up: [70.3114, 170, 30.7242] , angle_y: 58.000000, angle_x: 104.000000
 	//default:
-	//camera->angle_x = 108, camera->angle_y = 62;
-	//camera->location = R3(-5.12343, 60, 4.23075);
+	camera->angle_x = 108, camera->angle_y = 62;
+	camera->location = R3(-5.12343, 60, 4.23075);
 
 	//correct up:
-	camera->angle_x = 104, camera->angle_y = 58;
-	camera->location = R3(70.3114, 170, 30.7242);
+	//camera->angle_x = 104, camera->angle_y = 58;
+	//camera->location = R3(70.3114, 170, 30.7242);
 
 
 	//ll_algorithms::ll_pca_3d::LPCA pc(p.points, ll_algorithms::ll_pca_3d::LPCA::COMPUTE_2);
@@ -69,13 +69,13 @@ int main(){
 	Mat m1 = p1v.pca_correct_up();
 	Mat m2 = p2v.pca_correct_up();
 	double ss;
-	//Mat m = ll_pc::pc_register_pca(p1, p2, ss, true, 256);
-	p1.transform_set(m1);
-	p2.transform_set(m2);
+	Mat m = ll_pc::pc_register_pca(p1, p2, ss, true, 256);
+	//p1.transform_set(m);
+	//p2.transform_set(m2);
 
-	Mat m = ll_pc::pc_register(p1, p2, ss, true, 256);
+	//Mat m = ll_pc::pc_register(p1, p2, ss, true, 256);
 	p1.transform_set(m);
-	p1 += p2;
+	//p1 += p2;
 	//p1 += p2;
 	//p1 = p1v.pixel3dset();
 	//p1.transform_set(xx);
