@@ -460,6 +460,7 @@ namespace ll_pix3d
 		}
 	}
 
+	
 	void Pixel3DSet::noise(double mean, double stddev)
 	{
 		srand((unsigned int)time(NULL));
@@ -480,6 +481,20 @@ namespace ll_pix3d
 			colors[i][2] += (unsigned char)sum;
 		}
 	}
+
+	void Pixel3DSet::positional_noise(double scalarIn)
+	{
+		srand((unsigned int)time(NULL));
+		double scalar = scalarIn / (double)RAND_MAX;
+		double subber = -scalarIn * 0.5;
+		for (int i = 0; i < colors.size(); i++)
+		{
+			points[i].x += rand()*scalar + subber;
+			points[i].y += rand()*scalar + subber;
+			points[i].z += rand()*scalar + subber;
+		}
+	}
+
 
 	float Pixel3DSet::mean_gs()
 	{

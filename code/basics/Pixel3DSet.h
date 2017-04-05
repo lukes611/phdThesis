@@ -158,6 +158,7 @@ namespace ll_pix3d
 		void to_origin();
 		void to_center_of_MinMax();
 		void noise(double mean, double stddev);
+		void positional_noise(double scalar);
 		float mean_gs();
 
 		void mutate_points(std::function<void(ll_R3::R3&)> f);
