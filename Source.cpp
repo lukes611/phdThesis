@@ -45,9 +45,16 @@ int main(){
 
 	Fps_cam * camera = new Fps_cam(R3(40, 40, -60), 90.0f, 90.0f);
 	LLPointers::setPtr("camera", camera);
-	//[-5.12343, 60, 4.23075] , angle_y: 62.000000, angle_x: 108.000000
-	camera->angle_x = 108, camera->angle_y = 62;
-	camera->location = R3(-5.12343, 60, 4.23075);
+	//default[-5.12343, 60, 4.23075] , angle_y: 62.000000, angle_x: 108.000000
+	//correct up: [70.3114, 170, 30.7242] , angle_y: 58.000000, angle_x: 104.000000
+	//default:
+	//camera->angle_x = 108, camera->angle_y = 62;
+	//camera->location = R3(-5.12343, 60, 4.23075);
+
+	//correct up:
+	camera->angle_x = 104, camera->angle_y = 58;
+	camera->location = R3(70.3114, 170, 30.7242);
+
 
 	//ll_algorithms::ll_pca_3d::LPCA pc(p.points, ll_algorithms::ll_pca_3d::LPCA::COMPUTE_2);
 	//p.transform_set(0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, pc.mean);
@@ -57,16 +64,16 @@ int main(){
 
 	
 
-	VMat p1v(256, p1, 0.0f, true);
-	Mat xx = p1v.pca_correct_up();
+	VMat p1v(256, p2, 0.0f, true);
+	Mat m = p1v.pca_correct_up();
 	double ss;
 	//Mat m = ll_pc::pc_register_pca(p1, p2, ss, true, 256);
-	//p1.transform_set(m);
+	p2.transform_set(m);
 	//p1 += p2;
 	//p1 = p1v.pixel3dset();
 	//p1.transform_set(xx);
 	//LLPointers::setPtr<ll_algorithms::ll_pca_3d::LPCA>("pca", &pc2);
-	LLPointers::setPtr<Pixel3DSet>("object", &p1);
+	LLPointers::setPtr<Pixel3DSet>("object", &p2);
 
 	
 
