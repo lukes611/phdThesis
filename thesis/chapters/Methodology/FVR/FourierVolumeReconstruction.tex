@@ -1,7 +1,9 @@
 
 Section \ref{Sec:VolumeRegistrationSection} described techniques to register camera frames which have been projected to 3D. As mentioned, these frames may be registered with respect to the most common type of camera pose transform: y-axis rotation as well as camera movement. In addition, scale may be registered. For frames which have been projected differently or frames in which depth is computed relative to each frame, such as per frame depth computed in monocular view situations, this is an important transformation to register against. This is especially true since existing methods perform simple rigid movement camera pose registration. \\
 
-This section integrates this method into a full 3D reconstruction algorithm. This algorithm may also be used to perform SLAM, however this is not the overall goal of this technique and it may still be applied to input data in which depth is not projected at correct scale between frames. The input for this method is RGB images, with a depth component. The data may be generated via an RGB-D camera or the depth may be computed implicitly across camera frames using frame calibration with a known stereo disparity method. Alternatively, stereo cameras may be set up initially in which depth data may be computed per frame using disparity methods directly for each frame. \\
+This section integrates this method into a full 3D reconstruction algorithm. This algorithm may also be used to perform SLAM and it may still be applied to input data in which depth is not projected at correct scale between frames. The input for this method is RGB images, with a depth component. The data may be generated via an RGB-D camera or the depth may be computed implicitly across camera frames using frame calibration with a known stereo disparity method. Alternatively, stereo cameras may be set up initially in which depth data may be computed per frame using disparity methods directly for each frame. \\
+
+
 
 \subsubsection{Pipeline}
 
