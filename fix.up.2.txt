@@ -1,0 +1,8 @@
+mention metrics more more []
+both mvvr images bigger []
+limitations of mvvr method more []
+
+bigger graphs -> fewer frames per graph (10) -> tables []
+mention limitations more []
+noise ones purely to tables []
+
