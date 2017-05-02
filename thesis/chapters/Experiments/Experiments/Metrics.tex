@@ -1,5 +1,5 @@
 
-In order to properly assess the set of proposed 3D reconstruction algorithms as well as the proposed Plane-Tree and other compression methods, several metrics are used. These metrics are presented and defined mathematically here. Assessing both the 3D reconstruction algorithms as well as the lossy 3D data compression techniques requires comparing output 3D models. In the case of 3D reconstructions we can compare the error between the registered frame and the ground truth, the larger the error, the worse the registration. Alternatively a measurement may be used to measure the difference between two frames before and after they are registered, if the error is reduced or almost zero after registration, then the registration method may be deemed correct. If the error is larger or almost the same post registration, the registration maybe considered incorrect or there possibly was little camera movement. \\
+In order to assess the set of proposed 3D reconstruction algorithms as well as the proposed Plane-Tree and other compression methods, several metrics are used. These metrics are presented and defined mathematically here. Assessing both the 3D reconstruction algorithms as well as the lossy 3D data compression techniques requires comparing output 3D models. In the case of 3D reconstructions we can compare the error between the registered frame and the ground truth, the larger the error, the worse the registration. Alternatively a measurement may be used to measure the difference between two frames before and after they are registered, if the error is reduced or almost zero after registration, then the registration method may be deemed correct. If the error is larger or almost the same post registration, the registration maybe considered incorrect or there possibly was little camera movement. \\
 
 
 In both cases, a fair way to measure the difference between two 3D objects must be used. To compute this error we use nearest neighbour functions to measure the closest point in one model to the closest point in the next model. For example, given model A and model B, the closest point $B_j$ in $B$ for point $A_i$ in $A$, is used in summation of the total error. The closest point $B_j$ to $A_i$ is simply the nearest neighbour of $A_i$. This can be formally described as a function of 3D point list $V$ and a given point $p$ likely from some other model. This is described mathematically in equation \ref{eqn:NN}. Here, the result is a point $q$ in $V$, in which the distance between according to function $Dist(x,y)$ is lesser for $q$ given $p$ than any other point $k$ in $V$.  \\
@@ -8,7 +8,7 @@ In both cases, a fair way to measure the difference between two 3D objects must 
 NN(p, V) =  \{ q \in V | (Dist(q, p) < Dist(k, p))  \forall k \in V \}
 \end{equation}
 
-For all purposes within this research, the function $Dist(x,y)$ is simply the euclidean distance between the two input points. Using definition of nearest neighbour, several metrics may be used to compute the distance between two models. The one-way distance between two models is defined as the summation of distances for each point in one model to its nearest neighbour from the other model. The one-way mean error between two 3D models, $P$ and $Q$ is given in equation \ref{eqn:HDOW}. The full mean error between two objects is then computed as the average of the $Mean-Error_{one-way}$ function from models $P$ to $Q$ and $Q$ to $P$. This is defined in equation \ref{eqn:MEANERRORMETRIC1}. \\
+For all purposes within this research, the function $Dist(x,y)$ is simply the Euclidean distance between the two input points. Using this definition of a nearest neighbour, several metrics may be used to compute the distance between two models. The one-way distance between two models is defined as the summation of distances for each point in one model to its nearest neighbour from the other model. The one-way mean error between two 3D models, $P$ and $Q$ is given in equation \ref{eqn:HDOW}. The full mean error between two objects is then computed as the average of the $Mean-Error_{one-way}$ function from models $P$ to $Q$ and $Q$ to $P$. This is defined in equation \ref{eqn:MEANERRORMETRIC1}. \\
 
 
 \begin{equation} \label{eqn:HDOW}
@@ -33,7 +33,7 @@ MSE(P,Q) = \frac{MSE_{1-way}(P,Q) + MSE_{1-way}(Q,P)}{2}
 \end{equation}
 
 
-The mean error based on the nearest neighbour is often referred to as the Hausdorff error. In this research we used the Hausdorff error as well as the Mean Squared Error based on the nearest neighbour technique, as well as a percentage of total matches. The one-way percentage of total matches is the computation of the percent of points from one model which have a nearest neighbour which has a distance below a given threshold. This metric is defined in equation \ref{eqn:PERCMATCHOW}. \\
+The mean error based on the nearest neighbour is often referred to as the Hausdorff error. In this research we used the Hausdorff error as well as the Mean Squared Error (MSE) based on the nearest neighbour technique, as well as a percentage of total matches. The one-way percentage of total matches is the computation of the percent of points from one model which have a nearest neighbour which has a distance below a given threshold. This metric is defined in equation \ref{eqn:PERCMATCHOW}. \\
 
 \begin{equation} \label{eqn:PERCMATCHOW}
 PM_{1-way}(P, Q) = \frac{100}{N}\sum_{k=0}^{N} x, where
@@ -51,10 +51,8 @@ In experiments comparing the Plane-Tree with state-of-the-art algorithms, the ro
 MSE_{volume}(V_1,V_2) = \frac{1}{N^3}\sum_{z=0}^{N}\sum_{y=0}^{N}\sum_{x=0}^{N} \left(V_1(x,y,z) - V_2(x,y,z)\right)^2
 \end{equation}
 
-The PSNR metric is then defined as in equation \ref{eqn:PSNR1}. This metric is commonly used in image compression comparisons, since 3D images are being compared in this test, it is used here also. The PSNR metric is inversely related to error, so the larger the PSNR the lower the error between the two models. 
+The PSNR metric is then defined as in equation \ref{eqn:PSNR1}. This metric is commonly used in image compression comparisons, since 3D images are being compared in this test, it is used here also. The PSNR metric is inversely related to error, so the larger the PSNR the lower the error between the two models.
 
 \begin{equation} \label{eqn:PSNR1}
 PSNR(V_1,V_2) = 10 \times \log10{\frac{255^2}{MSE_{volume}(V_1, V_2)}}
 \end{equation}
-
-
