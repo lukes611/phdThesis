@@ -7,12 +7,12 @@ actual depth. However the 3D data in the registration is still spatially accurat
 
 \begin{figure}[!htb]
         \centering
-        \begin{subfigure}[b]{1.8in}
-                \includegraphics[width=1.5in]{images/results/mvvr/clockFVR}
+        \begin{subfigure}[b]{2.8in}
+                \includegraphics[width=2.5in]{images/results/mvvr/clockFVR}
                 \label{fig:clockFVRRes}
         \end{subfigure}%
-        \begin{subfigure}[b]{1.8in}
-                \includegraphics[width=1.5in]{images/results/mvvr/clockMVVR}
+        \begin{subfigure}[b]{2.8in}
+                \includegraphics[width=2.5in]{images/results/mvvr/clockMVVR}
                 \label{fig:clockMVVRRes}
         \end{subfigure}
         \caption{Registration of the Clock video stream using the FVR method (left) and the MVVR method (right).}
@@ -25,12 +25,12 @@ Figure \ref{fig:boxesMVVRQResults} shows results from a similar qualitative expe
 
 \begin{figure}[!htb]
         \centering
-        \begin{subfigure}[b]{1.8in}
-                \includegraphics[width=1.5in]{images/results/mvvr/boxesFVR}
+        \begin{subfigure}[b]{2.8in}
+                \includegraphics[width=2.5in]{images/results/mvvr/boxesFVR}
                 \label{fig:boxFVRRes}
         \end{subfigure}%
-        \begin{subfigure}[b]{1.8in}
-                \includegraphics[width=1.5in]{images/results/mvvr/boxesMVVR}
+        \begin{subfigure}[b]{2.8in}
+                \includegraphics[width=2.5in]{images/results/mvvr/boxesMVVR}
                 \label{fig:boxMVVRRes}
         \end{subfigure}
         \caption{Registration of the Boxes video stream using the FVR method (left) and the MVVR method (right).}
@@ -61,3 +61,4 @@ In order to assess the method quantitatively, frames were captured using the Mic
 
 Table \ref{table:transMVVR} shows that in these experiments, the RGB-D VR method was able to register with 100\% accuracy camera movements with up to 15 centimeters of camera movement between frames. With the same data, the MVVR method is capable of registering the camera movement despite the requirement of tolerating inconsistent and noisy depth information. The MVVR method is shown to be able to register up to 10 centimeters of camera movement without fault. With movements of 10 centimeters and frame rates of 30 frames per second, this equates to speeds of roughly 10 kilo-meters per hour. This is about twice the average walking speed of a person. \\
 
+Experiments in which camera rotation was performed were unsuccessful, this was mentioned as a limitation of the MVVR method, as currently monocular depth estimation techniques (including the basic block matching approach) do not generate accurate enough data for the FVR method to successfully generate robust and accurate 3D reconstructions. It is expected when these areas of research catch up to the quality produced by stereo and active camera technologies, that the accuracy and robustness of the FVR technique will be identical to the active camera input case. \\
