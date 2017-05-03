@@ -1,7 +1,12 @@
 
-The Fourier Volume Reconstruction (FVR) method described in sections \ref{Sec:VolumeRegistrationSection} and \ref{Sec:AFVRApproach} were designed to be independent of RGB-D information input and thus sensors. As long as greyscale data with a depth component, RGB data with a depth component or depth data on their own are input, the FVR method should be able to compute accurate relative dense 3D reconstructions and optionally relative camera pose data. This section details both RGB-D sensor input advantages and disadvantages as well as those for monocular video input. Input via a stereo setup is also discussed. However, since there is much research on stereo methods which often reach accuracy which approaches RGB-D sensors, more focus is given to depth sensor based input as well as monocular video input, which is the most difficult data to work with. \\
+The Fourier Volume Reconstruction (FVR) method described in sections \ref{Sec:VolumeRegistrationSection} and \ref{Sec:AFVRApproach} were designed to be independent of RGB-D information input and thus sensors. As long as greyscale data with a depth component, RGB data with a depth component or depth data on their own are input, the FVR method should be able to compute accurate relative dense 3D reconstructions and optionally relative camera pose data. \\
+
+Below, in section \ref{subsec:DSBR} both the advantages and limitations of 3D reconstruction via active depth sensors are discussed. It was experimentally discovered that the closer computed depth via monocular or stereo methods was to the high quality depth maps produced by active cameras, the better the camera pose registration using the FVR method. Section \ref{subsec:SCBR} briefly covers stereo input, however, since there is much research on stereo methods which often reach accuracy which approaches RGB-D sensors, more focus is given to depth sensor based input as well as monocular video input, which is the most difficult data to work with. \\
+
+In section \ref{subsec:MVVRMethodology} the technique dubbed Monocular View Volume Reconstruction (MVVR) is discussed in terms of process and limitations. Experiments in section \ref{Sec:MonocularExperimentsSection} show that the MVVR method is capable of accurate camera translation tracking using noisy depth data generated using only monocular methods. \\
 
 \subsubsection{Depth Sensor Based Reconstruction}
+\label{subsec:DSBR}
 
 Depth sensor input is advantageous for several reasons. It is faster than both stereo and monocular methods, and has more robustness and reliability. In general, it is also more accurate than stereo methods, and in most cases is more accurate than monocular based methods. The major disadvantage in using such sensors has historically been one of accessibility. Thanks to systems such as the Microsoft Kinect and the Asus Xtion Pro Live camera being available to the general public at a low expense, this is changing. However, there is still a mass of legacy video data which does not have actively generated depth data provided, moreover there is still a wealth of content still being produced by simple RGB cameras. \\
 
@@ -57,7 +62,7 @@ Once the data has been projected into a volume, it may be used as input into the
 \end{figure}
 
 \subsubsection{Stereo Camera Based Reconstruction}
-
+\label{subsec:SCBR}
 As mentioned, the FVR method may take dense depth data from any type of input sensor, as long as dense 3D point clouds can be generated per frame or near per frame rates 3D reconstructions may be computed. Stereo methods do not produce depth data as fast or as reliably as compared to active sensors such as RGB-D cameras. However, they allow for higher resolution depth maps to be computed and may be used under environmental conditions where active cameras cannot work under. Additionally they are capable of generating depth data over larger ranges as compared to active camera approaches. \\
 
 A major disadvantage is that depth maps are very noisy. Computing 3D reconstructions from depth data which have been produced via stereo methods is considerably more challenging. Still the noise is typically lower in comparison to monocular methods of depth estimation. In generating depth data using a stereo setup, the stereo camera pair must first be calibrated. The camera pair may be calibrated using software techniques to compute intrinsic camera parameters. Alternatively, the stereo data may be computed without first calibrating the stereo pair, resulting in less accurate depth data. Section \ref{StereoMethodsSection} described some of the available techniques in generating stereo data. \\
@@ -65,6 +70,7 @@ A major disadvantage is that depth maps are very noisy. Computing 3D reconstruct
 3D reconstruction from monocular view is considered a more difficult topic compared with 3D reconstruction generated from stereo views. For this reason, the use of monocular passive cameras was chosen to test the capabilities of the FVR method. The reason for choosing the more difficult topic of monocular 3D reconstructions is that stereo depth estimation is typically of higher quality. Therefore, if passable reconstructions could be computed based on this noisy monocular data, then 3D reconstructions based on stereo techniques (which produce significantly higher accuracy in terms of depth data generation) would be an easier task, relating more similarly to input obtained from RGB-D sensors. \\ 
 
 \subsubsection{Monocular View Volume Reconstruction}
+\label{subsec:MVVRMethodology}
 
 Generating dense depth information from monocular view is challenging. There are methods however, which take advantage of the properties of the Fundamental and Essential matrices to pre-calibrate consecutive frames. This allows stereo methods (see section \ref{StereoMethodsSection}) to be used to compute dense depth data per frame. These stereo methods are typically split into three categories: global, semi-global and local. Global methods are the most complex, and typically make use of some optimization method which optimizes the depth map's smoothness, disparity and contouring of edges jointly. Semi-global methods also optimize the depth map with respect to these requirements, however they are restricted to optimizing scan lines. This makes them much faster than the global optimization methods, whilst still providing better results than the local methods. Local methods are fast and ideal for real time applications, they make use of block matching to compute the disparity per pixel. \\
 
@@ -135,3 +141,6 @@ Using the concept of parallax, we know that the magnitude of the displacement ve
 \label{fig:DepthGenerationExample}
 \end{figure}
  
+\subsubsection{Limitations of MVVR}
+
+During experiments it was discovered that due to the high levels of noise, the MVVR method was limited to registration of translation information only. This was due to the difficulty in computing depth data using basic methods such as stereo methods between frames and optical flow. Despite this limitation, the FVR method was able to register up to 15 centimetres of camera translation (see experiments in section \ref{Sec:MonocularExperimentsSection}).  

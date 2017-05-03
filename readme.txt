@@ -1,5 +1,6 @@
 
 todo:
-	1 [o] add correct axis pic (PCA)
-	2 [o] add FVR-3D example pic
+	1 forward-mention experiments
+	2 add in a table per experiment
+	3 describe things better
 	

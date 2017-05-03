@@ -1,7 +1,10 @@
 
 Section \ref{Sec:VolumeRegistrationSection} described techniques to register camera frames which have been projected to 3D. As mentioned, these frames may be registered with respect to the most common type of camera pose transform: y-axis rotation as well as camera movement. In addition, scale may be registered. For frames which have been projected differently or frames in which depth is computed relative to each frame, such as per frame depth computed in monocular view situations, this is an important transformation to register against. This is especially true since existing methods perform simple rigid movement camera pose registration. \\
 
-This section integrates this method into a full 3D reconstruction algorithm. This algorithm may also be used to perform SLAM, however this is not the overall goal of this technique and it may still be applied to input data in which depth is not projected at correct scale between frames. The input for this method is RGB images, with a depth component. The data may be generated via an RGB-D camera or the depth may be computed implicitly across camera frames using frame calibration with a known stereo disparity method. Alternatively, stereo cameras may be set up initially in which depth data may be computed per frame using disparity methods directly for each frame. \\
+This section integrates this method into a full 3D reconstruction algorithm. This algorithm may also be used to perform SLAM and it may still be applied to input data in which depth is not projected at correct scale between frames. The input for this method is RGB images, with a depth component. The data may be generated via an RGB-D camera or the depth may be computed implicitly across camera frames using frame calibration with a known stereo disparity method. Alternatively, stereo cameras may be set up initially in which depth data may be computed per frame using disparity methods directly for each frame. \\
+
+Results for the FVR method are presented in section \ref{Sec:CamTransTrackExp}, \ref{Sec:CamRoteTrackExp}, \ref{Sec:FVRMotionExp} and \ref{Sec:FVRQual1Exp}. These show the FVR method is capable of accurate 3D reconstructions whilst being robust to noise. Details of how the Fourier Registration methods described in section \ref{FVRSectionA} are integrated to create the FVR algorithm. \\
+
 
 \subsubsection{Pipeline}
 
@@ -88,3 +91,8 @@ The camera pose is also updated, by adjusting the axes relative to the camera lo
 The integration procedure used with this technique is the common global voxel integration method. An automatically expanding volume is used to store the global 3D reconstruction. Given the algorithm described above, the output global reconstructed volume must take in point cloud data, and integrate it into the volume. \\
 
 The algorithm proposed does not make use of loop closure. Many recent techniques also forgo the use of such procedures, especially if they integrate globally. The FVR method can also easily be adjusted by changing the last line of the algorithm. Rather than simply setting $f_1$ to $f_2$, $f_1$ may be set to the volume extracted by sampling the global reconstruction into a volume based on the most recent camera location and pose computed. This way, loops may be detected by registering upcoming frames globally. \\
+
+
+\subsubsection{Limitations}
+
+The FVR method is capable of registering 3D pose data and in turn can generate accurate, high quality 3D reconstructions. However, it is limited to a single axis of rotation (the y-axis). The FVR method was tested, and remains robust to up to 10 degrees of rotation along the other axes, however this method is still not able to register 3 degrees of rotation on its own. In order to move past this limitation whilst retaining the robustness and accuracy of the technique, a novel extension is proposed in section \ref{FullRecovery3DSection}. Both the FVR method and this extension are tested empirically in section \ref{ch:Experiments} and results show they outperform the current standard in 3D pose estimation and 3D reconstruction. \\
