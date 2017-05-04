@@ -73,40 +73,97 @@ FVR		& 508.13 & ~29.6\\
 
 Figure \ref{fig:PET1} shows registration errors for the the apartment scene again, this time the camera is moved about the x-axis predominantly, again this scene contains lots of texture. In a about 60\% of the frames, FVR either outperforms or matches the best performing algorithm. Here, ICP and 2D-feature matching are also very competitive, with 3D-feature-matching and PCA failing to register most frames as accurately as the others. In the case of PCA, when there is not enough overlapping data to register, inaccurate registrations occur. When the FVR technique uses PCA, it only uses the primary axis, and refines the alignment in the secondary stage. \\
 
-\begin{figure}[!htb]
+%pet 3 Boxes Zoom Data Set
+\begin{figure}
 \centering
-\includegraphics[width=4.0in]{images/results/Boxes_Texture_ZoomOut}
+\includegraphics[width=6in]{images/results/Boxes_Texture_ZoomOut}
 \caption{Registration Error for the Boxes Zoom Data Set}
 \label{fig:PET3}
-\end{figure}
+
+\begin{tabular}{ccc}
+\hline
+\textbf{Algorithm} & \textbf{Average Error $\times$ 1000} & \textbf{\% best result}\\ \hline
+FM-2D	& 0.68 & ~18.18\\
+FM-3D	& 0.73 & 0\\
+ICP		& 0.59 & ~27.27\\
+PCA		& 0.73 & 0\\
+FVR		& 0.65 & ~54.54\\
+\end{tabular}
+\captionof{table}{Statistics for the Boxes Zoom Data Set}
+\label{tab:PET3ST}
+\end{figure} 
+
+
 
 In figure \ref{fig:PET2} 7 frame registration errors are shown for the Boxes scene. This scene contains camera rotation about the y-axis where in different views were observed during frame capture. In 4 out of the 7 frames, FVR outperformed the other algorithms. Note in frame 3, both PCA and feature-matching failed, despite texture being present in the scene. In frames 4 and 5, ICP outperformed the others by a successful margin.  \\
 
-\begin{figure}[!htb]
+%pet 4 Boxes Zoom Data Set
+\begin{figure}
 \centering
-\includegraphics[width=4.0in]{images/results/Desk_Texture_Translation}
+\includegraphics[width=6in]{images/results/Desk_Texture_Translation}
 \caption{Registration Error for the Desk Translation Data Set}
 \label{fig:PET4}
-\end{figure}
+
+\begin{tabular}{ccc}
+\hline
+\textbf{Algorithm} & \textbf{Average Error $\times$ 1000} & \textbf{\% best result}\\ \hline
+FM-2D	& 0.68 & ~18.18\\
+FM-3D	& 0.73 & 0\\
+ICP		& 0.59 & ~27.27\\
+PCA		& 0.73 & 0\\
+FVR		& 0.65 & ~54.54\\
+\end{tabular}
+\captionof{table}{Statistics for the Desk Translation Data Set}
+\label{tab:PET4ST}
+\end{figure} 
+
 
 Experiment results for the boxes scene are shown in figure \ref{fig:PET3}. In this scene, the camera was moved forward and backward, effectively changing focus on different parts of the same set of boxes at different times during frame capture. Here, only 10 out of the 21 (~47\%) of the frames had a registration error lowest or equal for the FVR technique. In a rare case, frame 16 observed a worst performance by FVR. In frame 3, 2D-feature-matching performed the worst, and towards the last few frames PCA and 3D-feature-matching performed worst. \\
 
-\begin{figure}[!htb]
+
+%pet 5 Texture Confusion Indoor-Space Translation Data Set
+\begin{figure}
 \centering
-\includegraphics[width=4.0in]{images/results/IndoorSpace_texture_confusion_translation}
+\includegraphics[width=6in]{images/results/IndoorSpace_texture_confusion_translation}
 \caption{Registration Error for the Texture Confusion Indoor-Space Translation Data Set}
 \label{fig:PET5}
-\end{figure}
+
+\begin{tabular}{ccc}
+\hline
+\textbf{Algorithm} & \textbf{Average Error $\times$ 1000} & \textbf{\% best result}\\ \hline
+FM-2D	& 715.72 & ~22.22\\
+FM-3D	& 992.34 & 0\\
+ICP		& 687.31 & ~33.33\\
+PCA		& 975.77 & 0\\
+FVR		& 630.47 & ~44.44\\
+\end{tabular}
+\captionof{table}{Statistics for the Texture Confusion Indoor-Space Translation Data Set}
+\label{tab:PET5ST}
+\end{figure} 
+
 
 In ~52\% of the frames of the desk translation data-set in figure \ref{fig:PET4}, the FVR method outperformed others relative to just ~26\% for ICP, ~9\% for 2D-feature-matching and PCA and ~4\% for 3D-feature-matching. This data-set tests each procedure's ability to reconstruct a scene captured by moving a camera forward along a path. 3D feature matching was a notable poor performer here, ICP and FVR outperformed the other methods overall on this data-set. \\
 
-
-\begin{figure}[!htb]
+%pet 6 Texture Confusion Indoor-Space Translation Data Set
+\begin{figure}
 \centering
-\includegraphics[width=4.0in]{images/results/Kitchen_LittleTexture_Pan}
+\includegraphics[width=6in]{images/results/Kitchen_LittleTexture_Pan}
 \caption{Registration Error for the Low-Texture Kitchen Translation Data Set}
 \label{fig:PET6}
-\end{figure}
+
+\begin{tabular}{ccc}
+\hline
+\textbf{Algorithm} & \textbf{Average Error $\times$ 1000} & \textbf{\% best result}\\ \hline
+FM-2D	& 3450.6 & ~11.11\\
+FM-3D	& 973.27 & 0\\
+ICP		& 772.9 & ~27.77\\
+PCA		& 1029 & ~16.66\\
+FVR		& 638.5 & ~44.44\\
+\end{tabular}
+\captionof{table}{Statistics for the Low-Texture Kitchen Translation Data Set}
+\label{tab:PET6ST}
+\end{figure} 
+
 
 An important data-set tested is the Indoor-Space with texture confusion (figure \ref{fig:PET5}). Here, a small scene was observed, where texture-confusion was present, this makes registration more difficult for all algorithms most notably the feature matching methods. We suspected that ICP, PCA, and FVR would perform best with this data set. \\
 
@@ -114,21 +171,52 @@ Here, around 39\% of the time, FVR performed best. Compared to the best feature-
 
 Results for the low-textured Kitchen data-set were collected and shown in figure \ref{fig:PET6}. Again around 44\% of the frames had best results given by FVR. Compared with the next best algorithm ICP at ~27\%. In this case, this is expected as the feature-matching methods should perform worse in a low-textured scene. PCA was next best having the best registration ~22\% of the time. \\
 
-\begin{figure}[!htb]
+
+%pet 7 Low-Texture Kitchen Zoom Data Set
+\begin{figure}
 \centering
-\includegraphics[width=4.0in]{images/results/Kitchen_Little_Texture_Zoom}
+\includegraphics[width=6in]{images/results/Kitchen_Little_Texture_Zoom}
 \caption{Registration Error for the Low-Texture Kitchen Zoom Data Set}
 \label{fig:PET7}
-\end{figure}
+
+\begin{tabular}{ccc}
+\hline
+\textbf{Algorithm} & \textbf{Average Error $\times$ 1000} & \textbf{\% best result}\\ \hline
+FM-2D	& 1645.35 & ~7.69\\
+FM-3D	& 899.43 & ~7.69\\
+ICP		& 833.2 & ~46.15\\
+PCA		& 1062.88 & ~15.38\\
+FVR		& 875.85 & ~23.08\\
+\end{tabular}
+\captionof{table}{Statistics for the Low-Texture Kitchen Zoom Data Set}
+\label{tab:PET7ST}
+\end{figure} 
+
+
 
 Another test for the low-textured Kitchen scene was also performed, this time by moving the camera forward and backwards, zooming in on the scene. In this test, FVR only outperformed the other methods in 3 out of the 13 frames. ICP outperformed FVR on this data-set, as 6 out of the 5 frames had best results given by ICP. It could also be said that ICP was a little more consistent. Interestingly 3D-feature-matching outperformed the 2D counterpart. \\
 
-\begin{figure}[!htb]
+
+%pet 8 Office Translation Data Set
+\begin{figure}
 \centering
-\includegraphics[width=4.0in]{images/results/Office_TexturedItems_Translation}
+\includegraphics[width=6in]{images/results/Office_TexturedItems_Translation}
 \caption{Registration Error for the Office Translation Data Set}
 \label{fig:PET8}
-\end{figure}
+
+\begin{tabular}{ccc}
+\hline
+\textbf{Algorithm} & \textbf{Average Error $\times$ 1000} & \textbf{\% best result}\\ \hline
+FM-2D	& 712.97 & 20\\
+FM-3D	& 367040 & 0\\
+ICP		& 710.34 & ~33.33\\
+PCA		& 1001.43 & ~6.67\\
+FVR		& 674.78 & 40\\
+\end{tabular}
+\captionof{table}{Statistics for the Office Translation Data Set}
+\label{tab:PET8ST}
+\end{figure} 
+
 
 In the results for the Textured Office set (figure \ref{fig:PET8}), FVR matched or beat the other algorithms 80\% of the time. 2D-feature matching also performed well but did not manage to best FVR most of the time. This result shows that FVR not only works well compared to other algorithms in scenes with little or no texture or in scenes where feature confusion is high, but also in high texture scenes where feature-matching should have an advantage. \\
 
