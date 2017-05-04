@@ -6,36 +6,11 @@ Experiment results are graphed and presented in this section with the x-axis ind
 
 
 
-%\begin{figure}[!htb]
-%\centering
-%\includegraphics[width=4.0in]{images/results/Apartment_Texture_Rotate}
-%\caption{Registration Error for the Apartment Y-Axis Rotation Data Set}
-%\label{fig:PET0}
-%\end{figure}
 
-%table for fig:PET0, header:
-%algorithm, average error, % of frames with lowest error
-%\begin{table}[!htb]
-%\centering
-%\begin{tabular}{ccc}
-%\hline
-%\textbf{Algorithm} & \textbf{Average Error} & \textbf{\% best result}\\ \hline
-%FM-2D 			& 0 & 1\\
-%FM-3D 			& 2 & 3\\
-%ICP		 		& 4 & 5\\
-%PCA			 	& 6 & 7\\
-%FVR			 	& 8 & 9\\
-%\\
-%\end{tabular}
-%\\
-%\caption{Statistics for the Apartment Y-Axis Rotation Data Set}
-%\label{table:PET0Stats}
-%\end{table}
-
-
+%pet0 : apartment texture rotate
 \begin{figure}
 \centering
-\includegraphics[width=4in]{images/results/Apartment_Texture_Rotate}
+\includegraphics[width=6in]{images/results/Apartment_Texture_Rotate}
 \caption{Registration Error for the Apartment Y-Axis Rotation Data Set}
 \label{fig:PET0}
 
@@ -52,22 +27,49 @@ FVR		& 26.87 & ~65.217\\
 \label{tab:PET0ST}
 \end{figure} 
 
-
-\begin{figure}[!htb]
+%pet 1 apartment texture rotate x-axis
+\begin{figure}
 \centering
-\includegraphics[width=4.0in]{images/results/Apartment_Texture_Rotate_XAxis}
+\includegraphics[width=6in]{images/results/Apartment_Texture_Rotate_XAxis}
 \caption{Registration Error for the Apartment X/Y-Axis Rotation Data Set}
 \label{fig:PET1}
-\end{figure}
+
+\begin{tabular}{ccc}
+\hline
+\textbf{Algorithm} & \textbf{Average Error $\times$ 1000} & \textbf{\% best result}\\ \hline
+FM-2D	& 624.3 & ~13.04\\
+FM-3D	& 841.3 & 0\\
+ICP		& 584.2 & ~43.48\\
+PCA		& 1005.1 & 0\\
+FVR		& 576.86 & ~43.48\\
+\end{tabular}
+\captionof{table}{Statistics for the Apartment X/Y-Axis Rotation Data Set}
+\label{tab:PET1ST}
+\end{figure} 
+
 
 In figure \ref{fig:PET0}, feature-matching, 3D-feature-matching, ICP, PCA and Fourier Volume Registration (FVR) were tested. In the first frame, FVR only outperformed feature-matching and PCA. In a few of the frames, the 3D feature matching and the PCA methods performed poorly relative to the rest, on other frames they were on par with others. In some frames FVR outperformed the others, this occurred on 13 out of the 23 frames tested (about 60\%). This was not completely expected as for this scene, where much texture is present, feature matching should have dominated. The frames were not highly separated so ICP should have gotten a better result too. ICP is shown to still be quite consistent. \\
 
-\begin{figure}[!htb]
+%pet 2 Boxes Y-Axis Rotation Data Set
+\begin{figure}
 \centering
-\includegraphics[width=4.0in]{images/results/Boxes_Texture_Rotate}
+\includegraphics[width=6in]{images/results/Boxes_Texture_Rotate}
 \caption{Registration Error for the Boxes Y-Axis Rotation Data Set}
 \label{fig:PET2}
-\end{figure}
+
+\begin{tabular}{ccc}
+\hline
+\textbf{Algorithm} & \textbf{Average Error $\times$ 1000} & \textbf{\% best result}\\ \hline
+FM-2D	& 574.48 & ~33.3\\
+FM-3D	& 19502.3 & ~3.7\\
+ICP		& 550.3 & ~33.3\\
+PCA		& 981.6 & 0\\
+FVR		& 508.13 & ~29.6\\
+\end{tabular}
+\captionof{table}{Statistics for the Boxes Y-Axis Rotation Data Set}
+\label{tab:PET2ST}
+\end{figure} 
+
 
 Figure \ref{fig:PET1} shows registration errors for the the apartment scene again, this time the camera is moved about the x-axis predominantly, again this scene contains lots of texture. In a about 60\% of the frames, FVR either outperforms or matches the best performing algorithm. Here, ICP and 2D-feature matching are also very competitive, with 3D-feature-matching and PCA failing to register most frames as accurately as the others. In the case of PCA, when there is not enough overlapping data to register, inaccurate registrations occur. When the FVR technique uses PCA, it only uses the primary axis, and refines the alignment in the secondary stage. \\
 
