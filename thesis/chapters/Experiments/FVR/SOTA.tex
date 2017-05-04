@@ -220,42 +220,99 @@ FVR		& 674.78 & 40\\
 
 In the results for the Textured Office set (figure \ref{fig:PET8}), FVR matched or beat the other algorithms 80\% of the time. 2D-feature matching also performed well but did not manage to best FVR most of the time. This result shows that FVR not only works well compared to other algorithms in scenes with little or no texture or in scenes where feature confusion is high, but also in high texture scenes where feature-matching should have an advantage. \\
 
-
-\begin{figure}[!htb]
+%pet 9 Office Centered Object Rotation Data Set
+\begin{figure}
 \centering
-\includegraphics[width=4.0in]{images/results/Office_Texture_blind_spot_rotation}
+\includegraphics[width=6in]{images/results/Office_Texture_blind_spot_rotation}
 \caption{Registration Error for the Office Centered Object Rotation Data Set}
 \label{fig:PET9}
-\end{figure}
+
+\begin{tabular}{ccc}
+\hline
+\textbf{Algorithm} & \textbf{Average Error $\times$ 1000} & \textbf{\% best result}\\ \hline
+FM-2D	& 666.04 & 10\\
+FM-3D	& 391310.1 & 0\\
+ICP		& 577.93 & 60\\
+PCA		& 1026.54 & 0\\
+FVR		& 583.42 & 25\\
+\end{tabular}
+\captionof{table}{Statistics for the Office Centered Object Rotation Data Set}
+\label{tab:PET9ST}
+\end{figure} 
+
 
 Figure \ref{fig:PET9} shows results for the centred object rotation scene. Here, a large divider was placed in the middle of two desks. The idea was to create an environment where the large divider could throw off the effects of PCA and FVR and give an advantage to the feature matching approaches and ICP. Interestingly, around 35\% of the time, FVR had the best result. 2D-feature-matching outperformed the 3D counterpart but only got the best result 10\% of the time. ICP on the other hand got the best result for around 55\% of the frames. It is suspected that ICP is able to use the large divider as an anchor which would make it more robust to non-overlapped data.
 
-\begin{figure}[!htb]
+%pet 10 Office X/Y-Axis Rotation Data Set
+\begin{figure}
 \centering
-\includegraphics[width=4.0in]{images/results/Office_Texture_Rotate_XAxis}
+\includegraphics[width=6in]{images/results/Office_Texture_Rotate_XAxis}
 \caption{Registration Error for the Office X/Y-Axis Rotation Data Set}
 \label{fig:PET10}
-\end{figure}
+
+\begin{tabular}{ccc}
+\hline
+\textbf{Algorithm} & \textbf{Average Error $\times$ 1000} & \textbf{\% best result}\\ \hline
+FM-2D	& 686.48 & ~56.25\\
+FM-3D	& 2080.65 & ~6.25\\
+ICP		& 705.76 & ~18.75\\
+PCA		& 964.13 & 0\\
+FVR		& 697.27 & 18.75\\
+\end{tabular}
+\captionof{table}{Statistics for the Office X/Y-Axis Rotation Data Set}
+\label{tab:PET10ST}
+\end{figure} 
+
 
 Another experiment where the scene was filmed with the camera rotated predominantly about the x-axis is shown in figure \ref{fig:PET10}, this time 2D-feature-matching, ICP and FVR all performed similarly, with only PCA and 3D-feature-matching failing to get good registrations. 
 
-\begin{figure}[!htb]
+%pet 11 Office Y-Axis Rotation Data Set
+\begin{figure}
 \centering
-\includegraphics[width=4.0in]{images/results/Office_Texture_Rotation}
+\includegraphics[width=6in]{images/results/Office_Texture_Rotation}
 \caption{Registration Error for the Office Y-Axis Rotation Data Set}
 \label{fig:PET11}
-\end{figure}
+
+\begin{tabular}{ccc}
+\hline
+\textbf{Algorithm} & \textbf{Average Error $\times$ 1000} & \textbf{\% best result}\\ \hline
+FM-2D	& 530 & ~35.71\\
+FM-3D	& 934.53 & 0\\
+ICP		& 528.47 & ~28.57\\
+PCA		& 1000.78 & 0\\
+FVR		& 533.23 & ~35.71\\
+\end{tabular}
+\captionof{table}{Statistics for the Office Y-Axis Rotation Data Set}
+\label{tab:PET11ST}
+\end{figure} 
+
 
 Figure \ref{fig:PET11} shows the registration errors for the Office data-set with camera rotation about the Y-axis. Here, in around 50\% of the cases, FVR outperformed or matched the best result. 2D-feature-matching was next best matching or outperforming the best result around 34\% of the time. Interestingly, PCA performed the worst with this data-set. Because rotation can incur a smaller overlap and thus a large shift in the axes and mean of the principal components, this could be expected. \\
 
-\begin{figure}[!htb]
+%pet 12 Office Translation Data Set
+\begin{figure}
 \centering
-\includegraphics[width=4.0in]{images/results/Office_Texture_Translation}
+\includegraphics[width=6in]{images/results/Office_Texture_Translation}
 \caption{Registration Error for the Office Translation Data Set}
 \label{fig:PET12}
-\end{figure}
+
+\begin{tabular}{ccc}
+\hline
+\textbf{Algorithm} & \textbf{Average Error $\times$ 1000} & \textbf{\% best result}\\ \hline
+FM-2D	& 773.23 & ~6.67\\
+FM-3D	& 2696.51 & 0\\
+ICP		& 636.84 & 40\\
+PCA		& 999.57 & 0\\
+FVR		& 621.72 & ~53.33\\
+\end{tabular}
+\captionof{table}{Statistics for the Office Translation Data Set}
+\label{tab:PET12ST}
+\end{figure} 
+
 
 In the Office translation scene, FVR outperformed or matched the other algorithms around 85\% of the time. This shows that the FVR has high accuracy when dealing with translation detection and the registration of 3D data with only translational changes. Here, PCA and 3D-feature matching performed the worst with ICP and 2D-feature matching being consistent and robust also. \\
+
+
 
 \begin{figure}[!htb]
 \centering
