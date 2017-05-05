@@ -35,7 +35,7 @@ FVR		& 26.87 & ~65.217\\
 
 
 
-In figure \ref{fig:PET0}, feature-matching, 3D-feature-matching, ICP, PCA and Fourier Volume Registration (FVR) were tested. Overall, the 2D feature matching has the lowest average error out of the two feature matching methods. ICP performed slightly better than FM-2D but the FVR algorithm was shown to have the lowest average error. Additionally to being consistent, the FVR method had the largest percentage of best results. At a value of ~65\%, this means that for around 65\% of the frames, the FVR method gave the optimal result compared to the others. Here ICP and FM-2D performed similarly. Both PCA and FM-3D performed worse-off. In this type of scene where much texture information is plentiful, this is ideal for feature matching methods. Additionally, frames were not highly separated so it is ideal for ICP also. ICP is shown to be consistent yet does not reach the performance of the FVR algorithm. \\
+In figure \ref{fig:PET0}, feature-matching, 3D-feature-matching, ICP, PCA and Fourier Volume Registration (FVR) were tested. Overall, the 2D feature matching has the lowest average error out of the two feature matching methods. This scene is of the inside of an apartment which contains various pieces of furniture and plenty of textural information. The camera was rotated about the y-axis whilst moving the camera (translation) across the room. ICP performed slightly better than FM-2D but the FVR algorithm was shown to have the lowest average error. Additionally to being consistent, the FVR method had the largest percentage of best results. At a value of ~65\%, this means that for around 65\% of the frames, the FVR method gave the optimal result compared to the others. Here ICP and FM-2D performed similarly. Both PCA and FM-3D performed worse-off. In this type of scene where much texture information is plentiful, this is ideal for feature matching methods. Additionally, frames were not highly separated so it is ideal for ICP also. ICP is shown to be consistent yet does not reach the performance of the FVR algorithm. \\
 
 
 %pet 1 apartment texture rotate x-axis
@@ -60,7 +60,7 @@ FVR		& 576.86 & ~43.48\\
 
 
 
-Figure \ref{fig:PET1} shows registration errors for the the apartment scene again, this time the camera is moved about the x-axis predominantly, again this scene contains lots of texture. In a about 60\% of the frames, FVR either outperforms or matches the best performing algorithm. Here, ICP and 2D-feature matching are also very competitive, with 3D-feature-matching and PCA failing to register most frames as accurately as the others. In the case of PCA, when there is not enough overlapping data to register, inaccurate registrations occur. When the FVR technique uses PCA, it only uses the primary axis, and refines the alignment in the secondary stage. \\
+Figure \ref{fig:PET1} shows registration errors for the the apartment scene again, this time the camera is moved about the x-axis predominantly, again this scene contains lots of texture. In a about 43\% of the frames, FVR either outperforms the other algorithms. Here, ICP performs next best with the same statistic for the percentage of best result metric. 2D-feature matching is also very competitive with 3D-feature-matching and PCA failing to register most frames as accurately as the others. In the case of PCA, when there is not enough overlapping data to register, inaccurate registrations occur. When the FVR technique uses PCA, it only uses the primary axis, and refines the alignment in the secondary stage. Additionally, according to the average error metric, the FVR is shown to be the best performer with the lowest average error. \\
 
 
 %pet 2 Boxes Y-Axis Rotation Data Set
@@ -84,6 +84,13 @@ FVR		& 508.13 & ~29.6\\
 \end{figure} 
 
 
+
+
+
+In figure \ref{fig:PET2} 7 frame registration errors are shown for the Boxes scene. This scene contains camera rotation about the y-axis where in different views were observed during frame capture. In around 30\% of the frames, FVR outperformed the other algorithms. Here both IPC and FM-2D performed similarly. Despite not achieving the largest number of optimal results, the FVR has the lowest average error, meaning it consistently outperformed others or at least matched their performance closely.  \\
+
+
+
 %pet 3 Boxes Zoom Data Set
 \begin{figure}
 \centering
@@ -104,10 +111,6 @@ FVR		& 0.65 & ~54.54\\
 \label{tab:PET3ST}
 \end{figure} 
 
-
-
-In figure \ref{fig:PET2} 7 frame registration errors are shown for the Boxes scene. This scene contains camera rotation about the y-axis where in different views were observed during frame capture. In 4 out of the 7 frames, FVR outperformed the other algorithms. Note in frame 3, both PCA and feature-matching failed, despite texture being present in the scene. In frames 4 and 5, ICP outperformed the others by a successful margin.  \\
-
 %pet 4 Boxes Zoom Data Set
 \begin{figure}
 \centering
@@ -118,19 +121,21 @@ In figure \ref{fig:PET2} 7 frame registration errors are shown for the Boxes sce
 \begin{tabular}{ccc}
 \hline
 \textbf{Algorithm} & \textbf{Average Error $\times$ 1000} & \textbf{\% best result}\\ \hline
-FM-2D	& 0.68 & ~18.18\\
-FM-3D	& 0.73 & 0\\
-ICP		& 0.59 & ~27.27\\
-PCA		& 0.73 & 0\\
-FVR		& 0.65 & ~54.54\\
+FM-2D	& 874.18 & ~8.7\\
+FM-3D	& 1447.42 & ~4.35\\
+ICP		& 818.41 & ~26.09\\
+PCA		& 1011.59 & ~8.7\\
+FVR		& 740.33 & ~52.17\\
 \end{tabular}
 \captionof{table}{Statistics for the Desk Translation Data Set}
 \label{tab:PET4ST}
 \end{figure} 
 
 
-Experiment results for the boxes scene are shown in figure \ref{fig:PET3}. In this scene, the camera was moved forward and backward, effectively changing focus on different parts of the same set of boxes at different times during frame capture. Here, only 10 out of the 21 (~47\%) of the frames had a registration error lowest or equal for the FVR technique. In a rare case, frame 16 observed a worst performance by FVR. In frame 3, 2D-feature-matching performed the worst, and towards the last few frames PCA and 3D-feature-matching performed worst. \\
+Experiment results for another boxes scene are shown in figure \ref{fig:PET3}. In this scene, the camera was moved forward and backward, effectively changing focus on different parts of the same set of boxes at different times during frame capture. Here the FVR algorithm achieved the optimal result in around 55\% of the frames. ICP performed next best with a percentage of best results of around 27\%. Additionally the FVR method also achieved a lower average error compared to the other algorithms. \\
 
+
+In ~52\% of the frames of the desk translation data-set in figure \ref{fig:PET4}, the FVR method outperformed others relative to just ~26\% for ICP, ~9\% for 2D-feature-matching and PCA and ~4\% for 3D-feature-matching. This data-set tests each procedure's ability to reconstruct a scene captured by moving a camera forward along a path. 3D feature matching was a notable poor performer here. Additionally FVR outperformed the other methods overall in terms of having the lowest average error. \\
 
 %pet 5 Texture Confusion Indoor-Space Translation Data Set
 \begin{figure}
@@ -153,7 +158,10 @@ FVR		& 630.47 & ~44.44\\
 \end{figure} 
 
 
-In ~52\% of the frames of the desk translation data-set in figure \ref{fig:PET4}, the FVR method outperformed others relative to just ~26\% for ICP, ~9\% for 2D-feature-matching and PCA and ~4\% for 3D-feature-matching. This data-set tests each procedure's ability to reconstruct a scene captured by moving a camera forward along a path. 3D feature matching was a notable poor performer here, ICP and FVR outperformed the other methods overall on this data-set. \\
+An important data-set tested is the Indoor-Space with texture confusion (figure \ref{fig:PET5}). Here, a small scene was observed, where texture-confusion was present, this makes registration more difficult for all algorithms most notably the feature matching methods. We suspected that ICP, PCA, and FVR would perform best with this data set. \\
+
+Here, around 39\% of the time, FVR performed best. Compared to the best feature-matching method (2D) with ~22\% of performances being the best. Interestingly PCA performed much worse compared with 2D-feature-matching. ICP outperformed others around 33\% of the time, similar to FVR's position but it is clear that ICP is not quite as robust as the FVR technique. \\ 
+
 
 %pet 6 Texture Confusion Indoor-Space Translation Data Set
 \begin{figure}
@@ -175,10 +183,6 @@ FVR		& 638.5 & ~44.44\\
 \label{tab:PET6ST}
 \end{figure} 
 
-
-An important data-set tested is the Indoor-Space with texture confusion (figure \ref{fig:PET5}). Here, a small scene was observed, where texture-confusion was present, this makes registration more difficult for all algorithms most notably the feature matching methods. We suspected that ICP, PCA, and FVR would perform best with this data set. \\
-
-Here, around 39\% of the time, FVR performed best. Compared to the best feature-matching method (2D) with ~22\% of performances being the best. Interestingly PCA performed much worse compared with 2D-feature-matching. ICP outperformed others around 33\% of the time, similar to FVR's position but it is clear that ICP is not quite as robust as the FVR technique. \\ 
 
 Results for the low-textured Kitchen data-set were collected and shown in figure \ref{fig:PET6}. Again around 44\% of the frames had best results given by FVR. Compared with the next best algorithm ICP at ~27\%. In this case, this is expected as the feature-matching methods should perform worse in a low-textured scene. PCA was next best having the best registration ~22\% of the time. \\
 
