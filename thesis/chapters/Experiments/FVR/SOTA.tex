@@ -302,7 +302,7 @@ FVR		& 533.23 & ~35.71\\
 \end{figure} 
 
 
-Figure \ref{fig:PET11} shows the registration errors for the Office data-set with camera rotation about the Y-axis. Here, in around 50\% of the cases, FVR outperformed or matched the best result. 2D-feature-matching was next best matching or outperforming the best result around 34\% of the time. Interestingly, PCA performed the worst with this data-set. Because rotation can incur a smaller overlap and thus a large shift in the axes and mean of the principal components, this could be expected. \\
+Figure \ref{fig:PET11} shows the registration errors for the Office data-set with camera rotation about the Y-axis. Here, in around 35\% of the cases, FVR outperformed the other algorithms. This result matched the 2D feature matching method. Both the FVR and 2D-FM method achieved a very similar average registration error. ICP actually achieved the lowest average error but did not achieve as high a percentage of optimal results as compared to FVR and FM-2D. \\
 
 %pet 12 Office Translation Data Set
 \begin{figure}
@@ -321,11 +321,11 @@ PCA		& 999.57 & 0\\
 FVR		& 621.72 & ~53.33\\
 \end{tabular}
 \captionof{table}{Statistics for the Office Translation Data Set}
-\label{tab:PET12ST}
+%\label{tab:PET12ST}
 \end{figure} 
 
 
-In the Office translation scene, FVR outperformed or matched the other algorithms around 85\% of the time. This shows that the FVR has high accuracy when dealing with translation detection and the registration of 3D data with only translational changes. Here, PCA and 3D-feature matching performed the worst with ICP and 2D-feature matching being consistent and robust also. \\
+In the Office translation scene (figure \ref{fig:PET12}), FVR outperformed or matched the other algorithms around 53\% of the time. It also had the lowest average registration error. This shows that the FVR has high accuracy when dealing with translation detection and the registration of 3D data with only translational changes. Here, PCA and 2D and 3D feature matching performed the worst with ICP performing second best. \\
 
 %pet 13 Little Texture Outdoors Rotation Data Set
 \begin{figure}
@@ -344,11 +344,11 @@ PCA		& 1008.22 & 0\\
 FVR		& 327.95 & ~55.56\\
 \end{tabular}
 \captionof{table}{Statistics for the Little Texture Outdoors Rotation Data Set}
-\label{tab:PET13ST}
+%\label{tab:PET13ST}
 \end{figure} 
 
 
-Figure \ref{fig:PET13} shows results for an outdoors scene with little texture, here the camera was rotated about an origin. In this case, PCA performed the worst, and 3D-feature-matching also failed several times. The only algorithm which did not fail once was FVR. In this test, FVR outperformed or matched the other algorithms 88\% of the time. This can be explained by FVR's robustness to out-door scenes and scenes with little texture.  \\
+Figure \ref{fig:PET13} shows results for an outdoors scene with little texture, here the camera was rotated about an origin. In this case, PCA performed the worst, and 3D-feature-matching also failed several times. FVR again had the largest percent of optimal results, and achieved the lowest average registration error by a considerable margin. This results can be explained by FVR's robustness to out-door scenes and scenes with little to no texture information.  \\
 
 %pet 14 Little Texture Outdoors Rotation Data Set
 \begin{figure}
@@ -370,7 +370,7 @@ FVR		& 379.06 & ~56.52\\
 \label{tab:PET14ST}
 \end{figure} 
 
-Another test using a low-textured out-doors scene was tested where the camera was translated along a path. Results are shown in figure \ref{fig:PET14}. Here again the FVR method dominated recording either the best result or matching best result for around 73\% of the frames. Notably, PCA performed poorly, and both the feature-matching methods failed to register a few times. ICP was more consistent, recoding the best or equivalent result around 47\% of the time. Again, this shows the strength of the FVR method in out-door and low-texture environments. 
+Another test using a low-textured out-doors scene was tested where the camera was translated along a path. Results are shown in figure \ref{fig:PET14}. Here again the FVR method dominated recording the best result for around 57\% of the frames. Notably, PCA performed poorly despite being a part of the FVR method. This scene was also a rare case where FM-3D outperformed the 2D feature matching version. ICP was more consistent, recoding the best result around 40\% of the time. Again, this shows the strength of the FVR method in out-door and low-texture environments. 
 
 
 %pet 15 Little Texture Outdoors Rotation Data Set
@@ -390,11 +390,11 @@ PCA		& 951.42 & 0\\
 FVR		& 450.07 & 62.5\\
 \end{tabular}
 \captionof{table}{Statistics for the Outdoors Texture Confusion Rotation Data Set}
-\label{tab:PET15ST}
+%\label{tab:PET15ST}
 \end{figure}
 
 
-Another test was performed with an outdoors scene. Here only 8 of the frames had any good results for all algorithms. They are shown in figure \ref{fig:PET15}. In these results, 6 out of the 8 frames had either a matching or best registration for the FVR method. 2D-feature-matching and 3D-feature-matching both failed a few times, and PCA was inconsistent. ICP had a competitive result 3 out of the 8 times, both FVR and ICP were most consistent. 
+Another test was performed with an outdoors scene. Here only 8 of the frames had any good results for all algorithms as the scene was very difficult to register due to the amount of noise and texture confusion in the captured frames. Results are shown in figure \ref{fig:PET15}. In them the FVR achieved the best result in around 63\% of the frames. 2D-feature-matching and 3D-feature-matching both failed to register a few of these frames, and PCA was inconsistent. ICP had a competitive result but the FVR algorithm still had a lower average registration error. \\ 
 
 
 %pet 16 Outdoors Texture Confusion Translation Data Set
@@ -414,10 +414,10 @@ PCA		& 1023.48 & 0\\
 FVR		& 676.51 & ~38.89\\
 \end{tabular}
 \captionof{table}{Statistics for the Outdoors Texture Confusion Translation Data Set}
-\label{tab:PET16ST}
+%\label{tab:PET16ST}
 \end{figure}
 
-Another scene with texture-confusion was taken out-doors. The interesting results are shown in figure \ref{fig:PET16}. Here, 3D-feature matching failed a majority of the time. Interestingly PCA also failed, the likely reason is because of the amount of noise in an out-doors scene. This noise can give inconsistencies in the principal axes and mean computation. Again, FVR performed best with it getting the best or equivalent result around 55\% of the time. This is another experiment where FVR is shown to be highly robust to scenes with texture confusion. 
+Another scene with texture-confusion was taken out-doors. The accompanying results are shown in figure \ref{fig:PET16}. Here, 3D-feature matching failed a majority of the time and thus had a large average registration error. PCA performed poorly due of the amount of noise in this out-doors scene. This noise can give inconsistencies in the principal axes and mean computation. Despite this the FVR again outperformed the other algorithms in terms of the percentage of optimal registrations. Despite this, both ICP's and FVR's average error was a close tie. But because of the percentage of best results achieved by FVR, it is considered to have performed best. \\
 
 %pet 17 Outdoor Plants Texture Confusion Rotation Data Set
 \begin{figure}
@@ -436,8 +436,10 @@ PCA		& 984.14 & 0\\
 FVR		& 450.06 & ~66.67\\
 \end{tabular}
 \captionof{table}{Statistics for the Outdoor Plants Texture Confusion Rotation Data Set}
-\label{tab:PET17ST}
+%\label{tab:PET17ST}
 \end{figure}
 
 
-The final figure in the pose estimation tests shows another scene taken out-doors. This scene also contains texture confusion, but the camera was rotated about an axis rather than translated in this data-set. Results shown in figure \ref{fig:PET17} indicate that again FVR dominates with 16 out of the 21 frames having a matching or best registration by FVR. 
+The final figure in the pose estimation tests shows another scene taken out-doors. This scene also contains texture confusion, but the camera was rotated about an axis rather than translated in this data-set. Results shown in figure \ref{fig:PET17} indicate that again FVR dominates over the other algorithms, achieving the best result around 67\% of the time and also obtained the lowest average registration error compared to the other algorithms. Surprisingly, it was FM-2D which showed the strongest competition as ICP performed poorly on this data-set especially in comparison to the FVR method. \\
+
+
