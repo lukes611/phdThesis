@@ -1,6 +1,0 @@
-
-2D FFT -> N^2 * log(N^2)
-3D FFT -> N^3 * log(N^3)
-
-3 * N^3 * log(N^3)
-+ 2 * N^3
