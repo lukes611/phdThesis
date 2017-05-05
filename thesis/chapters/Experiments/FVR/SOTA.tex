@@ -30,7 +30,7 @@ PCA		& 37.82 & 0\\
 FVR		& 26.87 & ~65.217\\
 \end{tabular}
 \captionof{table}{Statistics for the Apartment Y-Axis Rotation Data Set}
-\label{tab:PET0ST}
+%\label{tab:PET0ST}
 \end{figure} 
 
 
@@ -55,7 +55,7 @@ PCA		& 1005.1 & 0\\
 FVR		& 576.86 & ~43.48\\
 \end{tabular}
 \captionof{table}{Statistics for the Apartment X/Y-Axis Rotation Data Set}
-\label{tab:PET1ST}
+%\label{tab:PET1ST}
 \end{figure} 
 
 
@@ -80,7 +80,7 @@ PCA		& 981.6 & 0\\
 FVR		& 508.13 & ~29.6\\
 \end{tabular}
 \captionof{table}{Statistics for the Boxes Y-Axis Rotation Data Set}
-\label{tab:PET2ST}
+%\label{tab:PET2ST}
 \end{figure} 
 
 
@@ -108,7 +108,7 @@ PCA		& 0.73 & 0\\
 FVR		& 0.65 & ~54.54\\
 \end{tabular}
 \captionof{table}{Statistics for the Boxes Zoom Data Set}
-\label{tab:PET3ST}
+%\label{tab:PET3ST}
 \end{figure} 
 
 %pet 4 Boxes Zoom Data Set
@@ -128,7 +128,7 @@ PCA		& 1011.59 & ~8.7\\
 FVR		& 740.33 & ~52.17\\
 \end{tabular}
 \captionof{table}{Statistics for the Desk Translation Data Set}
-\label{tab:PET4ST}
+%\label{tab:PET4ST}
 \end{figure} 
 
 
@@ -154,13 +154,13 @@ PCA		& 975.77 & 0\\
 FVR		& 630.47 & ~44.44\\
 \end{tabular}
 \captionof{table}{Statistics for the Texture Confusion Indoor-Space Translation Data Set}
-\label{tab:PET5ST}
+%\label{tab:PET5ST}
 \end{figure} 
 
 
 An important data-set tested is the Indoor-Space with texture confusion (figure \ref{fig:PET5}). Here, a small scene was observed, where texture-confusion was present, this makes registration more difficult for all algorithms most notably the feature matching methods. We suspected that ICP, PCA, and FVR would perform best with this data set. \\
 
-Here, around 39\% of the time, FVR performed best. Compared to the best feature-matching method (2D) with ~22\% of performances being the best. Interestingly PCA performed much worse compared with 2D-feature-matching. ICP outperformed others around 33\% of the time, similar to FVR's position but it is clear that ICP is not quite as robust as the FVR technique. \\ 
+Here, around 44\% of the time, FVR performed best. Additionally it had the lowest average error compared to all the other algorithms. The 2D-FM method achieved the best registration result around 22\% of time, and ICP improved on this at around 33\% of the time. It is clear that 2D-FM and ICP also work quite well but they do not reach the performance of the FVR method. \\ 
 
 
 %pet 6 Texture Confusion Indoor-Space Translation Data Set
@@ -180,7 +180,7 @@ PCA		& 1029 & ~16.66\\
 FVR		& 638.5 & ~44.44\\
 \end{tabular}
 \captionof{table}{Statistics for the Low-Texture Kitchen Translation Data Set}
-\label{tab:PET6ST}
+%\label{tab:PET6ST}
 \end{figure} 
 
 
@@ -204,12 +204,12 @@ PCA		& 1062.88 & ~15.38\\
 FVR		& 875.85 & ~23.08\\
 \end{tabular}
 \captionof{table}{Statistics for the Low-Texture Kitchen Zoom Data Set}
-\label{tab:PET7ST}
+%\label{tab:PET7ST}
 \end{figure} 
 
 
 
-Another test for the low-textured Kitchen scene was also performed, this time by moving the camera forward and backwards, zooming in on the scene. In this test, FVR only outperformed the other methods in 3 out of the 13 frames. ICP outperformed FVR on this data-set, as 6 out of the 5 frames had best results given by ICP. It could also be said that ICP was a little more consistent. Interestingly 3D-feature-matching outperformed the 2D counterpart. \\
+Another test for the low-textured Kitchen scene was also performed, this time by moving the camera forward and backwards, zooming in on the scene. In this test, FVR only outperformed the other methods in around 23\% of the frames. ICP outperformed FVR and the other algorithms in around 46\%. Here, FVR performed second best, with an average error performance close to that of ICP. This result is different from the previous result with the low-textured Kitchen scene. There (figure \ref{fig:PET6}), FVR outperformed all of the other methods. This scene is different in that the camera was translated back and forth rather than side to side. Still, the FVR performed competitively compared to the other algorithms.  \\
 
 
 %pet 8 Office Translation Data Set
@@ -229,11 +229,11 @@ PCA		& 1001.43 & ~6.67\\
 FVR		& 674.78 & 40\\
 \end{tabular}
 \captionof{table}{Statistics for the Office Translation Data Set}
-\label{tab:PET8ST}
+%\label{tab:PET8ST}
 \end{figure} 
 
 
-In the results for the Textured Office set (figure \ref{fig:PET8}), FVR matched or beat the other algorithms 80\% of the time. 2D-feature matching also performed well but did not manage to best FVR most of the time. This result shows that FVR not only works well compared to other algorithms in scenes with little or no texture or in scenes where feature confusion is high, but also in high texture scenes where feature-matching should have an advantage. \\
+In the results for the Textured Office set (figure \ref{fig:PET8}), FVR matched or beat the other algorithms around 40\% of the time. 2D-feature matching also performed well but did not manage to best FVR most of the time. This result shows that FVR not only works well compared to other algorithms in scenes with little or no texture or in scenes where feature confusion is high, but also in high texture scenes where feature-matching and ICP should have an advantage. The FVR algorithm also had the lowest average registration error compared to these other iterative methods. \\
 
 %pet 9 Office Centered Object Rotation Data Set
 \begin{figure}
@@ -249,14 +249,14 @@ FM-2D	& 666.04 & 10\\
 FM-3D	& 391310.1 & 0\\
 ICP		& 577.93 & 60\\
 PCA		& 1026.54 & 0\\
-FVR		& 583.42 & 25\\
+FVR		& 583.42 & 30\\
 \end{tabular}
 \captionof{table}{Statistics for the Office Centered Object Rotation Data Set}
-\label{tab:PET9ST}
+%\label{tab:PET9ST}
 \end{figure} 
 
 
-Figure \ref{fig:PET9} shows results for the centred object rotation scene. Here, a large divider was placed in the middle of two desks. The idea was to create an environment where the large divider could throw off the effects of PCA and FVR and give an advantage to the feature matching approaches and ICP. Interestingly, around 35\% of the time, FVR had the best result. 2D-feature-matching outperformed the 3D counterpart but only got the best result 10\% of the time. ICP on the other hand got the best result for around 55\% of the frames. It is suspected that ICP is able to use the large divider as an anchor which would make it more robust to non-overlapped data.
+Figure \ref{fig:PET9} shows results for the centred object rotation scene. Here, a large divider was placed in the middle of two desks. The idea was to create an environment where the large divider could throw off the effects of PCA and FVR and give an advantage to the feature matching approaches and ICP. Interestingly, around 30\% of the time, FVR had the best result. 2D-feature-matching outperformed the 3D counterpart but only got achieved the best registration performance around 10\% of the time. ICP on the other hand got the best result for around 60\% of the frames. In this scene ICP is able to use the large divider as an anchor which would make it more robust to non-overlapped data.
 
 %pet 10 Office X/Y-Axis Rotation Data Set
 \begin{figure}
@@ -272,14 +272,14 @@ FM-2D	& 686.48 & ~56.25\\
 FM-3D	& 2080.65 & ~6.25\\
 ICP		& 705.76 & ~18.75\\
 PCA		& 964.13 & 0\\
-FVR		& 697.27 & 18.75\\
+FVR		& 697.27 & ~18.75\\
 \end{tabular}
 \captionof{table}{Statistics for the Office X/Y-Axis Rotation Data Set}
-\label{tab:PET10ST}
+%\label{tab:PET10ST}
 \end{figure} 
 
 
-Another experiment where the scene was filmed with the camera rotated predominantly about the x-axis is shown in figure \ref{fig:PET10}, this time 2D-feature-matching, ICP and FVR all performed similarly, with only PCA and 3D-feature-matching failing to get good registrations. 
+Another experiment where the scene was filmed with the camera rotated predominantly about the x-axis is shown in figure \ref{fig:PET10}, this time 2D-feature-matching outperformed the others. FVR and ICP performed second best in terms of the percent of best results achieved but FVR had a lower average registration error which came close to beating FM-2D.  
 
 %pet 11 Office Y-Axis Rotation Data Set
 \begin{figure}
@@ -298,7 +298,7 @@ PCA		& 1000.78 & 0\\
 FVR		& 533.23 & ~35.71\\
 \end{tabular}
 \captionof{table}{Statistics for the Office Y-Axis Rotation Data Set}
-\label{tab:PET11ST}
+%\label{tab:PET11ST}
 \end{figure} 
 
 
