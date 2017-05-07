@@ -18,7 +18,7 @@ $\infty$ & 0 & 100\% & ~6.85\% & ~5.61\% & ~29.4 & 100\%\\
 2,580 & 2 & ~93.11\% & ~6.73\% & ~8.43\% & ~29.4\% & 100\%\\
 \end{tabular}}
 \\
-\caption{Average percent matched registration results for data rotated about the y-axis under varying noise conditions.}
+\caption{Average percent matched registration results for data rotated about the y-axis from 0 to 360 degrees under varying noise conditions.}
 \label{table:YRNoiseT}
 \end{table}
 
@@ -56,20 +56,20 @@ In figure \ref{fig:YRNoise2} the SNR was reduced from $10300$ to $2580$. Again t
 
 The effects of noise on translation were also tested in these experiments. In the first experiment, 3D frames were translated by varying levels of x-axis translation. In the first experiment, different 3D reconstruction techniques were are compared using the percent match metric, to register translation transforms from 0 to 140 (in a frame space of $256^3$). Results are shown in figure \ref{figTNoise0}. In this figure, the 2D-FM, 3D-FM, PCA and FVR methods were shown to have perfect accuracy. This is expected as there is zero noise added prior to the registration of these 3D frames. ICP can be seen falling in terms of accuracy in translations with too wide a base-line (larger than 10 degrees). In this case, a possible solution may be to introduce scale space registration to ICP at an increase in complexity. \\  
 
-%yr-rotation
+%translation
 \begin{table}[!htb]
 \centering
 \scalebox{1.0}{
 \begin{tabular}{ccccccc}
 \hline
 \textbf{SNR} & \textbf{Noise Range} & \textbf{FM-2D} & \textbf{FM-3D} & \textbf{ICP} & \textbf{PCA} & \textbf{FVR}\\ \hline
-$\infty$ & 0 & 100\% & ~6.85\% & ~5.61\% & ~29.4 & 100\%\\
-10,300 & 1 & ~77.26\% & ~6.14\% & ~8.55\% & ~29.4\% & 100\%\\
-2,580 & 2 & ~93.11\% & ~6.73\% & ~8.43\% & ~29.4\% & 100\%\\
+$\infty$ & 0 & 100\% & 100\% & ~23.83\% & 100\% & 100\%\\
+10,300 & 1 & 100\% & 100\% & ~9.16\% & 100\% & 100\%\\
+2,580 & 2 & 100\% & 100\% & ~23.24\% & 100\% & 100\%\\
 \end{tabular}}
 \\
-\caption{Average percent matched registration results for data rotated about the y-axis under varying noise conditions.}
-\label{table:YRNoiseT}
+\caption{Average percent matched registration results for data translated 0 to 140 voxels under varying noise conditions.}
+\label{table:TNoiseT}
 \end{table}
 
 
