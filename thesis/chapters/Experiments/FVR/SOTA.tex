@@ -14,6 +14,75 @@ Each experiment's data is also tabled for convenience. For each algorithm, the a
 These experiments were performed by capturing the environment using the ASUS XTION PRO LIVE active depth camera. The frames were captured and stored to a computer hard-drive prior to being processed using each algorithm. \\
 
 %pet0 : apartment texture rotate
+
+
+\begin{figure}
+\centering
+\begin{tabular}{ccccccc}
+\hline
+\textbf{frame} & \textbf{FM-2D} & \textbf{FM-3D} & \textbf{ICP} & \textbf{PCA} & \textbf{FVR} & \textbf{FVR-3D}\\ \hline
+1&2&3&4&5&6&7\\
+\end{tabular}
+
+\vspace{10mm}
+\centering
+\begin{tabular}{ccc}
+\hline
+\textbf{Algorithm} & \textbf{Average Error $\times$ 1000} & \textbf{\% best results}\\ \hline
+FM-2D	& 27.52 & ~17.39\\
+FM-3D	& 49.80 & 0\\
+ICP		& 27.39 & ~17.39\\
+PCA		& 37.82 & 0\\
+FVR		& 26.87 & ~65.217\\
+\end{tabular}
+
+\caption{Statistics for the Apartment Y-Axis Rotation Data Set}
+\label{tab:PET0ST}
+\end{figure} 
+
+%exxx
+
+
+\begin{figure}
+\centering
+\begin{tabular}{ccccccc}
+\hline
+\textbf{frame} & \textbf{FM-2D} & \textbf{FM-3D} & \textbf{ICP} & \textbf{PCA} & \textbf{FVR} & \textbf{FVR-3D}
+\\ \hline
+1 & 0.042&0.041&0.037&0.049&0.036&0.141\\
+2 & 1.144&1.353&1.526&1.522&1.335&1.227\\
+3 & 1.476&0.639&0.527&0.642&0.65&0.524\\
+4 & 0.046&0.053&0.053&0.056&0.053&0.061\\
+5 & 0.627&0.591&0.622&0.575&0.482&0.631\\
+6 & 1.112&1.269&0.844&1.43&1.612&4.108\\
+7 & 0.112&0.115&0.069&0.088&0.129&0.089\\
+8 & 1.058&1.452&1.122&1.231&1.489&0.773\\
+9 & 0.213&0.177&0.172&0.194&0.184&0.153\\
+10 & 0.411&0.406&0.426&0.466&0.376&0.356\\
+11 & 1.188&1.881&1.146&1.725&1.841&2.447\\
+\end{tabular}
+
+\vspace{10mm}
+\centering
+\begin{tabular}{ccc}
+\hline
+\textbf{Algorithm} & \textbf{Median Error $\times$ 1000} & \textbf{\% best results}\\ \hline
+FM-2D	& 0.627 & ~18.182\%\\
+FM-3D	& 0.591 & ~0\%\\
+ICP	& 0.527 & ~27.273\%\\
+PCA	& 0.575 & ~0\%\\
+FVR	& 0.482 & ~18.182\%\\
+FVR-3D	& 0.524 & ~36.364\%\\
+\end{tabular}
+
+\caption{Statistics for the Apartment Y-Axis Rotation Data Set}
+\label{tab:PET0ST}
+\end{figure} 
+
+
+
+
+%pet0 : apartment texture rotate
 \begin{figure}
 \centering
 \includegraphics[width=6in]{images/results/Apartment_Texture_Rotate}
