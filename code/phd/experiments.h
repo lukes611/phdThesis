@@ -37,6 +37,7 @@
 #define LCPPDATA_DIR "/home/luke/lcppdata"
 #define EXPS_DIR "/home/luke/gitProjects/phdThesis/experiments"
 
+#define HASFFTW
 
 
 
