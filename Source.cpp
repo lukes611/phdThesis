@@ -59,7 +59,7 @@ int main(){
     //fft3D(v, re, im);
 
     VMat v2 = v;
-    v2.transform_volume_forward(0.0f, 0.0f, 0.0f, 1.0f, 10.0f, 15.0f, 20.0f);
+    v2.transform_volume_forward(0.0f, 10.0f, 0.0f, 1.2f, 10.0f, 15.0f, 20.0f);
     //VMat re2, im2;
     //fft3D(v2, re2, im2);
 
@@ -72,7 +72,12 @@ int main(){
     //float mn, mx;
     //o.max_min_loc(mn, mx, NULL, &mxl);
     //cout << mxl << endl;
-    cout << phaseCorrelate(v, v2) << endl;
+    //cout << phaseCorrelate(v, v2) << endl;
+    float r, s;
+    Point3i t;
+    cout << "starting..." << endl;
+    phaseCorrelate_rst(v, v2, r, s, t, true);
+    cout << "r = " << r << ", s = " << s << ", t = " << t << endl;
 
 	return 0;
 }
