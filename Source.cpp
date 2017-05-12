@@ -16,7 +16,18 @@ using namespace ll_cam;
 using namespace ll_siobj;
 using namespace ll_experiments;
 
+/*
+todo in fftw:
 
+LLGPU_phase_correlate
+    fft3d
+    multiply-spectrums
+    ifft3d
+    find the peak
+phase_correlate_rst
+
+
+*/
 
 int main(){
 
