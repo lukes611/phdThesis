@@ -16,8 +16,13 @@
 
 
 #define TheVolumePhaseCorrelator_H
+#include "../phd/experiments.h"
 
+
+#ifdef HASCUDA
 #include "../gpu/ExternGPUPrograms.h"
+#endif
+
 #include "../basics/VMatF.h"
 #include "../basics/locv_algorithms.h"
 
@@ -26,6 +31,9 @@
 
 namespace ll_volume_gpu
 {
+
+#ifdef HASCUDA
+
 	//performs the transform based on m!
 	void transform(VMat & vol, cv::Mat & m);
 
@@ -55,11 +63,17 @@ namespace ll_volume_gpu
 	//use two registered points along with phase correlation to align two volumes according to scale, translation and rotation
 	cv::Mat phase_correlate_rst_two_points(VMat & v1_in, VMat & v2_in, ll_R3::R3 match_1[2], ll_R3::R3 match_2[2]);
 
+
+#endif
+
 }
 
 
 namespace ll_volume_partial
 {
+
+#ifdef HASCUDA
+
 	//generates the magnitude of the fft of v1
 	void fft_mag(VMat & v1, VMat & mag, bool swap_quads = true);
 
@@ -84,6 +98,8 @@ namespace ll_volume_partial
 
 	//coputes the registration matrix between v1 and v2 using my method and pca
 	cv::Mat pca_lukes_pc_rt(VMat & v1, VMat & v2, cv::Size s = cv::Size(512, 512));
+
+#endif
 
 }
 

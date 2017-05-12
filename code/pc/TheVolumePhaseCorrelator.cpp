@@ -5,7 +5,8 @@ using namespace cv;
 
 namespace ll_volume_gpu
 {
-	
+#ifdef HASCUDA
+
 	void transform(VMat & vol, Mat & m)
 	{
 		LLGPU_transform(vol, m);
@@ -38,7 +39,7 @@ namespace ll_volume_gpu
 			v2.normalize();
 		}
 		Point3i t;
-		LLGPU_phase_correlate_rst(v1, v2, rotation, scale, t, false); 
+		LLGPU_phase_correlate_rst(v1, v2, rotation, scale, t, false);
 		translation = R3((float)t.x, (float)t.y, (float)t.z);
 		return VMat::transformation_matrix(v1.s, 0.0f, rotation, 0.0f, scale, translation.x, translation.y, translation.z).clone();
 	}
@@ -50,15 +51,15 @@ namespace ll_volume_gpu
 		//copy both
 		VMat v1 = v1_in;
 		VMat v2 = v2_in;
-		
+
 		//transform both to proper up space
 		Mat m1 = v1.pca_correct_up();
 		Mat m2 = v2.pca_correct_up();
 		Mat m2i = m2.inv();
-		
+
 		//pcrst
 		Mat pcm; float rotation, scale; R3 translation;
-		phase_correlate_rst(v1, v2, rotation, scale, translation); 
+		phase_correlate_rst(v1, v2, rotation, scale, translation);
 		pcm = VMat::transformation_matrix(v1.s, 0.0f, rotation, 0.0f, scale, translation.x, translation.y, translation.z);
 		//un-transform v1 according to the return value of v2's up correction
 
@@ -72,7 +73,7 @@ namespace ll_volume_gpu
 		VMat s1 = v1_in;
 		VMat s2 = v2_in;
 		Mat m;
-		
+
 		Mat m1 = VMat::new_up_mat((match_2[0]-match_1[0]).unit(), match_1[0]);
 		Mat m2 = VMat::new_up_mat((match_2[1]-match_1[1]).unit(), match_1[1]);
 		s1.transform_volume_forward(m1);
@@ -111,14 +112,18 @@ namespace ll_volume_gpu
 	{
 		LLGPU_log_polar(s);
 	}
+
+#endif
 }
 
 namespace ll_volume_partial
 {
+
+#ifdef HASCUDA
 	float luke_rotation_estimation_method(VMat & v1, VMat & v2, Size s)
 	{
 		VMat m1 = v1.s, m2 = v1.s;
-		
+
 		ll_volume_gpu::fft_mag(v1, m1);
 		ll_volume_gpu::fft_mag(v2, m2);
 		m1.normalize();
@@ -160,18 +165,19 @@ namespace ll_volume_partial
 		VMat tmp = v1.clone();
 		tmp.transform_volume_forward(m1);
 		Mat m2; float rotation; R3 translation;
-		ll_volume_partial::phase_correlate_rt_luke(tmp, v2, rotation, translation, s); 
+		ll_volume_partial::phase_correlate_rt_luke(tmp, v2, rotation, translation, s);
 		float half = v1.s / 2.0f;
 		m2 = Pixel3DSet::transformation_matrix(0.0f, rotation, 0.0f, 1.0f, translation.x, translation.y, translation.z, R3(half, half, half));
 		m2 *= m1;
 		return m2.clone();
 	}
+#endif
 }
 
 
 
 
-	
+
 
 
 
