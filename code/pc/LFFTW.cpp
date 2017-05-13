@@ -331,6 +331,22 @@ void phaseCorrelate_rst(VMat & vol1, VMat & vol2, float & rotation, float & scal
     //log-polar the volumes / copy them back into complex volumes
     logpolar_toComplex(mag1, v1);
     logpolar_toComplex(mag2, v2);
+    //put back through hanning window
+    if(hanning_window_on) //if should do hanning window
+    for(int z = 0, i = 0; z < vol1.s; z++)
+    {
+        for(int y = 0; y < vol1.s; y++)
+        {
+            for(int x = 0; x < vol1.s; x++, i++)
+            {
+                float scalar = 1.0f;
+                if(hanning_window_on) scalar = hanningWindowScalar(x,y,z,vol1.s);
+                v1[i][0] = v1[i][0] * scalar;
+                v2[i][0] = v2[i][0] * scalar;
+                v1[i][1] = v2[i][1] = 0.0f;
+            }
+        }
+    }
 
     //do fft and pc on those complex volumes
     {
@@ -387,7 +403,11 @@ void phaseCorrelate_rst(VMat & vol1, VMat & vol2, float & rotation, float & scal
         pk.y = peak_location / vol1.s;
         pk.x = peak_location % vol1.s;
 
+        pk = filter_phase_peak(pk, vol1.s);
+
         phase_correlate_rst_adjust_rs(pk, rotation, scale, vol1.s);
+        rotation = -rotation;
+        scale = 1.0f / scale;
     }
     //compute the trans separation
 
