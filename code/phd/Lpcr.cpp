@@ -25,6 +25,18 @@ Mat pc_register(Pixel3DSet & object1, Pixel3DSet & object2, double & seconds, bo
 	return ret.clone();
 }
 
+Mat ffvr(Pixel3DSet & object1, Pixel3DSet & object2, double & seconds, bool isScaled, int volumeSize)
+{
+	LTimer t; t.start();
+	VMat VA(volumeSize, object1, 0.0f, true);
+	VMat VB(volumeSize, object2, 0.0f, true);
+	Mat ret = ll_vpc::phase_correlate_rt_luke(VA, VB); //ll_vpc::phase_correlate_rst(VA, VB);
+	t.stop();
+	seconds = t.getSeconds();
+	return ret.clone();
+}
+
+
 Mat pc_register_pca(Pixel3DSet & object1, Pixel3DSet & object2, double & seconds, bool isScaled, int volumeSize)
 {
 	LTimer t; t.start();
