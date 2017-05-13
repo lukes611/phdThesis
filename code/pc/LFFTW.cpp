@@ -1,7 +1,6 @@
 #include "LFFTW.h"
 #include <functional>
 
-#define HASFFTW
 
 #ifdef HASFFTW
 
