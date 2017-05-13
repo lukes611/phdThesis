@@ -53,7 +53,7 @@ int main(){
 		//p2 = p;
 	}
 
-    VMat v(256, p1, 0.0f, false);
+    VMat v(512, p1, 0.0f, false);
 
     //VMat re, im;
     //fft3D(v, re, im);
@@ -79,6 +79,8 @@ int main(){
     phaseCorrelate_rst(v, v2, r, s, t, true);
     if(r < 0.0f) r = 360.0f + r;
     cout << "r = " << r << ", s = " << s << ", t = " << t << endl;
+
+
 
 	return 0;
 }

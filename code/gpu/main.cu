@@ -886,7 +886,7 @@ __global__ void hanning_gpu(cufftComplex * input, int N)
 	if(x >= N || y >= N || z >= N) return;
 
 	int hw = N / 2;
-	float hw_dist = sqrt((float)(hw*hw*3.0f));
+	float hw_dist = sqrt((float)(hw*hw*3.0f)) * 0.5f;
 	float dist = sqrt((float)((x-hw)*(x-hw) + (y-hw)*(y-hw) + (z-hw)*(z-hw)));
 	dist = hw_dist - dist;
 	hw_dist *= 2.0f;
