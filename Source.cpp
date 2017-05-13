@@ -47,38 +47,14 @@ int main(){
 		p1 = p;
 	}
 	{
-		//Pix3D p;
-		//reader.read_frame(p, 10);
-		//p2 = p;
+		Pix3D p;
+		reader.read_frame(p, 10);
+		p2 = p;
 	}
 
-    VMat v(64, p1, 0.0f, false);
-
-    //VMat re, im;
-    //fft3D(v, re, im);
-
-    VMat v2 = v;
-    v2.transform_volume_forward(0.0f, 25.0f, 0.0f, 1.2f, 5.0f, 10.0f, 20.0f);
-    //VMat re2, im2;
-    //fft3D(v2, re2, im2);
-
-
-    //multiplySpectrums(re, im, re2, im2);
-
-    //VMat o;
-    //ifft3D(o, re, im);
-    //Point3i mxl;
-    //float mn, mx;
-    //o.max_min_loc(mn, mx, NULL, &mxl);
-    //cout << mxl << endl;
-    //cout << phaseCorrelate(v, v2) << endl;
-    float r, s;
-    Point3i t;
-    cout << "starting..." << endl;
-    phaseCorrelate_rst(v, v2, r, s, t, false);
-    //if(r < 0.0f) r = 360.0f + r;
-    cout << "r = " << r << ", s = " << s << ", t = " << t << endl;
-
+	double secs;
+    ll_pc::pc_register(p1, p2, secs, true, 256);
+    cout << secs << endl;
 
 
 	return 0;

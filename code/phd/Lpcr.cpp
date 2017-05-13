@@ -7,8 +7,9 @@
 using namespace ll_pix3d;
 using namespace cv;
 using namespace std;
+#define HASFFTW
 
-#ifdef HASCUDA
+#if defined(HASCUDA) || defined(HASFFTW)
 
 namespace ll_pc
 {
@@ -18,7 +19,7 @@ Mat pc_register(Pixel3DSet & object1, Pixel3DSet & object2, double & seconds, bo
 	LTimer t; t.start();
 	VMat VA(volumeSize, object1, 0.0f, true);
 	VMat VB(volumeSize, object2, 0.0f, true);
-	Mat ret = ll_volume_gpu::phase_correlate_rst(VA, VB);
+	Mat ret = ll_vpc::phase_correlate_rst(VA, VB);
 	t.stop();
 	seconds = t.getSeconds();
 	return ret.clone();
@@ -29,7 +30,7 @@ Mat pc_register_pca(Pixel3DSet & object1, Pixel3DSet & object2, double & seconds
 	LTimer t; t.start();
 	VMat VA(volumeSize, object1, 0.0f, isScaled);
 	VMat VB(volumeSize, object2, 0.0f, isScaled);
-	Mat ret = ll_volume_gpu::pca_phase_correlate_rst(VA, VB);
+	Mat ret = ll_vpc::pca_phase_correlate_rst(VA, VB);
 	t.stop();
 	seconds = t.getSeconds();
 	return ret.clone();
@@ -43,7 +44,7 @@ Mat pc_register_pca_i(Pixel3DSet & object1, Pixel3DSet & object2, double & secon
 	for(int i = 0; i < count; i++)
 	{
 		double secs = 0.0;
-		Mat _m = pc_register_pca(src, object2, secs, true, volumeSize);	
+		Mat _m = pc_register_pca(src, object2, secs, true, volumeSize);
 		seconds += secs;
 		src.transform_set(_m);
 		ret *= _m;
@@ -54,7 +55,7 @@ Mat pc_register_pca_i(Pixel3DSet & object1, Pixel3DSet & object2, double & secon
 Mat pc_pca_icp(Pixel3DSet & object1, Pixel3DSet & object2, double & seconds, bool isScaled, int volumeSize)
 {
 	LTimer t; t.start();
-	
+
 	Mat m1 = pc_register_pca(object1, object2, seconds, isScaled, volumeSize);
 	Pixel3DSet tmp = object1;
 	tmp.transform_set(m1);
