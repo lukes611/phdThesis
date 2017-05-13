@@ -30,7 +30,13 @@ namespace ll_pc
 	cv::Mat pc_pca_icp(ll_pix3d::Pixel3DSet & object1, ll_pix3d::Pixel3DSet & object2, double & seconds, bool isScaled = true, int volumeSize = 256);
 }
 
+#elifdef HASFFTW
+
+
+
 #endif
+
+
 
 namespace ll_pca
 {

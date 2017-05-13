@@ -2,6 +2,7 @@
 #include <functional>
 
 
+
 #ifdef HASFFTW
 
 #include <fftw3.h>
@@ -35,6 +36,7 @@ void fft3D(VMat & volume, VMat & realOut, VMat & imagOut)
         imagOut.data[i] = out[i][1];
     }
 
+    fftw_destroy_plan(plan);
     fftw_free(in);
     fftw_free(out);
 }
@@ -61,7 +63,99 @@ void ifft3D(VMat & output, VMat & real, VMat & imag)
         output.data[i] = out[i][0];
     }
 
+    fftw_destroy_plan(plan);
     fftw_free(in);
+    fftw_free(out);
+}
+
+
+void logPolar(VMat & output)
+{
+    VMat input = output;
+    for(int z = 0; z < input.s; z++)
+    {
+        for(int y = 0; y < input.s; y++)
+        {
+            for(int x = 0; x < input.s; x++)
+            {
+                R3 p(x,y,z);
+                p.logPolarInv(input.s);
+
+                output.data[z*input.s2 + y*input.s + x] = input.at(p);
+            }
+        }
+    }
+
+}
+
+void fftMagSwapQuads(VMat & in, VMat & mag)
+{
+    int hw = in.s / 2;
+    function<void(fftw_complex*,VMat&,int)> computeMagnitudesSwapQuads = [&hw](fftw_complex * input, VMat & output, int s) -> void {
+        output = VMat(s);
+        for(int z = 0; z < hw; z++)
+        {
+            for(int y = 0; y < s; y++)
+            {
+                for(int x = 0; x < s; x++)
+                {
+                    int ox=x, oy=y, oz=z+hw;
+
+
+                    if(x<hw && y<hw)
+                    {
+                        ox += hw;
+                        oy += hw;
+                    }else if(x>=hw && y<hw)
+                    {
+                        ox -= hw;
+                        oy += hw;
+                    }else if(x<hw && y>=hw)
+                    {
+                        ox += hw;
+                        oy -= hw;
+                    }else if(x>=hw && y>=hw)
+                    {
+                        ox -= hw;
+                        oy -= hw;
+                    }
+
+                    int bid = z*s*s + y*s + x;
+                    int bid2 = oz*s*s + oy*s + ox;
+                    fftw_complex tmp, tmp2;
+                    {
+                        tmp[0] = input[bid][0];
+                        tmp[1] = input[bid][1];
+                        tmp2[0] = input[bid2][0];
+                        tmp2[1] = input[bid2][1];
+                    }
+                    float mag = sqrt(tmp[0]*tmp[0] + tmp[1]*tmp[1]);
+                    float mag2 = sqrt(tmp2[0]*tmp2[0] + tmp2[1]*tmp2[1]);
+
+                    output.data[bid] = mag2;
+                    output.data[bid2] = mag;
+                }
+            }
+        }
+    };
+
+
+    fftw_complex * din   = (fftw_complex *) fftw_malloc(sizeof(fftw_complex) * in.s3);
+    fftw_complex * out  = (fftw_complex *) fftw_malloc(sizeof(fftw_complex) * in.s3);
+
+    for(int i = 0; i < in.s3; i++)
+    {
+        din[i][0] = in.data[i];
+        din[i][1] = 0.0f;
+    }
+
+    fftw_plan plan = fftw_plan_dft_3d(in.s, in.s, in.s, din, out, FFTW_FORWARD, FFTW_ESTIMATE);
+    fftw_execute(plan);
+
+    computeMagnitudesSwapQuads(din, mag, in.s);
+
+
+    fftw_free(din);
     fftw_free(out);
 }
 

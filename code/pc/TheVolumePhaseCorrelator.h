@@ -12,11 +12,13 @@
 	*requires GPU
 */
 
-#ifndef TheVolumePhaseCorrelator_H
+#pragma once
 
 
 #define TheVolumePhaseCorrelator_H
 #include "../phd/experiments.h"
+
+
 
 
 #ifdef HASCUDA
@@ -28,11 +30,10 @@
 
 
 
+#if defined(HASCUDA) || defined(HASFFTW)
 
-namespace ll_volume_gpu
+namespace ll_vpc
 {
-
-#ifdef HASCUDA
 
 	//performs the transform based on m!
 	void transform(VMat & vol, cv::Mat & m);
@@ -63,34 +64,12 @@ namespace ll_volume_gpu
 	//use two registered points along with phase correlation to align two volumes according to scale, translation and rotation
 	cv::Mat phase_correlate_rst_two_points(VMat & v1_in, VMat & v2_in, ll_R3::R3 match_1[2], ll_R3::R3 match_2[2]);
 
-
-#endif
-
-}
-
-
-namespace ll_volume_partial
-{
-
-#ifdef HASCUDA
-
-	//generates the magnitude of the fft of v1
-	void fft_mag(VMat & v1, VMat & mag, bool swap_quads = true);
-
-	//performs a partial gpu/cpu version of phase correlation against rotation, scale and translation
-	void phase_correlate_rst(VMat & v1, VMat & v2, float & rotation, float & scale, R3 & translation);
-
 	//my rotation estimation procedure, this procedure estimated the y-axis rotation between v1 and v2
 	//despite the fact they can also be seperated by scale and translation
 	float luke_rotation_estimation_method(VMat & v1, VMat & v2, cv::Size s = cv::Size(512, 512));
 
-
-
 	//finds the rotation and translation params between two volumes using luke_rotation_estimation_method()
 	void phase_correlate_rt_lrem(VMat & v1, VMat & v2, float & rotation, R3 & translation);
-
-	//same as above function but works with rotation, translation AND scale
-	void phase_correlate_rst_lrem(VMat & v1, VMat & v2, float & rotation, float & scale, R3 & translation);
 
 	void phase_correlate_rt_luke(VMat & v1, VMat & v2, float & rotation, R3 & translation, cv::Size s = cv::Size(512, 512));
 
@@ -99,11 +78,10 @@ namespace ll_volume_partial
 	//coputes the registration matrix between v1 and v2 using my method and pca
 	cv::Mat pca_lukes_pc_rt(VMat & v1, VMat & v2, cv::Size s = cv::Size(512, 512));
 
-#endif
-
 }
 
-
-
-
 #endif
+
+
+
+

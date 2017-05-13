@@ -8,7 +8,6 @@
 #include "code/basics/locv_algorithms.h"
 #include "code/pc/TheVolumePhaseCorrelator.h"
 #include "code/phd/Lpcr.h"
-#include "code/pc/LFFTW.h"
 
 using namespace std;
 using namespace cv;
