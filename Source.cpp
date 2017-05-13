@@ -59,7 +59,7 @@ int main(){
     //fft3D(v, re, im);
 
     VMat v2 = v;
-    v2.transform_volume_forward(0.0f, 10.0f, 0.0f, 1.2f, 10.0f, 15.0f, 20.0f);
+    v2.transform_volume_forward(0.0f, 10.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f);
     //VMat re2, im2;
     //fft3D(v2, re2, im2);
 
@@ -77,6 +77,7 @@ int main(){
     Point3i t;
     cout << "starting..." << endl;
     phaseCorrelate_rst(v, v2, r, s, t, true);
+    if(r < 0.0f) r = 360.0f + r;
     cout << "r = " << r << ", s = " << s << ", t = " << t << endl;
 
 	return 0;

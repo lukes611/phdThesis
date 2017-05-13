@@ -3,7 +3,7 @@
 
 	Author: Luke Lincoln
 
-	contents description: 
+	contents description:
 		Contains the GPU cuda algorithms I wrote
 
 	depends on: null
@@ -322,7 +322,7 @@ bool sync()
 	{
 		if(!is_in(name))
 		{
-			_latest_error = "could not find " + name + " to collect."; 
+			_latest_error = "could not find " + name + " to collect.";
 			return false;
 		}
 		bool rv = _named_ptrs->operator[](name).retrieve<T>(data, _size);
@@ -514,7 +514,7 @@ struct R3_
 		GetUnitPointFromAngle(a2, x2, y2);
 		zdirx *= y1; zdiry *= y1; zdirz *= y1;
 		xdirx *= x1; xdiry *= x1; xdirz *= x1;
-		xdirx += zdirx; xdiry += zdiry; xdirz += zdirz; 
+		xdirx += zdirx; xdiry += zdiry; xdirz += zdirz;
 
 		xdirx *= y2; xdiry *= y2; xdirz *= y2;
 		ydirx *= x2; ydiry *= x2; ydirz *= x2;
@@ -557,14 +557,14 @@ struct R3_
 		z -= hw.z;
 
 		float mag = sqrt(x*x+y*y+z*z);
-		
+
 		x/=mag;
 		y/=mag;
 		z/=mag;
 
 		mag /= M;
 		mag = exp(mag);
-		
+
 
 		x*=mag;
 		y*=mag;
@@ -627,7 +627,7 @@ struct VMat_
 		int p1x = (int)r.x;
 		int p1y = (int)r.y;
 		int p1z = (int)r.z;
-		
+
 		float a = (inbounds(p1x,p1y, p1z))? (float) at(p1x, p1y, p1z): 0.0f;
 		float b = (inbounds(p1x+1,p1y, p1z))? (float) at(p1x+1, p1y, p1z): 0.0f;
 		float c = (inbounds(p1x, p1y+1, p1z))? (float) at(p1x, p1y+1, p1z): 0.0f;
@@ -680,7 +680,7 @@ __global__ void multiply_spectrums(cufftComplex * signal1, cufftComplex * signal
 
 
 	float mag = sqrt(tmp.x*tmp.x + tmp.y*tmp.y);
-	
+
 	signal1[bid].x = tmp.x / mag;
 	signal1[bid].y = tmp.y / mag;
 
@@ -709,7 +709,7 @@ __global__ void gpu_get_magnitude_swapQuads(cufftComplex * signal1, float * outp
 
 	int ox=x, oy=y, oz=z+hw;
 
-	
+
 	if(x<hw && y<hw)
 	{
 		ox += hw;
@@ -797,14 +797,14 @@ __global__ void laplacian_gpu(cufftComplex * input, float * output, int N)
 	val += input[(z+1)*N*N + (y+1)*N + (x+1)].x * -1.0f;
 	val += input[(z+1)*N*N + (y)*N + (x)].x * -1.0f;
 
-	
+
 	output[bid] = val;
 }
 
 //gpu transform volume input by matrix m, put result into volume output
 __global__ void volume_transform(float * input, float * output, float * m, int N)
 {
-	
+
 	int x = blockIdx.x*blockDim.x + threadIdx.x;
     int y = blockIdx.y*blockDim.y + threadIdx.y;
 	int z = blockIdx.z*blockDim.z + threadIdx.z;
@@ -826,7 +826,7 @@ __global__ void volume_transform(float * input, float * output, float * m, int N
 	VMat_ inp; inp.new_VMat_(N, input);
 
 	//linearly interpolate from input to output according to p
-	out.at(x,y,z) = inp.at(p); 
+	out.at(x,y,z) = inp.at(p);
 }
 
 //re-written
@@ -842,7 +842,7 @@ __global__ void logpolar3d_gpu(float * input, float * output, int N)
 	struct VMat_ in; in.new_VMat_(N, input);
 	struct VMat_ out; out.new_VMat_(N, output);
 
-	
+
 	out.at(x,y,z) = in.at(p);
 }
 
@@ -858,7 +858,7 @@ __global__ void logonly3d_gpu(float * input, float * output, int N)
 	struct VMat_ in; in.new_VMat_(N, input);
 	struct VMat_ out; out.new_VMat_(N, output);
 
-	
+
 	out.at(x,y,z) = in.at(p);
 }
 
@@ -884,17 +884,17 @@ __global__ void hanning_gpu(cufftComplex * input, int N)
     int y = blockIdx.y*blockDim.y + threadIdx.y;
 	int z = blockIdx.z*blockDim.z + threadIdx.z;
 	if(x >= N || y >= N || z >= N) return;
-	
+
 	int hw = N / 2;
-	float hw_dist = sqrt((float)(hw * hw));
+	float hw_dist = sqrt((float)(hw*hw*3.0f));
 	float dist = sqrt((float)((x-hw)*(x-hw) + (y-hw)*(y-hw) + (z-hw)*(z-hw)));
 	dist = hw_dist - dist;
 	hw_dist *= 2.0f;
 
-	
+
 
 	input[z*N*N + y*N + x].x *= (0.5f * (1.0f - cos((2.0f * M_PI * dist) / (hw_dist - 1.0f))));
-	
+
 }
 
 __global__ void log_on_gpu(float * input, int N)
@@ -913,13 +913,13 @@ __global__ void log_on_gpu(float * input, int N)
 bool LLGPU_phase_correlate_rst(VMat vol1, VMat vol2, float & rotation, float & scale, Point3i & translation, bool hanning_window_on)
 {
 	LCuda_Host_Manager m;
-	
+
 	try
 	{
 		int S = vol1.s3;
 		VMatCufftComplex vol1_ = vol1;
 		VMatCufftComplex vol2_ = vol2;
-		
+
 		if(!m.new_<cufftComplex>("vol1_", S, vol1_.d)) throw m.error();
 		if(!m.new_<cufftComplex>("vol2_", S, vol2_.d)) throw m.error();
 		if(!m.new_<float>("tmp1", S)) throw m.error();
@@ -932,7 +932,7 @@ bool LLGPU_phase_correlate_rst(VMat vol1, VMat vol2, float & rotation, float & s
 		dim3 numBlocks(vol1.s / threadsPerBlock.x, vol1.s / threadsPerBlock.y, vol1.s / threadsPerBlock.z);
 		int hw = vol1.s/2;
 		dim3 numBlocks4M(vol1.s / threadsPerBlock.x, vol1.s / threadsPerBlock.y, hw / threadsPerBlock.z);
-		
+
 		//hanning window
 		if(hanning_window_on)
 		{
@@ -950,7 +950,7 @@ bool LLGPU_phase_correlate_rst(VMat vol1, VMat vol2, float & rotation, float & s
 		cufftExecC2C(plan, m.at<cufftComplex>("vol1_"), m.at<cufftComplex>("vol1_"), CUFFT_FORWARD);
 		cufftExecC2C(plan, m.at<cufftComplex>("vol2_"), m.at<cufftComplex>("vol2_"), CUFFT_FORWARD);
 		if(!m.sync()) throw m.error();
-		
+
 		//get the magnitude of both
 		gpu_get_magnitude_swapQuads<<<numBlocks4M, threadsPerBlock>>>(m.at<cufftComplex>("vol1_"), m.at<float>("tmp1"), vol1.s);
 		gpu_get_magnitude_swapQuads<<<numBlocks4M, threadsPerBlock>>>(m.at<cufftComplex>("vol2_"), m.at<float>("tmp2"), vol1.s);
@@ -960,15 +960,15 @@ bool LLGPU_phase_correlate_rst(VMat vol1, VMat vol2, float & rotation, float & s
 		log_on_gpu<<<numBlocks, threadsPerBlock>>>(m.at<float>("tmp1"), vol1.s);
 		log_on_gpu<<<numBlocks, threadsPerBlock>>>(m.at<float>("tmp2"), vol1.s);
 		if(!m.sync()) throw m.error();
-	
+
 		//get the log polar of tmp1 and tmp2 as tmp3 and tmp4 respectfully
 		logpolar3d_gpu_complex_out<<<numBlocks, threadsPerBlock>>>(m.at<float>("tmp1"), m.at<cufftComplex>("vol1_"), vol1.s);
 		logpolar3d_gpu_complex_out<<<numBlocks, threadsPerBlock>>>(m.at<float>("tmp2"), m.at<cufftComplex>("vol2_"), vol1.s);
 		if(!m.sync()) throw m.error();
-	
+
 
 		//gpu_only_pc
-		function<Point3i(LCuda_Host_Manager*,cufftHandle*,string,string,VMatCufftComplex*)> f = 
+		function<Point3i(LCuda_Host_Manager*,cufftHandle*,string,string,VMatCufftComplex*)> f =
 		[](LCuda_Host_Manager * m, cufftHandle * plan, string data1, string data2, VMatCufftComplex * cpu_a) -> Point3i
 		{
 			int S = cpu_a->s3;
@@ -993,11 +993,11 @@ bool LLGPU_phase_correlate_rst(VMat vol1, VMat vol2, float & rotation, float & s
 		translation = f(&m, &plan, "vol1_", "vol2_", &vol1_);
 		if(!m.sync()) throw m.error();
 		VMatCufftComplex::phase_correlate_rst_adjust_rs(translation, rotation, scale, vol1.s);
-		
+
 		//copy from vol1 to tmp1, and from vol2_ to "vol2_"
 		if(!m.upload<float>("tmp1", S, vol1.data)) throw m.error();
 		if(!m.upload<cufftComplex>("vol2_", S, vol2_.d)) throw m.error();
-		
+
 		//transform tmp1 by R/S and set into tmp2
 		Mat transformation_matrix = VMat::transformation_matrix(vol1.s, 0.0f, rotation, 0.0f, scale, 0.0f, 0.0f, 0.0f);
 		transformation_matrix = transformation_matrix.inv();
@@ -1009,13 +1009,13 @@ bool LLGPU_phase_correlate_rst(VMat vol1, VMat vol2, float & rotation, float & s
 		//dim3 threadsPerBlock11(9, 9, 9);
 		copytoCufftComplex<<<numBlocks, threadsPerBlock>>>(m.at<cufftComplex>("vol1_"), m.at<float>("tmp2"), vol1.s);//wastmp2
 		if(!m.sync()) throw m.error();
-	
+
 		if(!m.upload<cufftComplex>("vol2_", S, vol2_.d)) throw m.error();
-	
+
 		//final PC
 		translation = f(&m, &plan, "vol1_", "vol2_", &vol1_);
 		if(!m.sync()) throw m.error();
-	
+
 		//destroy plan
 		cufftDestroy(plan);
 	}catch(string e)
@@ -1035,7 +1035,7 @@ bool LLGPU_phase_correlate(VMat & v1, VMat & v2, Point3i & rv)
 		int S = v1.s3;
 		VMatCufftComplex v1_ = v1;
 		VMatCufftComplex v2_ = v2;
-		
+
 		//setup the fft plan
 		cufftHandle plan;
 		cufftPlan3d(&plan, v1.s, v1.s, v1.s, CUFFT_C2C);
@@ -1043,7 +1043,7 @@ bool LLGPU_phase_correlate(VMat & v1, VMat & v2, Point3i & rv)
 		//setup gpu data
 		if(!m.new_<cufftComplex>("v1_", S, v1_.d)) throw m.error();
 		if(!m.new_<cufftComplex>("v2_", S, v2_.d)) throw m.error();
-		
+
 		//do PC
 		cufftExecC2C(plan, m.at<cufftComplex>("v1_"), m.at<cufftComplex>("v1_"), CUFFT_FORWARD);
 		cufftExecC2C(plan, m.at<cufftComplex>("v2_"), m.at<cufftComplex>("v2_"), CUFFT_FORWARD);
@@ -1057,7 +1057,7 @@ bool LLGPU_phase_correlate(VMat & v1, VMat & v2, Point3i & rv)
 		if(!m.sync()) throw m.error();
 		if(!m.collect<cufftComplex>("v1_", S, v1_.d)) throw m.error();
 		rv = v1_.peak_real();
-		
+
 		//destroy the plan
 		cufftDestroy(plan);
 	}catch(string e)
@@ -1247,7 +1247,7 @@ bool LLGPU_log(VMat & v)
 		if(!m.set_default_device()) throw m.error();
 
 		if(!m.new_<float>("v", S, v.data)) throw m.error();
-		
+
 		//perform element-wise log
 		dim3 threadsPerBlock(8, 8, 8);
 		dim3 numBlocks(v.s / threadsPerBlock.x, v.s / threadsPerBlock.y, v.s / threadsPerBlock.z);

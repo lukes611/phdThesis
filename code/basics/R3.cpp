@@ -293,6 +293,29 @@ namespace ll_R3
 		float scalar = (*this) * b.unit();
 		return bu * scalar;
 	}
+
+    void R3::logPolarInv(int s)
+	{
+		float sf = (float) s;
+		x /= sf;
+		x *= 360.0f;
+		y /= sf;
+		y *= 180.0f;
+		float M = ((float) s) / log(((float) s) / 2.56f);
+		z /= M;
+		M = exp(z);
+		float a1 = x;
+		float a2 = y;
+		set_from_dual_angles(a1, a2);
+		x *= M;
+		y *= M;
+		z *= M;
+		float hw = sf * 0.5f;
+		x += hw;
+		y += hw;
+		z += hw;
+	}
+
 }
 
 //Quarternion Class:

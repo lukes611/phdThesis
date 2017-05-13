@@ -19,13 +19,13 @@ namespace ll_R3
 		const float ll_R3_rad2deg = (float)57.295779513082320876798154814105;
 		const float ll_R3_deg2rad = (float)0.017453292519943295;
 	}
-	
-	
+
+
 	class R3
 	{
 	public:
 		float x, y, z;
-		
+
 		//error
 		void error(std::string st);
 
@@ -36,10 +36,10 @@ namespace ll_R3
 		R3(float xin, float yin); //x=xin, y=yin, z=0
 		R3(const R3 & r2); //copy constructor
 		R3 & operator = (const R3 & r2);//= op
-		R3(const R3 & center, float angle1, float angle2, float radius); // sets r3 to be the 3d point about center, given by angle1 and 
+		R3(const R3 & center, float angle1, float angle2, float radius); // sets r3 to be the 3d point about center, given by angle1 and
 		//angle2 with a radius of radius
 		void setAs(const R3 & inp);
-		
+
 		//i.o
 		void print();
 		friend std::ostream& operator<<(std::ostream& stream, const R3& input);
@@ -53,25 +53,25 @@ namespace ll_R3
 		//functions
 		R3 operator+(const R3 & r2) const; //element wise add : returns [this.x+r2.x,this.y+r2.y,this.z+r2.z]
 		R3 & operator+=(const R3 & r2); //this += r2
-		
+
 		R3 operator-(const R3 & r2) const; //element wise subtract : returns [this.x-r2.x,this.y-r2.y,this.z-r2.z]
 		R3 & operator-=(const R3 & r2); //this -= r2
-		
+
 		float operator*(const R3 & r2) const; // dot product : returns this.x*r2.x + this.y*r2.y + this.z*r2.z
-		
+
 		R3 operator^(const R3 & r2) const; // cross product : returns a vector orthogonal to *this and r2
 		R3 & operator^=(const R3 & r2); //this = cross(this,r2)
-		
-		
+
+
 		R3 operator*(float scalar) const; // scale
 		R3 & operator*=(float scalar); //this *= scalar
 
 		R3 operator/(float scalar) const; // attenuate
 		R3 & operator/=(float scalar); //this /= scalar
-		
-		
+
+
 		R3 operator-() const; //return the inverse
-		
+
 		//equality testing
 		bool operator==(const R3 & r2) const ; //tests for equality
 		bool operator!=(const R3 & r2) const ; //tests for inequality
@@ -79,9 +79,9 @@ namespace ll_R3
 		bool operator>(const R3 & r2) const ; //tests for scanline gt
 		bool operator<=(const R3 & r2) const ; //tests for scanline le
 		bool operator>=(const R3 & r2) const ; //tests for scanline ge
-		
+
 		float & operator[](int index); //return &Array(x,y,z)[index]
-		
+
 		//other functions
 		R3 & inv(); //inverse this
 		R3 & normalize(); //normalizes this
@@ -90,7 +90,7 @@ namespace ll_R3
 		float mag() const; //computes the magnitude of this
 		R3 unit() const; //grabs the unit version of this
 		R3 cp(const R3 & r2) const; //a safe version of the cross product
-		
+
 		R3 interpolate_to(const R3 & target, float time) const;
 
 		void get_dual_angles(float & a1, float & a2);
@@ -131,14 +131,16 @@ namespace ll_R3
 		R3 & round(); //rounds the values
 
 		float dist(const R3 & r2) const; //computes the euclidean distance between two points
-		
+
 		float projScalar(const R3 & b) const; //returns the scalar of the projection of this onto b
 		R3 project(const R3 & b) const; //returns the projection of this onto b
 
+		void logPolarInv(int s); //compute as the inverse log polar coordinate
+
 	};
 
-	
-	
+
+
 }
 
 namespace ll_Quarternion
@@ -172,7 +174,7 @@ namespace ll_Quarternion
 		void add(Quarternion inp);
 		void scale(float inp);
 	};
-	
+
 
 }
 

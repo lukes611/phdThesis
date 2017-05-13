@@ -166,20 +166,117 @@ Point3i phaseCorrelate(VMat & _v1, VMat & _v2)
 
 }
 
+Point3i filter_phase_peak(Point3i a, int s)
+{
+    function<int(int,int)> f = [](int a, int s) -> int { return (a > s/2) ? s-a: -a; };
+    return Point3i(f(a.x,s), f(a.y,s), f(a.z,s));
+}
+
+void phase_correlate_rst_adjust_rs(Point3i pc, float & rotation, float & scale, int s)
+{
+    R3 q((float)pc.x, (float)pc.y, (float)pc.z);
+    q.x *= (-360.0f / (float)s);
+    q.y *= (180.0f / (float)s);
+    q.z /= (((float) s) / log(((float) s) / 2.56f));
+    q.z = exp(q.z);
+    rotation = q.x;
+    scale = 1.0f /  q.z;
+}
 
 
 void phaseCorrelate_rst(VMat & vol1, VMat & vol2, float & rotation, float & scale, Point3i & translation, bool hanning_window_on)
 {
     //helping functions
     int hw = vol1.s / 2;
-    float hw_dist = sqrt((float)(hw * hw));
-    function<float(int,int,int,int)> hanningWindowScalar = [&hw,&hw_dist](int x, int y, int z, int N) -> float {
-        float dist = sqrt((float)((x-hw)*(x-hw) + (y-hw)*(y-hw) + (z-hw)*(z-hw)));
-        dist = hw_dist - dist;
-        hw_dist *= 2.0f;
-        return (0.5f * (1.0f - cos((2.0f * M_PI * dist) / (hw_dist - 1.0f))));
-    };
+    double diag_dist = sqrt((double)(hw*hw*3));
+    double diag_hdist = diag_dist * 0.5;
+    function<double(int,int,int,int)> hanningWindowScalar = [&hw,&diag_dist,&diag_hdist](int x, int y, int z, int N) -> double {
+        double xd = x-hw;
+        double yd = y-hw;
+        double zd = z-hw;
+        xd *= xd;
+        yd *= yd;
+        zd *= zd;
+        double dist = sqrt(xd + yd + zd); //dist is distance from half-way
+        //dist is i out of N/2
+        //hw_dist is N
+        dist = diag_hdist - dist;
 
+        //cout << "? " << dist << endl;
+        return 0.5 * (
+            1.0 -
+            cos(
+                (2.0 * M_PI * dist)
+                /
+                (diag_dist - 1.0)
+            )
+        );
+    };
+    function<void(fftw_complex*,VMat&,int)> computeMagnitudesSwapQuads = [&hw](fftw_complex * input, VMat & output, int s) -> void {
+        output = VMat(s);
+        for(int z = 0; z < hw; z++)
+        {
+            for(int y = 0; y < s; y++)
+            {
+                for(int x = 0; x < s; x++)
+                {
+                    int ox=x, oy=y, oz=z+hw;
+
+
+                    if(x<hw && y<hw)
+                    {
+                        ox += hw;
+                        oy += hw;
+                    }else if(x>=hw && y<hw)
+                    {
+                        ox -= hw;
+                        oy += hw;
+                    }else if(x<hw && y>=hw)
+                    {
+                        ox += hw;
+                        oy -= hw;
+                    }else if(x>=hw && y>=hw)
+                    {
+                        ox -= hw;
+                        oy -= hw;
+                    }
+
+                    int bid = z*s*s + y*s + x;
+                    int bid2 = oz*s*s + oy*s + ox;
+                    fftw_complex tmp, tmp2;
+                    {
+                        tmp[0] = input[bid][0];
+                        tmp[1] = input[bid][1];
+                        tmp2[0] = input[bid2][0];
+                        tmp2[1] = input[bid2][1];
+                    }
+                    float mag = sqrt(tmp[0]*tmp[0] + tmp[1]*tmp[1]);
+                    float mag2 = sqrt(tmp2[0]*tmp2[0] + tmp2[1]*tmp2[1]);
+
+                    output.data[bid] = mag2;
+                    output.data[bid2] = mag;
+                }
+            }
+        }
+    };
+    function<void(VMat&,fftw_complex*)> logpolar_toComplex = [](VMat & input, fftw_complex * output)->void
+    {
+        for(int z = 0; z < input.s; z++)
+        {
+            for(int y = 0; y < input.s; y++)
+            {
+                for(int x = 0; x < input.s; x++)
+                {
+                    R3 p(x,y,z);
+                    p.logPolarInv(input.s);
+
+                    output[z*input.s2 + y*input.s + x][0] = input.at(p);
+                    output[z*input.s2 + y*input.s + x][1] = 0.0f;
+                }
+            }
+        }
+
+    };
     //end
 
 
@@ -204,14 +301,95 @@ void phaseCorrelate_rst(VMat & vol1, VMat & vol2, float & rotation, float & scal
     }
 
     //create two outputs for fft data
-    //fft both
-    //compute magnitudes and swap quads for both, put into two volumes
-    //log the volumes
-    //log-polar the volumes
-    //copy them back into complex volumes
-    //do fft and pc on those complex volumes
-    //then use PC on both too
+    fftw_complex * t1   = (fftw_complex *) fftw_malloc(sizeof(fftw_complex) * vol1.s3);
+    fftw_complex * t2   = (fftw_complex *) fftw_malloc(sizeof(fftw_complex) * vol1.s3);
 
+
+    //fft both
+    {
+        fftw_plan p1 = fftw_plan_dft_3d(vol1.s, vol1.s, vol1.s, v1, t1, FFTW_FORWARD, FFTW_ESTIMATE);
+        fftw_plan p2 = fftw_plan_dft_3d(vol1.s, vol1.s, vol1.s, v2, t2, FFTW_FORWARD, FFTW_ESTIMATE);
+
+        fftw_execute(p1);
+        fftw_execute(p2);
+
+        fftw_destroy_plan(p1);
+        fftw_destroy_plan(p2);
+    }
+    //compute magnitudes and swap quads for both, put into two volumes
+    VMat mag1, mag2;
+    computeMagnitudesSwapQuads(t1, mag1, vol1.s);
+    computeMagnitudesSwapQuads(t2, mag2, vol1.s);
+
+    //log the volumes
+    for(int i = 0; i < vol1.s3; i++)
+    {
+        mag1.data[i] = log(mag1.data[i]);
+        mag2.data[i] = log(mag2.data[i]);
+    }
+
+    //log-polar the volumes / copy them back into complex volumes
+    logpolar_toComplex(mag1, v1);
+    logpolar_toComplex(mag2, v2);
+
+    //do fft and pc on those complex volumes
+    {
+        fftw_plan p1 = fftw_plan_dft_3d(vol1.s, vol1.s, vol1.s, v1, t1, FFTW_FORWARD, FFTW_ESTIMATE);
+        fftw_plan p2 = fftw_plan_dft_3d(vol1.s, vol1.s, vol1.s, v2, t2, FFTW_FORWARD, FFTW_ESTIMATE);
+
+        fftw_execute(p1);
+        fftw_execute(p2);
+
+        fftw_destroy_plan(p1);
+        fftw_destroy_plan(p2);
+    }
+    //multiple spectrums
+    for(int i = 0; i < vol1.s3; i++)
+    {
+        float R1 =  t1[i][0];
+        float I1 =  t1[i][1];
+        float R2 =  t2[i][0];
+        float I2 = -t2[i][1];
+
+        float TR = R1*R2 - I1*I2;
+        float TI = I1*R2 + R1*I2;
+
+
+        float mag = sqrt(TR*TR + TI*TI);
+
+        t1[i][0] = TR / mag;
+        t1[i][1] = TI / mag;
+    }
+    //invert the fft
+    {
+        fftw_plan p = fftw_plan_dft_3d(vol1.s, vol1.s, vol1.s, t1, v1, FFTW_FORWARD, FFTW_ESTIMATE);
+        fftw_execute(p);
+        fftw_destroy_plan(p);
+    }
+    //find rwal peak for v1 and compute the rotation and scale
+    {
+        int peak_location = 0;
+        float peak_value = v1[1][0];
+        float tmp;
+        for(int i = 1; i < vol1.s3; i++)
+        {
+            tmp = v1[i][0];
+            if(tmp > peak_value)
+            {
+                peak_value = tmp;
+                peak_location = i;
+            }
+        }
+        Point3i pk(0,0,0);
+
+        pk.z = peak_location / vol1.s2;
+        peak_location %= vol1.s2;
+        pk.y = peak_location / vol1.s;
+        pk.x = peak_location % vol1.s;
+
+        phase_correlate_rst_adjust_rs(pk, rotation, scale, vol1.s);
+    }
+    //compute the trans separation
 
 
     /*
@@ -328,6 +506,8 @@ void phaseCorrelate_rst(VMat & vol1, VMat & vol2, float & rotation, float & scal
 
     fftw_free(v1);
     fftw_free(v2);
+    fftw_free(t1);
+    fftw_free(t2);
 }
 
 
