@@ -409,7 +409,86 @@ void phaseCorrelate_rst(VMat & vol1, VMat & vol2, float & rotation, float & scal
         rotation = -rotation;
         scale = 1.0f / scale;
     }
-    //compute the trans separation
+    //transform vol1 by the rotation and scale found
+    VMat vol1T = vol1;
+    vol1T.transform_volume(0.0f, rotation, 0.0f, scale, 0.0f, 0.0f, 0.0f);
+    //vol1T.transform_volume_forward(0.0f, rotation, 0.0f, scale, 0.0f, 0.0f, 0.0f);
+
+    //copy in the data and possibly do the hanning filter
+    for(int z = 0, i = 0; z < vol1.s; z++)
+    {
+        for(int y = 0; y < vol1.s; y++)
+        {
+            for(int x = 0; x < vol1.s; x++, i++)
+            {
+                float scalar = 1.0f;
+                if(hanning_window_on) scalar = hanningWindowScalar(x,y,z,vol1.s);
+                v1[i][0] = vol1T.data[i] * scalar;
+                v2[i][0] = vol2.data[i] * scalar;
+                v1[i][1] = v2[i][1] = 0.0f;
+            }
+        }
+    }
+
+    //do fft and pc on those complex volumes
+    {
+        fftw_plan p1 = fftw_plan_dft_3d(vol1.s, vol1.s, vol1.s, v1, t1, FFTW_FORWARD, FFTW_ESTIMATE);
+        fftw_plan p2 = fftw_plan_dft_3d(vol1.s, vol1.s, vol1.s, v2, t2, FFTW_FORWARD, FFTW_ESTIMATE);
+
+        fftw_execute(p1);
+        fftw_execute(p2);
+
+        fftw_destroy_plan(p1);
+        fftw_destroy_plan(p2);
+    }
+    //multiple spectrums
+    for(int i = 0; i < vol1.s3; i++)
+    {
+        float R1 =  t1[i][0];
+        float I1 =  t1[i][1];
+        float R2 =  t2[i][0];
+        float I2 = -t2[i][1];
+
+        float TR = R1*R2 - I1*I2;
+        float TI = I1*R2 + R1*I2;
+
+
+        float mag = sqrt(TR*TR + TI*TI);
+
+        t1[i][0] = TR / mag;
+        t1[i][1] = TI / mag;
+    }
+    //invert the fft
+    {
+        fftw_plan p = fftw_plan_dft_3d(vol1.s, vol1.s, vol1.s, t1, v1, FFTW_FORWARD, FFTW_ESTIMATE);
+        fftw_execute(p);
+        fftw_destroy_plan(p);
+    }
+    //find rwal peak for v1 and compute the rotation and scale
+    {
+        int peak_location = 0;
+        float peak_value = v1[1][0];
+        float tmp;
+        for(int i = 1; i < vol1.s3; i++)
+        {
+            tmp = v1[i][0];
+            if(tmp > peak_value)
+            {
+                peak_value = tmp;
+                peak_location = i;
+            }
+        }
+        Point3i pk(0,0,0);
+
+        pk.z = peak_location / vol1.s2;
+        peak_location %= vol1.s2;
+        pk.y = peak_location / vol1.s;
+        pk.x = peak_location % vol1.s;
+
+        pk = -VMat::filter_pc(pk, vol1.s);
+
+        translation = pk;
+    }
 
 
     /*

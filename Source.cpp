@@ -53,13 +53,13 @@ int main(){
 		//p2 = p;
 	}
 
-    VMat v(256, p1, 0.0f, false);
+    VMat v(64, p1, 0.0f, false);
 
     //VMat re, im;
     //fft3D(v, re, im);
 
     VMat v2 = v;
-    v2.transform_volume_forward(0.0f, 25.0f, 0.0f, 0.7f, 0.0f, 0.0f, 0.0f);
+    v2.transform_volume_forward(0.0f, 25.0f, 0.0f, 1.2f, 5.0f, 10.0f, 20.0f);
     //VMat re2, im2;
     //fft3D(v2, re2, im2);
 
