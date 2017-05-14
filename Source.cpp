@@ -486,7 +486,7 @@ int main(int argc, char * * argv)
 	string fn = namesList[4];
 	//exp1("Apartment.Texture.rotate", ll_experiments::rng(15, 20, 1));
 
-    quantitativeExperiment10("none", fn, "regular", inds,0.0f);
+    //quantitativeExperiment10("none", fn, "regular", inds,0.0f);
     //quantitativeExperiment10("fm", fn, "regular", inds,0.0f);
     //quantitativeExperiment10("fm3d", fn, "regular", inds,0.0f);
     //quantitativeExperiment10("icp", fn, "regular", inds,0.0f);
@@ -495,7 +495,7 @@ int main(int argc, char * * argv)
     //quantitativeExperiment10("pc2", fn, "regular", inds,0.0f);
     //quantitativeExperiment10("pca", fn, "regular", inds,0.0f);
 	//quantitativeExperiment10("pc3", fn, "regular", inds,0.0f);
-	quantitativeExperiment10("ffvr", fn, "regular", inds,0.0f);
+	//quantitativeExperiment10("ffvr", fn, "regular", inds,0.0f);
 
     }
 
