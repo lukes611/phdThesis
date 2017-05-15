@@ -535,7 +535,9 @@ void quantitativeExperiment20(string algorithm_name, string data_name, vector<in
 
 		//compute the errors
 		b.transform_set(_m);
-		hde = ll_measure::hausdorff(a, b);
+		//hde = ll_measure::hausdorff(a, b);
+		double msee, pme;
+		ll_measure::error_metrics(a, b, hde, msee, pme);
 
 		//void saveV20(string data_name, string alg_name, int frame1, int frame2, float seconds, float hd)
 		saveV20(data_name, algorithm_name, frames[_i], frames[_i-1], seconds, hde);
@@ -617,13 +619,13 @@ int main(int argc, char * * argv)
 
     //quantitativeExperiment20("none", fn, inds);
     //quantitativeExperiment20("FM2D", fn, inds);
-    //quantitativeExperiment10("FM3D", fn, "regular", inds,0.0f);
-    //quantitativeExperiment10("ICP", fn, "regular", inds,0.0f);
-    //quantitativeExperiment10("PCA", fn, "regular", inds,0.0f);
-    quantitativeExperiment20("FVR", fn, inds);
-    //quantitativeExperiment10("FVR3D", fn, "regular", inds,0.0f);
-    //quantitativeExperiment10("FVR3D-2", fn, "regular", inds,0.0f);
-	//quantitativeExperiment10("FFVR", fn, "regular", inds,0.0f);
+    quantitativeExperiment20("FM3D", fn, inds);
+    //quantitativeExperiment20("ICP", fn, inds);
+    //quantitativeExperiment20("PCA", fn, inds);
+    //quantitativeExperiment20("FVR", fn, inds);
+    //quantitativeExperiment20("FVR3D", fn, inds);
+    //quantitativeExperiment20("FVR3D-2", fn, inds);
+	//quantitativeExperiment20("FFVR", fn, inds);
 
 
     }

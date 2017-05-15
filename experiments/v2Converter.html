@@ -116,29 +116,44 @@ function out(ds, d, from, to){
     nres[alg].seconds=nres[alg].seconds.map(x=>x.er);
   }
   results = nres;
+  let bestResults = [];
   for(let alg in results){
     if(alg != 'none'){
-
+      if(bestResults.length == 0) bestResults = results[alg].errors.map(x=>Object.create({x,a:alg+''}));
+      else bestResults = bestResults.map((r,i) => {
+        //if(results[alg].length < i) return r;
+        if(r.x < results[alg].errors[i])
+          return r;
+        return {x:results[alg].errors[i], a:alg+''};
+      });
     }
   }
+
+
 
   document.getElementById('stats-out').innerHTML = '';
 
   function addRow(elems){
     document.getElementById('stats-out').innerHTML += '<tr>'+elems.map(x => `<td>${x}</td>`).join('')+'</td>';
   }
-  let tdp = (x,N=3) => Math.round(x*Math.pow(10,N)) / Math.pow(10,N);
+  let tdp = (x,N=3) => Math.round(x*Math.pow(10.0,N)) / Math.pow(10,N);;
   let algorithmNames = 'none,FM2D,FM3D,ICP,PCA,FVR,FFVR,FVR3D'.split(',').filter(n=>results[n]!==undefined);
   addRow(['_'].concat(algorithmNames));
   addRow(['mean'].concat(algorithmNames.map(name => {
     let l = results[name].errors.length;
-    return tdp(results[name].errors.reduce((p,c)=> p+c/l, 0));
+    return tdp(results[name].errors.reduce((p,c)=> p+c/l, 0) * 1000, 2);
   })));
   addRow(['median'].concat(algorithmNames.map(name => {
+    console.log(name, results[name].errors.length);
     let ers = results[name].errors.map(x=>x+0);
     let l = ers.length;
     ers.sort();
-    return tdp(ers[Math.floor(l/2)]);
+    let ind = Math.floor(l/2);
+
+    return tdp(ers[ind] * 1000, 2);
+  })));
+  addRow(['bm%'].concat(algorithmNames.map(name => {
+    return tdp((bestResults.filter(r => r.a == name).length / bestResults.length) * 100,3);
   })));
 
 }
