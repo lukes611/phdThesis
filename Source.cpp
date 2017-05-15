@@ -37,7 +37,26 @@ amount of error added
 errors...
 
 
+v2.0
+rules: save name of file as [data-name].[versionNo].csv
 
+headers:
+algorithm name, frame-index-1, frame-index-2, seconds, error (hausdorff-distance)
+
+toJSON function ->
+{
+    results : [
+        {
+            dataset : {
+                algorithm : [
+                    name : string,
+                    errors : array,
+                    seconds : array
+                ]
+            }
+        }
+    ]
+}
 
 */
 #define HASFFTW
@@ -326,6 +345,34 @@ void saveV10(string data_name, string alg_name, string desc, int frame1, int fra
 
 }
 
+
+//saves to version 2.0 data file
+void saveV20(string data_name, string alg_name, int frame1, int frame2, float seconds, float hd)
+{
+    //save output to file
+    cout << "saving v2.0..." << endl;
+    string outDirName = EXPS_DIR;
+    //save name of file as [data-name].[versionNo].csv
+    stringstream outFn; outFn << outDirName << "/" << data_name << ".v2.csv";
+    //header: algorithm name, frame-index-1, frame-index-2, seconds, error (hausdorff-distance)
+    string header = "alg,frame1,frame2,seconds,hd";
+    string fileName = outFn.str();
+    stringstream outData;
+    outData <<
+    alg_name << "," <<
+    frame1 << "," <<
+    frame2 << "," <<
+    seconds << "," <<
+    hd;
+
+    cout << outData.str() << endl;
+
+    appendData(fileName, header, outData.str());
+
+
+
+}
+
 //does an experiment ver 1.0
 void quantitativeExperiment10(string algorithm_name,
 	string data_name,
@@ -422,6 +469,88 @@ void quantitativeExperiment10(string algorithm_name,
 
 
 
+
+
+
+
+void quantitativeExperiment20(string algorithm_name, string data_name, vector<int> frames)
+{
+    CapturePixel3DSet video = ll_experiments::openData(data_name, 1);
+
+	Pix3D frame1, frame2;
+	Pixel3DSet a, b;
+
+	video.read_frame(frame1, frames[0]);
+
+	for (int _i = 1; _i < frames.size(); _i++)
+	{
+		int currentIndex = frames[_i];
+		//get match _m from i+1 to i
+		double seconds = 0.0;
+		double hde;
+		int iters = 0;
+		Pixel3DSet _;
+
+
+		cout << algorithm_name << ", completed " << _i << " of " << frames.size() << endl;
+
+		video.read_frame(frame2, currentIndex);
+
+		a = frame1; b = frame2;
+
+		Mat _m = Mat::eye(Size(4, 4), CV_32FC1);
+
+		//algorithms here:
+		if (algorithm_name == "none") {
+            //do-nothing
+		}
+#if defined(HASCUDA) || defined(HASFFTW)
+		else if (algorithm_name == "FVR") {
+			_m = ll_pc::pc_register(b, a, seconds);
+		}
+
+		else if (algorithm_name == "FVR3D") {
+			_m = ll_pc::pc_register_pca_i(b, a, seconds);
+		}
+		else if (algorithm_name == "FVR3D-2") {
+			_m = ll_pc::pc_pca_icp(b, a, seconds);
+		}else if (algorithm_name == "FFVR"){
+            _m = ll_pc::ffvr(b, a, seconds);
+		}
+#endif
+        else if(algorithm_name == "PCA"){
+            _m = ll_pca::register_pca(b, a, seconds);
+        }else if (algorithm_name == "ICP") {
+			_m = Licp::icp(b, a, _, hde, seconds, iters);
+		}
+		else if (algorithm_name == "FM2D") {
+			ll_fmrsc::registerPix3D("surf", frame2, frame1, _m, seconds, true, 150);
+		}else if(algorithm_name == "FM3D"){
+		    _m = LukeLincoln::sift3DRegister(b, a, seconds, true, 256);
+		}
+
+
+
+		//:end
+
+		//compute the errors
+		b.transform_set(_m);
+		hde = ll_measure::hausdorff(a, b);
+
+		//void saveV20(string data_name, string alg_name, int frame1, int frame2, float seconds, float hd)
+		saveV20(data_name, algorithm_name, frames[_i], frames[_i-1], seconds, hde);
+
+
+		frame1 = frame2;
+	}
+
+
+
+
+}
+
+
+
 int main(int argc, char * * argv)
 {
 
@@ -486,16 +615,16 @@ int main(int argc, char * * argv)
 	string fn = namesList[4];
 	//exp1("Apartment.Texture.rotate", ll_experiments::rng(15, 20, 1));
 
-    //quantitativeExperiment10("none", fn, "regular", inds,0.0f);
-    //quantitativeExperiment10("fm", fn, "regular", inds,0.0f);
-    //quantitativeExperiment10("fm3d", fn, "regular", inds,0.0f);
-    //quantitativeExperiment10("icp", fn, "regular", inds,0.0f);
-    //quantitativeExperiment10("icp2", fn, "regular", inds,0.0f);
-    //quantitativeExperiment10("pc", fn, "regular", inds,0.0f);
-    //quantitativeExperiment10("pc2", fn, "regular", inds,0.0f);
-    //quantitativeExperiment10("pca", fn, "regular", inds,0.0f);
-	//quantitativeExperiment10("pc3", fn, "regular", inds,0.0f);
-	//quantitativeExperiment10("ffvr", fn, "regular", inds,0.0f);
+    //quantitativeExperiment20("none", fn, inds);
+    //quantitativeExperiment20("FM2D", fn, inds);
+    //quantitativeExperiment10("FM3D", fn, "regular", inds,0.0f);
+    //quantitativeExperiment10("ICP", fn, "regular", inds,0.0f);
+    //quantitativeExperiment10("PCA", fn, "regular", inds,0.0f);
+    quantitativeExperiment20("FVR", fn, inds);
+    //quantitativeExperiment10("FVR3D", fn, "regular", inds,0.0f);
+    //quantitativeExperiment10("FVR3D-2", fn, "regular", inds,0.0f);
+	//quantitativeExperiment10("FFVR", fn, "regular", inds,0.0f);
+
 
     }
 

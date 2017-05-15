@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>v2.0 cvt</title>
+    <style>
+      body{margin : 0; padding : 0;}
+      h1{
+          text-align : center;
+      }
+      .partition{
+        width : 50%;
+        float : left;
+        display : inline-block;
+      }
+      .ls{background-color : lightblue;}
+      .rs{background-color : lightpink;}
+      textarea{
+        width : 98%;
+        height : 400px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>version2.0 results converter</h1>
+    <div id="body">
+      <div class="partition ls">
+        <h4>input</h4>
+        name <input id="input-ds" onkeyup="input.update('dataset', this.value)" />
+        from: <input id="input-fr" onkeyup="input.update('from', this.value)" type="number"/>
+        to: <input id="input-to" type="number" onkeyup="input.update('to', this.value)"/>
+        <textarea id="input-d" onkeyup="input.update('data',this.value)">
+        </textarea>
+      </div>
+      <div class="partition rs">
+        <h4>output</h4>
+        <div id="name-out"></div>
+        <table id="stats-out"></table>
+      </div>
+    </div>
+
+
+<script>
+
+let input = {
+  dataset : '',
+  data : '',
+  from : 0,
+  to : 30,
+  subscribers : [],
+  save : function(){
+    window.localStorage.setItem('dataset', this.dataset);
+    window.localStorage.setItem('data', this.data);
+    window.localStorage.setItem('from', this.from);
+    window.localStorage.setItem('to', this.to);
+  },
+  load : function(){
+    let dataset = window.localStorage.getItem('dataset') || '';
+    let data    = window.localStorage.getItem('data') || '';
+    let from = window.localStorage.getItem('from') || 0;
+    let to    = window.localStorage.getItem('to') || 30;
+    this.update('dataset', dataset);
+    this.update('data', data);
+    this.update('from', from);
+    this.update('to', to);
+  },
+  update : function(item, value){
+    this[item] = value;
+    this.save();
+    this.render();
+    this.subscribers.forEach((cb) => cb(this.dataset, this.data, this.from, this.to));
+  },
+  render : function(){
+    document.getElementById('input-d').value = this.data;
+    document.getElementById('input-ds').value = this.dataset;
+    document.getElementById('input-fr').value = this.from;
+    document.getElementById('input-to').value = this.to;
+  },
+  subscribe : function(cb){
+    this.subscribers.push(cb);
+  }
+};
+
+function out(ds, d, from, to){
+  document.getElementById('name-out').innerHTML = ds;
+  let lines = d.split('\n');
+  let headers = lines.splice(0,1);
+
+  let results = {};
+  lines.forEach(function(line){
+    let cols = line.split(',');
+    let alg = cols[0].split('-')[0];
+    let id = cols[1] + '_' + cols[2];
+    if(results[alg] === undefined) results[alg] = {};
+    if(results[alg][id] === undefined){
+      results[alg][id] = [cols[3], cols[4], cols[2]].map(Number)
+    }else if(Number(cols[4]) < results[alg][id][1]){
+      results[alg][id] = [cols[3], cols[4], cols[2]].map(Number)
+    }
+  });
+  let nres = {};
+  for(let alg in results){
+    nres[alg] = {
+      errors : [],
+      seconds : []
+    };
+    for(let fr in results[alg]){
+      let i = results[alg][fr];
+      nres[alg].errors.push({er:i[1], fr:i[2]});
+      nres[alg].seconds.push({er:i[0], fr:i[2]});
+    }
+    nres[alg].errors=nres[alg].errors.filter(x => x.fr >= from && x.fr < to);
+    nres[alg].seconds=nres[alg].seconds.filter(x => x.fr >= from && x.fr < to);
+    nres[alg].errors.sort((a,b)=>a.fr-b.fr);
+    nres[alg].errors=nres[alg].errors.map(x=>x.er);
+    nres[alg].seconds.sort((a,b)=>a.fr-b.fr);
+    nres[alg].seconds=nres[alg].seconds.map(x=>x.er);
+  }
+  results = nres;
+  for(let alg in results){
+    if(alg != 'none'){
+
+    }
+  }
+
+  document.getElementById('stats-out').innerHTML = '';
+
+  function addRow(elems){
+    document.getElementById('stats-out').innerHTML += '<tr>'+elems.map(x => `<td>${x}</td>`).join('')+'</td>';
+  }
+  let tdp = (x,N=3) => Math.round(x*Math.pow(10,N)) / Math.pow(10,N);
+  let algorithmNames = 'none,FM2D,FM3D,ICP,PCA,FVR,FFVR,FVR3D'.split(',').filter(n=>results[n]!==undefined);
+  addRow(['_'].concat(algorithmNames));
+  addRow(['mean'].concat(algorithmNames.map(name => {
+    let l = results[name].errors.length;
+    return tdp(results[name].errors.reduce((p,c)=> p+c/l, 0));
+  })));
+  addRow(['median'].concat(algorithmNames.map(name => {
+    let ers = results[name].errors.map(x=>x+0);
+    let l = ers.length;
+    ers.sort();
+    return tdp(ers[Math.floor(l/2)]);
+  })));
+
+}
+
+function outError(msg){
+  document.getElementById('name-out').innerHTML = msg;
+  document.getElementById('stats-out').innerHTML = '';
+}
+
+window.onload = function(){
+    input.subscribe(function(ds, d, from, to){
+      try{
+        out(ds, d, from, to);
+      }catch(s){
+        outError('incorrect-input data: ' + s);
+      }
+    });
+    input.load();
+
+};
+
+
+
+
+
+
+
+
+
+</script>
+
+
+
+
+
+  </body>
+</html>
