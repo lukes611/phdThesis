@@ -137,7 +137,7 @@ function out(ds, d, from, to){
     document.getElementById('stats-out').innerHTML += '<tr>'+elems.map(x => `<td>${x}</td>`).join('')+'</td>';
   }
   let tdp = (x,N=3) => Math.round(x*Math.pow(10.0,N)) / Math.pow(10,N);;
-  let algorithmNames = 'none,FM2D,FM3D,ICP,PCA,FVR,FFVR,FVR3D'.split(',').filter(n=>results[n]!==undefined);
+  let algorithmNames = 'FM2D,FM3D,ICP,PCA,FVR,FFVR,FVR3D'.split(',').filter(n=>results[n]!==undefined);
   addRow(['_'].concat(algorithmNames));
   addRow(['mean'].concat(algorithmNames.map(name => {
     let l = results[name].errors.length;
