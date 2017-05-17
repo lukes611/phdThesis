@@ -215,7 +215,7 @@ namespace ll_vpc
 			v2.normalize();
 		}
 		Point3i t;
-		llfftw::phaseCorrelate_rst(v1, v2, rotation, scale, t, false);
+		llfftw::phaseCorrelate_rst(v1, v2, rotation, scale, t, true);
 		translation = R3((float)t.x, (float)t.y, (float)t.z);
 		return VMat::transformation_matrix(v1.s, 0.0f, rotation, 0.0f, scale, translation.x, translation.y, translation.z).clone();
 	}

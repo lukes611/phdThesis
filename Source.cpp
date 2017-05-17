@@ -537,6 +537,7 @@ void quantitativeExperiment20(string algorithm_name, string data_name, vector<in
 		b.transform_set(_m);
 		//hde = ll_measure::hausdorff(a, b);
 		double msee, pme;
+		hde = 21.0;
 		ll_measure::error_metrics(a, b, hde, msee, pme);
 
 		//void saveV20(string data_name, string alg_name, int frame1, int frame2, float seconds, float hd)
@@ -614,15 +615,15 @@ int main(int argc, char * * argv)
 
 	//for(int i = 13; i < 20; i++)
 	{
-	string fn = namesList[4];
+	string fn = namesList[0];
 	//exp1("Apartment.Texture.rotate", ll_experiments::rng(15, 20, 1));
 
-    //quantitativeExperiment20("none", fn, inds);
-    //quantitativeExperiment20("FM2D", fn, inds);
-    quantitativeExperiment20("FM3D", fn, inds);
-    //quantitativeExperiment20("ICP", fn, inds);
+    quantitativeExperiment20("none", fn, inds);
+    quantitativeExperiment20("FM2D", fn, inds);
+    //quantitativeExperiment20("FM3D", fn, inds);
+    quantitativeExperiment20("ICP", fn, inds);
     //quantitativeExperiment20("PCA", fn, inds);
-    //quantitativeExperiment20("FVR", fn, inds);
+    quantitativeExperiment20("FVR", fn, inds);
     //quantitativeExperiment20("FVR3D", fn, inds);
     //quantitativeExperiment20("FVR3D-2", fn, inds);
 	//quantitativeExperiment20("FFVR", fn, inds);
