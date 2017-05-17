@@ -116,19 +116,21 @@ function out(ds, d, from, to){
     nres[alg].seconds=nres[alg].seconds.map(x=>x.er);
   }
   results = nres;
+  if(results[''] !== undefined) delete results[''];
+  //console.log(results['FM2D'].errors);
   let bestResults = [];
   for(let alg in results){
     if(alg != 'none'){
-      if(bestResults.length == 0) bestResults = results[alg].errors.map(x=>Object.create({x,a:alg+''}));
+      if(bestResults.length == 0) bestResults = results[alg].errors.map(x=>Object.create({x:x,a:alg+''}));
       else bestResults = bestResults.map((r,i) => {
-        //if(results[alg].length < i) return r;
-        if(r.x < results[alg].errors[i])
-          return r;
+        //if(results[alg].length <= i) return r;
+        console.log(r.x, results[alg].errors[i]);
+        if(r.x < results[alg].errors[i]) return r;
         return {x:results[alg].errors[i], a:alg+''};
       });
     }
   }
-
+  bestResults = bestResults.map(br => br.a);
 
 
   document.getElementById('stats-out').innerHTML = '';
@@ -144,16 +146,16 @@ function out(ds, d, from, to){
     return tdp(results[name].errors.reduce((p,c)=> p+c/l, 0) * 1000, 2);
   })));
   addRow(['median'].concat(algorithmNames.map(name => {
-    console.log(name, results[name].errors.length);
-    let ers = results[name].errors.map(x=>x+0);
+    //console.log(name, results[name].errors.length);
+    let ers = results[name].errors.map(x=>Number(x)+0);
     let l = ers.length;
-    ers.sort();
+    ers.sort((a,b)=>a-b);
     let ind = Math.floor(l/2);
-
-    return tdp(ers[ind] * 1000, 2);
+    return tdp(ers[ind], 2);
   })));
+  console.log(bestResults);
   addRow(['bm%'].concat(algorithmNames.map(name => {
-    return tdp((bestResults.filter(r => r.a == name).length / bestResults.length) * 100,3);
+    return tdp(100 * bestResults.filter(n => n==name).length / bestResults.length,2);
   })));
 
 }
