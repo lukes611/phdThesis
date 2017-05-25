@@ -552,9 +552,49 @@ void quantitativeExperiment20(string algorithm_name, string data_name, vector<in
 
 }
 
+int main()
+{
+	string directory = string(LCPPDATA_DIR) + string("/kitti/2011_09_26_drive_0001_sync/velodyne_points/data/");
+	auto filename = [&directory](int index) -> string {
+		stringstream t;
+		t << directory;
+		int numDP = index == 0 ? 1 : log10(index)+1;
+		for (int i = 0; i < 10 - numDP; i++) t << "0";
+		t << index << ".bin";
+		return t.str();
+	};
+	auto kittiRead = [](string filename) -> Pixel3DSet
+	{
+		FILE * file = fopen(filename.c_str(), "rb");
+		Pixel3DSet ret;
+		if (file)
+		{
+			while (!feof(file))
+			{
+				float data[4];
+				fread(data, sizeof(float), 4, file);
+				ret.push_back(R3(data[0], data[1], data[2]), Vec3b(255, 255, 255));
+			}
+		}
+		return ret;
+	};
 
 
-int main(int argc, char * * argv)
+	//for (int i = 0; i < 1; i++) {
+		//cout << filename(i) << endl;
+		Pixel3DSet p = kittiRead(filename(0));
+		p.transform_set(90.0f, 0, 0, 1, 0, 0, 0, p.getAvg());
+		cout << p.size() << endl;;
+	//}
+
+		LLPointers::setPtr("object", &p);
+		ll_experiments::viewPixel3DSet();
+
+	return 0;
+}
+
+
+int main2(int argc, char * * argv)
 {
 
 	string namesList[20] = {
