@@ -1,6 +1,7 @@
 #include "experiments.h"
 #include <fstream>
 #include <ctime>
+#include <string>
 
 using namespace std;
 #include "../basics/Pixel3DSet.h"
@@ -111,6 +112,73 @@ ll_pix3d::CapturePixel3DSet openData(string name, int numFrames)
 	path << LCPPDATA_DIR << "/pix3dc/films";
 	return CapturePixel3DSet::openCustom(path.str(), name, numFrames);
 }
+
+namespace kitti
+{
+	string getFileName(string directory, int index)
+	{
+		stringstream t;
+		t << directory;
+		int numDP = index == 0 ? 1 : log10(index) + 1;
+		for (int i = 0; i < 10 - numDP; i++) t << "0";
+		t << index << ".bin";
+		return t.str();
+	}
+	Pixel3DSet read(string directoryName, int index, bool flip)
+	{
+		FILE * file = fopen(getFileName(directoryName, index).c_str(), "rb");
+		Pixel3DSet ret;
+		if (file)
+		{
+			while (!feof(file))
+			{
+				float data[4];
+				fread(data, sizeof(float), 4, file);
+				ret.push_back(R3(data[0], data[1], data[2]), Vec3b(255, 255, 255));
+			}
+		}
+		if (flip)
+		{
+			ret.transform_set(90, 0, 0, 1, 0, 0, 0, R3());
+		}
+		return ret;
+	}
+
+	Mat velo2Cam(string directoryName)
+	{
+		Mat ret = Mat::eye(Size(4, 4), CV_32FC1);
+		FILE * file = fopen((directoryName + "calib_velo_to_cam.txt").c_str(), "r");
+
+		char buf[100];
+		fscanf(file, "%s", buf);
+		fscanf(file, "%s", buf);
+		fscanf(file, "%s", buf);
+		fscanf(file, "%s", buf);
+		for (int y = 0; y < 3; y++)
+		{
+			for (int x = 0; x < 3; x++)
+			{
+				double tmp;
+				fscanf(file, "%lf", &tmp);
+				ret.at<float>(y, x) = tmp;
+			}
+		}
+		fscanf(file, "%s", buf);
+		for (int y = 0; y < 3; y++)
+		{
+			double tmp;
+			fscanf(file, "%lf", &tmp);
+			ret.at<float>(y, 3) = tmp;
+		}
+		fclose(file);
+		return ret;
+	}
+	void cam2cam(std::string directoryName, cv::Mat & R_rect0x, cv::Mat & P_rect_0x, int x)
+	{
+		
+	}
+}
+
 
 #ifdef HASGL
 

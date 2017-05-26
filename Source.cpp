@@ -1,3 +1,4 @@
+#include "code/basics/ll_gl.h"
 #include <iostream>
 #include <string>
 #include <vector>
@@ -552,43 +553,108 @@ void quantitativeExperiment20(string algorithm_name, string data_name, vector<in
 
 }
 
+//todo
+/*
+view video of pixel3dsets
+see if I can align the pixels with the depth data
+
+
+*/
+
+Fps_cam camera(R3(40, 40, -60), 90.0f, 90.0f);
+Pixel3DSet obj;
+
+
+void display()
+{
+
+
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	ll_gl::default_viewing(camera);
+
+	ll_gl::default_lighting();
+	ll_gl::turn_off_lights();
+
+	
+	glBegin(GL_POINTS);
+	for (int i = 0; i < obj.points.size(); i++)
+	{
+		R3 col = obj.color_as_r3(i) / 255.0f;
+		swap(col.x, col.z);
+		ll_gl::set_color(col);
+		ll_gl::glR3(obj.points[i]);
+	}
+	glEnd();
+	
+
+	glutSwapBuffers();
+	glutPostRedisplay();
+}
+
+void kbf(unsigned char key, int x, int y)
+{
+	camera.keyboard(key, x, y);
+	if (key == '5')
+	{
+		cout << camera.to_string() << endl;
+	}
+}
+void mouseF(int x, int y)
+{
+	camera.mouse(x, y);
+}
+
+void mouse(int button, int state, int x, int y)
+{
+	ll_gl::camera_mouse_click(camera, button, state, x, y);
+}
+int countt = 1;
+double pas = 0.0;
+LTimer tmr;
+Mat velo2cam;
+void idle()
+{
+	tmr.stop();
+	double passed = tmr.getSeconds();
+	if (pas > 0.03)
+	{
+		string directory = string(LCPPDATA_DIR) + string("/kitti/2011_09_26_drive_0001_sync/velodyne_points/data/");
+		obj = kitti::read(directory, countt);
+		obj.transform_set(velo2cam);
+		countt++;
+		countt %= 107;
+		pas = 0;
+	}
+	pas += passed;
+	
+	tmr.reset();
+	tmr.start();
+}
+
+
+
 int main()
 {
 	string directory = string(LCPPDATA_DIR) + string("/kitti/2011_09_26_drive_0001_sync/velodyne_points/data/");
-	auto filename = [&directory](int index) -> string {
-		stringstream t;
-		t << directory;
-		int numDP = index == 0 ? 1 : log10(index)+1;
-		for (int i = 0; i < 10 - numDP; i++) t << "0";
-		t << index << ".bin";
-		return t.str();
-	};
-	auto kittiRead = [](string filename) -> Pixel3DSet
-	{
-		FILE * file = fopen(filename.c_str(), "rb");
-		Pixel3DSet ret;
-		if (file)
-		{
-			while (!feof(file))
-			{
-				float data[4];
-				fread(data, sizeof(float), 4, file);
-				ret.push_back(R3(data[0], data[1], data[2]), Vec3b(255, 255, 255));
-			}
-		}
-		return ret;
-	};
-
-
+	velo2cam = ll_experiments::kitti::velo2Cam(string(LCPPDATA_DIR) + string("/kitti/2011_09_26_drive_0001_sync/"));
 	//for (int i = 0; i < 1; i++) {
 		//cout << filename(i) << endl;
-		Pixel3DSet p = kittiRead(filename(0));
-		p.transform_set(90.0f, 0, 0, 1, 0, 0, 0, p.getAvg());
-		cout << p.size() << endl;;
+		obj = kitti::read(directory, 0);
+		obj.transform_set(velo2cam);
 	//}
+		tmr.start();
+		
 
-		LLPointers::setPtr("object", &p);
-		ll_experiments::viewPixel3DSet();
+		ll_gl::default_glut_main("lukes phd project", 640, 480);
+
+		glutDisplayFunc(display);
+
+		glutKeyboardFunc(kbf);
+		
+		glutMotionFunc(mouseF);
+		glutMouseFunc(mouse);
+		glutIdleFunc(idle);
+		glutMainLoop();
 
 	return 0;
 }

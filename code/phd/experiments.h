@@ -134,6 +134,14 @@ namespace ll_experiments
 	ll_pix3d::Pix3D getNoisedVersion(ll_pix3d::Pix3D & input, double noiseRange, double & snrOut);
 
 
+	namespace kitti
+	{
+		std::string getFileName(std::string directory, int index);
+		ll_pix3d::Pixel3DSet read(std::string directoryName, int index, bool flip = false);
+		cv::Mat velo2Cam(std::string directoryName);
+		void cam2cam(std::string directoryName, cv::Mat & R_rect0x, cv::Mat & P_rect_0x, int x);
+	}
+
 #ifdef HASGL
 	//set Pixel3DSet object in LLPointers by key "object"
 	void viewPixel3DSet();
