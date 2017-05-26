@@ -1,4 +1,7 @@
+#include "code/phd/experiments.h"
+#ifdef HASGL
 #include "code/basics/ll_gl.h"
+#endif
 #include <iostream>
 #include <string>
 #include <vector>
@@ -315,37 +318,6 @@ void exp1(string name, vector<int> frames)
 
 }
 
-//saves to version 1.0 data file
-void saveV10(string data_name, string alg_name, string desc, int frame1, int frame2, float errorAdded, float seconds, float mse, float pm, float hd)
-{
-    //save output to file
-    cout << "saving..." << endl;
-    string outDirName = EXPS_DIR;
-
-    stringstream outFn; outFn << outDirName << "/" << data_name << ".v1.0.csv";
-    string header = "data name, algorithm name, description, frame-index 1, frame-index 2, error-added, seconds, mse, percent match, hausdorff distance";
-    string fileName = outFn.str();
-    stringstream outData;
-    outData <<
-    data_name << "," <<
-    alg_name << "," <<
-    desc << "," <<
-    frame1 << "," <<
-    frame2 << "," <<
-    errorAdded << "," <<
-    seconds << "," <<
-    mse << "," <<
-    pm << "," <<
-    hd;
-
-    cout << outData.str() << endl;
-
-    appendData(fileName, header, outData.str());
-
-
-
-}
-
 
 //saves to version 2.0 data file
 void saveV20(string data_name, string alg_name, int frame1, int frame2, float seconds, float hd)
@@ -373,102 +345,6 @@ void saveV20(string data_name, string alg_name, int frame1, int frame2, float se
 
 
 }
-
-//does an experiment ver 1.0
-void quantitativeExperiment10(string algorithm_name,
-	string data_name,
-	string description,
-	vector<int> frames,
-	float error_added)
-{
-	#ifdef _WIN32
-	CapturePixel3DSet video(data_name, 1);
-#else
-    CapturePixel3DSet video = CapturePixel3DSet::openCustom("/home/luke/lcppdata/pix3dc/films", data_name, 1);
-#endif
-
-	Pix3D frame1, frame2;
-	Pixel3DSet a, b;
-
-	//vector<double> times, errors, mses, pmes; //times, errors, mse errors, percent matches
-
-											  //add first frame to the output
-	video.read_frame(frame1, frames[0]);
-
-	for (int _i = 1; _i < frames.size(); _i++)
-	{
-		int currentIndex = frames[_i];
-		//get match _m from i+1 to i
-		double seconds = 0.0;
-		double hde, msee, pme;
-		int iters = 0;
-		Pixel3DSet _;
-
-		cout << algorithm_name << " : " << _i << " / " << frames.size() << endl;
-
-		video.read_frame(frame2, currentIndex);
-
-		a = frame1; b = frame2;
-
-		Mat _m = Mat::eye(Size(4, 4), CV_32FC1);
-
-		//algorithms here:
-		if (algorithm_name == "none") {
-		}
-#if defined(HASCUDA) || defined(HASFFTW)
-		else if (algorithm_name == "pc") {
-			_m = ll_pc::pc_register(b, a, seconds);
-		}
-
-		else if (algorithm_name == "pc2") {
-			_m = ll_pc::pc_register_pca_i(b, a, seconds);
-		}
-		else if (algorithm_name == "pc3") {
-			_m = ll_pc::pc_pca_icp(b, a, seconds);
-		}else if (algorithm_name == "ffvr"){
-            _m = ll_pc::ffvr(b, a, seconds);
-		}
-#endif
-		else if (algorithm_name == "icp") {
-			_m = Licp::icp(b, a, _, hde, seconds, iters);
-		}
-
-		else if (algorithm_name == "icp2") {
-			_m = Licp::icp_outlierRemoval(b, a, _, hde, seconds, iters, 10.0);
-		}
-
-		else if (algorithm_name == "fm") {
-			ll_fmrsc::registerPix3D("surf", frame2, frame1, _m, seconds, true, 150);
-		}else if(algorithm_name == "fm3d"){
-		    _m = LukeLincoln::sift3DRegister(b, a, seconds, true, 256);
-		}
-
-
-
-		//:end
-
-		//compute the errors
-		b.transform_set(_m);
-		ll_measure::error_metrics(a, b, hde, msee, pme);
-
-		//append data to lists
-		//pmes.push_back(pme);
-		//mses.push_back(msee);
-		//errors.push_back(hde);
-		//times.push_back(seconds);
-		saveV10(data_name, algorithm_name, description, frames[_i], frames[_i-1], error_added, seconds, msee, pme, hde);
-
-
-		frame1 = frame2;
-	}
-
-
-
-
-}
-
-
-
 
 
 
@@ -561,6 +437,8 @@ see if I can align the pixels with the depth data
 
 */
 
+#ifdef HASGL
+
 Fps_cam camera(R3(40, 40, -60), 90.0f, 90.0f);
 Pixel3DSet obj;
 
@@ -575,7 +453,7 @@ void display()
 	ll_gl::default_lighting();
 	ll_gl::turn_off_lights();
 
-	
+
 	glBegin(GL_POINTS);
 	for (int i = 0; i < obj.points.size(); i++)
 	{
@@ -585,7 +463,7 @@ void display()
 		ll_gl::glR3(obj.points[i]);
 	}
 	glEnd();
-	
+
 
 	glutSwapBuffers();
 	glutPostRedisplay();
@@ -626,35 +504,43 @@ void idle()
 		pas = 0;
 	}
 	pas += passed;
-	
+
 	tmr.reset();
 	tmr.start();
 }
+#endif
 
+using namespace ll_experiments;
 
 
 int main()
 {
 	string directory = string(LCPPDATA_DIR) + string("/kitti/2011_09_26_drive_0001_sync/velodyne_points/data/");
-	velo2cam = ll_experiments::kitti::velo2Cam(string(LCPPDATA_DIR) + string("/kitti/2011_09_26_drive_0001_sync/"));
+	Mat velo2cam = ll_experiments::kitti::velo2Cam(string(LCPPDATA_DIR) + string("/kitti/2011_09_26_drive_0001_sync/"));
+	cout << velo2cam << endl;
+	Mat R, P;
+	ll_experiments::kitti::cam2cam(string(LCPPDATA_DIR) + string("/kitti/2011_09_26_drive_0001_sync/"), R, P, 0);
+	//cout << R << endl << P << endl;
+	//cout << P.size() << endl << R.size() << endl;
+	cout << "out: " << endl << (P * R) << endl;
 	//for (int i = 0; i < 1; i++) {
 		//cout << filename(i) << endl;
-		obj = kitti::read(directory, 0);
+		Pixel3DSet obj = kitti::read(directory, 0);
 		obj.transform_set(velo2cam);
 	//}
-		tmr.start();
-		
+		//tmr.start();
 
-		ll_gl::default_glut_main("lukes phd project", 640, 480);
+
+		/*ll_gl::default_glut_main("lukes phd project", 640, 480);
 
 		glutDisplayFunc(display);
 
 		glutKeyboardFunc(kbf);
-		
+
 		glutMotionFunc(mouseF);
 		glutMouseFunc(mouse);
 		glutIdleFunc(idle);
-		glutMainLoop();
+		glutMainLoop();*/
 
 	return 0;
 }

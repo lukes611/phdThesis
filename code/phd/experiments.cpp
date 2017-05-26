@@ -2,6 +2,8 @@
 #include <fstream>
 #include <ctime>
 #include <string>
+#include <cstdio>
+#include <cstdlib>
 
 using namespace std;
 #include "../basics/Pixel3DSet.h"
@@ -10,6 +12,7 @@ using namespace std;
 #endif
 #include "../basics/R3.h"
 #include "../basics/llCamera.h"
+#include "../basics/locv3.h"
 
 using namespace ll_pix3d;
 using namespace ll_R3;
@@ -134,7 +137,9 @@ namespace kitti
 			{
 				float data[4];
 				fread(data, sizeof(float), 4, file);
-				ret.push_back(R3(data[0], data[1], data[2]), Vec3b(255, 255, 255));
+				R3 newPoint(data[0], data[1], data[2]);
+				Vec3b newColor(Vec3b(255, 255, 255));
+				ret.push_back(newPoint, newColor);
 			}
 		}
 		if (flip)
@@ -173,9 +178,56 @@ namespace kitti
 		fclose(file);
 		return ret;
 	}
-	void cam2cam(std::string directoryName, cv::Mat & R_rect0x, cv::Mat & P_rect_0x, int x)
+	void cam2cam(std::string directoryName, cv::Mat & R_rect_0x, cv::Mat & P_rect_0x, int x)
 	{
-		
+        R_rect_0x = Mat::eye(Size(4,4), CV_32FC1);
+        P_rect_0x = Mat::eye(Size(4,4), CV_32FC1);
+        string wholeFile = "";
+        FILE * file = fopen((directoryName + "calib_cam_to_cam.txt").c_str(), "r");
+        string rheader, pheader;
+        {
+            stringstream rh, ph;
+            rh << "R_rect_0" << "0:";
+            ph << "P_rect_0" << x << ":";
+            rheader = rh.str();
+            pheader = ph.str();
+        }
+        if(file)
+        {
+            while(!feof(file))
+            {
+                char buf[101];
+                int nr = fread(buf, 1, 100, file);
+                buf[nr] = 0;
+                wholeFile += buf;
+
+            }
+            vector<string> lines = ll_split(wholeFile, '\n');
+            for(int l = 0; l < lines.size(); l++)
+            {
+                vector<string> words = ll_split(lines[l], ' ');
+                if(words[0] == rheader)
+                {
+                    for(int y = 0, i = 1; y < 3; y++)
+                        for(int x = 0; x < 3; x++, i++)
+                        {
+                            double tmp;
+                            sscanf(words[i].c_str(), "%lf", &tmp);
+                            R_rect_0x.at<float>(y,x) = tmp;
+                        }
+                }else if(words[0] == pheader)
+                {
+                    for(int y = 0, i = 1; y < 3; y++)
+                        for(int x = 0; x < 4; x++, i++)
+                        {
+                            double tmp;
+                            sscanf(words[i].c_str(), "%lf", &tmp);
+                            P_rect_0x.at<float>(y,x) = tmp;
+                        }
+                }
+            }
+        }else cout << "could not open cam2cam calibration file\n";
+
 	}
 }
 
@@ -327,9 +379,9 @@ Point3f NoiseGenerator::mean(vector<Point3f> & data)
 	{
 		init += data[i] * scalar;
 	}
-		
-	
-	
+
+
+
 	return init;
 }
 Point3f NoiseGenerator::stdDevNoise()
