@@ -144,7 +144,7 @@ namespace kitti
 		}
 		if (flip)
 		{
-			ret.transform_set(90, 0, 0, 1, 0, 0, 0, R3());
+			//ret.transform_set(90, 0, 0, 1, 0, 0, 0, R3());
 		}
 		return ret;
 	}

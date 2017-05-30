@@ -502,8 +502,8 @@ void unproject(Pixel3DSet & o)
 			Vec3b white(255, 255, 255);
 			R3 t = tmp[i];
 			t = R3(t.x, t.y, t.z);
-			//Pixel3DSet::transform_point(primary, t);
-			//t /= 1000.0;
+			Pixel3DSet::transform_point(primary, t);
+			t /= 1000.0;
 			o.push_back(t, white);
 		}
 		
@@ -546,7 +546,15 @@ int main()
 	cout << velo2cam << endl;
 	Mat R, P;
 	ll_experiments::kitti::cam2cam(string(LCPPDATA_DIR) + string("/kitti/2011_09_26_drive_0001_sync/"), R, P, 0);
-	primary = P * R;
+
+	Mat primary1 = P * R;
+	primary = Mat::eye(Size(4, 4), CV_32FC1);
+	for (int y = 0; y < 3; y++)
+		for (int x = 0; x < 4; x++)
+			primary.at<float>(y, x) = primary1.at<float>(y, x);
+	cout << primary1.size() << endl;
+	//primary = primary.inv();
+
 	cout << "R:\n\n" << R << "\n\nP:\n\n" << P << endl;
 	//cout << "P\n" << P << endl;
 	//cout << P.size() << endl << R.size() << endl;
