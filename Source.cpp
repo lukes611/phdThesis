@@ -489,16 +489,42 @@ void mouse(int button, int state, int x, int y)
 int countt = 1;
 double pas = 0.0;
 LTimer tmr;
-Mat velo2cam;
+Mat velo2cam, primary;
+void unproject(Pixel3DSet & o)
+{
+	Pixel3DSet tmp = o.clone();
+	o = Pixel3DSet();
+	tmp.transform_set(velo2cam);
+	for (int i = 0; i < tmp.size(); i++)
+	{
+		if (tmp[i].z >= 0.0f)
+		{
+			Vec3b white(255, 255, 255);
+			R3 t = tmp[i];
+			t = R3(t.x, t.y, t.z);
+			//Pixel3DSet::transform_point(primary, t);
+			//t /= 1000.0;
+			o.push_back(t, white);
+		}
+		
+		//o[i].z = 0.0f;
+		//o[i] /= 1000.0;
+	}
+	//cout << o.size() << endl;
+}
+
+
 void idle()
 {
+	//return;
 	tmr.stop();
 	double passed = tmr.getSeconds();
 	if (pas > 0.03)
 	{
 		string directory = string(LCPPDATA_DIR) + string("/kitti/2011_09_26_drive_0001_sync/velodyne_points/data/");
 		obj = kitti::read(directory, countt);
-		obj.transform_set(velo2cam);
+		//obj.transform_set(primary);
+		unproject(obj);
 		countt++;
 		countt %= 107;
 		pas = 0;
@@ -516,22 +542,35 @@ using namespace ll_experiments;
 int main()
 {
 	string directory = string(LCPPDATA_DIR) + string("/kitti/2011_09_26_drive_0001_sync/velodyne_points/data/");
-	Mat velo2cam = ll_experiments::kitti::velo2Cam(string(LCPPDATA_DIR) + string("/kitti/2011_09_26_drive_0001_sync/"));
+	velo2cam = ll_experiments::kitti::velo2Cam(string(LCPPDATA_DIR) + string("/kitti/2011_09_26_drive_0001_sync/"));
 	cout << velo2cam << endl;
 	Mat R, P;
 	ll_experiments::kitti::cam2cam(string(LCPPDATA_DIR) + string("/kitti/2011_09_26_drive_0001_sync/"), R, P, 0);
-	//cout << R << endl << P << endl;
+	primary = P * R;
+	cout << "R:\n\n" << R << "\n\nP:\n\n" << P << endl;
+	//cout << "P\n" << P << endl;
 	//cout << P.size() << endl << R.size() << endl;
-	cout << "out: " << endl << (P * R) << endl;
+	//cout << "out: " << endl << (P * R) << endl;
 	//for (int i = 0; i < 1; i++) {
 		//cout << filename(i) << endl;
-		Pixel3DSet obj = kitti::read(directory, 0);
-		obj.transform_set(velo2cam);
+	//return 0;
+
+		obj = kitti::read(directory, 0);
+		unproject(obj);
+		//obj.transform_set(primary);
 	//}
-		//tmr.start();
+		R3 _mn, _mx;
+		obj.min_max_R3(_mn, _mx);
 
+		cout << "min: " << _mn << endl
+			<< "max: " << _mx << endl;
 
-		/*ll_gl::default_glut_main("lukes phd project", 640, 480);
+		//return 0;
+
+		tmr.start();
+		
+
+		ll_gl::default_glut_main("lukes phd project", 640, 480);
 
 		glutDisplayFunc(display);
 
@@ -540,7 +579,7 @@ int main()
 		glutMotionFunc(mouseF);
 		glutMouseFunc(mouse);
 		glutIdleFunc(idle);
-		glutMainLoop();*/
+		glutMainLoop();
 
 	return 0;
 }
