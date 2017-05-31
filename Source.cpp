@@ -429,6 +429,75 @@ void quantitativeExperiment20(string algorithm_name, string data_name, vector<in
 
 }
 
+
+int countt = 1;
+double pas = 0.0;
+LTimer tmr;
+Mat velo2cam, primary;
+Pixel3DSet obj;
+
+void unproject(Pixel3DSet & o)
+{
+	Pixel3DSet tmp = o.clone();
+	o = Pixel3DSet();
+	tmp.transform_set(velo2cam);
+	for (int i = 0; i < tmp.size(); i++)
+	{
+		if (tmp[i].z >= 0.0f)
+		{
+			Vec3b white(255, 255, 255);
+			R3 t = tmp[i];
+			t = R3(t.x, t.y, t.z);
+			Pixel3DSet::transform_point(primary, t);
+			t /= 1000.0;
+			o.push_back(t, white);
+		}
+
+		//o[i].z = 0.0f;
+		//o[i] /= 1000.0;
+	}
+	//cout << o.size() << endl;
+}
+
+
+R3 kittiProject(R3 input, Mat & matrix)
+{
+    Mat tmp = Mat::zeros(Size(1, 4), CV_32FC1);
+    tmp.at<float>(0,0) = input.x;
+    tmp.at<float>(1,0) = input.y;
+    tmp.at<float>(2,0) = input.z;
+    tmp.at<float>(3,0) = 1.0f;
+    tmp = matrix * tmp;
+    return R3(tmp.at<float>(0,0), tmp.at<float>(1,0), tmp.at<float>(2,0)) / tmp.at<float>(3,0);
+}
+
+void unprojectNew(Pixel3DSet & o, Mat m)
+{
+    for(int i = 0; i < o.size(); i++)
+        o[i] = kittiProject(o[i], m);
+}
+
+void unprojectNew2(Pixel3DSet & o, Mat & m)
+{
+	Pixel3DSet tmp = o.clone();
+	o = Pixel3DSet();
+	tmp.transform_set(velo2cam);
+	for (int i = 0; i < tmp.size(); i++)
+	{
+		if (tmp[i].z >= 0.0f)
+		{
+			Vec3b white(255, 255, 255);
+			R3 t = kittiProject(tmp[i], m);
+			o.push_back(t, white);
+		}
+
+		//o[i].z = 0.0f;
+		//o[i] /= 1000.0;
+	}
+	//cout << o.size() << endl;
+}
+
+
 //todo
 /*
 view video of pixel3dsets
@@ -440,7 +509,7 @@ see if I can align the pixels with the depth data
 #ifdef HASGL
 
 Fps_cam camera(R3(40, 40, -60), 90.0f, 90.0f);
-Pixel3DSet obj;
+
 
 
 void display()
@@ -486,32 +555,6 @@ void mouse(int button, int state, int x, int y)
 {
 	ll_gl::camera_mouse_click(camera, button, state, x, y);
 }
-int countt = 1;
-double pas = 0.0;
-LTimer tmr;
-Mat velo2cam, primary;
-void unproject(Pixel3DSet & o)
-{
-	Pixel3DSet tmp = o.clone();
-	o = Pixel3DSet();
-	tmp.transform_set(velo2cam);
-	for (int i = 0; i < tmp.size(); i++)
-	{
-		if (tmp[i].z >= 0.0f)
-		{
-			Vec3b white(255, 255, 255);
-			R3 t = tmp[i];
-			t = R3(t.x, t.y, t.z);
-			Pixel3DSet::transform_point(primary, t);
-			t /= 1000.0;
-			o.push_back(t, white);
-		}
-		
-		//o[i].z = 0.0f;
-		//o[i] /= 1000.0;
-	}
-	//cout << o.size() << endl;
-}
 
 
 void idle()
@@ -543,18 +586,20 @@ int main()
 {
 	string directory = string(LCPPDATA_DIR) + string("/kitti/2011_09_26_drive_0001_sync/velodyne_points/data/");
 	velo2cam = ll_experiments::kitti::velo2Cam(string(LCPPDATA_DIR) + string("/kitti/2011_09_26_drive_0001_sync/"));
-	cout << velo2cam << endl;
+	//cout << velo2cam << endl;
 	Mat R, P;
 	ll_experiments::kitti::cam2cam(string(LCPPDATA_DIR) + string("/kitti/2011_09_26_drive_0001_sync/"), R, P, 0);
 
-	Mat primary1 = P * R;
-	primary = Mat::eye(Size(4, 4), CV_32FC1);
-	for (int y = 0; y < 3; y++)
-		for (int x = 0; x < 4; x++)
-			primary.at<float>(y, x) = primary1.at<float>(y, x);
-	cout << primary1.size() << endl;
+	Mat primary1 = (P * R) * velo2cam;
+	//primary1 = P;
+	//Mat primary = Mat::eye(Size(4, 4), CV_32FC1);
+	//for (int y = 0; y < 3; y++)
+	//	for (int x = 0; x < 4; x++)
+	//		primary.at<float>(y, x) = primary1.at<float>(y, x);
+	//cout << primary1.size() << endl;
+	//cout << primary1.size() << endl;
 	//primary = primary.inv();
-
+    //cout << "sizes: " << R.size() << " was R: P=" << P.size() << endl;
 	cout << "R:\n\n" << R << "\n\nP:\n\n" << P << endl;
 	//cout << "P\n" << P << endl;
 	//cout << P.size() << endl << R.size() << endl;
@@ -564,8 +609,12 @@ int main()
 	//return 0;
 
 		obj = kitti::read(directory, 0);
-		unproject(obj);
-		//obj.transform_set(primary);
+        unprojectNew(obj, primary1);
+		//unproject(obj);
+		//obj.transform_set(P);
+
+
+
 	//}
 		R3 _mn, _mx;
 		obj.min_max_R3(_mn, _mx);
@@ -574,9 +623,9 @@ int main()
 			<< "max: " << _mx << endl;
 
 		//return 0;
-
+#ifdef HASGL
 		tmr.start();
-		
+
 
 		ll_gl::default_glut_main("lukes phd project", 640, 480);
 
@@ -588,7 +637,7 @@ int main()
 		glutMouseFunc(mouse);
 		glutIdleFunc(idle);
 		glutMainLoop();
-
+#endif
 	return 0;
 }
 
