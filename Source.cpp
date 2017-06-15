@@ -486,7 +486,7 @@ void unprojectNew3(Pixel3DSet & in, Mat m)
 	Pixel3DSet o = in.clone();
 	in = Pixel3DSet();
 	Vec3b white(255, 255, 255);
-	for (int i = 0; i < o.size(); i+=5)
+	for (int i = 0; i < o.size(); i++)
 	{
 		//if (o[i].y > 5) continue;
 		//if (o[i].x < -46.0) continue;
@@ -595,7 +595,7 @@ void pasteInData(Pixel3DSet & p, Mat & im)
 		Point2i p2d(point.x, point.y);
 		unsigned char color = 256.0f * (point.z / 80.0f);
 		Vec3b outColor = ll_getColoredPixelFromGrayscale(255 - color);
-		circle(im, p2d, 4, outColor, -1);
+		circle(im, p2d, 1, outColor, -1);
 	}
 }
 
