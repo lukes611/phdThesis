@@ -467,14 +467,34 @@ R3 kittiProject(R3 input, Mat & matrix)
     tmp.at<float>(1,0) = input.y;
     tmp.at<float>(2,0) = input.z;
     tmp.at<float>(3,0) = 1.0f;
+	//cout << "in " << tmp << endl;
     tmp = matrix * tmp;
-    return R3(tmp.at<float>(0,0), tmp.at<float>(1,0), tmp.at<float>(2,0)) / tmp.at<float>(3,0);
+	//cout << "out " << tmp << endl;
+	//system("pause");
+	return R3(tmp.at<float>(0, 0), tmp.at<float>(1, 0), tmp.at<float>(2, 0) * tmp.at<float>(2, 0)) / tmp.at<float>(2, 0);
 }
 
 void unprojectNew(Pixel3DSet & o, Mat m)
 {
     for(int i = 0; i < o.size(); i++)
         o[i] = kittiProject(o[i], m);
+}
+
+void unprojectNew3(Pixel3DSet & in, Mat m)
+{
+	Pixel3DSet o = in.clone();
+	in = Pixel3DSet();
+	Vec3b white(255, 255, 255);
+	for (int i = 0; i < o.size(); i+=5)
+	{
+		//if (o[i].y > 5) continue;
+		//if (o[i].x < -46.0) continue;
+		o[i] = kittiProject(o[i], m);
+		int col_idx = round(64.0 * 5.0 / o[i].y);
+		//o[i].z = 0.0f;
+
+		in.push_back(o[i], white);
+	}
 }
 
 void unprojectNew2(Pixel3DSet & o, Mat & m)
@@ -489,10 +509,11 @@ void unprojectNew2(Pixel3DSet & o, Mat & m)
 			Vec3b white(255, 255, 255);
 			R3 t = kittiProject(tmp[i], m);
 			o.push_back(t, white);
+			o[o.size()-1] /= 1000.0;
 		}
 
 		//o[i].z = 0.0f;
-		//o[i] /= 1000.0;
+		
 	}
 	//cout << o.size() << endl;
 }
@@ -567,7 +588,7 @@ void idle()
 		string directory = string(LCPPDATA_DIR) + string("/kitti/2011_09_26_drive_0001_sync/velodyne_points/data/");
 		obj = kitti::read(directory, countt);
 		//obj.transform_set(primary);
-		unproject(obj);
+		unprojectNew3(obj, primary);
 		countt++;
 		countt %= 107;
 		pas = 0;
@@ -581,6 +602,21 @@ void idle()
 
 using namespace ll_experiments;
 
+void printProper(string name, Mat m)
+{
+	cout << "*******************" << name << "*******************" << endl << endl;
+
+	for (int y = 0; y < m.rows; y++)
+	{
+		for (int x = 0; x < m.cols; x++)
+		{
+			cout << m.at<float>(y, x) << "\t\t\t";
+		}
+		cout << endl;
+	}
+
+	cout << "\n\n****************************" << endl << endl;
+}
 
 int main()
 {
@@ -590,7 +626,28 @@ int main()
 	Mat R, P;
 	ll_experiments::kitti::cam2cam(string(LCPPDATA_DIR) + string("/kitti/2011_09_26_drive_0001_sync/"), R, P, 0);
 
-	Mat primary1 = (P * R) * velo2cam;
+	P.at<float>(3, 3) = 0.0f;
+
+	printProper("R", R);
+	printProper("P", P);
+
+	printProper("P*R", P*R);
+	//return 5;
+	
+
+	primary = P*R*velo2cam;
+	/*primary = Mat::eye(Size(4, 4), CV_32FC1);
+	for (int y = 0; y < 3; y++)
+	{
+		for (int x = 0; x < 4; x++)
+		{
+			primary.at<float>(y, x) = tmp.at<float>(y, x);
+		}
+	}*/
+	printProper("primary", primary);
+	//
+	cout << "primary-size: "<< primary.size() << endl;
+
 	//primary1 = P;
 	//Mat primary = Mat::eye(Size(4, 4), CV_32FC1);
 	//for (int y = 0; y < 3; y++)
@@ -600,7 +657,11 @@ int main()
 	//cout << primary1.size() << endl;
 	//primary = primary.inv();
     //cout << "sizes: " << R.size() << " was R: P=" << P.size() << endl;
-	cout << "R:\n\n" << R << "\n\nP:\n\n" << P << endl;
+	//cout << "R:\n\n" << R << "\n\nP:\n\n" << P << endl;
+
+	cout << "\n\n" << primary << endl << endl;
+
+	
 	//cout << "P\n" << P << endl;
 	//cout << P.size() << endl << R.size() << endl;
 	//cout << "out: " << endl << (P * R) << endl;
@@ -609,7 +670,11 @@ int main()
 	//return 0;
 
 		obj = kitti::read(directory, 0);
-        unprojectNew(obj, primary1);
+		cout << obj.size() << endl;
+
+
+
+        unprojectNew3(obj, primary);
 		//unproject(obj);
 		//obj.transform_set(P);
 
@@ -621,6 +686,8 @@ int main()
 
 		cout << "min: " << _mn << endl
 			<< "max: " << _mx << endl;
+
+		system("pause");
 
 		//return 0;
 #ifdef HASGL

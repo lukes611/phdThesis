@@ -142,6 +142,7 @@ namespace kitti
 				ret.push_back(newPoint, newColor);
 			}
 		}
+		else cout << "could not open the file " << getFileName(directoryName, index) << endl;
 		if (flip)
 		{
 			//ret.transform_set(90, 0, 0, 1, 0, 0, 0, R3());
@@ -181,7 +182,7 @@ namespace kitti
 	void cam2cam(std::string directoryName, cv::Mat & R_rect_0x, cv::Mat & P_rect_0x, int x)
 	{
         R_rect_0x = Mat::eye(Size(4,4), CV_32FC1);
-        P_rect_0x = Mat::eye(Size(4,3), CV_32FC1);
+        P_rect_0x = Mat::eye(Size(4,4), CV_32FC1);
         string wholeFile = "";
         FILE * file = fopen((directoryName + "calib_cam_to_cam.txt").c_str(), "r");
         string rheader, pheader;
