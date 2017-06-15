@@ -131,6 +131,7 @@ cv::Mat ll_depth2dbm(cv::Mat & iml, cv::Mat & imr, int ndisparities = 80, int sa
 cv::Mat ll_depth2dbm_both_sides(cv::Mat & iml, cv::Mat & imr, int ndisparities = 80, int sad_size = 21); //2d block matching disparity image generation (search both sides of window)
 
 cv::Mat ll_getColoredDepthMap(cv::Mat & inputDepth);
+cv::Vec3b ll_getColoredPixelFromGrayscale(unsigned char pixel);
 
 double ll_get_angle(double x, double y); //compute the angle given a 2d vector
 

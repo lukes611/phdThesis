@@ -127,6 +127,22 @@ namespace kitti
 		t << index << ".bin";
 		return t.str();
 	}
+	string getImageFileName(string directory, int index)
+	{
+		stringstream t;
+		t << directory;
+		int numDP = index == 0 ? 1 : log10(index) + 1;
+		for (int i = 0; i < 10 - numDP; i++) t << "0";
+		t << index << ".png";
+		return t.str();
+	}
+
+	Mat readImage(string directoryName, int index)
+	{
+		Mat ret = imread(getImageFileName(directoryName, index).c_str(), CV_LOAD_IMAGE_GRAYSCALE);
+		return ret.clone();
+	}
+
 	Pixel3DSet read(string directoryName, int index, bool flip)
 	{
 		FILE * file = fopen(getFileName(directoryName, index).c_str(), "rb");

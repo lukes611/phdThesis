@@ -1049,6 +1049,15 @@ Mat ll_depth2dbm_both_sides(Mat & iml, Mat & imr, int ndisparities, int sad_size
 	return rv.clone();
 }
 
+Vec3b ll_getColoredPixelFromGrayscale(unsigned char pixel)
+{
+	Mat tmp = Mat::zeros(Size(1, 1), CV_8UC1);
+	tmp.at<unsigned char>(0,0) = pixel;
+	Mat out;
+	applyColorMap(tmp, out, COLORMAP_JET);
+	return out.at<Vec3b>(0,0);
+}
+
 Mat ll_getColoredDepthMap(Mat & inputDepth)
 {
 	Mat tmp;

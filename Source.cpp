@@ -435,6 +435,7 @@ double pas = 0.0;
 LTimer tmr;
 Mat velo2cam, primary;
 Pixel3DSet obj;
+Mat imi;
 
 void unproject(Pixel3DSet & o)
 {
@@ -578,6 +579,25 @@ void mouse(int button, int state, int x, int y)
 	ll_gl::camera_mouse_click(camera, button, state, x, y);
 }
 
+void pasteInData(Pixel3DSet & p, Mat & im)
+{
+	cvtColor(im, im, CV_GRAY2RGB);
+	R3 mn, mx;
+	//p.min_max_R3(mn, mx);
+	//cout << mx << endl << mn << endl;
+	//cout << "*************";
+	//cout << endl;
+	//system("pause");
+	for (int i = 0; i < p.size(); i++)
+	{
+		R3 point = p[i];
+		if (point.z < 0.0) continue;
+		Point2i p2d(point.x, point.y);
+		unsigned char color = 256.0f * (point.z / 80.0f);
+		Vec3b outColor = ll_getColoredPixelFromGrayscale(255 - color);
+		circle(im, p2d, 4, outColor, -1);
+	}
+}
 
 void idle()
 {
@@ -587,12 +607,18 @@ void idle()
 	if (pas > 0.03)
 	{
 		string directory = string(LCPPDATA_DIR) + string("/kitti/2011_09_26_drive_0001_sync/velodyne_points/data/");
+		string imDirectory = string(LCPPDATA_DIR) + string("/kitti/2011_09_26_drive_0001_sync/image_00/data/");
 		obj = kitti::read(directory, countt);
 		//obj.transform_set(primary);
 		unprojectNew3(obj, primary);
 		countt++;
 		countt %= 107;
 		pas = 0;
+		imi = kitti::readImage(imDirectory, countt);
+		pasteInData(obj, imi);
+		imshow("win-i", imi);
+		waitKey(30);
+		
 	}
 	pas += passed;
 
@@ -622,10 +648,14 @@ void printProper(string name, Mat m)
 int main()
 {
 	string directory = string(LCPPDATA_DIR) + string("/kitti/2011_09_26_drive_0001_sync/velodyne_points/data/");
+	string imDirectory = string(LCPPDATA_DIR) + string("/kitti/2011_09_26_drive_0001_sync/image_00/data/");
+
 	velo2cam = ll_experiments::kitti::velo2Cam(string(LCPPDATA_DIR) + string("/kitti/2011_09_26_drive_0001_sync/"));
 	//cout << velo2cam << endl;
 	Mat R, P;
 	ll_experiments::kitti::cam2cam(string(LCPPDATA_DIR) + string("/kitti/2011_09_26_drive_0001_sync/"), R, P, 0);
+
+	namedWindow("win-i");
 
 	P.at<float>(3, 3) = 0.0f;
 
@@ -676,6 +706,13 @@ int main()
 
 
         unprojectNew3(obj, primary);
+		
+		imi = kitti::readImage(imDirectory, 0);
+
+		imshow("win-i", imi);
+		waitKey(30);
+
+		
 		//unproject(obj);
 		//obj.transform_set(P);
 
