@@ -492,8 +492,8 @@ void unprojectNew3(Pixel3DSet & in, Mat m)
 		o[i] = kittiProject(o[i], m);
 		int col_idx = round(64.0 * 5.0 / o[i].y);
 		//o[i].z = 0.0f;
-
-		in.push_back(o[i], white);
+		if(o[i].x >= 0.0f && o[i].x < 1242.0f && o[i].y > 0.0f && o[i].y < 375.0f)
+			in.push_back(o[i], white);
 	}
 }
 
@@ -529,7 +529,8 @@ see if I can align the pixels with the depth data
 
 #ifdef HASGL
 
-Fps_cam camera(R3(40, 40, -60), 90.0f, 90.0f);
+//[570, 230, -1050] , angle_y: 88.000000, angle_x: 90.000000
+Fps_cam camera(R3(570, 230, -1050), 88.0f, 90.0f);
 
 
 
@@ -687,7 +688,7 @@ int main()
 		cout << "min: " << _mn << endl
 			<< "max: " << _mx << endl;
 
-		system("pause");
+		//system("pause");
 
 		//return 0;
 #ifdef HASGL
