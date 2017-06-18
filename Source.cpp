@@ -650,8 +650,10 @@ int main()
 	string directory = string(LCPPDATA_DIR) + string("/kitti/2011_09_26_drive_0001_sync/velodyne_points/data/");
 	string imDirectory = string(LCPPDATA_DIR) + string("/kitti/2011_09_26_drive_0001_sync/image_00/data/");
 
-	velo2cam = ll_experiments::kitti::velo2Cam(string(LCPPDATA_DIR) + string("/kitti/2011_09_26_drive_0001_sync/"));
-	//cout << velo2cam << endl;
+	velo2cam = ll_experiments::kitti::velo2Cam("2011_09_26_drive_0001_sync");
+	cout << velo2cam << endl;
+
+	return 0;
 	Mat R, P;
 	ll_experiments::kitti::cam2cam(string(LCPPDATA_DIR) + string("/kitti/2011_09_26_drive_0001_sync/"), R, P, 0);
 

@@ -143,7 +143,7 @@ namespace ll_experiments
 		std::string getImageFileName(std::string directory, int index);
 		cv::Mat readImage(std::string directoryName, int index);
 
-		cv::Mat velo2Cam(std::string directoryName);
+		cv::Mat velo2Cam(std::string fileName);
         void cam2cam(std::string directoryName, cv::Mat & R_rect0x, cv::Mat & P_rect_0x, int x);
 	}
 

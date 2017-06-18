@@ -166,10 +166,11 @@ namespace kitti
 		return ret;
 	}
 
-	Mat velo2Cam(string directoryName)
+	Mat velo2Cam(string fileName)
 	{
 		Mat ret = Mat::eye(Size(4, 4), CV_32FC1);
-		FILE * file = fopen((directoryName + "calib_velo_to_cam.txt").c_str(), "r");
+		string filePath = string(LCPPDATA_DIR) + string("/kitti/") + string(fileName) + "/calib_velo_to_cam.txt";
+		FILE * file = fopen(filePath.c_str(), "r");
 
 		char buf[100];
 		fscanf(file, "%s", buf);
