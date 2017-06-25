@@ -147,7 +147,7 @@ namespace ll_experiments
 			cv::Mat getColoredDepthMap();
 			cv::Mat getAugmentedDepthMap();
 
-			Pixel3DSet getPoints();
+			ll_pix3d::Pixel3DSet getPoints();
 
 		};
 

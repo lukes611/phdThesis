@@ -550,8 +550,8 @@ see if I can align the pixels with the depth data
 
 #ifdef HASGL
 
-//[570, 230, -1050] , angle_y: 88.000000, angle_x: 90.000000
-Fps_cam camera(R3(570, 230, -1050), 88.0f, 90.0f);
+// [122.828, 20.0001, 115.381] , angle_y: 88.000000, angle_x: 90.000000
+Fps_cam camera(R3(122.828f, 20.0001f, 115.381f), 88.0f, 90.0f);
 
 
 
@@ -625,16 +625,12 @@ void idle()
 	double passed = tmr.getSeconds();
 	if (pas > 0.03)
 	{
-		obj = kitti::read(kittiData, countt);
-		obj.transform_set(velo2cam);
-
-
-		printFacts(obj);
-		//unprojectNew3(obj, primary);
+		kitti::KittiPix3dSet p = kitti::open(kittiData, countt);
+		obj = p.getPoints();
 		countt++;
 		countt %= 107;
 		pas = 0;
-		imi = kitti::readImage(kittiData, countt);
+		imi = p.getAugmentedDepthMap();
 		//pasteInData(obj, imi);
 		imshow("win-i", imi);
 		waitKey(30);
@@ -668,22 +664,7 @@ void printProper(string name, Mat m)
 int main()
 {
 
-	kitti::KittiPix3dSet p;
-	p = kitti::open(kittiData, 0);
-	Mat depth = p.getDepthMap();
-
-	imshow("color", p.colorImage);
-	imshow("validDepth", p.validDepthImage);
-	imshow("depthmap", depth);
-	Mat X = p.getAugmentedDepthMap();
-	imshow("coloredDepth", X);
-
-	waitKey();
-
-
-
-	return -1;
-
+	
 	/*
 	to-do:
 		1. simplify-access
@@ -702,91 +683,18 @@ int main()
 	
 	*/
 
-	string directory = string(LCPPDATA_DIR) + string("/kitti/2011_09_26_drive_0001_sync/velodyne_points/data/");
-	string imDirectory = string(LCPPDATA_DIR) + string("/kitti/2011_09_26_drive_0001_sync/image_00/data/");
-
-	velo2cam = ll_experiments::kitti::velo2Cam(kittiData);
-	//cout << velo2cam << endl;
-
 	
-	Mat R, P;
-	ll_experiments::kitti::cam2cam(kittiData, R, P, 0);
-
-	cout << R << endl << endl << P << endl;
-
-	//return 0;
-	//namedWindow("win-i");
-
-	//P.at<float>(3, 3) = 0.0f;
-
-	printProper("R", R);
-	printProper("P", P);
-
-	//return 0;
-
-	printProper("P*R", P*R);
-	//return 5;
-	
-
-	primary = P*R*velo2cam;
-	/*primary = Mat::eye(Size(4, 4), CV_32FC1);
-	for (int y = 0; y < 3; y++)
-	{
-		for (int x = 0; x < 4; x++)
-		{
-			primary.at<float>(y, x) = tmp.at<float>(y, x);
-		}
-	}*/
-	printProper("primary", primary);
-	//
-	cout << "primary-size: "<< primary.size() << endl;
-
-	//primary1 = P;
-	//Mat primary = Mat::eye(Size(4, 4), CV_32FC1);
-	//for (int y = 0; y < 3; y++)
-	//	for (int x = 0; x < 4; x++)
-	//		primary.at<float>(y, x) = primary1.at<float>(y, x);
-	//cout << primary1.size() << endl;
-	//cout << primary1.size() << endl;
-	//primary = primary.inv();
-    //cout << "sizes: " << R.size() << " was R: P=" << P.size() << endl;
-	//cout << "R:\n\n" << R << "\n\nP:\n\n" << P << endl;
-
-	cout << "\n\n" << primary << endl << endl;
-
-	
-	//cout << "P\n" << P << endl;
-	//cout << P.size() << endl << R.size() << endl;
-	//cout << "out: " << endl << (P * R) << endl;
-	//for (int i = 0; i < 1; i++) {
-		//cout << filename(i) << endl;
-	//return 0;
-
-		obj = kitti::read(kittiData, 0);
+		kitti::KittiPix3dSet kp = kitti::open(kittiData, 0);
+		obj = kp.getPoints();
 		cout << obj.size() << endl;
 
-
-
-        //unprojectNew3(obj, primary);
-		obj.transform_set(velo2cam);
-		
-		imi = kitti::readImage(kittiData, 0);
+				
+		imi = kp.getAugmentedDepthMap();
 
 		imshow("win-i", imi);
 		waitKey(30);
 
 		
-		//unproject(obj);
-		//obj.transform_set(P);
-
-
-
-	//}
-		printFacts(obj);
-
-		//system("pause");
-
-		//return 0;
 #ifdef HASGL
 		tmr.start();
 
