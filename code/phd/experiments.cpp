@@ -259,6 +259,8 @@ namespace kitti
 
 	}
 
+
+
 	KittiPix3dSet open(std::string dataset, int index)
 	{
 		KittiPix3dSet ret;
@@ -304,15 +306,20 @@ namespace kitti
 				//add to points if needed
 				int uvIndex = uv.y * ret.validDepthImage.size().width + uv.x;
 				R3 output = point;
-				point -= R3(-85.0f, -5.0f, -85.0f);
-				point *= 256.0f / 170.0f;
-				ret.points[uvIndex] = point;
+				output.y *= -1.0f;
+				output.x *= -1.0f;
+				output -= R3(-55.0f, -5.0f, 0.0f);
+				output *= 256.0f / 110.0f;
+				
+				ret.points[uvIndex] = output;
+
+
 
 
 			}
+			
 		}
-
-
+		
 		return ret;
 	}
 

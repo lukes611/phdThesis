@@ -431,235 +431,7 @@ void quantitativeExperiment20(string algorithm_name, string data_name, vector<in
 
 string kittiData = "2011_09_26_drive_0001_sync";
 
-int countt = 1;
-double pas = 0.0;
-LTimer tmr;
-Mat velo2cam, primary;
-Pixel3DSet obj;
-Mat imi;
 
-R3 vmin, vmax;
-void printFacts(Pixel3DSet & x)
-{
-	R3 tmin, tmax;
-	x.min_max_R3(tmin, tmax);
-	tmin.min(vmin);
-	tmax.max(vmax);
-	if (tmin != vmin || tmax != vmax)
-	{
-		vmax = tmax;
-		vmin = tmin;
-		cout << "*****************************************\n";
-		cout << "X: " << vmin.x << "\t\t\t" << vmax.x << endl;
-		cout << "Y: " << vmin.y << "\t\t\t" << vmax.y << endl;
-		cout << "Z: " << vmin.z << "\t\t\t" << vmax.z << endl;
-		cout << "*****************************************\n";
-	}
-}
-
-void unproject(Pixel3DSet & o)
-{
-	Pixel3DSet tmp = o.clone();
-	o = Pixel3DSet();
-	tmp.transform_set(velo2cam);
-	for (int i = 0; i < tmp.size(); i++)
-	{
-		if (tmp[i].z >= 0.0f)
-		{
-			Vec3b white(255, 255, 255);
-			R3 t = tmp[i];
-			t = R3(t.x, t.y, t.z);
-			Pixel3DSet::transform_point(primary, t);
-			t /= 1000.0;
-			o.push_back(t, white);
-		}
-
-		//o[i].z = 0.0f;
-		//o[i] /= 1000.0;
-	}
-	//cout << o.size() << endl;
-}
-
-
-R3 kittiProject(R3 input, Mat & matrix)
-{
-    Mat tmp = Mat::zeros(Size(1, 4), CV_32FC1);
-    tmp.at<float>(0,0) = input.x;
-    tmp.at<float>(1,0) = input.y;
-    tmp.at<float>(2,0) = input.z;
-    tmp.at<float>(3,0) = 1.0f;
-	//cout << "in " << tmp << endl;
-    tmp = matrix * tmp;
-	//cout << "out " << tmp << endl;
-	//system("pause");
-	return R3(tmp.at<float>(0, 0), tmp.at<float>(1, 0), tmp.at<float>(2, 0) * tmp.at<float>(2, 0)) / tmp.at<float>(2, 0);
-}
-
-void unprojectNew(Pixel3DSet & o, Mat m)
-{
-    for(int i = 0; i < o.size(); i++)
-        o[i] = kittiProject(o[i], m);
-}
-
-void unprojectNew3(Pixel3DSet & in, Mat m)
-{
-	Pixel3DSet o = in.clone();
-	in = Pixel3DSet();
-	Vec3b white(255, 255, 255);
-	for (int i = 0; i < o.size(); i++)
-	{
-		//if (o[i].y > 5) continue;
-		//if (o[i].x < -46.0) continue;
-		o[i] = kittiProject(o[i], m);
-		int col_idx = round(64.0 * 5.0 / o[i].y);
-		//o[i].z = 0.0f;
-		if(o[i].x >= 0.0f && o[i].x < 1242.0f && o[i].y > 0.0f && o[i].y < 375.0f)
-			in.push_back(o[i], white);
-	}
-}
-
-void unprojectNew2(Pixel3DSet & o, Mat & m)
-{
-	Pixel3DSet tmp = o.clone();
-	o = Pixel3DSet();
-	tmp.transform_set(velo2cam);
-	for (int i = 0; i < tmp.size(); i++)
-	{
-		if (tmp[i].z >= 0.0f)
-		{
-			Vec3b white(255, 255, 255);
-			R3 t = kittiProject(tmp[i], m);
-			o.push_back(t, white);
-			o[o.size()-1] /= 1000.0;
-		}
-
-		//o[i].z = 0.0f;
-		
-	}
-	//cout << o.size() << endl;
-}
-
-
-//todo
-/*
-view video of pixel3dsets
-see if I can align the pixels with the depth data
-
-
-*/
-
-#ifdef HASGL
-
-// [122.828, 20.0001, 115.381] , angle_y: 88.000000, angle_x: 90.000000
-Fps_cam camera(R3(122.828f, 20.0001f, 115.381f), 88.0f, 90.0f);
-
-
-
-void display()
-{
-
-
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	ll_gl::default_viewing(camera);
-
-	ll_gl::default_lighting();
-	ll_gl::turn_off_lights();
-
-
-	glBegin(GL_POINTS);
-	for (int i = 0; i < obj.points.size(); i++)
-	{
-		R3 col = obj.color_as_r3(i) / 255.0f;
-		swap(col.x, col.z);
-		ll_gl::set_color(col);
-		ll_gl::glR3(obj.points[i]);
-	}
-	glEnd();
-
-
-	glutSwapBuffers();
-	glutPostRedisplay();
-}
-
-void kbf(unsigned char key, int x, int y)
-{
-	camera.keyboard(key, x, y);
-	if (key == '5')
-	{
-		cout << camera.to_string() << endl;
-	}
-}
-void mouseF(int x, int y)
-{
-	camera.mouse(x, y);
-}
-
-void mouse(int button, int state, int x, int y)
-{
-	ll_gl::camera_mouse_click(camera, button, state, x, y);
-}
-
-void pasteInData(Pixel3DSet & p, Mat & im)
-{
-	cvtColor(im, im, CV_GRAY2RGB);
-	R3 mn, mx;
-	//p.min_max_R3(mn, mx);
-	//cout << mx << endl << mn << endl;
-	//cout << "*************";
-	//cout << endl;
-	//system("pause");
-	for (int i = 0; i < p.size(); i++)
-	{
-		R3 point = p[i];
-		if (point.z < 0.0) continue;
-		Point2i p2d(point.x, point.y);
-		unsigned char color = 256.0f * (point.z / 80.0f);
-		Vec3b outColor = ll_getColoredPixelFromGrayscale(255 - color);
-		circle(im, p2d, 1, outColor, -1);
-	}
-}
-
-void idle()
-{
-	tmr.stop();
-	double passed = tmr.getSeconds();
-	if (pas > 0.03)
-	{
-		kitti::KittiPix3dSet p = kitti::open(kittiData, countt);
-		obj = p.getPoints();
-		countt++;
-		countt %= 107;
-		pas = 0;
-		imi = p.getAugmentedDepthMap();
-		//pasteInData(obj, imi);
-		imshow("win-i", imi);
-		waitKey(30);
-		
-	}
-	pas += passed;
-
-	tmr.reset();
-	tmr.start();
-}
-#endif
-
-using namespace ll_experiments;
-
-void printProper(string name, Mat m)
-{
-	cout << "*******************" << name << "*******************" << endl << endl;
-
-	for (int y = 0; y < m.rows; y++)
-	{
-		for (int x = 0; x < m.cols; x++)
-		{
-			cout << m.at<float>(y, x) << "\t\t\t";
-		}
-		cout << endl;
-	}
-
-	cout << "\n\n****************************" << endl << endl;
-}
 
 int main()
 {
@@ -667,10 +439,6 @@ int main()
 	
 	/*
 	to-do:
-		1. simplify-access
-			easily open matrices and data
-			easily test viewing for those also
-			easily open pix3d object from those
 		2. create experiments 3.0
 		3. run experiments 3.0
 		4. setup the other test experiments
@@ -682,34 +450,17 @@ int main()
 
 	
 	*/
-
+	for (int i = 0; i < 10; i++)
+	{
+		for (int j = 0; j < 107; j++)
+		{
+			kitti::KittiPix3dSet p = kitti::open("2011_09_26_drive_0001_sync", j);
+			Mat im = p.getColoredDepthMap();
+			imshow("a", im);
+			waitKey(100);
+		}
+	}
 	
-		kitti::KittiPix3dSet kp = kitti::open(kittiData, 0);
-		obj = kp.getPoints();
-		cout << obj.size() << endl;
-
-				
-		imi = kp.getAugmentedDepthMap();
-
-		imshow("win-i", imi);
-		waitKey(30);
-
-		
-#ifdef HASGL
-		tmr.start();
-
-
-		ll_gl::default_glut_main("lukes phd project", 640, 480);
-
-		glutDisplayFunc(display);
-
-		glutKeyboardFunc(kbf);
-
-		glutMotionFunc(mouseF);
-		glutMouseFunc(mouse);
-		glutIdleFunc(idle);
-		glutMainLoop();
-#endif
 	return 0;
 }
 
