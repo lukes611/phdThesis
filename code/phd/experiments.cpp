@@ -144,7 +144,8 @@ namespace kitti
 		if (!getLeftImage) imageType++;
 		if (getColor) imageType += 2;
 		fileName << LCPPDATA_DIR << "/kitti/" << directoryName << "/image_0" << imageType << "/data/";
-		Mat ret = imread(getImageFileName(fileName.str(), index).c_str(), CV_LOAD_IMAGE_GRAYSCALE);
+		
+		Mat ret = imread(getImageFileName(fileName.str(), index).c_str(), getColor ? CV_LOAD_IMAGE_COLOR : CV_LOAD_IMAGE_GRAYSCALE);
 		return ret.clone();
 	}
 
@@ -322,10 +323,61 @@ namespace kitti
 		{
 			for (int x = 0; x < ret.size().width; x++)
 			{
-				ret.at<float>(y, x) = this->points[y * ret.size().width + x].z / 256.0f;
+				if(this->validDepthImage.at<unsigned char>(y,x))
+					ret.at<float>(y, x) = this->points[y * ret.size().width + x].z / 256.0f;
 			}
 		}
 		return ret.clone();
+	}
+
+	Mat KittiPix3dSet::getColoredDepthMap()
+	{
+		Mat depthImage = this->getDepthMap();
+		ll_normalize(depthImage, this->validDepthImage);
+		Mat coloredDepthImage = ll_getColoredDepthMap(depthImage);
+		for (int y = 0; y < coloredDepthImage.size().height; y++)
+		{
+			for (int x = 0; x < coloredDepthImage.size().width; x++)
+			{
+				if (!this->validDepthImage.at<unsigned char>(y, x))
+				{
+					coloredDepthImage.at<Vec3b>(y, x) = Vec3b(0, 0, 0);
+				}
+			}
+		}
+		return coloredDepthImage.clone();
+	}
+	Mat KittiPix3dSet::getAugmentedDepthMap()
+	{
+		Mat ret = this->colorImage.clone();
+		Mat cdi = this->getColoredDepthMap();
+		for (int y = 0; y < cdi.size().height; y++)
+		{
+			for (int x = 0; x < cdi.size().width; x++)
+			{
+				if(this->validDepthImage.at<unsigned char>(y,x))
+					ret.at<Vec3b>(y, x) = cdi.at<Vec3b>(y,x);
+			}
+		}
+		return ret.clone();
+	}
+
+	Pixel3DSet KittiPix3dSet::getPoints()
+	{
+		Pixel3DSet ret;
+		Size s = this->colorImage.size();
+		for (int y = 0; y < s.height; y++)
+		{
+			for (int x = 0; x < s.width; x++)
+			{
+				if (this->validDepthImage.at<unsigned char>(y, x))
+				{
+					ret.push_back(this->points[y * s.width + x], this->colorImage.at<Vec3b>(y, x));
+				}
+			}
+		}
+		
+		return ret;
 	}
 }
 

@@ -144,6 +144,10 @@ namespace ll_experiments
 			std::vector<ll_R3::R3> points;
 
 			cv::Mat getDepthMap();
+			cv::Mat getColoredDepthMap();
+			cv::Mat getAugmentedDepthMap();
+
+			Pixel3DSet getPoints();
 
 		};
 

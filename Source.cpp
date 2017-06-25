@@ -675,17 +675,7 @@ int main()
 	imshow("color", p.colorImage);
 	imshow("validDepth", p.validDepthImage);
 	imshow("depthmap", depth);
-	Mat X = ll_getColoredDepthMap(depth);
-	for (int y = 0; y < X.size().height; y++)
-	{
-		for (int x = 0; x < X.size().width; x++)
-		{
-			if (!p.validDepthImage.at<unsigned char>(y, x))
-			{
-				X.at<Vec3b>(y, x) = Vec3b(0, 0, 0);
-			}
-		}
-	}
+	Mat X = p.getAugmentedDepthMap();
 	imshow("coloredDepth", X);
 
 	waitKey();
