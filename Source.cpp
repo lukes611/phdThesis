@@ -429,6 +429,7 @@ void quantitativeExperiment20(string algorithm_name, string data_name, vector<in
 
 }
 
+string kittiData = "2011_09_26_drive_0001_sync";
 
 int countt = 1;
 double pas = 0.0;
@@ -436,6 +437,25 @@ LTimer tmr;
 Mat velo2cam, primary;
 Pixel3DSet obj;
 Mat imi;
+
+R3 vmin, vmax;
+void printFacts(Pixel3DSet & x)
+{
+	R3 tmin, tmax;
+	x.min_max_R3(tmin, tmax);
+	tmin.min(vmin);
+	tmax.max(vmax);
+	if (tmin != vmin || tmax != vmax)
+	{
+		vmax = tmax;
+		vmin = tmin;
+		cout << "*****************************************\n";
+		cout << "X: " << vmin.x << "\t\t\t" << vmax.x << endl;
+		cout << "Y: " << vmin.y << "\t\t\t" << vmax.y << endl;
+		cout << "Z: " << vmin.z << "\t\t\t" << vmax.z << endl;
+		cout << "*****************************************\n";
+	}
+}
 
 void unproject(Pixel3DSet & o)
 {
@@ -601,21 +621,21 @@ void pasteInData(Pixel3DSet & p, Mat & im)
 
 void idle()
 {
-	//return;
 	tmr.stop();
 	double passed = tmr.getSeconds();
 	if (pas > 0.03)
 	{
-		string directory = string(LCPPDATA_DIR) + string("/kitti/2011_09_26_drive_0001_sync/velodyne_points/data/");
-		string imDirectory = string(LCPPDATA_DIR) + string("/kitti/2011_09_26_drive_0001_sync/image_00/data/");
-		obj = kitti::read(directory, countt);
-		//obj.transform_set(primary);
-		unprojectNew3(obj, primary);
+		obj = kitti::read(kittiData, countt);
+		obj.transform_set(velo2cam);
+
+
+		printFacts(obj);
+		//unprojectNew3(obj, primary);
 		countt++;
 		countt %= 107;
 		pas = 0;
-		imi = kitti::readImage(imDirectory, countt);
-		pasteInData(obj, imi);
+		imi = kitti::readImage(kittiData, countt);
+		//pasteInData(obj, imi);
 		imshow("win-i", imi);
 		waitKey(30);
 		
@@ -648,6 +668,32 @@ void printProper(string name, Mat m)
 int main()
 {
 
+	kitti::KittiPix3dSet p;
+	p = kitti::open(kittiData, 0);
+	Mat depth = p.getDepthMap();
+
+	imshow("color", p.colorImage);
+	imshow("validDepth", p.validDepthImage);
+	imshow("depthmap", depth);
+	Mat X = ll_getColoredDepthMap(depth);
+	for (int y = 0; y < X.size().height; y++)
+	{
+		for (int x = 0; x < X.size().width; x++)
+		{
+			if (!p.validDepthImage.at<unsigned char>(y, x))
+			{
+				X.at<Vec3b>(y, x) = Vec3b(0, 0, 0);
+			}
+		}
+	}
+	imshow("coloredDepth", X);
+
+	waitKey();
+
+
+
+	return -1;
+
 	/*
 	to-do:
 		1. simplify-access
@@ -669,12 +715,12 @@ int main()
 	string directory = string(LCPPDATA_DIR) + string("/kitti/2011_09_26_drive_0001_sync/velodyne_points/data/");
 	string imDirectory = string(LCPPDATA_DIR) + string("/kitti/2011_09_26_drive_0001_sync/image_00/data/");
 
-	velo2cam = ll_experiments::kitti::velo2Cam("2011_09_26_drive_0001_sync");
+	velo2cam = ll_experiments::kitti::velo2Cam(kittiData);
 	//cout << velo2cam << endl;
 
 	
 	Mat R, P;
-	ll_experiments::kitti::cam2cam("2011_09_26_drive_0001_sync", R, P, 0);
+	ll_experiments::kitti::cam2cam(kittiData, R, P, 0);
 
 	cout << R << endl << endl << P << endl;
 
@@ -726,14 +772,15 @@ int main()
 		//cout << filename(i) << endl;
 	//return 0;
 
-		obj = kitti::read(directory, 0);
+		obj = kitti::read(kittiData, 0);
 		cout << obj.size() << endl;
 
 
 
-        unprojectNew3(obj, primary);
+        //unprojectNew3(obj, primary);
+		obj.transform_set(velo2cam);
 		
-		imi = kitti::readImage(imDirectory, 0);
+		imi = kitti::readImage(kittiData, 0);
 
 		imshow("win-i", imi);
 		waitKey(30);
@@ -745,11 +792,7 @@ int main()
 
 
 	//}
-		R3 _mn, _mx;
-		obj.min_max_R3(_mn, _mx);
-
-		cout << "min: " << _mn << endl
-			<< "max: " << _mx << endl;
+		printFacts(obj);
 
 		//system("pause");
 

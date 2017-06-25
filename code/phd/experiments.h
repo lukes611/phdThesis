@@ -65,6 +65,7 @@
 namespace ll_experiments
 {
 
+	
 
 
 	class LLPointers{
@@ -137,14 +138,25 @@ namespace ll_experiments
 
 	namespace kitti
 	{
+		struct KittiPix3dSet {
+			cv::Mat colorImage;
+			cv::Mat validDepthImage;
+			std::vector<ll_R3::R3> points;
+
+			cv::Mat getDepthMap();
+
+		};
+
 		std::string getFileName(std::string directory, int index);
 		ll_pix3d::Pixel3DSet read(std::string directoryName, int index, bool flip = false);
 
 		std::string getImageFileName(std::string directory, int index);
-		cv::Mat readImage(std::string directoryName, int index);
+		cv::Mat readImage(std::string directoryName, int index, bool color = false, bool leftImage = true);
 
 		cv::Mat velo2Cam(std::string fileName);
         void cam2cam(std::string directoryName, cv::Mat & R_rect0x, cv::Mat & P_rect_0x, int x);
+
+		KittiPix3dSet open(std::string dataset, int index);
 	}
 
 #ifdef HASGL

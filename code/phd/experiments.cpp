@@ -137,15 +137,22 @@ namespace kitti
 		return t.str();
 	}
 
-	Mat readImage(string directoryName, int index)
+	Mat readImage(string directoryName, int index, bool getColor, bool getLeftImage)
 	{
-		Mat ret = imread(getImageFileName(directoryName, index).c_str(), CV_LOAD_IMAGE_GRAYSCALE);
+		stringstream fileName;
+		int imageType = 0;
+		if (!getLeftImage) imageType++;
+		if (getColor) imageType += 2;
+		fileName << LCPPDATA_DIR << "/kitti/" << directoryName << "/image_0" << imageType << "/data/";
+		Mat ret = imread(getImageFileName(fileName.str(), index).c_str(), CV_LOAD_IMAGE_GRAYSCALE);
 		return ret.clone();
 	}
 
 	Pixel3DSet read(string directoryName, int index, bool flip)
 	{
-		FILE * file = fopen(getFileName(directoryName, index).c_str(), "rb");
+		stringstream fileName;
+		fileName << LCPPDATA_DIR << "/kitti/" << directoryName << "/velodyne_points/data/";
+		FILE * file = fopen(getFileName(fileName.str(), index).c_str(), "rb");
 		Pixel3DSet ret;
 		if (file)
 		{
@@ -249,6 +256,76 @@ namespace kitti
             }
         }else cout << "could not open cam2cam calibration file\n";
 
+	}
+
+	KittiPix3dSet open(std::string dataset, int index)
+	{
+		KittiPix3dSet ret;
+
+		//get color-data
+		ret.colorImage = readImage(dataset, index, true, true);
+
+		//get 3d-data
+		ret.validDepthImage = Mat::zeros(ret.colorImage.size(), CV_8UC1);
+		ret.points = vector<R3>(ret.colorImage.size().width * ret.colorImage.size().height);
+
+		Mat projectToPoints = velo2Cam(dataset);
+		Mat P, R;
+		cam2cam(dataset, R, P, 0);
+
+		Mat projectToImage = P * R;
+
+		Pixel3DSet raw_points = read(dataset, index);
+		Mat tmp = Mat::zeros(Size(1, 4), CV_32FC1);
+
+		for (int i = 0; i < raw_points.size(); i++)
+		{
+			R3 point = raw_points[i];
+			//multiply by projectToPoints
+			Pixel3DSet::transform_point(projectToPoints, point);
+			//multiply by projectToImage
+			R3 imageIndexR3 = point;
+			tmp.at<float>(0, 0) = imageIndexR3.x;
+			tmp.at<float>(1, 0) = imageIndexR3.y;
+			tmp.at<float>(2, 0) = imageIndexR3.z;
+			tmp.at<float>(3, 0) = 1.0f;
+			tmp = projectToImage * tmp;
+			imageIndexR3.x = tmp.at<float>(0, 0) / tmp.at<float>(2, 0);
+			imageIndexR3.y = tmp.at<float>(1, 0) / tmp.at<float>(2, 0);
+			imageIndexR3.z = tmp.at<float>(2, 0);
+			//find the image coordinates
+			Point2i uv(round(imageIndexR3.x), round(imageIndexR3.y));
+			
+			if (uv.x >= 0 && uv.x < ret.colorImage.size().width && uv.y >= 0 && uv.y < ret.colorImage.size().height && imageIndexR3.z >= 0.0)
+			{
+				//add to validDepth
+				ret.validDepthImage.at<unsigned char>(uv) = 0xFF;
+				//add to points if needed
+				int uvIndex = uv.y * ret.validDepthImage.size().width + uv.x;
+				R3 output = point;
+				point -= R3(-85.0f, -5.0f, -85.0f);
+				point *= 256.0f / 170.0f;
+				ret.points[uvIndex] = point;
+
+
+			}
+		}
+
+
+		return ret;
+	}
+
+	Mat KittiPix3dSet::getDepthMap()
+	{
+		Mat ret = Mat::zeros(this->colorImage.size(), CV_32FC1);
+		for (int y = 0; y < ret.size().height; y++)
+		{
+			for (int x = 0; x < ret.size().width; x++)
+			{
+				ret.at<float>(y, x) = this->points[y * ret.size().width + x].z / 256.0f;
+			}
+		}
+		return ret.clone();
 	}
 }
 
