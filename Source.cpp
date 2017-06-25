@@ -647,13 +647,32 @@ void printProper(string name, Mat m)
 
 int main()
 {
+
+	/*
+	to-do:
+		1. simplify-access
+			easily open matrices and data
+			easily test viewing for those also
+			easily open pix3d object from those
+		2. create experiments 3.0
+		3. run experiments 3.0
+		4. setup the other test experiments
+		5. add to the thesis
+		6. finalize thesis experiments section
+		7. re-write the section also
+			add the r-table required
+		8. re-write intro.conclusion.methodology (somewhat)
+
+	
+	*/
+
 	string directory = string(LCPPDATA_DIR) + string("/kitti/2011_09_26_drive_0001_sync/velodyne_points/data/");
 	string imDirectory = string(LCPPDATA_DIR) + string("/kitti/2011_09_26_drive_0001_sync/image_00/data/");
 
 	velo2cam = ll_experiments::kitti::velo2Cam("2011_09_26_drive_0001_sync");
 	cout << velo2cam << endl;
 
-	return 0;
+	
 	Mat R, P;
 	ll_experiments::kitti::cam2cam(string(LCPPDATA_DIR) + string("/kitti/2011_09_26_drive_0001_sync/"), R, P, 0);
 
