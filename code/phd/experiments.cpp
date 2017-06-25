@@ -200,8 +200,11 @@ namespace kitti
 	{
         R_rect_0x = Mat::eye(Size(4,4), CV_32FC1);
         P_rect_0x = Mat::eye(Size(4,4), CV_32FC1);
+
+		string fileName = LCPPDATA_DIR + string("/kitti/") + directoryName + string("/calib_cam_to_cam.txt");
+
         string wholeFile = "";
-        FILE * file = fopen((directoryName + "calib_cam_to_cam.txt").c_str(), "r");
+        FILE * file = fopen(fileName.c_str(), "r");
         string rheader, pheader;
         {
             stringstream rh, ph;

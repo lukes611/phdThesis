@@ -670,18 +670,23 @@ int main()
 	string imDirectory = string(LCPPDATA_DIR) + string("/kitti/2011_09_26_drive_0001_sync/image_00/data/");
 
 	velo2cam = ll_experiments::kitti::velo2Cam("2011_09_26_drive_0001_sync");
-	cout << velo2cam << endl;
+	//cout << velo2cam << endl;
 
 	
 	Mat R, P;
-	ll_experiments::kitti::cam2cam(string(LCPPDATA_DIR) + string("/kitti/2011_09_26_drive_0001_sync/"), R, P, 0);
+	ll_experiments::kitti::cam2cam("2011_09_26_drive_0001_sync", R, P, 0);
 
-	namedWindow("win-i");
+	cout << R << endl << endl << P << endl;
 
-	P.at<float>(3, 3) = 0.0f;
+	//return 0;
+	//namedWindow("win-i");
+
+	//P.at<float>(3, 3) = 0.0f;
 
 	printProper("R", R);
 	printProper("P", P);
+
+	//return 0;
 
 	printProper("P*R", P*R);
 	//return 5;
