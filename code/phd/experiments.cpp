@@ -144,7 +144,7 @@ namespace kitti
 		if (!getLeftImage) imageType++;
 		if (getColor) imageType += 2;
 		fileName << LCPPDATA_DIR << "/kitti/" << directoryName << "/image_0" << imageType << "/data/";
-		
+
 		Mat ret = imread(getImageFileName(fileName.str(), index).c_str(), getColor ? CV_LOAD_IMAGE_COLOR : CV_LOAD_IMAGE_GRAYSCALE);
 		return ret.clone();
 	}
@@ -298,7 +298,7 @@ namespace kitti
 			imageIndexR3.z = tmp.at<float>(2, 0);
 			//find the image coordinates
 			Point2i uv(round(imageIndexR3.x), round(imageIndexR3.y));
-			
+
 			if (uv.x >= 0 && uv.x < ret.colorImage.size().width && uv.y >= 0 && uv.y < ret.colorImage.size().height && imageIndexR3.z >= 0.0)
 			{
 				//add to validDepth
@@ -310,16 +310,16 @@ namespace kitti
 				output.x *= -1.0f;
 				output -= R3(-55.0f, -5.0f, 0.0f);
 				output *= 256.0f / 110.0f;
-				
+
 				ret.points[uvIndex] = output;
 
 
 
 
 			}
-			
+
 		}
-		
+
 		return ret;
 	}
 
@@ -383,8 +383,52 @@ namespace kitti
 				}
 			}
 		}
-		
+
 		return ret;
+	}
+
+	bool KittiPix3dSet::getClosePoint(cv::Point2i p, ll_R3::R3 & out)
+	{
+        bool found = false;
+        double dist;
+
+        int W = this->colorImage.size().width;
+        int H = this->colorImage.size().height;
+        if(this->validDepthImage.at<unsigned char>(p))
+        {
+            out = this->points[p.y * W + p.x];
+            return true;
+        }else
+        {
+            for(int y = p.y - 2; y <= p.y + 2; y++)
+            {
+                for(int x = p.x - 2; x <= p.x + 2; x++)
+                {
+                    if(x >= 0 && x < W && y >= 0 && y < H)
+                    {
+                        if(this->validDepthImage.at<unsigned char>(y,x))
+                        {
+                            double tmpDist = ll_distance(x,y, p.x, p.y);
+                            if(!found)
+                            {
+                                out = this->points[y * W + x];
+                                dist = tmpDist;
+                                found = true;
+                            }else if(tmpDist < dist)
+                            {
+                                dist = tmpDist;
+                                out = this->points[y * W + x];
+                            }
+                        }
+                    }
+                }
+            }
+
+            return found;
+        }
+
+
+
 	}
 }
 

@@ -69,164 +69,8 @@ toJSON function ->
 #include "code/basics/BitReaderWriter.h"
 
 
-void test(string name, Point3d rotation, float scale, Point3d translation, double noiseRange = 0.0, bool view = false)
-{
-	cout << "**************\n";
-	cout << "rotation: " << rotation << ", scale: " << scale << ", translation: " << translation << endl;
-
-	CapturePixel3DSet video = ll_experiments::openData(name, 1);
-	Mat M = VMat::transformation_matrix(256, rotation.x, rotation.y, rotation.z, scale, translation.x, translation.y, translation.z);
-
-	//output structure
-	LukeLincoln::LVol<Vec3b> output(64, 64, 64, Vec3b(0, 0, 0));
-	//read in frame
-	Pix3D frame1, frame2; video.read_frame(frame1, 0);
-	Mat SCALAR_MAT = VMat::transformation_matrix(256, 0.0f, 0.0f, 0.0f, 384.0f / 256.0f, 0.0f, 0.0f, 0.0f);
-	for (int i = 0; i < frame1.count; i++)
-	{
-		Point3f p = LukeLincoln::operator*(SCALAR_MAT, Point3f(frame1.points[i].x, frame1.points[i].y, frame1.points[i].z));
-		frame1.points[i] = R3(p.x, p.y, p.z);
-	}
-	frame2 = frame1;
-	//transform second frame
-	for (int i = 0; i < frame2.count; i++)
-	{
-		Point3f p = LukeLincoln::operator*(M, Point3f(frame2.points[i].x, frame2.points[i].y, frame2.points[i].z));
-		frame2.points[i] = R3(p.x, p.y, p.z);
-	}
-
-	vector<string> algorithms;
-	//algorithms.push_back("none");
-	//algorithms.push_back("fm");
-	//algorithms.push_back("fm3d");
-	//algorithms.push_back("icp");
-	//algorithms.push_back("pc");
-	//algorithms.push_back("pc2");
-	//algorithms.push_back("pc3");
-	//algorithms.push_back("pca");
-    algorithms.push_back("ffvr");
 
 
-	//for each algorithm
-	for (int i = 0; i < algorithms.size(); i++)
-	{
-		//register
-		Mat M2 = Mat::eye(Size(4, 4), CV_32FC1);
-
-		double snr1, snr2, snrOut;
-
-		Pix3D frame1Noise = ll_experiments::getNoisedVersion(frame1, noiseRange, snr1);
-		Pix3D frame2Noise = ll_experiments::getNoisedVersion(frame2, noiseRange, snr2);
-		snrOut = (snr1 + snr2) * 0.5f;
-
-		Pixel3DSet f1 = frame1Noise;
-		Pixel3DSet f2 = frame2Noise;
-
-
-
-		double seconds;
-		if (algorithms[i] == "fm")
-			ll_fmrsc::registerPix3D("", frame1Noise, frame2Noise, M2, seconds, true, 50);
-		else if (algorithms[i] == "icp")
-		{
-			Pixel3DSet out;
-			int iters;
-			double errorOut;
-			M2 = Licp::icp(f1, f2, out, errorOut, seconds, iters, 0.2, 150);
-		}
-		else if (algorithms[i] == "fm3d")
-		{
-			M2 = LukeLincoln::sift3DRegister(f1, f2, seconds, true, 256);
-		}
-		else if (algorithms[i] == "pca")
-		{
-			M2 = ll_pca::register_pca(f1, f2, seconds, 256);
-		}
-#if defined(HASCUDA) || defined(HASFFTW)
-		else if(algorithms[i] == "pc")
-		{
-			M2 = ll_pc::pc_register(f1, f2, seconds);
-		}else if(algorithms[i] == "pc2")
-		{
-			//M2 = ll_pc::pc_register_pca(f1, f2, seconds);
-			ll_pc::pc_register_pca_i(f1, f2, seconds);
-		}else if(algorithms[i] == "pc3")
-		{
-			M2 = ll_pc::pc_pca_icp(f1, f2, seconds);
-		}else if(algorithms[i] == "ffvr")
-		{
-			M2 = ll_pc::ffvr(f1, f2, seconds);
-		}
-#endif
-
-
-		//measure error
-		double count = 0.0, numMatches = 0.0;
-		for (int i = 0; i < frame1.count; i++)
-		{
-			Point3f _ = LukeLincoln::operator*(M2, Point3f(frame1.points[i].x, frame1.points[i].y, frame1.points[i].z));
-			R3 p(_.x, _.y, _.z);
-			float D = p.dist(frame2.points[i]);
-			if (D < 3.0f) numMatches += 1.0;
-			count += 1.0;
-		}
-
-		double percentMatch = 100.0 * (numMatches / count);
-		stringstream line; line << algorithms[i] << ", " << rotation.x << ", " << rotation.y << ", " << rotation.z << ", " <<
-			scale << ", " << translation.x << ", " << translation.y << ", " << translation.z << ", " <<
-			noiseRange << ", " << snrOut << ", "
-			<< percentMatch << ", " << seconds;
-
-		//print error
-		cout << "algorithm[" << algorithms[i] << "] had " << percentMatch << "% matching rate" << endl;
-		ll_experiments::appendData(string(EXPS_DIR) + string("/") + name + string(".") + algorithms[i] + string(".") + string(".tests.v3.csv"),
-			string("algorithm, rx, ry, rz, scale, tx, ty, tz, noiseRange, SNR, percent match, seconds"),
-			line.str());
-
-#ifdef HASGL
-		if(algorithms[i] == "="){
-			f1.transform_set(M2);
-			f1 += f2;
-			LLPointers::setPtr("object", &f1);
-			ll_experiments::viewPixel3DSet();
-		}
-#endif
-	}
-
-
-
-
-
-
-
-
-
-
-}
-
-
-//does noise experiments
-void testSetPix3d(string name)
-{
-	double nr = 0.0;
-	//for(int Y = 0; Y < 360; Y+=10){
-	//	test(name, Point3d(0.0, Y, 0.0), 1.0f, Point3d(0.0, 0.0, 0.0), nr);
-	//}
-	//for(int x = 0; x < 160; x+=10)
-	//	test(name, Point3d(0.0, 0.0, 0.0), 1.0f, Point3d(x, 0.0, 0.0), nr);
-	//for(double S = 0.9; S <= 1.2; S += 0.5)
-	//	test(name, Point3d(0.0, 0.0, 0.0), S, Point3d(0.0, 0.0, 0.0), nr);
-	for(int i = 0; i < 3; i++)
-	for(int y = 0; y < 200; y+=30)
-	{
-		for(int x = 0; x < 200; x+=30)
-		{
-			//for(int z = 0; z < 30; z += 10)
-			test(name, Point3d(x, y, 0.0f), 1.0f, Point3d(0.0, 0.0, 0.0), (double)i);
-		}
-	}
-
-}
 
 
 //single experiment, only tests one algorithm at a time
@@ -347,9 +191,6 @@ void saveV20(string data_name, string alg_name, int frame1, int frame2, float se
 }
 
 
-
-
-
 void quantitativeExperiment20(string algorithm_name, string data_name, vector<int> frames)
 {
     CapturePixel3DSet video = ll_experiments::openData(data_name, 1);
@@ -429,43 +270,120 @@ void quantitativeExperiment20(string algorithm_name, string data_name, vector<in
 
 }
 
+
+//saves to kitti data file
+void saveKitti(string data_name, string alg_name, int frame1, int frame2, float seconds, float hd)
+{
+    //save output to file
+    cout << "saving v2.0..." << endl;
+    string outDirName = EXPS_DIR;
+    //save name of file as [data-name].[versionNo].csv
+    stringstream outFn; outFn << outDirName << "/" << data_name << ".kitti.v2.csv";
+    //header: algorithm name, frame-index-1, frame-index-2, seconds, error (hausdorff-distance)
+    string header = "alg,frame1,frame2,seconds,hd";
+    string fileName = outFn.str();
+    stringstream outData;
+    outData <<
+    alg_name << "," <<
+    frame1 << "," <<
+    frame2 << "," <<
+    seconds << "," <<
+    hd;
+
+    cout << outData.str() << endl;
+
+    appendData(fileName, header, outData.str());
+
+
+
+}
+
+
+
+void quantitativeExperimentKitti10(string algorithm_name, string data_name, vector<int> frames)
+{
+    kitti::KittiPix3dSet frame1, frame2;
+	Pixel3DSet a, b;
+
+    frame1 = kitti::open(data_name, frames[0]);
+
+	for (int _i = 1; _i < frames.size(); _i++)
+	{
+		int currentIndex = frames[_i];
+		//get match _m from i+1 to i
+		double seconds = 0.0;
+		double hde;
+		int iters = 0;
+		Pixel3DSet _;
+
+
+		cout << algorithm_name << ", completed " << _i << " of " << frames.size() << endl;
+
+		frame2 = kitti::open(data_name, currentIndex);
+
+
+		a = frame1.getPoints(); b = frame2.getPoints();
+
+		Mat _m = Mat::eye(Size(4, 4), CV_32FC1);
+
+		//algorithms here:
+		if (algorithm_name == "none") {
+            //do-nothing
+		}
+#if defined(HASCUDA) || defined(HASFFTW)
+		else if (algorithm_name == "FVR") {
+			_m = ll_pc::pc_register(b, a, seconds);
+		}
+
+		else if (algorithm_name == "FVR3D") {
+			_m = ll_pc::pc_register_pca_i(b, a, seconds);
+		}
+		else if (algorithm_name == "FVR3D-2") {
+			_m = ll_pc::pc_pca_icp(b, a, seconds);
+		}else if (algorithm_name == "FFVR"){
+            _m = ll_pc::ffvr(b, a, seconds);
+		}
+#endif
+        else if(algorithm_name == "PCA"){
+            _m = ll_pca::register_pca(b, a, seconds);
+        }else if (algorithm_name == "ICP") {
+			_m = Licp::icp(b, a, _, hde, seconds, iters);
+		}
+		else if (algorithm_name == "FM2D") {
+			ll_fmrsc::registerPix3D("surf", frame2, frame1, _m, seconds, true, -1);
+		}else if(algorithm_name == "FM3D"){
+		    _m = LukeLincoln::sift3DRegister(b, a, seconds, true, 256);
+		}
+
+
+
+		//:end
+
+		//compute the errors
+		b.transform_set(_m);
+		//hde = ll_measure::hausdorff(a, b);
+		double msee, pme;
+		hde = 21.0;
+		ll_measure::error_metrics(a, b, hde, msee, pme);
+
+		//void saveV20(string data_name, string alg_name, int frame1, int frame2, float seconds, float hd)
+		saveKitti(data_name, algorithm_name, frames[_i], frames[_i-1], seconds, hde);
+
+
+		frame1 = frame2;
+	}
+
+
+
+
+}
+
+
 string kittiData = "2011_09_26_drive_0001_sync";
 
 
 
-int main()
-{
-
-	
-	/*
-	to-do:
-		2. create experiments 3.0
-		3. run experiments 3.0
-		4. setup the other test experiments
-		5. add to the thesis
-		6. finalize thesis experiments section
-		7. re-write the section also
-			add the r-table required
-		8. re-write intro.conclusion.methodology (somewhat)
-
-	
-	*/
-	for (int i = 0; i < 10; i++)
-	{
-		for (int j = 0; j < 107; j++)
-		{
-			kitti::KittiPix3dSet p = kitti::open("2011_09_26_drive_0001_sync", j);
-			Mat im = p.getColoredDepthMap();
-			imshow("a", im);
-			waitKey(100);
-		}
-	}
-	
-	return 0;
-}
-
-
-int main2(int argc, char * * argv)
+int main(int argc, char * * argv)
 {
 
 	string namesList[20] = {
@@ -535,12 +453,47 @@ int main2(int argc, char * * argv)
     //quantitativeExperiment20("ICP", fn, inds);
     //quantitativeExperiment20("PCA", fn, inds);
     //quantitativeExperiment20("FVR", fn, inds);
-    quantitativeExperiment20("FVR3D", fn, inds);
-    quantitativeExperiment20("FVR3D-2", fn, inds);
+    //quantitativeExperiment20("FVR3D", fn, inds);
+    //quantitativeExperiment20("FVR3D-2", fn, inds);
 	//quantitativeExperiment20("FFVR", fn, inds);
 
 
     }
+
+    /*
+	to-do:
+		2. create experiments 3.0 []
+            feature matching 2d []
+            feature matching 3d []
+            fvr []
+            fvr3d []
+            fvr3d-2 []
+            ffvr []
+            icp []
+            PCA []
+
+		3. run experiments 3.0
+		4. setup the other test experiments
+		5. add to the thesis
+		6. finalize thesis experiments section
+		7. re-write the section also
+			add the r-table required
+		8. re-write intro.conclusion.methodology (somewhat)
+
+
+	*/
+
+	inds = ll_experiments::rng(0, 107, 1);
+    //quantitativeExperimentKitti10("none", kittiData, inds);
+    //quantitativeExperimentKitti10("FM2D", kittiData, inds);
+    //quantitativeExperimentKitti10("FM3D", kittiData, inds);
+    //quantitativeExperimentKitti10("ICP", kittiData, inds);
+    //quantitativeExperimentKitti10("PCA", kittiData, inds);
+    //quantitativeExperimentKitti10("FVR", kittiData, inds);
+    //quantitativeExperimentKitti10("FVR3D", kittiData, inds);
+    //quantitativeExperimentKitti10("FVR3D-2", kittiData, inds);
+	quantitativeExperimentKitti10("FFVR", kittiData, inds);
+
 
 
 	return 0;

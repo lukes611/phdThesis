@@ -7,17 +7,25 @@
       h1{
           text-align : center;
       }
+      #body{
+        display: flex;     
+        width: 95%;
+        margin-left: 2.5%;
+       }
       .partition{
         width : 50%;
-        float : left;
-        display : inline-block;
+        
       }
       .ls{background-color : lightblue;}
       .rs{background-color : lightpink;}
-      textarea{
+      #input-d{
         width : 98%;
         height : 400px;
       }
+      .rta{
+          width: 98%;
+          height: 300px;
+        }
     </style>
   </head>
   <body>
@@ -35,6 +43,9 @@
         <h4>output</h4>
         <div id="name-out"></div>
         <table id="stats-out"></table>
+        <textarea class="rta" id="output-table">
+            this is the output table  
+        </textarea>
       </div>
     </div>
 
@@ -79,7 +90,10 @@ let input = {
     this.subscribers.push(cb);
   }
 };
-
+    
+let tdp = (x,N=3) => Math.round(x*Math.pow(10.0,N)) / Math.pow(10,N);;
+  
+    
 function out(ds, d, from, to){
   document.getElementById('name-out').innerHTML = ds;
   let lines = d.split('\n');
@@ -124,7 +138,7 @@ function out(ds, d, from, to){
       if(bestResults.length == 0) bestResults = results[alg].errors.map(x=>Object.create({x:x,a:alg+''}));
       else bestResults = bestResults.map((r,i) => {
         //if(results[alg].length <= i) return r;
-        console.log(r.x, results[alg].errors[i]);
+        //console.log(r.x, results[alg].errors[i]);
         if(r.x < results[alg].errors[i]) return r;
         return {x:results[alg].errors[i], a:alg+''};
       });
@@ -138,7 +152,6 @@ function out(ds, d, from, to){
   function addRow(elems){
     document.getElementById('stats-out').innerHTML += '<tr>'+elems.map(x => `<td>${x}</td>`).join('')+'</td>';
   }
-  let tdp = (x,N=3) => Math.round(x*Math.pow(10.0,N)) / Math.pow(10,N);;
   let algorithmNames = 'FM2D,FM3D,ICP,PCA,FVR,FFVR,FVR3D'.split(',').filter(n=>results[n]!==undefined);
   addRow(['_'].concat(algorithmNames));
   addRow(['mean'].concat(algorithmNames.map(name => {
@@ -151,12 +164,64 @@ function out(ds, d, from, to){
     let l = ers.length;
     ers.sort((a,b)=>a-b);
     let ind = Math.floor(l/2);
-    return tdp(ers[ind], 2);
+    let medianResult = tdp(ers[ind], 2);
+      results[name].median = medianResult;
+    return medianResult;
   })));
-  console.log(bestResults);
+  //console.log(bestResults);
   addRow(['bm%'].concat(algorithmNames.map(name => {
-    return tdp(100 * bestResults.filter(n => n==name).length / bestResults.length,2);
+    let percentBestMatch = tdp(100 * bestResults.filter(n => n==name).length / bestResults.length,2);
+    results[name].bm = percentBestMatch;
+    return percentBestMatch;
   })));
+    
+    
+  let out = document.getElementById('output-table'); 
+  out.value = getLatexTable(ds, algorithmNames, results);    
+  
+    
+    
+
+}
+    
+    
+function getLatexTable(datasetname, algorithmNames, data){
+    let id = datasetname.replace(/\s/g, '').toLowerCase();
+    let ret = `\\begin{figure}
+\\centering
+\\begin{tabular}{cccccccc}
+\\hline
+\\textbf{frame} & \\textbf{FM-2D} & \\textbf{FM-3D} & \\textbf{ICP} & \\textbf{PCA} & \\textbf{FVR} & \\textbf{FFVR} & \\textbf{FVR-3D}
+\\\\ \\hline
+`;
+for(let i = 0; i < data.FM2D.errors.length; i++){
+    ret += `${i} & `;
+    let l = [];
+    
+    algorithmNames.forEach(name => {
+        let errors = data[name].errors;
+        l.push(errors[i]);
+    });
+    ret += l.join(' & ') + '\\\\\n';
+}
+    ret += '\\end{tabular}\n';
+    
+    ret += `\\vspace{10mm}
+\\centering
+\\begin{tabular}{ccc}
+\\hline
+\\textbf{Algorithm} & \\textbf{Median Error $\\times$ 1000} & \\textbf{\\% best results}\\\\ \\hline
+`;
+algorithmNames.forEach(name =>    
+ ret += `${name}	& ${data[name].median} & ${data[name].bm}\\%\\\\\n`);
+ret += `\\end{tabular}
+\\caption{Statistics for the ${datasetname} Data Set}
+\\label{tab:${id}}
+\\end{figure} 
+`;
+
+    
+    return ret;
 
 }
 

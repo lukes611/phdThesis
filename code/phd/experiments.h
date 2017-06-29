@@ -6,7 +6,7 @@
 #include "../basics/Pixel3DSet.h"
 
 
-#define AT_UNI //i am at uni
+//#define AT_UNI //i am at uni
 
 #ifdef _WIN32 //if on windows
 
@@ -65,7 +65,7 @@
 namespace ll_experiments
 {
 
-	
+
 
 
 	class LLPointers{
@@ -148,6 +148,8 @@ namespace ll_experiments
 			cv::Mat getAugmentedDepthMap();
 
 			ll_pix3d::Pixel3DSet getPoints();
+
+			bool getClosePoint(cv::Point2i p, ll_R3::R3 & out);
 
 		};
 
