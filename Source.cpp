@@ -388,27 +388,26 @@ int main(int argc, char * * argv)
 
 	string namesList[20] = {
 
-        "Apartment.Texture.rotate",
-        "Apartment.Texture.rotateXAxis",
-        "Boxes.Texture.arbitrarycamera",
-        "Boxes.Texture.rotate",
-        "Boxes.Texture.zoomOut",
-        "Desk.Texture.Translation",
-        "IndoorSpace.tc.translation",
-        "Kitchen.littleTexture.pan",
-        "Kitchen.littleTexture.zoom",
-        "OfficeDesk.Texture.rotationLift",
-        //"office.move1cm",
-        "Office.Texture.blindSpotRotation",
-        "Office.TexturedItems.Translation",
-        "Office.Texture.rotation",
-        "Office.Texture.rotationXAxis",
-        "Office.Texture.Translation",
-        "Outside.NoTexture.rotation",
-        "Outside.NoTexture.translation",
-        "Outside.TextureConfusion.rotation",
-        "Outside.TextureConfusion.Translation",
-        "PlantsOutdoors.tc.rotation"
+        "Apartment.Texture.rotate", //0
+        "Apartment.Texture.rotateXAxis", //1
+        "Boxes.Texture.arbitrarycamera", // 2
+        "Boxes.Texture.rotate", // 3
+        "Boxes.Texture.zoomOut", //4
+        "Desk.Texture.Translation", //5
+        "IndoorSpace.tc.translation", //6
+        "Kitchen.littleTexture.pan", //7
+        "Kitchen.littleTexture.zoom", //8
+        "OfficeDesk.Texture.rotationLift", //9
+        "Office.Texture.blindSpotRotation", //10
+        "Office.TexturedItems.Translation", //11
+        "Office.Texture.rotation", //12
+        "Office.Texture.rotationXAxis", //13
+        "Office.Texture.Translation", //14
+        "Outside.NoTexture.rotation", //15
+        "Outside.NoTexture.translation", //16
+        "Outside.TextureConfusion.rotation", //17
+        "Outside.TextureConfusion.Translation", //18
+        "PlantsOutdoors.tc.rotation" //19
     };
 
     //string fn = "PlantsOutdoors.tc.rotation";
