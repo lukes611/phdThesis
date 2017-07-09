@@ -447,9 +447,9 @@ int main(int argc, char * * argv)
 	string fn = namesList[6];
 	//exp1("Apartment.Texture.rotate", ll_experiments::rng(15, 20, 1));
 
-    quantitativeExperiment20("none", fn, inds);
-    quantitativeExperiment20("FM2D", fn, inds);
-    quantitativeExperiment20("FM3D", fn, inds);
+    //quantitativeExperiment20("none", fn, inds);
+    //quantitativeExperiment20("FM2D", fn, inds);
+    //quantitativeExperiment20("FM3D", fn, inds);
     quantitativeExperiment20("ICP", fn, inds);
     quantitativeExperiment20("PCA", fn, inds);
     quantitativeExperiment20("FVR", fn, inds);
