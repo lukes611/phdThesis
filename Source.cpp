@@ -443,12 +443,12 @@ int main(int argc, char * * argv)
 
 	//for(int i = 13; i < 20; i++)
 	{
-	string fn = namesList[6];
+	string fn = namesList[10];
 	//exp1("Apartment.Texture.rotate", ll_experiments::rng(15, 20, 1));
 
-    //quantitativeExperiment20("none", fn, inds);
-    //quantitativeExperiment20("FM2D", fn, inds);
-    //quantitativeExperiment20("FM3D", fn, inds);
+    quantitativeExperiment20("none", fn, inds);
+    quantitativeExperiment20("FM2D", fn, inds);
+    quantitativeExperiment20("FM3D", fn, inds);
     quantitativeExperiment20("ICP", fn, inds);
     quantitativeExperiment20("PCA", fn, inds);
     quantitativeExperiment20("FVR", fn, inds);
