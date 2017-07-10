@@ -379,7 +379,7 @@ void quantitativeExperimentKitti10(string algorithm_name, string data_name, vect
 }
 
 
-string kittiData = "2011_09_26_drive_0001_sync";
+
 
 
 
@@ -411,8 +411,7 @@ int main(int argc, char * * argv)
     };
 
     //string fn = "PlantsOutdoors.tc.rotation";
-    int start = 4, to = 30, inc = 1;
-    vector<int> inds = ll_experiments::rng(start, to, inc);
+    
 
 
 	//save images: 4 per video file
@@ -441,23 +440,8 @@ int main(int argc, char * * argv)
 	//testSetPix3d(namesList[0]);
 	//test("Apartment.Texture.rotate", Point3d(5.0f, 2.0f, 0.0f), 1.0f, Point3d(0.0, 1.0, 8.0));
 
-	for(int i = 13; i < 19; i++)
-	{
-	string fn = namesList[i];
-	//exp1("Apartment.Texture.rotate", ll_experiments::rng(15, 20, 1));
-
-    quantitativeExperiment20("none", fn, inds);
-    quantitativeExperiment20("FM2D", fn, inds);
-    quantitativeExperiment20("FM3D", fn, inds);
-    quantitativeExperiment20("ICP", fn, inds);
-    quantitativeExperiment20("PCA", fn, inds);
-    quantitativeExperiment20("FVR", fn, inds);
-    quantitativeExperiment20("FVR3D", fn, inds);
-    quantitativeExperiment20("FVR3D-2", fn, inds);
-	quantitativeExperiment20("FFVR", fn, inds);
-
-
-    }
+	//for(int i = 13; i < 19; i++)
+	
 
     /*
 	to-do:
@@ -482,16 +466,47 @@ int main(int argc, char * * argv)
 
 	*/
 
-	inds = ll_experiments::rng(0, 107, 1);
-    //quantitativeExperimentKitti10("none", kittiData, inds);
-    //quantitativeExperimentKitti10("FM2D", kittiData, inds);
-    //quantitativeExperimentKitti10("FM3D", kittiData, inds);
-    //quantitativeExperimentKitti10("ICP", kittiData, inds);
-    //quantitativeExperimentKitti10("PCA", kittiData, inds);
-    //quantitativeExperimentKitti10("FVR", kittiData, inds);
-    //quantitativeExperimentKitti10("FVR3D", kittiData, inds);
-    //quantitativeExperimentKitti10("FVR3D-2", kittiData, inds);
-	//quantitativeExperimentKitti10("FFVR", kittiData, inds);
+	string namesList2[5] = {
+		"2011_09_26_drive_0001_sync",
+		"2011_09_26_drive_0002_sync",
+		"2011_09_26_drive_0005_sync",
+		"2011_09_26_drive_0091_sync",
+		"2011_09_26_drive_0095_sync"
+	};
+	int countList[5] = {107, 76, 153, 339, 267};
+
+	for (int i = 1; i < 5; i++)
+	{
+		string kittiData = namesList2[i];
+		vector<int> inds = ll_experiments::rng(0, countList[i], 1);
+		quantitativeExperimentKitti10("none", kittiData, inds);
+		quantitativeExperimentKitti10("FM2D", kittiData, inds);
+		quantitativeExperimentKitti10("FM3D", kittiData, inds);
+		quantitativeExperimentKitti10("ICP", kittiData, inds);
+		quantitativeExperimentKitti10("PCA", kittiData, inds);
+		quantitativeExperimentKitti10("FVR", kittiData, inds);
+		quantitativeExperimentKitti10("FVR3D", kittiData, inds);
+		quantitativeExperimentKitti10("FVR3D-2", kittiData, inds);
+		quantitativeExperimentKitti10("FFVR", kittiData, inds);
+	}
+
+	{
+		string fn = namesList[12];
+		//exp1("Apartment.Texture.rotate", ll_experiments::rng(15, 20, 1));
+		int start = 4, to = 30, inc = 1;
+		vector<int> inds = ll_experiments::rng(start, to, inc);
+		quantitativeExperiment20("none", fn, inds);
+		quantitativeExperiment20("FM2D", fn, inds);
+		quantitativeExperiment20("FM3D", fn, inds);
+		quantitativeExperiment20("ICP", fn, inds);
+		quantitativeExperiment20("PCA", fn, inds);
+		quantitativeExperiment20("FVR", fn, inds);
+		quantitativeExperiment20("FVR3D", fn, inds);
+		quantitativeExperiment20("FVR3D-2", fn, inds);
+		quantitativeExperiment20("FFVR", fn, inds);
+
+
+	}
 
 
 
