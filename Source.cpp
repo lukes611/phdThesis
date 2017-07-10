@@ -441,9 +441,9 @@ int main(int argc, char * * argv)
 	//testSetPix3d(namesList[0]);
 	//test("Apartment.Texture.rotate", Point3d(5.0f, 2.0f, 0.0f), 1.0f, Point3d(0.0, 1.0, 8.0));
 
-	//for(int i = 13; i < 20; i++)
+	for(int i = 13; i < 19; i++)
 	{
-	string fn = namesList[19];
+	string fn = namesList[i];
 	//exp1("Apartment.Texture.rotate", ll_experiments::rng(15, 20, 1));
 
     quantitativeExperiment20("none", fn, inds);
