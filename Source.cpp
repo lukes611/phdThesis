@@ -475,8 +475,9 @@ int main(int argc, char * * argv)
 	};
 	int countList[5] = {107, 76, 153, 339, 267};
 
-	for (int i = 1; i < 5; i++)
+	//for (int i = 1; i < 5; i++)
 	{
+		int i = 1;
 		string kittiData = namesList2[i];
 		vector<int> inds = ll_experiments::rng(0, countList[i], 1);
 		quantitativeExperimentKitti10("none", kittiData, inds);
