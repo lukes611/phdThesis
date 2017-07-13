@@ -475,14 +475,15 @@ int main(int argc, char * * argv)
 	};
 	int countList[5] = {107, 76, 153, 339, 267};
 
-	//for (int i = 1; i < 5; i++)
+	//for (int i = 2; i < 5; i++)
 	{
-		int i = 1;
+		int i = 2;
 		string kittiData = namesList2[i];
 		vector<int> inds = ll_experiments::rng(0, countList[i], 1);
-		quantitativeExperimentKitti10("none", kittiData, inds);
-		quantitativeExperimentKitti10("FM2D", kittiData, inds);
-		quantitativeExperimentKitti10("FM3D", kittiData, inds);
+		vector<int> inds2 = ll_experiments::rng(99, countList[i], 1);
+		//quantitativeExperimentKitti10("none", kittiData, inds);
+		//quantitativeExperimentKitti10("FM2D", kittiData, inds2);
+		//quantitativeExperimentKitti10("FM3D", kittiData, inds);
 		quantitativeExperimentKitti10("ICP", kittiData, inds);
 		quantitativeExperimentKitti10("PCA", kittiData, inds);
 		quantitativeExperimentKitti10("FVR", kittiData, inds);
