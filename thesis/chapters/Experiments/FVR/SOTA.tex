@@ -13,72 +13,162 @@ Each experiment's data is also tabled for convenience. For each algorithm, the a
 
 These experiments were performed by capturing the environment using the ASUS XTION PRO LIVE active depth camera. The frames were captured and stored to a computer hard-drive prior to being processed using each algorithm. \\
 
-%pet0 : apartment texture rotate
-
-
+%%Apartment Texture Rotate:
 \begin{figure}
 \centering
-\begin{tabular}{ccccccc}
+\begin{tabular}{cccccccc}
 \hline
-\textbf{frame} & \textbf{FM-2D} & \textbf{FM-3D} & \textbf{ICP} & \textbf{PCA} & \textbf{FVR} & \textbf{FVR-3D}\\ \hline
-1&2&3&4&5&6&7\\
-\end{tabular}
-
-\vspace{10mm}
-\centering
-\begin{tabular}{ccc}
-\hline
-\textbf{Algorithm} & \textbf{Average Error $\times$ 1000} & \textbf{\% best results}\\ \hline
-FM-2D	& 27.52 & ~17.39\\
-FM-3D	& 49.80 & 0\\
-ICP		& 27.39 & ~17.39\\
-PCA		& 37.82 & 0\\
-FVR		& 26.87 & ~65.217\\
-\end{tabular}
-
-\caption{Statistics for the Apartment Y-Axis Rotation Data Set}
-\label{tab:PET0ST}
-\end{figure} 
-
-%exxx
-
-
-\begin{figure}
-\centering
-\begin{tabular}{ccccccc}
-\hline
-\textbf{frame} & \textbf{FM-2D} & \textbf{FM-3D} & \textbf{ICP} & \textbf{PCA} & \textbf{FVR} & \textbf{FVR-3D}
+\textbf{frame} & \textbf{FM-2D} & \textbf{FM-3D} & \textbf{ICP} & \textbf{PCA} & \textbf{FVR} & \textbf{FFVR} & \textbf{FVR-3D}
 \\ \hline
-1 & 0.042&0.041&0.037&0.049&0.036&0.141\\
-2 & 1.144&1.353&1.526&1.522&1.335&1.227\\
-3 & 1.476&0.639&0.527&0.642&0.65&0.524\\
-4 & 0.046&0.053&0.053&0.056&0.053&0.061\\
-5 & 0.627&0.591&0.622&0.575&0.482&0.631\\
-6 & 1.112&1.269&0.844&1.43&1.612&4.108\\
-7 & 0.112&0.115&0.069&0.088&0.129&0.089\\
-8 & 1.058&1.452&1.122&1.231&1.489&0.773\\
-9 & 0.213&0.177&0.172&0.194&0.184&0.153\\
-10 & 0.411&0.406&0.426&0.466&0.376&0.356\\
-11 & 1.188&1.881&1.146&1.725&1.841&2.447\\
+0 & 0.478417 & 0.506736 & 0.447183 & 0.445932 & 0.620688 & 0.505137 & 0.510863\\
+1 & 0.582597 & 1.61258 & 0.595438 & 1.04106 & 0.758645 & 0.600421 & 0.808451\\
+2 & 19.4351 & 19.1487 & 18.6912 & 20.7154 & 19.5778 & 17.7408 & 18.0525\\
+3 & 21.7546 & 24.3136 & 22.6241 & 25.0549 & 24.0602 & 23.671 & 22.776\\
+4 & 1.39929 & 1.46424 & 1.415 & 2.99145 & 2.40412 & 1.4817 & 1.29737\\
+5 & 0.859244 & 1.51199 & 0.857898 & 2.49516 & 1.936 & 1.06275 & 0.876897\\
+6 & 1.06336 & 1.45169 & 1.03948 & 2.72662 & 1.76563 & 1.11591 & 1.05757\\
+7 & 19.6122 & 23.3278 & 20.2606 & 23.4074 & 23.1639 & 21.2543 & 19.4695\\
+8 & 53.3025 & 65.6231 & 56.643 & 68.3139 & 59.9984 & 61.2692 & 58.3851\\
+9 & 19.37 & 20.367 & 17.4562 & 22.9191 & 21.6049 & 21.9125 & 16.9486\\
+10 & 8.25349 & 9.75559 & 9.25963 & 13.7863 & 9.72146 & 8.26443 & 9.06475\\
+11 & 1.85978 & 2.19762 & 1.76417 & 6.84059 & 3.40424 & 2.70236 & 1.72725\\
+12 & 1.44217 & 1.68831 & 1.48648 & 5.10666 & 1.40064 & 2.39001 & 1.3949\\
+13 & 2.67979 & 3.27427 & 3.1218 & 8.25529 & 2.87228 & 3.2638 & 2.5564\\
+14 & 29.4747 & 27.4894 & 21.3027 & 30.343 & 29.4785 & 25.1089 & 21.4795\\
+15 & 1.77204 & 1.9622 & 2.42012 & 7.06448 & 1.58299 & 1.73455 & 2.01376\\
+16 & 1.48743 & 5.13644 & 1.67647 & 6.49642 & 1.3802 & 1.37318 & 1.46306\\
+17 & 3.85845 & 4.17497 & 4.09397 & 22.9444 & 4.38348 & 4.14752 & 4.23414\\
+18 & 1.69175 & 2.9192 & 2.0393 & 10.3053 & 1.84889 & 1.73564 & 2.0516\\
+19 & 1.59776 & 6.71202 & 1.55585 & 6.34746 & 1.42057 & 1.7095 & 2.05724\\
+20 & 3.75736 & 5.50361 & 3.99929 & 29.4137 & 25.0218 & 18.6852 & 3.76322\\
+21 & 2.12519 & 3888.74 & 3.52166 & 12.418 & 2.61507 & 5.23758 & 1.88939\\
+22 & 2.43943 & 2.40684 & 1.90791 & 8.61471 & 11.6686 & 2.62841 & 1.96005\\
+23 & 5.17007 & 12.0863 & 5.98678 & 23.5096 & 8.67179 & 5.56165 & 6.71047\\
+24 & 1.67374 & 7.61316 & 1.82444 & 4.09527 & 2.16772 & 2.16103 & 1.87331\\
 \end{tabular}
-
 \vspace{10mm}
 \centering
 \begin{tabular}{ccc}
 \hline
 \textbf{Algorithm} & \textbf{Median Error $\times$ 1000} & \textbf{\% best results}\\ \hline
-FM-2D	& 0.627 & ~18.182\%\\
-FM-3D	& 0.591 & ~0\%\\
-ICP	& 0.527 & ~27.273\%\\
-PCA	& 0.575 & ~0\%\\
-FVR	& 0.482 & ~18.182\%\\
-FVR-3D	& 0.524 & ~36.364\%\\
+FM2D	& 2.13 & 36\%\\
+FM3D	& 5.14 & 0\%\\
+ICP	& 2.42 & 16\%\\
+PCA	& 8.61 & 4\%\\
+FVR	& 2.87 & 8\%\\
+FFVR	& 2.7 & 8\%\\
+FVR3D	& 2.05 & 28\%\\
 \end{tabular}
-
-\caption{Statistics for the Apartment Y-Axis Rotation Data Set}
-\label{tab:PET0ST}
+\caption{Statistics for the Apartment Texture Rotate Data Set}
+\label{tab:apartmenttexturerotate}
 \end{figure} 
 
+
+
+%%Apartment Texture X-Axis Rotation
+\begin{figure}
+\centering
+\begin{tabular}{cccccccc}
+\hline
+\textbf{frame} & \textbf{FM-2D} & \textbf{FM-3D} & \textbf{ICP} & \textbf{PCA} & \textbf{FVR} & \textbf{FFVR} & \textbf{FVR-3D}
+\\ \hline
+0 & 1.33481 & 7927.91 & 1.46722 & 2.777 & 1.68266 & 1.46117 & 1.38799\\
+1 & 1.68483 & 2.77985 & 1.60828 & 2.4862 & 1.73615 & 1.92964 & 1.61608\\
+2 & 1.34864 & 2.12382 & 1.34021 & 1.52616 & 1.81546 & 1.38809 & 1.26199\\
+3 & 2.26964 & 291.922 & 1.88852 & 10.3672 & 1.99035 & 1.98026 & 1.95294\\
+4 & 1.34885 & 1.75835 & 1.3159 & 12.31 & 1.38821 & 1.61666 & 1.23494\\
+5 & 1.43367 & 1.65131 & 1.44732 & 3.80585 & 1.37873 & 1.46513 & 1.38593\\
+6 & 1.71925 & 2.21381 & 1.69422 & 10.4574 & 1.93514 & 1.90556 & 1.86798\\
+7 & 1.79216 & 2.43062 & 1.55475 & 7.7394 & 1.77011 & 2.01243 & 1.52445\\
+8 & 2.97638 & 4.26347 & 2.60474 & 7.75538 & 2.95724 & 3.3101 & 2.32754\\
+9 & 1.48528 & 1.914 & 1.30556 & 3.06841 & 1.68179 & 1.73592 & 1.29888\\
+10 & 3.28894 & 3.50101 & 3.09294 & 3.863 & 3.58629 & 3.09713 & 2.91952\\
+11 & 24.6335 & 24.3533 & 23.4071 & 25.1373 & 25.3556 & 26.0748 & 22.182\\
+12 & 1.54148 & 1.7395 & 1.53637 & 3.19431 & 1.7693 & 1.5894 & 1.53832\\
+13 & 2.08955 & 2.42828 & 1.58474 & 3.45761 & 1.87269 & 1.74314 & 1.57237\\
+14 & 2.12663 & 2.58139 & 2.0057 & 3.72699 & 2.17569 & 2.12096 & 2.12892\\
+15 & 1.75532 & 1.84621 & 1.64236 & 3.58264 & 1.85394 & 2.29551 & 1.5533\\
+16 & 17.3425 & 15.4415 & 12.9454 & 17.2937 & 15.457 & 16.0395 & 14.6046\\
+17 & 30.0512 & 29.2805 & 29.1818 & 30.7484 & 30.1717 & 32.0976 & 27.7918\\
+18 & 2.4129 & 2.98033 & 2.34206 & 3.14888 & 3.6444 & 2.5757 & 2.36149\\
+19 & 1.55593 & 1.66131 & 1.52418 & 285.285 & 1.74957 & 1.6415 & 1.5145\\
+20 & 1.97251 & 2.2396 & 1.77509 & 3.64156 & 2.2089 & 1.95566 & 1.92958\\
+21 & 2.27393 & 4.06376 & 2.32114 & 3.77645 & 2.67621 & 2.41867 & 2.15598\\
+22 & 9.86705 & 14.2648 & 9.13174 & 11.947 & 9.96653 & 10.6107 & 9.43974\\
+23 & 9.23458 & 9.99594 & 8.41619 & 12.9221 & 9.47407 & 10.8921 & 8.32073\\
+24 & 1.81147 & 2.23523 & 1.98875 & 2.22941 & 2.39562 & 2.11487 & 1.7818\\
+\end{tabular}
+\vspace{10mm}
+\centering
+\begin{tabular}{ccc}
+\hline
+\textbf{Algorithm} & \textbf{Median Error $\times$ 1000} & \textbf{\% best results}\\ \hline
+FM2D	& 1.97 & 4\%\\
+FM3D	& 2.58 & 0\%\\
+ICP	& 1.78 & 36\%\\
+PCA	& 3.81 & 0\%\\
+FVR	& 1.99 & 4\%\\
+FFVR	& 2.01 & 0\%\\
+FVR3D	& 1.87 & 56\%\\
+\end{tabular}
+\caption{Statistics for the Apartment Texture X-Axis Rotation Data Set}
+\label{tab:apartmenttexturex-axisrotation}
+\end{figure} 
+
+
+%% desk texture translation
+\begin{figure}
+\centering
+\begin{tabular}{cccccccc}
+\hline
+\textbf{frame} & \textbf{FM-2D} & \textbf{FM-3D} & \textbf{ICP} & \textbf{PCA} & \textbf{FVR} & \textbf{FFVR} & \textbf{FVR-3D}
+\\ \hline
+0 & 0.427059 & 0.386444 & 0.425551 & 0.444711 & 0.79895 & 0.404669 & 0.886539\\
+1 & 0.511405 & 0.600255 & 0.37038 & 0.443054 & 0.375919 & 0.398651 & 0.736221\\
+2 & 0.505066 & 0.411181 & 0.689881 & 0.495027 & 0.520825 & 0.520784 & 0.696738\\
+3 & 1.16111 & 1.14981 & 0.959396 & 1.22485 & 0.742059 & 0.936038 & 1.31274\\
+4 & 1.18962 & 0.840738 & 0.747345 & 1.04372 & 0.931254 & 1.02042 & 1.08887\\
+5 & 0.579869 & 0.578428 & 2.34602 & 0.699312 & 0.756597 & 0.534477 & 1.0598\\
+6 & 2.23156 & 1.59657 & 1.21059 & 1.50673 & 1.0997 & 1.1579 & 1.09505\\
+7 & 0.575454 & 0.770299 & 0.451198 & 0.675469 & 1.1625 & 0.463289 & 0.473196\\
+8 & 1.51708 & 2.48019 & 1.58989 & 2.27208 & 2.02134 & 1.5529 & 1.55731\\
+9 & 0.924191 & 2.46662 & 0.829318 & 1.1526 & 0.870573 & 0.820371 & 1.10438\\
+10 & 26.0733 & 27.1609 & 24.6425 & 26.1605 & 31.8409 & 27.3771 & 26.6029\\
+11 & 25.8039 & 16.9519 & 12.6847 & 14.0889 & 13.4272 & 14.7013 & 16.1955\\
+12 & 84.6808 & 76.7683 & 75.187 & 73.985 & 72.2941 & 86.135 & 72.5103\\
+13 & 14.8138 & 12.593 & 11.3068 & 14.9934 & 12.3519 & 12.8473 & 12.1939\\
+14 & 8.04678 & 8.39369 & 5.96803 & 8.0337 & 7.46631 & 8.55085 & 8.74751\\
+15 & 35.9532 & 33.1912 & 27.6466 & 33.1955 & 32.8383 & 32.8621 & 26.51\\
+16 & 0.677605 & 0.425612 & 0.645189 & 0.618851 & 0.831358 & 0.441106 & 0.601424\\
+17 & 0.631157 & 1.08224 & 0.542638 & 0.987994 & 0.531382 & 0.918999 & 0.551222\\
+18 & 1.90329 & 3.42056 & 1.58637 & 2.29047 & 3.81843 & 1.57775 & 1.65624\\
+19 & 3.32153 & 2.57921 & 2.29164 & 2.69458 & 6.54668 & 2.11716 & 2.9997\\
+20 & 0.945952 & 3.52895 & 2.92841 & 2.79178 & 0.958754 & 1.7856 & 1.07923\\
+21 & 2.98774 & 2.56914 & 2.37079 & 3.49873 & 2.52724 & 2.64389 & 1.7058\\
+22 & 4.03651 & 31.7833 & 8.1486 & 3.23295 & 3.36118 & 6.5068 & 3.83573\\
+23 & 0.651134 & 1076.79 & 0.859187 & 0.679688 & 0.513815 & 0.790372 & 1.23335\\
+24 & 1.23536 & 1.11099 & 1.11946 & 1.45004 & 1.3036 & 1.28556 & 1.06952\\
+\end{tabular}
+\vspace{10mm}
+\centering
+\begin{tabular}{ccc}
+\hline
+\textbf{Algorithm} & \textbf{Median Error $\times$ 1000} & \textbf{\% best results}\\ \hline
+FM2D	& 1.24 & 8\%\\
+FM3D	& 2.48 & 12\%\\
+ICP	& 1.59 & 28\%\\
+PCA	& 1.51 & 4\%\\
+FVR	& 1.16 & 16\%\\
+FFVR	& 1.29 & 16\%\\
+FVR3D	& 1.23 & 16\%\\
+\end{tabular}
+\caption{Statistics for the Desk Texture Translation Data Set}
+\label{tab:desktexturetranslation}
+\end{figure} 
+
+
+
+%%Office Textured Blindspot Rotation
 
 \begin{figure}
 \centering
@@ -86,483 +176,150 @@ FVR-3D	& 0.524 & ~36.364\%\\
 \hline
 \textbf{frame} & \textbf{FM-2D} & \textbf{FM-3D} & \textbf{ICP} & \textbf{PCA} & \textbf{FVR} & \textbf{FFVR} & \textbf{FVR-3D}
 \\ \hline
-0 & 5.76827 & 5.56533 & 5.2571 & 6.01189 & 6.39835 & 5.58867 & 5.16802\\
-1 & 5.99727 & 25864.9 & 5.42174 & 6.48775 & 6.68527 & 6.5874 & 6.36251\\
-2 & 5.45112 & 5.66693 & 5.631 & 5.96035 & 6.77246 & 5.49704 & 8.1749\\
-3 & 5.59298 & 5.35189 & 4.63077 & 5.30576 & 4.72905 & 6.30678 & 4.76685\\
-4 & 4.86083 & 5.80337 & 4.73291 & 5.68578 & 5.98504 & 4.80517 & 5.21404\\
-5 & 5.44836 & 9235.71 & 6.36579 & 6.5696 & 6.80482 & 8.37353 & 5.87933\\
-6 & 5.23478 & 5.57038 & 6.74113 & 6.07219 & 6.47283 & 6.6327 & 5.2392\\
-7 & 7.58893 & 19552.4 & 7.03406 & 7.71283 & 7.08542 & 8.35665 & 7.00138\\
-8 & 4.63246 & 4.90545 & 4.65159 & 4.59741 & 5.44854 & 5.04928 & 5.3405\\
-9 & 5.39655 & 5.42601 & 5.30633 & 5.8112 & 5.82338 & 5.17521 & 4.85065\\
-10 & 5.27262 & 6.47485 & 5.09788 & 5.2152 & 6.40838 & 5.40483 & 5.20236\\
-11 & 5.5436 & 3766.04 & 5.461 & 5.69188 & 8.5856 & 5.38372 & 6.0163\\
-12 & 4.81508 & 130851 & 4.59424 & 5.62355 & 4.50471 & 5.4209 & 5.06482\\
-13 & 4.00779 & 4214.9 & 3.92531 & 4.59796 & 4.30731 & 4.0559 & 4.14147\\
-14 & 4.28421 & 5.10618 & 4.52619 & 4.72885 & 4.43962 & 3.98497 & 4.44409\\
-15 & 4.48135 & 5.21103 & 4.8585 & 4.81297 & 5.44388 & 4.90852 & 4.56727\\
-16 & 6.64 & 6.64684 & 4.59663 & 5.06546 & 6.65699 & 5.21956 & 4.34174\\
-17 & 5.13697 & 5.17023 & 4.59618 & 5.1936 & 5.83675 & 5.74173 & 4.53822\\
-18 & 4.64986 & 4.93649 & 4.52268 & 4.97689 & 4.70366 & 5.04662 & 4.60245\\
-19 & 4.84677 & 6.083 & 5.40279 & 5.32683 & 5.36619 & 5.86823 & 5.96715\\
-20 & 5.2719 & 15604 & 5.12423 & 6.43023 & 5.41725 & 5.99697 & 6.22611\\
-21 & 4.46766 & 4.85459 & 5.03549 & 5.04746 & 5.14205 & 6.75146 & 4.35163\\
-22 & 5.66482 & 99429.5 & 5.5768 & 5.65694 & 7.29495 & 5.95852 & 5.29211\\
-23 & 5.92643 & 937.023 & 7.08007 & 6.11491 & 7.55055 & 6.13918 & 5.36414\\
-24 & 6.16881 & 6.17455 & 6.07677 & 6.41914 & 5.8878 & 6.42176 & 5.90582\\
-25 & 5.17311 & 5.10011 & 4.93152 & 6.16958 & 4.54295 & 5.49422 & 5.68012\\
-26 & 5.31275 & 87463.4 & 4.3208 & 5.49572 & 6.3327 & 5.35319 & 4.91221\\
-27 & 5.55481 & 5.36219 & 5.11154 & 5.23516 & 5.69667 & 5.64758 & 5.52259\\
-28 & 4.38553 & 5.24997 & 4.97161 & 4.72492 & 5.13863 & 12.8416 & 4.26143\\
+0 & 0.573025 & 0.538702 & 0.5302 & 0.615022 & 0.754954 & 0.590357 & 0.790187\\
+1 & 0.602199 & 1.09951 & 0.643139 & 0.560507 & 0.61614 & 0.772099 & 0.899576\\
+2 & 0.711823 & 0.893597 & 1.00898 & 0.812034 & 1.16404 & 4.11162 & 0.93797\\
+3 & 0.715407 & 1.05478 & 0.750809 & 0.695175 & 0.705927 & 1.92263 & 0.725146\\
+4 & 0.919503 & 1.03622 & 0.752635 & 0.887547 & 0.849316 & 0.88867 & 0.733311\\
+5 & 1.08517 & 0.933163 & 0.857079 & 1.29486 & 0.899383 & 0.9249 & 0.910766\\
+6 & 0.777341 & 0.931114 & 0.801236 & 1.02982 & 1.85375 & 1.08238 & 0.799723\\
+7 & 0.862278 & 1.00702 & 0.747474 & 1.98783 & 1.70211 & 1.75381 & 0.913958\\
+8 & 0.759912 & 1.0946 & 0.786065 & 1.50255 & 1.50606 & 1.59803 & 0.817704\\
+9 & 1.39135 & 1.97857 & 1.37474 & 1.69629 & 2.06514 & 2.31021 & 1.08818\\
+10 & 1.61388 & 1.76466 & 1.20281 & 5.25926 & 7.1593 & 4.8721 & 1.3515\\
+11 & 1.65904 & 3.0659 & 1.5097 & 4.83305 & 4.41015 & 4.10436 & 1.3956\\
+12 & 7.5934 & 7.23411 & 6.45561 & 11.6119 & 7.95341 & 15.0171 & 5.24665\\
+13 & 10.5448 & 7.81134 & 5.84243 & 11.5236 & 8.03211 & 9.0443 & 5.48707\\
+14 & 2.30907 & 6.58343 & 24.9983 & 12.1117 & 3.28068 & 73.3063 & 8.87859\\
+15 & 3.21292 & 6.39236 & 4.06469 & 30.5271 & 7.24281 & 4.07405 & 4.6313\\
+16 & 2.7655 & 7.95184 & 3.82615 & 26.2629 & 8.10414 & 2.92256 & 4.30693\\
+17 & 2.34562 & 3088.49 & 1.34209 & 57.892 & 3.96389 & 4.45513 & 1.43469\\
+18 & 0.940884 & 325.548 & 0.744895 & 2.55858 & 1.95551 & 1.47043 & 0.913393\\
+19 & 3.25882 & 7.08096 & 2.57775 & 63.8641 & 25.6575 & 7.70519 & 31.9194\\
+20 & 1.2229 & 5.91952 & 1.08254 & 4.98855 & 1.65308 & 1.7223 & 1.09824\\
+21 & 35.2899 & 250.715 & 22.9173 & 62.1878 & 33.6411 & 35.9841 & 23.2537\\
+22 & 6.82018 & 129.265 & 4.06837 & 21.6115 & 9.68393 & 9.61946 & 4.30237\\
+23 & 0.993991 & 69.992 & 0.830335 & 4.4983 & 0.880916 & 0.880278 & 0.925099\\
+24 & 3.2537 & 10.9157 & 3.95472 & 19.3076 & 6.06813 & 8.00289 & 2.80695\\
 \end{tabular}
 \vspace{10mm}
 \centering
 \begin{tabular}{ccc}
 \hline
 \textbf{Algorithm} & \textbf{Median Error $\times$ 1000} & \textbf{\% best results}\\ \hline
-FM2D	& 5.27 & 17.24\%\\
-FM3D	& 5.8 & 0\%\\
-ICP	& 5.1 & 31.03\%\\
-PCA	& 5.62 & 3.45\%\\
-FVR	& 5.84 & 10.34\%\\
-FFVR	& 5.59 & 6.9\%\\
-FVR3D	& 5.21 & 31.03\%\\
+FM2D	& 1.39 & 24\%\\
+FM3D	& 5.92 & 0\%\\
+ICP	& 1.2 & 44\%\\
+PCA	& 4.83 & 8\%\\
+FVR	& 2.07 & 0\%\\
+FFVR	& 2.92 & 0\%\\
+FVR3D	& 1.1 & 24\%\\
 \end{tabular}
-\caption{Statistics for the Kitti Stereo Data Set}
-\label{tab:kittistereo}
+\caption{Statistics for the Office Textured Blindspot Rotation Data Set}
+\label{tab:officetexturedblindspotrotation}
+\end{figure} 
+
+%%Office Textured Items Translation
+
+\begin{figure}
+\centering
+\begin{tabular}{cccccccc}
+\hline
+\textbf{frame} & \textbf{FM-2D} & \textbf{FM-3D} & \textbf{ICP} & \textbf{PCA} & \textbf{FVR} & \textbf{FFVR} & \textbf{FVR-3D}
+\\ \hline
+0 & 2.62451 & 2.79327 & 2.69584 & 3.15954 & 7.27674 & 2.70418 & 2.83422\\
+1 & 2.08671 & 35.8261 & 2.15925 & 2.56577 & 6.67926 & 2.17364 & 2.14083\\
+2 & 2.89056 & 3.09043 & 2.92901 & 3.85315 & 7.70155 & 2.71159 & 2.77382\\
+3 & 1.93159 & 4.98797 & 1.87836 & 2.11593 & 1.92978 & 1.93793 & 1.87813\\
+4 & 2.34486 & 12679.8 & 2.38783 & 3.01349 & 2.45215 & 2.46212 & 2.27314\\
+5 & 3.48885 & 3.91358 & 3.5011 & 3.78892 & 3.55513 & 3.48562 & 3.53985\\
+6 & 1.77573 & 6.11207 & 2.05227 & 2.06358 & 1.88169 & 1.82086 & 1.81771\\
+7 & 2.1031 & 2.29624 & 2.10874 & 2.34496 & 2.38949 & 1.95614 & 1.96206\\
+8 & 2.52423 & 3.34112 & 2.51072 & 3.50523 & 6.46675 & 2.77802 & 2.45442\\
+9 & 2.04092 & 2.05311 & 2.02229 & 2.77327 & 6.12307 & 1.95067 & 2.05096\\
+10 & 2.0198 & 5.44524 & 2.05008 & 2.37795 & 1.96798 & 1.9625 & 2.0534\\
+11 & 3.85712 & 30.6571 & 4.16413 & 3.99734 & 3.17363 & 3.08065 & 2.86399\\
+12 & 2.33806 & 4.81093 & 2.28686 & 3.2123 & 4.6796 & 2.15601 & 2.14123\\
+13 & 2.00695 & 2.17824 & 2.20605 & 3.21929 & 2.15915 & 3.0649 & 2.0055\\
+14 & 5.4637 & 9089.85 & 4.84711 & 5.86673 & 5.1437 & 4.77534 & 4.22902\\
+15 & 5.00933 & 6.18594 & 4.82357 & 6.4146 & 26.271 & 4.60187 & 4.32704\\
+16 & 2.2422 & 2.57168 & 2.19247 & 2.47381 & 2.60619 & 2.23071 & 2.22008\\
+17 & 4.69573 & 5.44967 & 4.00174 & 4.88796 & 4.90218 & 4.20595 & 3.84896\\
+18 & 6.20389 & 9.6292 & 7.2672 & 6.02013 & 6.12789 & 5.77758 & 5.64114\\
+19 & 4.85982 & 5.09415 & 4.84859 & 7.8426 & 5.0413 & 3.93801 & 6.27758\\
+20 & 6.36364 & 18.559 & 7.50686 & 9.50525 & 9.48946 & 6.17812 & 12.3435\\
+21 & 11.2961 & 13.3021 & 12.6449 & 20.3273 & 14.2754 & 12.5326 & 3181.98\\
+22 & 4.12729 & 9.82329 & 3.73585 & 5.98633 & 3.51441 & 3.57114 & 3.10604\\
+23 & 6.15765 & 29.0517 & 7.31286 & 11.2895 & 11.0797 & 6.57273 & 12.2758\\
+24 & 4.7711 & 10329.3 & 5.02903 & 9.91512 & 6.45381 & 5.72149 & 4.91037\\
+\end{tabular}
+\vspace{10mm}
+\centering
+\begin{tabular}{ccc}
+\hline
+\textbf{Algorithm} & \textbf{Median Error $\times$ 1000} & \textbf{\% best results}\\ \hline
+FM2D	& 2.89 & 24\%\\
+FM3D	& 5.45 & 0\%\\
+ICP	& 2.93 & 4\%\\
+PCA	& 3.79 & 0\%\\
+FVR	& 5.04 & 0\%\\
+FFVR	& 3.06 & 28\%\\
+FVR3D	& 2.83 & 44\%\\
+\end{tabular}
+\caption{Statistics for the Office Textured Items Translation Data Set}
+\label{tab:officetextureditemstranslation}
 \end{figure} 
 
 
+%%office texture rotation
 
-
-%pet0 : apartment texture rotate
 \begin{figure}
 \centering
-\includegraphics[width=6in]{images/results/Apartment_Texture_Rotate}
-\caption{Registration Error for the Apartment Y-Axis Rotation Data Set}
-\label{fig:PET0}
-
+\begin{tabular}{cccccccc}
+\hline
+\textbf{frame} & \textbf{FM-2D} & \textbf{FM-3D} & \textbf{ICP} & \textbf{PCA} & \textbf{FVR} & \textbf{FFVR} & \textbf{FVR-3D}
+\\ \hline
+0 & 2.21572 & 4.21984 & 2.25092 & 3.1218 & 3.97379 & 2.21047 & 2.23502\\
+1 & 2.05825 & 4.1862 & 2.04934 & 2.23517 & 2.08989 & 2.02422 & 2.07531\\
+2 & 2.35681 & 2.73753 & 2.36526 & 2.41352 & 4.20494 & 2.40004 & 2.38712\\
+3 & 2.128 & 4.80457 & 2.23 & 2.2484 & 2.10669 & 2.15907 & 2.12968\\
+4 & 2.58431 & 17.0432 & 2.70188 & 2.80298 & 4.4093 & 2.65892 & 2.64551\\
+5 & 2.20967 & 3.49584 & 2.18261 & 2.22853 & 3.74658 & 2.26616 & 2.12191\\
+6 & 1.91482 & 5.98994 & 1.92767 & 2.80152 & 3.75576 & 2.19196 & 1.94071\\
+7 & 1.87922 & 2.42052 & 1.95334 & 2.00312 & 1.95793 & 2.02037 & 1.96854\\
+8 & 2.92633 & 5.06522 & 2.91875 & 3.25248 & 2.93665 & 3.19235 & 3.07622\\
+9 & 2.25912 & 4.84174 & 2.06333 & 2.2941 & 3.77655 & 2.1319 & 2.2062\\
+10 & 3.34784 & 6.24822 & 3.38867 & 4.89315 & 3.3358 & 3.64665 & 3.38224\\
+11 & 3.07698 & 4.09064 & 3.01514 & 6.55364 & 4.21989 & 3.03761 & 3.10778\\
+12 & 2.81336 & 6.67723 & 2.67824 & 3.18844 & 4.13691 & 2.79145 & 2.66165\\
+13 & 4.36234 & 7.14535 & 4.90627 & 5.59819 & 5.29516 & 5.18836 & 4.35153\\
+14 & 10.8055 & 38.1029 & 8.06682 & 15.5129 & 9.8488 & 9.0717 & 10.6538\\
+15 & 6.76504 & 25.1977 & 5.80137 & 12.9336 & 5.89069 & 6.69544 & 6.76653\\
+16 & 18.8346 & 22.8345 & 20.5042 & 30.5968 & 22.709 & 47.6484 & 26.4044\\
+17 & 22.1577 & 23.9852 & 18.6048 & 26.7638 & 20.7796 & 24.5614 & 19.603\\
+18 & 7.82136 & 16.5608 & 7.35869 & 11.0303 & 9.15703 & 7.04795 & 7.03271\\
+19 & 5.63688 & 9.27229 & 5.78681 & 11.0463 & 5.90937 & 5.68788 & 5.56648\\
+20 & 8.58437 & 7474.19 & 7.38113 & 17.2002 & 8.23386 & 8.35952 & 7.93491\\
+21 & 4.5199 & 8961.38 & 4.76078 & 9.80655 & 5.59032 & 4.74313 & 4.59129\\
+22 & 6.47399 & 6.86407 & 5.67769 & 12.2202 & 6.16859 & 6.24262 & 5.58794\\
+23 & 4.86948 & 8507.24 & 4.93801 & 12.0852 & 8.93663 & 5.52515 & 5.11787\\
+24 & 11.1138 & 19.5952 & 9.04695 & 16.3056 & 9.84303 & 10.3909 & 9.54403\\
+25 & 33.3779 & 365.979 & 26.0885 & 29.635 & 33.284 & 35.4616 & 27.3845\\
+\end{tabular}
+\vspace{10mm}
+\centering
 \begin{tabular}{ccc}
 \hline
-\textbf{Algorithm} & \textbf{Average Error $\times$ 1000} & \textbf{\% best results}\\ \hline
-FM-2D	& 27.52 & ~17.39\\
-FM-3D	& 49.80 & 0\\
-ICP		& 27.39 & ~17.39\\
-PCA		& 37.82 & 0\\
-FVR		& 26.87 & ~65.217\\
+\textbf{Algorithm} & \textbf{Median Error $\times$ 1000} & \textbf{\% best results}\\ \hline
+FM2D	& 4.36 & 26.92\%\\
+FM3D	& 7.15 & 0\%\\
+ICP	& 4.76 & 34.62\%\\
+PCA	& 6.55 & 0\%\\
+FVR	& 5.3 & 7.69\%\\
+FFVR	& 4.74 & 7.69\%\\
+FVR3D	& 4.35 & 23.08\%\\
 \end{tabular}
-\captionof{table}{Statistics for the Apartment Y-Axis Rotation Data Set}
-%\label{tab:PET0ST}
+\caption{Statistics for the Office Texture Rotation Data Set}
+\label{tab:officetexturerotation}
 \end{figure} 
-
-
-
-In figure \ref{fig:PET0}, feature-matching, 3D-feature-matching, ICP, PCA and Fourier Volume Registration (FVR) were tested. Overall, the 2D feature matching has the lowest average error out of the two feature matching methods. This scene is of the inside of an apartment which contains various pieces of furniture and plenty of textural information. The camera was rotated about the y-axis whilst moving the camera (translation) across the room. ICP performed slightly better than FM-2D but the FVR algorithm was shown to have the lowest average error. Additionally to being consistent, the FVR method had the largest percentage of best results. At a value of ~65\%, this means that for around 65\% of the frames, the FVR method gave the optimal result compared to the others. Here ICP and FM-2D performed similarly. Both PCA and FM-3D performed worse-off. In this type of scene where much texture information is plentiful, this is ideal for feature matching methods. Additionally, frames were not highly separated so it is ideal for ICP also. ICP is shown to be consistent yet does not reach the performance of the FVR algorithm. \\
-
-
-%pet 1 apartment texture rotate x-axis
-\begin{figure}
-\centering
-\includegraphics[width=6in]{images/results/Apartment_Texture_Rotate_XAxis}
-\caption{Registration Error for the Apartment X/Y-Axis Rotation Data Set}
-\label{fig:PET1}
-
-\begin{tabular}{ccc}
-\hline
-\textbf{Algorithm} & \textbf{Average Error $\times$ 1000} & \textbf{\% best result}\\ \hline
-FM-2D	& 624.3 & ~13.04\\
-FM-3D	& 841.3 & 0\\
-ICP		& 584.2 & ~43.48\\
-PCA		& 1005.1 & 0\\
-FVR		& 576.86 & ~43.48\\
-\end{tabular}
-\captionof{table}{Statistics for the Apartment X/Y-Axis Rotation Data Set}
-%\label{tab:PET1ST}
-\end{figure} 
-
-
-
-Figure \ref{fig:PET1} shows registration errors for the the apartment scene again, this time the camera is moved about the x-axis predominantly, again this scene contains lots of texture. In a about 43\% of the frames, FVR either outperforms the other algorithms. Here, ICP performs next best with the same statistic for the percentage of best result metric. 2D-feature matching is also very competitive with 3D-feature-matching and PCA failing to register most frames as accurately as the others. In the case of PCA, when there is not enough overlapping data to register, inaccurate registrations occur. When the FVR technique uses PCA, it only uses the primary axis, and refines the alignment in the secondary stage. Additionally, according to the average error metric, the FVR is shown to be the best performer with the lowest average error. \\
-
-
-%pet 2 Boxes Y-Axis Rotation Data Set
-\begin{figure}
-\centering
-\includegraphics[width=6in]{images/results/Boxes_Texture_Rotate}
-\caption{Registration Error for the Boxes Y-Axis Rotation Data Set}
-\label{fig:PET2}
-
-\begin{tabular}{ccc}
-\hline
-\textbf{Algorithm} & \textbf{Average Error $\times$ 1000} & \textbf{\% best result}\\ \hline
-FM-2D	& 574.48 & ~33.3\\
-FM-3D	& 19502.3 & ~3.7\\
-ICP		& 550.3 & ~33.3\\
-PCA		& 981.6 & 0\\
-FVR		& 508.13 & ~29.6\\
-\end{tabular}
-\captionof{table}{Statistics for the Boxes Y-Axis Rotation Data Set}
-%\label{tab:PET2ST}
-\end{figure} 
-
-
-
-
-
-In figure \ref{fig:PET2} 7 frame registration errors are shown for the Boxes scene. This scene contains camera rotation about the y-axis where in different views were observed during frame capture. In around 30\% of the frames, FVR outperformed the other algorithms. Here both IPC and FM-2D performed similarly. Despite not achieving the largest number of optimal results, the FVR has the lowest average error, meaning it consistently outperformed others or at least matched their performance closely.  \\
-
-
-
-%pet 3 Boxes Zoom Data Set
-\begin{figure}
-\centering
-\includegraphics[width=6in]{images/results/Boxes_Texture_ZoomOut}
-\caption{Registration Error for the Boxes Zoom Data Set}
-\label{fig:PET3}
-
-\begin{tabular}{ccc}
-\hline
-\textbf{Algorithm} & \textbf{Average Error $\times$ 1000} & \textbf{\% best result}\\ \hline
-FM-2D	& 0.68 & ~18.18\\
-FM-3D	& 0.73 & 0\\
-ICP		& 0.59 & ~27.27\\
-PCA		& 0.73 & 0\\
-FVR		& 0.65 & ~54.54\\
-\end{tabular}
-\captionof{table}{Statistics for the Boxes Zoom Data Set}
-%\label{tab:PET3ST}
-\end{figure} 
-
-%pet 4 Boxes Zoom Data Set
-\begin{figure}
-\centering
-\includegraphics[width=6in]{images/results/Desk_Texture_Translation}
-\caption{Registration Error for the Desk Translation Data Set}
-\label{fig:PET4}
-
-\begin{tabular}{ccc}
-\hline
-\textbf{Algorithm} & \textbf{Average Error $\times$ 1000} & \textbf{\% best result}\\ \hline
-FM-2D	& 874.18 & ~8.7\\
-FM-3D	& 1447.42 & ~4.35\\
-ICP		& 818.41 & ~26.09\\
-PCA		& 1011.59 & ~8.7\\
-FVR		& 740.33 & ~52.17\\
-\end{tabular}
-\captionof{table}{Statistics for the Desk Translation Data Set}
-%\label{tab:PET4ST}
-\end{figure} 
-
-
-Experiment results for another boxes scene are shown in figure \ref{fig:PET3}. In this scene, the camera was moved forward and backward, effectively changing focus on different parts of the same set of boxes at different times during frame capture. Here the FVR algorithm achieved the optimal result in around 55\% of the frames. ICP performed next best with a percentage of best results of around 27\%. Additionally the FVR method also achieved a lower average error compared to the other algorithms. \\
-
-
-In ~52\% of the frames of the desk translation data-set in figure \ref{fig:PET4}, the FVR method outperformed others relative to just ~26\% for ICP, ~9\% for 2D-feature-matching and PCA and ~4\% for 3D-feature-matching. This data-set tests each procedure's ability to reconstruct a scene captured by moving a camera forward along a path. 3D feature matching was a notable poor performer here. Additionally FVR outperformed the other methods overall in terms of having the lowest average error. \\
-
-%pet 5 Texture Confusion Indoor-Space Translation Data Set
-\begin{figure}
-\centering
-\includegraphics[width=6in]{images/results/IndoorSpace_texture_confusion_translation}
-\caption{Registration Error for the Texture Confusion Indoor-Space Translation Data Set}
-\label{fig:PET5}
-
-\begin{tabular}{ccc}
-\hline
-\textbf{Algorithm} & \textbf{Average Error $\times$ 1000} & \textbf{\% best result}\\ \hline
-FM-2D	& 715.72 & ~22.22\\
-FM-3D	& 992.34 & 0\\
-ICP		& 687.31 & ~33.33\\
-PCA		& 975.77 & 0\\
-FVR		& 630.47 & ~44.44\\
-\end{tabular}
-\captionof{table}{Statistics for the Texture Confusion Indoor-Space Translation Data Set}
-%\label{tab:PET5ST}
-\end{figure} 
-
-
-An important data-set tested is the Indoor-Space with texture confusion (figure \ref{fig:PET5}). Here, a small scene was observed, where texture-confusion was present, this makes registration more difficult for all algorithms most notably the feature matching methods. We suspected that ICP, PCA, and FVR would perform best with this data set. \\
-
-Here, around 44\% of the time, FVR performed best. Additionally it had the lowest average error compared to all the other algorithms. The 2D-FM method achieved the best registration result around 22\% of time, and ICP improved on this at around 33\% of the time. It is clear that 2D-FM and ICP also work quite well but they do not reach the performance of the FVR method. \\ 
-
-
-%pet 6 Texture Confusion Indoor-Space Translation Data Set
-\begin{figure}
-\centering
-\includegraphics[width=6in]{images/results/Kitchen_LittleTexture_Pan}
-\caption{Registration Error for the Low-Texture Kitchen Translation Data Set}
-\label{fig:PET6}
-
-\begin{tabular}{ccc}
-\hline
-\textbf{Algorithm} & \textbf{Average Error $\times$ 1000} & \textbf{\% best result}\\ \hline
-FM-2D	& 3450.6 & ~11.11\\
-FM-3D	& 973.27 & 0\\
-ICP		& 772.9 & ~27.77\\
-PCA		& 1029 & ~16.66\\
-FVR		& 638.5 & ~44.44\\
-\end{tabular}
-\captionof{table}{Statistics for the Low-Texture Kitchen Translation Data Set}
-%\label{tab:PET6ST}
-\end{figure} 
-
-
-Results for the low-textured Kitchen data-set were collected and shown in figure \ref{fig:PET6}. Again around 44\% of the frames had best results given by FVR. Compared with the next best algorithm ICP at ~27\%. In this case, this is expected as the feature-matching methods should perform worse in a low-textured scene. PCA was next best having the best registration ~22\% of the time. \\
-
-
-%pet 7 Low-Texture Kitchen Zoom Data Set
-\begin{figure}
-\centering
-\includegraphics[width=6in]{images/results/Kitchen_Little_Texture_Zoom}
-\caption{Registration Error for the Low-Texture Kitchen Zoom Data Set}
-\label{fig:PET7}
-
-\begin{tabular}{ccc}
-\hline
-\textbf{Algorithm} & \textbf{Average Error $\times$ 1000} & \textbf{\% best result}\\ \hline
-FM-2D	& 1645.35 & ~7.69\\
-FM-3D	& 899.43 & ~7.69\\
-ICP		& 833.2 & ~46.15\\
-PCA		& 1062.88 & ~15.38\\
-FVR		& 875.85 & ~23.08\\
-\end{tabular}
-\captionof{table}{Statistics for the Low-Texture Kitchen Zoom Data Set}
-%\label{tab:PET7ST}
-\end{figure} 
-
-
-
-Another test for the low-textured Kitchen scene was also performed, this time by moving the camera forward and backwards, zooming in on the scene. In this test, FVR only outperformed the other methods in around 23\% of the frames. ICP outperformed FVR and the other algorithms in around 46\%. Here, FVR performed second best, with an average error performance close to that of ICP. This result is different from the previous result with the low-textured Kitchen scene. There (figure \ref{fig:PET6}), FVR outperformed all of the other methods. This scene is different in that the camera was translated back and forth rather than side to side. Still, the FVR performed competitively compared to the other algorithms.  \\
-
-
-%pet 8 Office Translation Data Set
-\begin{figure}
-\centering
-\includegraphics[width=6in]{images/results/Office_TexturedItems_Translation}
-\caption{Registration Error for the Office Translation Data Set}
-\label{fig:PET8}
-
-\begin{tabular}{ccc}
-\hline
-\textbf{Algorithm} & \textbf{Average Error $\times$ 1000} & \textbf{\% best result}\\ \hline
-FM-2D	& 712.97 & 20\\
-FM-3D	& 367040 & 0\\
-ICP		& 710.34 & ~33.33\\
-PCA		& 1001.43 & ~6.67\\
-FVR		& 674.78 & 40\\
-\end{tabular}
-\captionof{table}{Statistics for the Office Translation Data Set}
-%\label{tab:PET8ST}
-\end{figure} 
-
-
-In the results for the Textured Office set (figure \ref{fig:PET8}), FVR matched or beat the other algorithms around 40\% of the time. 2D-feature matching also performed well but did not manage to best FVR most of the time. This result shows that FVR not only works well compared to other algorithms in scenes with little or no texture or in scenes where feature confusion is high, but also in high texture scenes where feature-matching and ICP should have an advantage. The FVR algorithm also had the lowest average registration error compared to these other iterative methods. \\
-
-%pet 9 Office Centered Object Rotation Data Set
-\begin{figure}
-\centering
-\includegraphics[width=6in]{images/results/Office_Texture_blind_spot_rotation}
-\caption{Registration Error for the Office Centered Object Rotation Data Set}
-\label{fig:PET9}
-
-\begin{tabular}{ccc}
-\hline
-\textbf{Algorithm} & \textbf{Average Error $\times$ 1000} & \textbf{\% best result}\\ \hline
-FM-2D	& 666.04 & 10\\
-FM-3D	& 391310.1 & 0\\
-ICP		& 577.93 & 60\\
-PCA		& 1026.54 & 0\\
-FVR		& 583.42 & 30\\
-\end{tabular}
-\captionof{table}{Statistics for the Office Centered Object Rotation Data Set}
-%\label{tab:PET9ST}
-\end{figure} 
-
-
-Figure \ref{fig:PET9} shows results for the centred object rotation scene. Here, a large divider was placed in the middle of two desks. The idea was to create an environment where the large divider could throw off the effects of PCA and FVR and give an advantage to the feature matching approaches and ICP. Interestingly, around 30\% of the time, FVR had the best result. 2D-feature-matching outperformed the 3D counterpart but only got achieved the best registration performance around 10\% of the time. ICP on the other hand got the best result for around 60\% of the frames. In this scene ICP is able to use the large divider as an anchor which would make it more robust to non-overlapped data.
-
-%pet 10 Office X/Y-Axis Rotation Data Set
-\begin{figure}
-\centering
-\includegraphics[width=6in]{images/results/Office_Texture_Rotate_XAxis}
-\caption{Registration Error for the Office X/Y-Axis Rotation Data Set}
-\label{fig:PET10}
-
-\begin{tabular}{ccc}
-\hline
-\textbf{Algorithm} & \textbf{Average Error $\times$ 1000} & \textbf{\% best result}\\ \hline
-FM-2D	& 686.48 & ~56.25\\
-FM-3D	& 2080.65 & ~6.25\\
-ICP		& 705.76 & ~18.75\\
-PCA		& 964.13 & 0\\
-FVR		& 697.27 & ~18.75\\
-\end{tabular}
-\captionof{table}{Statistics for the Office X/Y-Axis Rotation Data Set}
-%\label{tab:PET10ST}
-\end{figure} 
-
-
-Another experiment where the scene was filmed with the camera rotated predominantly about the x-axis is shown in figure \ref{fig:PET10}, this time 2D-feature-matching outperformed the others. FVR and ICP performed second best in terms of the percent of best results achieved but FVR had a lower average registration error which came close to beating FM-2D.  
-
-%pet 11 Office Y-Axis Rotation Data Set
-\begin{figure}
-\centering
-\includegraphics[width=6in]{images/results/Office_Texture_Rotation}
-\caption{Registration Error for the Office Y-Axis Rotation Data Set}
-\label{fig:PET11}
-
-\begin{tabular}{ccc}
-\hline
-\textbf{Algorithm} & \textbf{Average Error $\times$ 1000} & \textbf{\% best result}\\ \hline
-FM-2D	& 530 & ~35.71\\
-FM-3D	& 934.53 & 0\\
-ICP		& 528.47 & ~28.57\\
-PCA		& 1000.78 & 0\\
-FVR		& 533.23 & ~35.71\\
-\end{tabular}
-\captionof{table}{Statistics for the Office Y-Axis Rotation Data Set}
-%\label{tab:PET11ST}
-\end{figure} 
-
-
-Figure \ref{fig:PET11} shows the registration errors for the Office data-set with camera rotation about the Y-axis. Here, in around 35\% of the cases, FVR outperformed the other algorithms. This result matched the 2D feature matching method. Both the FVR and 2D-FM method achieved a very similar average registration error. ICP actually achieved the lowest average error but did not achieve as high a percentage of optimal results as compared to FVR and FM-2D. \\
-
-%pet 12 Office Translation Data Set
-\begin{figure}
-\centering
-\includegraphics[width=6in]{images/results/Office_Texture_Translation}
-\caption{Registration Error for the Office Translation Data Set}
-\label{fig:PET12}
-
-\begin{tabular}{ccc}
-\hline
-\textbf{Algorithm} & \textbf{Average Error $\times$ 1000} & \textbf{\% best result}\\ \hline
-FM-2D	& 773.23 & ~6.67\\
-FM-3D	& 2696.51 & 0\\
-ICP		& 636.84 & 40\\
-PCA		& 999.57 & 0\\
-FVR		& 621.72 & ~53.33\\
-\end{tabular}
-\captionof{table}{Statistics for the Office Translation Data Set}
-%\label{tab:PET12ST}
-\end{figure} 
-
-
-In the Office translation scene (figure \ref{fig:PET12}), FVR outperformed or matched the other algorithms around 53\% of the time. It also had the lowest average registration error. This shows that the FVR has high accuracy when dealing with translation detection and the registration of 3D data with only translational changes. Here, PCA and 2D and 3D feature matching performed the worst with ICP performing second best. \\
-
-%pet 13 Little Texture Outdoors Rotation Data Set
-\begin{figure}
-\centering
-\includegraphics[width=6in]{images/results/Outside_No_Texture_Rotation}
-\caption{Registration Error for the Little Texture Outdoors Rotation Data Set}
-\label{fig:PET13}
-
-\begin{tabular}{ccc}
-\hline
-\textbf{Algorithm} & \textbf{Average Error $\times$ 1000} & \textbf{\% best result}\\ \hline
-FM-2D	& 497.83 & ~11.11\\
-FM-3D	& 12411.23 & ~5.56\\
-ICP		& 414.87 & ~27.78\\
-PCA		& 1008.22 & 0\\
-FVR		& 327.95 & ~55.56\\
-\end{tabular}
-\captionof{table}{Statistics for the Little Texture Outdoors Rotation Data Set}
-%\label{tab:PET13ST}
-\end{figure} 
-
-
-Figure \ref{fig:PET13} shows results for an outdoors scene with little texture, here the camera was rotated about an origin. In this case, PCA performed the worst, and 3D-feature-matching also failed several times. FVR again had the largest percent of optimal results, and achieved the lowest average registration error by a considerable margin. This results can be explained by FVR's robustness to out-door scenes and scenes with little to no texture information.  \\
-
-%pet 14 Little Texture Outdoors Rotation Data Set
-\begin{figure}
-\centering
-\includegraphics[width=6in]{images/results/Outside_No_Texture_Translation}
-\caption{Registration Error for the Little Texture Outdoors Translation Data Set}
-\label{fig:PET14}
-
-\begin{tabular}{ccc}
-\hline
-\textbf{Algorithm} & \textbf{Average Error $\times$ 1000} & \textbf{\% best result}\\ \hline
-FM-2D	& 716.1 & ~4.35\\
-FM-3D	& 678.65 & 0\\
-ICP		& 402.16 & ~39.13\\
-PCA		& 980.15 & 0\\
-FVR		& 379.06 & ~56.52\\
-\end{tabular}
-\captionof{table}{Statistics for the Little Texture Outdoors Translation Data Set}
-\label{tab:PET14ST}
-\end{figure} 
-
-Another test using a low-textured out-doors scene was tested where the camera was translated along a path. Results are shown in figure \ref{fig:PET14}. Here again the FVR method dominated recording the best result for around 57\% of the frames. Notably, PCA performed poorly despite being a part of the FVR method. This scene was also a rare case where FM-3D outperformed the 2D feature matching version. ICP was more consistent, recoding the best result around 40\% of the time. Again, this shows the strength of the FVR method in out-door and low-texture environments. 
-
-
-%pet 15 Little Texture Outdoors Rotation Data Set
-\begin{figure}
-\centering
-\includegraphics[width=6in]{images/results/Outside_TextureConfusion_Rotation}
-\caption{Registration Error for the Outdoors Texture Confusion Rotation Data Set}
-\label{fig:PET15}
-
-\begin{tabular}{ccc}
-\hline
-\textbf{Algorithm} & \textbf{Average Error $\times$ 1000} & \textbf{\% best result}\\ \hline
-FM-2D	& 1274.19 & 12.5\\
-FM-3D	& 2336.98 & 0\\
-ICP		& 452.08 & 25\\
-PCA		& 951.42 & 0\\
-FVR		& 450.07 & 62.5\\
-\end{tabular}
-\captionof{table}{Statistics for the Outdoors Texture Confusion Rotation Data Set}
-%\label{tab:PET15ST}
-\end{figure}
-
-
-Another test was performed with an outdoors scene. Here only 8 of the frames had any good results for all algorithms as the scene was very difficult to register due to the amount of noise and texture confusion in the captured frames. Results are shown in figure \ref{fig:PET15}. In them the FVR achieved the best result in around 63\% of the frames. 2D-feature-matching and 3D-feature-matching both failed to register a few of these frames, and PCA was inconsistent. ICP had a competitive result but the FVR algorithm still had a lower average registration error. \\ 
-
-
-%pet 16 Outdoors Texture Confusion Translation Data Set
-\begin{figure}
-\centering
-\includegraphics[width=6in]{images/results/Outside_TextureConfusion_Translation}
-\caption{Registration Error for the Outdoors Texture Confusion Translation Data Set}
-\label{fig:PET16}
-
-\begin{tabular}{ccc}
-\hline
-\textbf{Algorithm} & \textbf{Average Error $\times$ 1000} & \textbf{\% best result}\\ \hline
-FM-2D	& 765.94 & ~27.78\\
-FM-3D	& 375694.14 & 0\\
-ICP		& 676.02 & ~33.33\\
-PCA		& 1023.48 & 0\\
-FVR		& 676.51 & ~38.89\\
-\end{tabular}
-\captionof{table}{Statistics for the Outdoors Texture Confusion Translation Data Set}
-%\label{tab:PET16ST}
-\end{figure}
-
-Another scene with texture-confusion was taken out-doors. The accompanying results are shown in figure \ref{fig:PET16}. Here, 3D-feature matching failed a majority of the time and thus had a large average registration error. PCA performed poorly due of the amount of noise in this out-doors scene. This noise can give inconsistencies in the principal axes and mean computation. Despite this the FVR again outperformed the other algorithms in terms of the percentage of optimal registrations. Despite this, both ICP's and FVR's average error was a close tie. But because of the percentage of best results achieved by FVR, it is considered to have performed best. \\
-
-%pet 17 Outdoor Plants Texture Confusion Rotation Data Set
-\begin{figure}
-\centering
-\includegraphics[width=6in]{images/results/Plants_Outdoors_Texture_Confusion_Rotation}
-\caption{Registration Error for the Outdoor Plants Texture Confusion Rotation Data Set}
-\label{fig:PET17}
-
-\begin{tabular}{ccc}
-\hline
-\textbf{Algorithm} & \textbf{Average Error $\times$ 1000} & \textbf{\% best result}\\ \hline
-FM-2D	& 518.02 & ~23.81\\
-FM-3D	& 12791.22 & 0\\
-ICP		& 742.37 & ~4.76\\
-PCA		& 984.14 & 0\\
-FVR		& 450.06 & ~66.67\\
-\end{tabular}
-\captionof{table}{Statistics for the Outdoor Plants Texture Confusion Rotation Data Set}
-%\label{tab:PET17ST}
-\end{figure}
-
-
-The final figure in the pose estimation tests shows another scene taken out-doors. This scene also contains texture confusion, but the camera was rotated about an axis rather than translated in this data-set. Results shown in figure \ref{fig:PET17} indicate that again FVR dominates over the other algorithms, achieving the best result around 67\% of the time and also obtained the lowest average registration error compared to the other algorithms. Surprisingly, it was FM-2D which showed the strongest competition as ICP performed poorly on this data-set especially in comparison to the FVR method. \\
-
 
