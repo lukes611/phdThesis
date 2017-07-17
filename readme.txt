@@ -11,6 +11,18 @@ todo:
 
 	re-write the methodology + intro + conclusion
 
+
+experiments
+	intro
+	data
+	tools
+	metrics
+	qualitative-results
+	stereo-results
+	rgb-d-results
+	on-monocular-results	
+		
+
 todo:
 	1. clean up code [X]
 	2. create another version of exp2.0 called exp3.0 [X]
