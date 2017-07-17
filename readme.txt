@@ -1,5 +1,17 @@
 
 todo:
+	film some more experiments
+		experiments moving the camera
+		experiments moving objects
+	fix writing stereo version
+	fix writing sota version
+
+	fix writing monocular version
+	re-write the data section
+
+	re-write the methodology + intro + conclusion
+
+todo:
 	1. clean up code [X]
 	2. create another version of exp2.0 called exp3.0 [X]
 	3. read in both laser and rgb and use closest 3d points to merge them | or try only choosing features which have a defined point (in both images?) [X]
