@@ -1,5 +1,9 @@
 #pragma once
+
+
+
 #include <OpenNI.h>
+
 #include "locv3.h"
 
 #include "Pixel3DSet.h"
@@ -13,7 +17,7 @@ namespace ll_openni { class LL_APXCapture; }
 
 namespace ll_openni
 {
-	
+
 	//maximum I have read is 443, will cap at 1000
 	class LL_AXPCapture
 	{
@@ -21,7 +25,7 @@ namespace ll_openni
 		VideoCapture cap;
 		void init(); //initializes openni
 		bool registration_on();//checks if registration is on
-		
+
 		bool ready(); //call before getting images
 		void destroy(); //frees up and shuts down camera
 
