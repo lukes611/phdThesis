@@ -13,11 +13,21 @@ namespace ll_fmrsc
 
 	int featureMatch(string algorithm, Pix3D & object1, Pix3D & object2, vector<Point2i> & p1, vector<Point2i> & p2, bool sort, int top)
 	{
+		//cout << "wow" << endl;
 		p1.clear(); p2.clear();
 		vector<Point2i> pts1, pts2;
 		Mat colA, colB, vdA, vdB;
+
+		//cout << object1.hasVd() << endl;
+		//system("pause");
+
 		object1.colorImage(colA); object2.colorImage(colB);
 		object1.vdImage(vdA); object2.vdImage(vdB);
+
+		//imshow("colA", colA);
+		//waitKey();
+
+		
 		if(algorithm == "sift")
 			ll_sift(colA, colB, pts1, pts2, sort, top);
 		else //surf
@@ -39,6 +49,7 @@ namespace ll_fmrsc
 		LTimer t; t.start();
 		vector<Point2i> points1, points2;
 		int numPoints = featureMatch(fm_algorithm, object1, object2, points1, points2, sort, top);
+		
 		vector<Point3f> src, dst;
 		Mat ret;
 		Mat inliers;

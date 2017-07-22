@@ -387,7 +387,28 @@ void quantitativeExperimentKitti10(string algorithm_name, string data_name, vect
 
 int main()
 {
-	currate("trans.5cminc.office1", 0, 1, "5cm");
+	//currate("rotation.10deginc.office1", 0, 1, "10deg");
+	string tsets[1] = {
+		"trans.5cminc.office3"
+	};
+	string rsets[1] = {
+		"rotation.10deginc.office3",
+		
+	};
+	string algorithms[9] = {
+		"none",
+		"FM2D",
+		"FFVR",
+		"PCA",
+		"FVR",
+		"FVR3D",
+		"FVR3D-2",
+		"FM3D",
+		"ICP"
+	};
+
+	for (int i = 0; i < 9; i++)
+		lcamExpR(rsets[0], algorithms[i]);
 	
 
 	return 0;

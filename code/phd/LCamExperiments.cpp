@@ -1,23 +1,59 @@
 #include "LCamExperiments.h"
-
-
+#include "experiments.h"
+#include "../phd/fmRansac.h"
+#include "../phd/Lpcr.h"
+#include "../phd/Licp.h"
+#include "../phd/LSift.h"
+#include "../phd/measurements.h"
+using namespace ll_pix3d;
+using namespace cv;
+using namespace ll_R3;
+using namespace ll_experiments;
+using namespace std;
+/*
 
 
 #ifdef HASGL
 
 #include "../basics/ll_gl.h"
 #include "../basics/llCamera.h"
-#include "experiments.h"
-
-using namespace ll_pix3d;
-using namespace cv;
-using namespace ll_R3;
-using namespace ll_cam;
-using namespace ll_experiments;
-using namespace std;
 using namespace ll_gl;
+using namespace ll_cam;
 
-void currate(Pix3D a, Pix3D b, string distance)
+
+
+
+//save camera experiments
+//saves to version 2.0 data file
+void saveCameraExperiments(string data_name, string alg_name, string distance, double noiseRange, double SNR, float trans, double rotation)
+{
+	//save output to file
+	cout << "saving cameraExperiments.v2.0..." << endl;
+	string outDirName = string(EXPS_DIR) + "/camera-tests/";
+	//save name of file as [data-name].[versionNo].csv
+	stringstream outFn; outFn << outDirName << "/" << data_name << ".v2.csv";
+	//header: algorithm-name,amount,translation-x,rotation,noise-level,SNR
+	string header = "alg,distance,translation,rotation,noise,SNR";
+	string fileName = outFn.str();
+	stringstream outData;
+	outData <<
+		alg_name << "," <<
+		distance << "," << 
+		trans << "," <<
+		rotation << "," <<
+		noiseRange << "," <<
+		SNR;
+
+	cout << outData.str() << endl;
+
+	appendData(fileName, header, outData.str());
+
+
+
+}
+
+
+void currate(Pix3D a, Pix3D b, string dataset, string distance)
 {
 	R3 translation;
 	double rotation = 0.0f;
@@ -33,6 +69,7 @@ void currate(Pix3D a, Pix3D b, string distance)
 	LLPointers::setPtr("currate::rotation", &rotation);
 	LLPointers::setPtr("currate::usingCamera", &usingCamera);
 	LLPointers::setPtr("currate::distance", &distance);
+	LLPointers::setPtr("currate::dataset", &dataset);
 
 	//add objects
 	Pixel3DSet obj1Original = a;
@@ -101,10 +138,12 @@ void currate(Pix3D a, Pix3D b, string distance)
 		}
 		else
 		{
+			double * rotation = LLPointers::getPtr<double>("currate::rotation");
+			R3 * translation = LLPointers::getPtr<R3>("currate::translation");
+
 			if (key == '1' || key == '2' || key == '5' || key == '9' || key == '0')
 			{
-				double * rotation = LLPointers::getPtr<double>("currate::rotation");
-				R3 * translation = LLPointers::getPtr<R3>("currate::translation");
+				
 
 				double rinc = 0.01;
 				float tinc = 0.01f;
@@ -123,6 +162,16 @@ void currate(Pix3D a, Pix3D b, string distance)
 
 				*obj1 = *obj1Original;
 				obj1->transform_set(0.0f, *rotation, 0.0f, 1.0f, translation->x, 0.0f, 0.0f, R3());
+			}
+
+			if (key == 's')
+			{
+				string dataset = *LLPointers::getPtr<string>("currate::dataset");
+				string distance = *LLPointers::getPtr<string>("currate::distance");
+				cout << "saving dataset:" << dataset << ", with distance:" << distance << endl;
+
+				saveCameraExperiments(dataset, "ground-truth", distance, 0.0, std::numeric_limits<double>::infinity(), translation->x, *rotation);
+
 			}
 
 			
@@ -167,8 +216,191 @@ void currate(string datasetname, int index1, int index2, string distance)
 	frames.read_frame(a, index1);
 	frames.read_frame(b, index2);
 
-	currate(a, b, distance);
+	currate(a, b, datasetname, distance);
 }
 
 
+
+
 #endif
+
+*/
+
+void saveCameraExperimentsV3(string data_name, string alg_name, string distance, double noiseRange, double SNR, float error)
+{
+	//save output to file
+	cout << "saving cameraExperiments.v3.0..." << endl;
+	string outDirName = string(EXPS_DIR) + "/camera-tests/";
+	//save name of file as [data-name].[versionNo].csv
+	stringstream outFn; outFn << outDirName << "/" << data_name << ".v2.csv";
+	//header: algorithm-name,amount,translation-x,rotation,noise-level,SNR
+	string header = "alg,distance,noise,SNR,error";
+	string fileName = outFn.str();
+	stringstream outData;
+	outData <<
+		alg_name << "," <<
+		distance << "," <<
+		noiseRange << "," <<
+		SNR << "," << 
+		error;
+
+	cout << outData.str() << endl;
+
+	appendData(fileName, header, outData.str());
+
+
+
+}
+
+void lcamExpT(std::string dataset, std::string algorithm)
+{
+	CapturePixel3DSet frames = openData(dataset, 4);
+
+	double noiseLevels[5] = {0.0, 0.1, 0.25, 0.5, 0.7};
+
+	for (int j = 0; j < 5; j++)
+	{
+
+		double noiseRange = noiseLevels[j];
+		string dists[3] = {"5cm", "10cm", "15cm"};
+		for (int frameIndex = 1, i = 0; frameIndex <= 3; frameIndex++, i++)
+		{
+			Pix3D frame1, frame2;
+			frames.read_frame(frame1, 0);
+			frames.read_frame(frame2, frameIndex);
+			double snr1 = 0.0, snr2 = 0.0;
+
+			//add noise
+			frame1 = ll_experiments::getNoisedVersion(frame1, noiseRange, snr1);
+			frame2 = ll_experiments::getNoisedVersion(frame2, noiseRange, snr2);
+
+			//set pixel3dsets
+			Pixel3DSet a = frame2, b = frame1; 
+
+			//algorithms solving it:
+			//algorithms here:
+			string algorithm_name = algorithm;
+			Mat _m = Mat::eye(Size(4, 4), CV_32FC1);
+			double seconds;
+			double hde;
+			int iters = 0;
+			if (algorithm_name == "none") {
+				//do-nothing
+			}
+#if defined(HASCUDA) || defined(HASFFTW)
+			else if (algorithm_name == "FVR") {
+				_m = ll_pc::pc_register(b, a, seconds);
+			}
+
+			else if (algorithm_name == "FVR3D") {
+				_m = ll_pc::pc_register_pca_i(b, a, seconds);
+			}
+			else if (algorithm_name == "FVR3D-2") {
+				_m = ll_pc::pc_pca_icp(b, a, seconds);
+			}
+			else if (algorithm_name == "FFVR") {
+				_m = ll_pc::ffvr(b, a, seconds);
+			}
+#endif
+			else if (algorithm_name == "PCA") {
+				_m = ll_pca::register_pca(b, a, seconds);
+			}
+			else if (algorithm_name == "ICP") {
+				Pixel3DSet _;
+				_m = Licp::icp(b, a, _, hde, seconds, iters);
+			}
+			else if (algorithm_name == "FM2D") {
+				ll_fmrsc::registerPix3D("surf", frame2, frame1, _m, seconds, true, 150);
+			}
+			else if (algorithm_name == "FM3D") {
+				_m = LukeLincoln::sift3DRegister(b, a, seconds, true, 256);
+			}
+
+			//end
+			b.transform_set(_m);
+			double msee, pme;
+			hde = 21.0;
+			ll_measure::error_metrics(a, b, hde, msee, pme);
+
+			saveCameraExperimentsV3(dataset, algorithm, dists[i], noiseRange, (snr1 + snr2) / 2, msee);
+
+		}
+	}
+}
+
+
+void lcamExpR(std::string dataset, std::string algorithm)
+{
+	CapturePixel3DSet frames = openData(dataset, 4);
+
+	double noiseLevels[5] = { 0.0, 0.1, 0.25, 0.5, 0.75 };
+
+	for (int j = 0; j < 5; j++)
+	{
+
+		double noiseRange = noiseLevels[j];
+		string dists[3] = { "10deg", "20deg", "30deg" };
+		for (int frameIndex = 1, i = 0; frameIndex <= 3; frameIndex++, i++)
+		{
+			Pix3D frame1, frame2;
+			frames.read_frame(frame1, 0);
+			frames.read_frame(frame2, frameIndex);
+			double snr1 = 0.0, snr2 = 0.0;
+
+			//add noise
+			frame1 = ll_experiments::getNoisedVersion(frame1, noiseRange, snr1);
+			frame2 = ll_experiments::getNoisedVersion(frame2, noiseRange, snr2);
+
+			//set pixel3dsets
+			Pixel3DSet a = frame2, b = frame1;
+
+			//algorithms solving it:
+			//algorithms here:
+			string algorithm_name = algorithm;
+			Mat _m = Mat::eye(Size(4, 4), CV_32FC1);
+			double seconds;
+			double hde;
+			int iters = 0;
+			if (algorithm_name == "none") {
+				//do-nothing
+			}
+#if defined(HASCUDA) || defined(HASFFTW)
+			else if (algorithm_name == "FVR") {
+				_m = ll_pc::pc_register(b, a, seconds);
+			}
+
+			else if (algorithm_name == "FVR3D") {
+				_m = ll_pc::pc_register_pca_i(b, a, seconds);
+			}
+			else if (algorithm_name == "FVR3D-2") {
+				_m = ll_pc::pc_pca_icp(b, a, seconds);
+			}
+			else if (algorithm_name == "FFVR") {
+				_m = ll_pc::ffvr(b, a, seconds);
+			}
+#endif
+			else if (algorithm_name == "PCA") {
+				_m = ll_pca::register_pca(b, a, seconds);
+			}
+			else if (algorithm_name == "ICP") {
+				Pixel3DSet _;
+				_m = Licp::icp(b, a, _, hde, seconds, iters);
+			}
+			else if (algorithm_name == "FM2D") {
+				ll_fmrsc::registerPix3D("surf", frame2, frame1, _m, seconds, true, 150);
+			}
+			else if (algorithm_name == "FM3D") {
+				_m = LukeLincoln::sift3DRegister(b, a, seconds, true, 256);
+			}
+
+			//end
+			b.transform_set(_m);
+			double msee, pme;
+			hde = 21.0;
+			ll_measure::error_metrics(a, b, hde, msee, pme);
+
+			saveCameraExperimentsV3(dataset, algorithm, dists[i], noiseRange, (snr1 + snr2) / 2, msee);
+
+		}
+	}
+}

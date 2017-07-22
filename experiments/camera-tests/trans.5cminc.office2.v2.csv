@@ -1,0 +1,4 @@
+alg,distance,translation,rotation,noise,SNR
+ground-truth,5cm,-1.21,0,0,inf
+ground-truth,10cm,-2.63,0,0,inf
+ground-truth,15cm,-4.33,0,0,inf
