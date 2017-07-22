@@ -5,8 +5,75 @@ Experiments measuring the difference between the ground-truth camera movement an
 
 Different levels of noise were added to both frames prior to 3D registration in order to measure the FVR registration method's ability to register frames with large amounts of noise. The Signal to Noise Ratio (SNR) metric is used to describe the noise added to both captured frames, prior to any registration. This noise effects any registration method's ability to accurately estimate the transformation separating two sets of data. A noise range value of $x$\% means random noise was added in the range [$\frac{-x}{2}$, $\frac{x}{2}$]. Camera registration error is measured in both centimetres (cm) and voxel error (the error in the phase correlation volume without taking into account the effects of quantization). Table \ref{table:trans} shows the results of these tests, they illustrate the FVR's robustness to noise whilst registering frames which are captured during different camera translation intervals. \\
 
+%translation
+\begin{table}[!htb]
+\centering
+\scalebox{1.0}{
+\begin{tabular}{cccccccc}
+\\ \textbf{5cm} &   &   &   &   &   &   &   \\ 
+ & \textbf{FM2D} & \textbf{FM3D} & \textbf{ICP} & \textbf{PCA} & \textbf{FVR} & \textbf{FFVR} & \textbf{FVR3D} \\ \hline
+0 &  5.07 & 4.75 & 12.35 & 3.73 & 4.04 & fail & 6.24 \\
+0.1 &  18.96 & fail & fail & 2.33 & 2.73 & 14.6 & 5.63 \\
+0.25 &  5.12 & 4.3 & 2.03 & 4.2 & 4.13 & 5.51 & 2.3 \\
+0.5 &  5.61 & 1.95 & 3.71 & 6.83 & 3.7 & 7.73 & 2.83 \\
+0.7 &  5.02 & 8.57 & 6.41 & 20.94 & 2.24 & 6.5 & 4.33 \\
+\\ \textbf{10cm} &   &   &   &   &   &   &   \\ 
+ & \textbf{FM2D} & \textbf{FM3D} & \textbf{ICP} & \textbf{PCA} & \textbf{FVR} & \textbf{FFVR} & \textbf{FVR3D} \\ \hline
+0 &  15.35 & fail & 10.26 & 16.87 & 3.47 & fail & 7.07 \\
+0.1 &  18.2 & 15.36 & 6.24 & fail & 3.89 & fail & 11.45 \\
+0.25 &  fail & 24.12 & 6.02 & 20.12 & 5.4 & fail & 7.53 \\
+0.5 &  fail & 4.42 & 5 & 3.96 & 4.65 & fail & 9.47 \\
+0.7 &  7.27 & 8.57 & 3.98 & 7.85 & 15.45 & fail & 4.3 \\
+\\ \textbf{15cm} &   &   &   &   &   &   &   \\ 
+ & \textbf{FM2D} & \textbf{FM3D} & \textbf{ICP} & \textbf{PCA} & \textbf{FVR} & \textbf{FFVR} & \textbf{FVR3D} \\ \hline
+0 &  fail & fail & 7.85 & fail & 25.87 & fail & fail \\
+0.1 &  fail & fail & 7.13 & fail & 12.27 & fail & fail \\
+0.25 &  15.17 & fail & fail & fail & 8.1 & 12.52 & fail \\
+0.5 &  fail & fail & 11.11 & fail & 10.13 & 11.09 & fail \\
+0.7 &  fail & fail & 10.31 & 20.59 & 7.79 & fail & fail \\
+\\
+\end{tabular}}
+\\
+\caption{Translation Tracking}
+\label{table:trans}
+\end{table}
 
 
+
+%translation
+\begin{table}[!htb]
+\centering
+\scalebox{1.0}{
+\begin{tabular}{cccccccc}
+\\ \textbf{10deg} &   &   &   &   &   &   &   \\ 
+ & \textbf{FM2D} & \textbf{FM3D} & \textbf{ICP} & \textbf{PCA} & \textbf{FVR} & \textbf{FFVR} & \textbf{FVR3D} \\ \hline
+0 &  1.86 & 1304.46 & 1.18 & 1.35 & 1.01 & 1.18 & 6.75 \\
+0.1 &  2.52 & 1.36 & 1.1 & 1.09 & 1.03 & 1.47 & 1.79 \\
+0.25 &  11.47 & 0.99 & 1 & 1.22 & 1.07 & 1.1 & 7.37 \\
+0.5 &  1.92 & 11.74 & 1.01 & 1.03 & 0.97 & 1.45 & 6.76 \\
+0.75 &  46.55 & 1.04 & 1.26 & 1.41 & 3.13 & 1.53 & 4.94 \\
+\\ \textbf{20deg} &   &   &   &   &   &   &   \\ 
+ & \textbf{FM2D} & \textbf{FM3D} & \textbf{ICP} & \textbf{PCA} & \textbf{FVR} & \textbf{FFVR} & \textbf{FVR3D} \\ \hline
+0 &  142.17 & 14 & 5.31 & 3.82 & 4.45 & 8.16 & 35.15 \\
+0.1 &  6.98 & 110.77 & 4.65 & 6.87 & 5.71 & 4.93 & 9.77 \\
+0.25 &  19.73 & 551.95 & 4.4 & 15.7 & 53.85 & 43.63 & 8.31 \\
+0.5 &  6.2 & 590.04 & 5.31 & 3.48 & 5.28 & 6.46 & 25.57 \\
+0.75 &  8.67 & 18.53 & 5.78 & 4.89 & 8.38 & 7.08 & 8.61 \\
+\\ \textbf{30deg} &   &   &   &   &   &   &   \\ 
+ & \textbf{FM2D} & \textbf{FM3D} & \textbf{ICP} & \textbf{PCA} & \textbf{FVR} & \textbf{FFVR} & \textbf{FVR3D} \\ \hline
+0 &  242.6 & 11.64 & 5.62 & 160.32 & 4.37 & 31.39 & 159.64 \\
+0.1 &  24.22 & 9.7 & 4.73 & 115.38 & 25.33 & 18.36 & 28.11 \\
+0.25 &  35.76 & 15.01 & 3 & 138.62 & 8.05 & 17.78 & 21.09 \\
+0.5 &  48.64 & 34.73 & 3.03 & 22.81 & 7.71 & 9.33 & 37.75 \\
+0.75 &  23.63 & 63.56 & 3.53 & 72.88 & 10.86 & 23.71 & 21.51 \\
+\\
+\end{tabular}}
+\\
+\caption{Translation Tracking}
+\label{table:trans}
+\end{table}
+
+   
 %translation
 \begin{table}[!htb]
 \centering
