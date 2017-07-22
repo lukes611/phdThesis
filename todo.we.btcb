@@ -1,0 +1,42 @@
+todo-today:
+	1. setup camera and environment [x]
+	2. save some files [x]
+	3. transfer to computer []
+	4. re-write those experiments []
+		measure and write self fitting app []
+		ground-truth error measurement []
+		add noise adding part []
+		record that []
+		place out-put as matrices []
+		measure errors []
+	
+	translation-experiments (5,10,15cm): []
+		noise-range: 0,10,25,50,75 with SNR, error (cm) and voxel-error []
+	rotation-experiments: []
+		rotation (10,20,30deg) []
+		noise-range: 0,10,15,25,50,75 with SNR, error (cm) and voxel-error []
+		
+	reconstructed-scenes?? []
+		run for each algorithm: output and save images []
+	
+	mmvr: []
+		do-similar-experiments to the ones done already []
+	
+	re-write thesis []
+		experiments-section []
+			camera-tracking experiments []
+			qualitative ones []
+			stereo []
+			active []
+			monocular []
+		methodology []
+		intro []
+		conclusion []
+		
+	eat lunch []
+	eat dinner []
+		
+2 / 31
+			
+	
+		
