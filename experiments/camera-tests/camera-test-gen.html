@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+	<head></head>
+	<body>
+		<div style="display: flex; flex-direction: column;width:20%;float:left;">
+			<div>camera-test-gen</div>
+			<textarea id="input" style="width:100%;height:600px;">
+
+			</textarea>
+			<button onclick="go()">go</button>
+			
+		</div>
+		<div style="display: flex; flex-direction: column;width:80%;float:left;">
+			<div>output</div>
+			<textarea id="output" style="width:100%;height:600px;">
+
+			</textarea>
+			
+			
+		</div>
+		
+<script>
+
+let g = {
+	ei : null, //element-in
+	eo : null //element-out
+};
+window.onload = function(){
+	g.ei = document.getElementById('input');
+	g.eo = document.getElementById('output');
+	g.ei.value = localStorage.getItem('x') || '';
+	go();
+};
+
+function go(){
+	localStorage.setItem('x', g.ei.value);
+	let lines = g.ei.value.split('\n');
+	let headers = lines.splice(0,1);
+	
+	//console.log(headers);
+	//console.log(lines);
+	
+	let data = {};
+	lines.forEach(line => {
+		let cols = line.split(',');
+		if(cols.length != 5) return;
+		let item = 'alg,dist,noise,snr,error'.split(',').reduce((p,c, index) => Object.assign(p, {[c] : cols[index]}), {});
+		'error'.split(',').forEach(n => item[n] = Number(item[n]));
+		item.alg = item.alg.split('-').shift();
+		
+		
+		if(!data[item.dist]) data[item.dist] = {};
+		let di = data[item.dist];
+		if(!di[item.noise]) di[item.noise] = {};
+		di = di[item.noise];
+		if(di[item.alg] === undefined) di[item.alg] = item.error;
+		else di[item.alg] = Math.min(di[item.alg], item.error);
+		
+		
+		
+		
+	});
+	Object.keys(data).forEach(dist => {
+		Object.keys(data[dist]).forEach(noise => {
+			Object.keys(data[dist][noise]).forEach(alg => {
+				//if(alg != 'none') data[dist][noise][alg] /= data[dist][noise]['none'];
+			});
+		});
+	});
+	
+	/**
+	
+%translation
+\begin{table}[!htb]
+\centering
+\scalebox{1.0}{
+\begin{tabular}{ccccc}
+\hline
+\textbf{translation (cm)} & \textbf{noise range (\%)} & \textbf{SNR} & \textbf{error (cm)} & \textbf{error (voxel)}\\ \hline
+5cm & 0 & $\infty$ & 0 & 0\\
+5cm & 10 & 20db & 0 & 0\\
+5cm & 25 & 12db & 0 & 0\\
+5cm & 50 & 6db & 0 & 0\\
+5cm & 75 & 2.5db & 112.28 & 89.83\\
+10cm & 0 & $\infty$ & 0 & 0\\
+10cm & 10 & 20db & 0 & 0\\
+10cm & 25 & 12db & 0 & 0\\
+10cm & 50 & 6db & 156.65 & 125.32\\
+15cm & 0 & $\infty$ & 2.8 & 2.24\\
+15cm & 10 & 20db & 2.8 & 2.24\\
+15cm & 25 & 12db & 2.8 & 2.24\\
+15cm & 50 & 6db & 198.55 & 158.84\\
+\\
+\end{tabular}}
+\\
+\caption{Translation Tracking}
+\label{table:trans}
+\end{table}
+
+	**/
+	
+	let genLatexTable = data => {
+		let order = '5cm,10cm,15cm,10deg,20deg,30deg'.split(',');
+		
+let out = `%translation
+\\begin{table}[!htb]
+\\centering
+\\scalebox{1.0}{
+\\begin{tabular}{cccccccc}
+`;
+		let algs = 'FM2D,FM3D,ICP,PCA,FVR,FFVR,FVR3D'.split(',');
+		
+		order.forEach(dist => {
+			if(!data[dist]) return;
+			out += `\\\\ \\textbf{${dist}} & ${algs.map(x => ` `).join(' & ')} \\\\ \n`;
+			out += ` & ${algs.map(x => `\\textbf{${x}}`).join(' & ')} \\\\ \\hline\n`;
+			//console.log(dist);
+			let noise = '0,0.1,0.25,0.5,0.7,0.75'.split(',');
+			noise.forEach(nr => {
+				if(!data[dist][nr]) return;
+				out += `${nr} & `;
+				//console.log('\t' + nr);
+				let errs = [];
+				algs.forEach(a => {
+					if(!data[dist][nr][a]) return;
+					errs.push(data[dist][nr][a]);
+					//console.log('\t\t', a);
+				});
+				//trans
+				//errs = errs.map(e => Math.round(e * 1)/100).map(e => e > 30 ? 'fail' : e);
+				//rote
+				errs = errs.map(e => Math.round(Math.round(e * 1)/1000)/100)//.map(e => e > 30 ? 'fail' : e);
+				out += ` ${errs.join(' & ')} \\\\\n`;
+			});
+		});
+		
+		out += `\\\\
+\\end{tabular}}
+\\\\
+\\caption{Translation Tracking}
+\\label{table:trans}
+\\end{table}`;
+		
+		g.eo.value = out;
+	};
+	
+	genLatexTable(data);
+}
+
+</script>
+	
+	</body>
+</html>
