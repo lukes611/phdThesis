@@ -18,6 +18,7 @@
 #include "code/phd/Lpcr.h"
 #include "code/script/LScript.h"
 #include "code/phd/LSift.h"
+#include "code/phd/LCamExperiments.h"
 
 
 using namespace std;
@@ -384,6 +385,13 @@ void quantitativeExperimentKitti10(string algorithm_name, string data_name, vect
 
 
 
+int main()
+{
+	currate("trans.5cminc.office1", 0, 1, "5cm");
+	
+
+	return 0;
+}
 
 
 
@@ -520,7 +528,7 @@ int main2(int argc, char * * argv)
 }
 
 
-int main(int argc, char * * argv)
+int mainmanual(int argc, char * * argv)
 {
     return 1;
 	//usage: experiment-type algorithm  dataset index
