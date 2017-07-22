@@ -19,6 +19,7 @@
 #include "code/script/LScript.h"
 #include "code/phd/LSift.h"
 
+
 using namespace std;
 using namespace cv;
 using namespace ll_R3;
@@ -194,14 +195,14 @@ void saveV20(string data_name, string alg_name, int frame1, int frame2, float se
 void quantitativeExperiment20(string algorithm_name, string data_name, vector<int> frames)
 {
     CapturePixel3DSet video = ll_experiments::openData(data_name, 1);
-	
+
 
 	Pix3D frame1, frame2;
 	Pixel3DSet a, b;
 
 	video.read_frame(frame1, frames[0]);
 
-	
+
 
 	for (int _i = 1; _i < frames.size(); _i++)
 	{
@@ -414,7 +415,7 @@ int main2(int argc, char * * argv)
     };
 
     //string fn = "PlantsOutdoors.tc.rotation";
-    
+
 
 
 	//save images: 4 per video file
@@ -444,7 +445,7 @@ int main2(int argc, char * * argv)
 	//test("Apartment.Texture.rotate", Point3d(5.0f, 2.0f, 0.0f), 1.0f, Point3d(0.0, 1.0, 8.0));
 
 	//for(int i = 13; i < 19; i++)
-	
+
 
     /*
 	to-do:
@@ -519,8 +520,9 @@ int main2(int argc, char * * argv)
 }
 
 
-int main(int argc, char * * argv) 
+int main(int argc, char * * argv)
 {
+    return 1;
 	//usage: experiment-type algorithm  dataset index
 	bool usedProperly = true;
 	string algorithm, experimentType, dataset;
@@ -534,7 +536,7 @@ int main(int argc, char * * argv)
 			algorithm = argv[2];
 			experimentType = argv[1];
 			dataset = argv[3];
-			
+
 			if (experimentType != "2.0" && experimentType != "kitti") usedProperly = false;
 			if (algorithm != "none"&&algorithm != "FM2D"&&algorithm != "FM3D"&&algorithm != "ICP"&&algorithm != "PCA"
 				&&algorithm != "FVR"&&algorithm != "FVR3D"&&algorithm != "FVR3D-2"&&algorithm != "FFVR")
@@ -543,7 +545,7 @@ int main(int argc, char * * argv)
 	}
 
 
-	if (usedProperly) 
+	if (usedProperly)
 	{
 		cout << "OK" << endl;
 		cout << "type: " << experimentType << endl;
@@ -560,7 +562,7 @@ int main(int argc, char * * argv)
 			vector<int> inds = ll_experiments::rng(index, index + 2, 1);
 			quantitativeExperimentKitti10(algorithm, dataset, inds);
 		}
-		
+
 	}
 	else
 	{
