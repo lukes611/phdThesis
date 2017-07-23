@@ -492,5 +492,8 @@ void saveReg(std::string dataset, std::string algorithm, int f1, int f2)
     b.UNION(a);
 
     b.save_obj(string(DESKTOP_DIR) + string("/") + algorithm + string("-") + dataset + "-out.obj");
-
+	#ifdef HASGL
+	LLPointers::setPtr("object", &b);
+    ll_experiments::viewPixel3DSet();
+    #endif
 }
