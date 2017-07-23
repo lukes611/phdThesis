@@ -123,7 +123,9 @@ let out = `%translation
 				if(!data[dist][nr]) return;
 				let snr = snrs[nr+''];
 				snr = (snr == '1.#INF') ? 'infinity' : snr;
-				console.log(snr);
+				
+				
+				if(!isNaN(snr)) snr = '' + Math.round(5*Math.log10(Math.pow(snr, 1)));
 				
 				out += `${nr} & ${snr} &`;
 				//console.log('\t' + nr);
@@ -134,9 +136,9 @@ let out = `%translation
 					//console.log('\t\t', a);
 				});
 				//trans
-				//errs = errs.map(e => Math.round(e * 1)/100).map(e => e > 30 ? 'fail' : e);
+				errs = errs.map(e => Math.round(e * 1)/100).map(e => e > 30 ? 'fail' : e);
 				//rote
-				errs = errs.map(e => Math.round(Math.round(e * 1)/1000)/100)//.map(e => e > 30 ? 'fail' : e);
+				//errs = errs.map(e => Math.round(Math.round(e * 1)/1000)/100)//.map(e => e > 30 ? 'fail' : e);
 				out += ` ${errs.join(' & ')} \\\\\n`;
 			});
 		});
