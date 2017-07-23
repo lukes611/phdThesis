@@ -409,9 +409,11 @@ int main()
 
 	};
 
-	for (int i = 0; i < 9; i++)
-		lcamExpT(tsets[0], algorithms[i]);
+	//for (int i = 0; i < 9; i++)
+	//	lcamExpR(tsets[1], algorithms[i]);
 
+    saveReg(rsets[1], "FVR3D", 0, 2);
+    //saveReg(rsets[1], "FVR", 0, 2);
 
 	return 0;
 }

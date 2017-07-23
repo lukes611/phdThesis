@@ -226,6 +226,48 @@ void currate(string datasetname, int index1, int index2, string distance)
 
 */
 
+Mat performReg(Pix3D frame1, Pix3D frame2, string algorithm_name)
+{
+    Pixel3DSet b = frame1;
+    Pixel3DSet a = frame2;
+    Mat _m = Mat::eye(Size(4, 4), CV_32FC1);
+    double seconds;
+    double hde;
+    int iters = 0;
+    if (algorithm_name == "none") {
+        //do-nothing
+    }
+#if defined(HASCUDA) || defined(HASFFTW)
+    else if (algorithm_name == "FVR") {
+        _m = ll_pc::pc_register(b, a, seconds);
+    }
+
+    else if (algorithm_name == "FVR3D") {
+        _m = ll_pc::pc_register_pca_i(b, a, seconds);
+    }
+    else if (algorithm_name == "FVR3D-2") {
+        _m = ll_pc::pc_pca_icp(b, a, seconds);
+    }
+    else if (algorithm_name == "FFVR") {
+        _m = ll_pc::ffvr(b, a, seconds);
+    }
+#endif
+    else if (algorithm_name == "PCA") {
+        _m = ll_pca::register_pca(b, a, seconds);
+    }
+    else if (algorithm_name == "ICP") {
+        Pixel3DSet _;
+        _m = Licp::icp(b, a, _, hde, seconds, iters);
+    }
+    else if (algorithm_name == "FM2D") {
+        ll_fmrsc::registerPix3D("surf", frame1, frame2, _m, seconds, true, 150);
+    }
+    else if (algorithm_name == "FM3D") {
+        _m = LukeLincoln::sift3DRegister(b, a, seconds, true, 256);
+    }
+    return _m.clone();
+}
+
 void saveCameraExperimentsV3(string data_name, string alg_name, string distance, double noiseRange, double SNR, float error)
 {
 	//save output to file
@@ -244,7 +286,12 @@ void saveCameraExperimentsV3(string data_name, string alg_name, string distance,
 		SNR << "," <<
 		error;
 
-	cout << outData.str() << endl;
+	cout <<
+		alg_name << " | " <<
+		distance << " | " <<
+		noiseRange << " | " <<
+		SNR << " | " <<
+		error << endl;
 
 	appendData(fileName, header, outData.str());
 
@@ -256,7 +303,7 @@ void lcamExpT(std::string dataset, std::string algorithm)
 {
 	CapturePixel3DSet frames = openData(dataset, 4);
 
-	double noiseLevels[5] = {0.0, 0.1, 0.25, 0.5, 0.7};
+	double noiseLevels[5] = {0.0, 0.1, 0.25, 0.5, 0.75};
 
 	for (int j = 0; j < 5; j++)
 	{
@@ -316,26 +363,14 @@ void lcamExpT(std::string dataset, std::string algorithm)
 				_m = LukeLincoln::sift3DRegister(b, a, seconds, true, 256);
 			}
 
-			{
-                R3 estT;
 
-
-                Pixel3DSet::transform_point(_m, estT);
-
-                cout << dataset << " | " << algorithm << " | " << dists[i] << " | " <<  noiseRange << " | ";
-                cout << "estimated translation: " << estT.x << endl;
-
-
-
-            }
 
 			//end
-			//b.transform_set(_m);
+			b.transform_set(_m);
 			double msee, pme;
 			hde = 21.0;
-			//ll_measure::error_metrics(a, b, hde, msee, pme);
-
-			//saveCameraExperimentsV3(dataset, algorithm, dists[i], noiseRange, (snr1 + snr2) / 2, msee);
+			ll_measure::error_metrics(a, b, hde, msee, pme);
+            saveCameraExperimentsV3(dataset, algorithm, dists[i], noiseRange, (snr1 + snr2) / 2, msee);
 
 		}
 	}
@@ -431,9 +466,9 @@ void lcamExpR(std::string dataset, std::string algorithm)
 
 			double msee, pme;
 			hde = 21.0;
-			//ll_measure::error_metrics(a, b, hde, msee, pme);
+			ll_measure::error_metrics(a, b, hde, msee, pme);
 
-			//saveCameraExperimentsV3(dataset, algorithm, dists[i], noiseRange, (snr1 + snr2) / 2, msee);
+			saveCameraExperimentsV3(dataset, algorithm, dists[i], noiseRange, (snr1 + snr2) / 2, msee);
 
 		}
 	}
@@ -442,5 +477,20 @@ void lcamExpR(std::string dataset, std::string algorithm)
 
 void saveReg(std::string dataset, std::string algorithm, int f1, int f2)
 {
+    CapturePixel3DSet frames = openData(dataset, 4);
+    Pix3D frame1, frame2;
+    frames.read_frame(frame1, f1);
+    frames.read_frame(frame2, f2);
+
+    //set pixel3dsets
+    Pixel3DSet a = frame2, b = frame1;
+    Mat _m = performReg(frame1, frame2, algorithm);
+
+    //end
+    b.transform_set(_m);
+
+    b.UNION(a);
+
+    b.save_obj(string(DESKTOP_DIR) + string("/") + algorithm + string("-") + dataset + "-out.obj");
 
 }
