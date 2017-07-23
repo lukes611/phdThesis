@@ -39,6 +39,7 @@ function go(){
 	
 	//console.log(headers);
 	//console.log(lines);
+	let snrs = {};
 	
 	let data = {};
 	lines.forEach(line => {
@@ -53,6 +54,7 @@ function go(){
 		let di = data[item.dist];
 		if(!di[item.noise]) di[item.noise] = {};
 		di = di[item.noise];
+		snrs[item.noise] = item.snr;
 		if(di[item.alg] === undefined) di[item.alg] = item.error;
 		else di[item.alg] = Math.min(di[item.alg], item.error);
 		
@@ -106,19 +108,24 @@ let out = `%translation
 \\begin{table}[!htb]
 \\centering
 \\scalebox{1.0}{
-\\begin{tabular}{cccccccc}
+\\begin{tabular}{ccccccccc}
 `;
 		let algs = 'FM2D,FM3D,ICP,PCA,FVR,FFVR,FVR3D'.split(',');
+		let nine = Array.apply(undefined, Array(8)).map(x => ' ');
 		
 		order.forEach(dist => {
 			if(!data[dist]) return;
-			out += `\\\\ \\textbf{${dist}} & ${algs.map(x => ` `).join(' & ')} \\\\ \n`;
-			out += ` & ${algs.map(x => `\\textbf{${x}}`).join(' & ')} \\\\ \\hline\n`;
+			out += `\\\\ \\textbf{${dist}} & ${nine.join(' & ')} \\\\ \n`;
+			out += `Noise & SNR & ${algs.map(x => `\\textbf{${x}}`).join(' & ')} \\\\ \\hline\n`;
 			//console.log(dist);
 			let noise = '0,0.1,0.25,0.5,0.7,0.75'.split(',');
 			noise.forEach(nr => {
 				if(!data[dist][nr]) return;
-				out += `${nr} & `;
+				let snr = snrs[nr+''];
+				snr = (snr == '1.#INF') ? 'infinity' : snr;
+				console.log(snr);
+				
+				out += `${nr} & ${snr} &`;
 				//console.log('\t' + nr);
 				let errs = [];
 				algs.forEach(a => {

@@ -383,7 +383,7 @@ void lcamExpR(std::string dataset, std::string algorithm)
 
 	double noiseLevels[4] = { 0.0, 0.1, 0.25, 0.3 };
 
-	for (int j = 0; j < 4; j++)
+	for (int j = 1; j < 2; j++)
 	{
 
 		double noiseRange = noiseLevels[j];
