@@ -26,3 +26,5 @@
 
 void lcamExpT(std::string dataset, std::string algorithm);
 void lcamExpR(std::string dataset, std::string algorithm);
+
+void saveReg(std::string dataset, std::string algorithm, int f1, int f2);

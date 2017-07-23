@@ -38,7 +38,7 @@ void saveCameraExperiments(string data_name, string alg_name, string distance, d
 	stringstream outData;
 	outData <<
 		alg_name << "," <<
-		distance << "," << 
+		distance << "," <<
 		trans << "," <<
 		rotation << "," <<
 		noiseRange << "," <<
@@ -127,7 +127,7 @@ void currate(Pix3D a, Pix3D b, string dataset, string distance)
 	glutKeyboardFunc([](unsigned char key, int x, int y)->void {
 		Fps_cam * camera = LLPointers::getPtr<Fps_cam>("currate::camera");
 		bool usingCamera = *LLPointers::getPtr<bool>("currate::usingCamera");
-		
+
 		if (usingCamera)
 		{
 			camera->keyboard(key, x, y);
@@ -143,7 +143,7 @@ void currate(Pix3D a, Pix3D b, string dataset, string distance)
 
 			if (key == '1' || key == '2' || key == '5' || key == '9' || key == '0')
 			{
-				
+
 
 				double rinc = 0.01;
 				float tinc = 0.01f;
@@ -174,7 +174,7 @@ void currate(Pix3D a, Pix3D b, string dataset, string distance)
 
 			}
 
-			
+
 
 		}
 		if (key == 'u')
@@ -182,7 +182,7 @@ void currate(Pix3D a, Pix3D b, string dataset, string distance)
 			double * rotation = LLPointers::getPtr<double>("currate::rotation");
 			R3 * translation = LLPointers::getPtr<R3>("currate::translation");
 			*LLPointers::getPtr<bool>("currate::usingCamera") = !usingCamera;
-			if (usingCamera) cout << "not using camera" << endl; 
+			if (usingCamera) cout << "not using camera" << endl;
 			else
 			{
 				cout << "switched to camera " << endl;
@@ -206,7 +206,7 @@ void currate(Pix3D a, Pix3D b, string dataset, string distance)
 	});
 	glutMainLoop();
 
-	
+
 }
 
 void currate(string datasetname, int index1, int index2, string distance)
@@ -241,7 +241,7 @@ void saveCameraExperimentsV3(string data_name, string alg_name, string distance,
 		alg_name << "," <<
 		distance << "," <<
 		noiseRange << "," <<
-		SNR << "," << 
+		SNR << "," <<
 		error;
 
 	cout << outData.str() << endl;
@@ -275,7 +275,7 @@ void lcamExpT(std::string dataset, std::string algorithm)
 			frame2 = ll_experiments::getNoisedVersion(frame2, noiseRange, snr2);
 
 			//set pixel3dsets
-			Pixel3DSet a = frame2, b = frame1; 
+			Pixel3DSet a = frame1, b = frame2;
 
 			//algorithms solving it:
 			//algorithms here:
@@ -316,13 +316,26 @@ void lcamExpT(std::string dataset, std::string algorithm)
 				_m = LukeLincoln::sift3DRegister(b, a, seconds, true, 256);
 			}
 
+			{
+                R3 estT;
+
+
+                Pixel3DSet::transform_point(_m, estT);
+
+                cout << dataset << " | " << algorithm << " | " << dists[i] << " | " <<  noiseRange << " | ";
+                cout << "estimated translation: " << estT.x << endl;
+
+
+
+            }
+
 			//end
-			b.transform_set(_m);
+			//b.transform_set(_m);
 			double msee, pme;
 			hde = 21.0;
-			ll_measure::error_metrics(a, b, hde, msee, pme);
+			//ll_measure::error_metrics(a, b, hde, msee, pme);
 
-			saveCameraExperimentsV3(dataset, algorithm, dists[i], noiseRange, (snr1 + snr2) / 2, msee);
+			//saveCameraExperimentsV3(dataset, algorithm, dists[i], noiseRange, (snr1 + snr2) / 2, msee);
 
 		}
 	}
@@ -333,9 +346,9 @@ void lcamExpR(std::string dataset, std::string algorithm)
 {
 	CapturePixel3DSet frames = openData(dataset, 4);
 
-	double noiseLevels[5] = { 0.0, 0.1, 0.25, 0.5, 0.75 };
+	double noiseLevels[4] = { 0.0, 0.1, 0.25, 0.3 };
 
-	for (int j = 0; j < 5; j++)
+	for (int j = 0; j < 4; j++)
 	{
 
 		double noiseRange = noiseLevels[j];
@@ -387,7 +400,7 @@ void lcamExpR(std::string dataset, std::string algorithm)
 				_m = Licp::icp(b, a, _, hde, seconds, iters);
 			}
 			else if (algorithm_name == "FM2D") {
-				ll_fmrsc::registerPix3D("surf", frame2, frame1, _m, seconds, true, 150);
+				ll_fmrsc::registerPix3D("surf", frame1, frame2, _m, seconds, true, 150);
 			}
 			else if (algorithm_name == "FM3D") {
 				_m = LukeLincoln::sift3DRegister(b, a, seconds, true, 256);
@@ -395,12 +408,39 @@ void lcamExpR(std::string dataset, std::string algorithm)
 
 			//end
 			b.transform_set(_m);
+
+            {
+                double estRotation = 0.0;
+
+                R3 p(0.0f, 0.0f, 0.0f);
+                R3 v(0.0f, 0.0f, 1.0f);
+
+                Pixel3DSet::transform_point(_m, p);
+                Pixel3DSet::transform_point(_m, v);
+
+                v -= p; //get vector
+                v.normalize();
+
+                estRotation = R3::getAngle(v.z, v.x);
+                cout << dataset << " | " << algorithm << " | " << dists[i] << " | " <<  noiseRange << " | ";
+                cout << "estimated rotation: " << estRotation << endl;
+
+
+
+            }
+
 			double msee, pme;
 			hde = 21.0;
-			ll_measure::error_metrics(a, b, hde, msee, pme);
+			//ll_measure::error_metrics(a, b, hde, msee, pme);
 
-			saveCameraExperimentsV3(dataset, algorithm, dists[i], noiseRange, (snr1 + snr2) / 2, msee);
+			//saveCameraExperimentsV3(dataset, algorithm, dists[i], noiseRange, (snr1 + snr2) / 2, msee);
 
 		}
 	}
+}
+
+
+void saveReg(std::string dataset, std::string algorithm, int f1, int f2)
+{
+
 }

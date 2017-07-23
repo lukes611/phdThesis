@@ -391,25 +391,27 @@ int main()
 	string tsets[1] = {
 		"trans.5cminc.office3"
 	};
-	string rsets[1] = {
+	string rsets[2] = {
 		"rotation.10deginc.office3",
-		
+		"rotation.10deginc.office4"
+
 	};
 	string algorithms[9] = {
+        "FM2D",
+        "FVR",
 		"none",
-		"FM2D",
-		"FFVR",
-		"PCA",
-		"FVR",
+		"ICP",
 		"FVR3D",
 		"FVR3D-2",
-		"FM3D",
-		"ICP"
+		"FFVR",
+		"PCA",
+		"FM3D"
+
 	};
 
 	for (int i = 0; i < 9; i++)
-		lcamExpR(rsets[0], algorithms[i]);
-	
+		lcamExpT(tsets[0], algorithms[i]);
+
 
 	return 0;
 }
