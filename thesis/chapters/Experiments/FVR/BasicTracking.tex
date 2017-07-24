@@ -1,11 +1,60 @@
 \section{Camera Translation Tracking}
 \label{Sec:CamTransTrackExp}
 
-Experiments measuring the error after moving the camera using the FVR based methods as well as other methods from the literature are presented in this section. For these experiments, one camera frame of an indoor environment was captured using the ASUS Xtion PRO LIVE active camera. The camera was then moved (translated) by different amounts including: 5 centimeters, 10 centimeters and 15 centimeters. The Mean Squared Error metric was then used to measure registration error between frames captured at these intervals. The 2D and 3D Feature matching / Ransac methods (FM2D, FM3D), ICP and PCA methods were all tested. Additionally, results for the FVR, FFVR and FVR3D method are presented. \\
+Experiments measuring the error after moving the camera using the FVR based methods as well as other methods from the literature are presented in this section. For these experiments, one camera frame of an indoor environment was captured using the ASUS Xtion PRO LIVE active camera. The camera was then moved (translated) by different amounts including: 5 centimeters, 10 centimeters and 15 centimeters. The 2D and 3D Feature matching / Ransac methods (FM2D, FM3D), ICP and PCA methods were all tested. Additionally, results for the FVR, FFVR and FVR3D method are presented. FM3D, FVR and FVR3D require the 3D frames be quantized into $256\times 256\times 256$ volumes. \\
 
-Different levels of noise were added to both frames prior to 3D registration in order to measure each method's ability to register frames with large amounts of noise. The Signal to Noise Ratio (SNR) metric is used to describe the noise added to both captured frames, prior to any registration. This noise effects any registration method's ability to accurately estimate the transformation separating two sets of data. A noise range value of $x$\% means random noise was added in the range [$\frac{-x}{2}$, $\frac{x}{2}$]. Camera registration error is measured in both centimetres (cm) and voxel error (the error in the phase correlation volume without taking into account the effects of quantization). Table \ref{table:trans} shows the results of these tests, they illustrate the FVR's robustness to noise whilst registering frames which are captured during different camera translation intervals. \\
+Different levels of noise were added to both frames prior to 3D registration in order to measure each method's ability to register frames with large amounts of noise. The Signal to Noise Ratio (SNR) metric is used to describe the noise added to both captured frames, prior to any registration. This noise effects any registration method's ability to accurately estimate the transformation separating two sets of data. In a given experiment, a noise range value of $x$ means random noise was added in the range [$\frac{-x}{2}$, $\frac{x}{2}$] to a signal within the range [0, 1]. Reconstruction error is measured in mean squared error (as presented in section \ref{metricsSection}). \\
+
+Table \ref{table:trans} shows the results of these tests, they illustrate the FVR's robustness to noise whilst registering frames which are captured during different camera translation intervals. Each sub-table is labelled with a distance in centimeters in which frames were separated prior to registration. The first two columns represent the amount of noise added both in terms of noise-range and the subsequent Signal to Noise ratio computed from it. The rest of the columns represent the registration error using the Mean Squared Error metric.  \\
+
+%translation
+\begin{table}[!htb]
+\centering
+\scalebox{1.0}{
+\begin{tabular}{ccccccccc}
+\\ \textbf{5cm} &   &   &   &   &   &   &   &   \\ 
+Noise & SNR & \textbf{FM2D} & \textbf{FM3D} & \textbf{ICP} & \textbf{PCA} & \textbf{FVR} & \textbf{FFVR} & \textbf{FVR3D} \\ \hline
+0 & $\infty$ & 5.07 & 4.75 & 12.35 & 3.73 & 4.04 & fail & 6.24 \\
+0.1 & 20db & 18.96 & fail & fail & 2.33 & 2.73 & 14.6 & 5.63 \\
+0.25 & 12db & 5.12 & 4.3 & 2.03 & 4.2 & 4.13 & 5.51 & 2.3 \\
+0.5 & 6db & 5.61 & 1.95 & 3.71 & 6.83 & 3.7 & 7.73 & 2.83 \\
+0.75 & 2.5db & 5.02 & 8.57 & 6.41 & 20.94 & 2.24 & 6.5 & 4.33 \\
+\\ \textbf{10cm} &   &   &   &   &   &   &   &   \\ 
+Noise & SNR & \textbf{FM2D} & \textbf{FM3D} & \textbf{ICP} & \textbf{PCA} & \textbf{FVR} & \textbf{FFVR} & \textbf{FVR3D} \\ \hline
+0 & $\infty$ & 15.35 & fail & 10.26 & 16.87 & 3.47 & fail & 7.07 \\
+0.1 & 20db & 18.2 & 15.36 & 6.24 & fail & 3.89 & fail & 11.45 \\
+0.25 & 12db & fail & 24.12 & 6.02 & 20.12 & 5.4 & fail & 7.53 \\
+0.5 & 6db & fail & 4.42 & 5 & 3.96 & 4.65 & fail & 9.47 \\
+0.7 & 2.5db & 7.27 & 8.57 & 3.98 & 7.85 & 15.45 & fail & 4.3 \\
+\\ \textbf{15cm} &   &   &   &   &   &   &   &   \\ 
+Noise & SNR & \textbf{FM2D} & \textbf{FM3D} & \textbf{ICP} & \textbf{PCA} & \textbf{FVR} & \textbf{FFVR} & \textbf{FVR3D} \\ \hline
+0 & $\infty$ & fail & fail & 7.85 & fail & 25.87 & fail & fail \\
+0.1 & 20db & fail & fail & 7.13 & fail & 12.27 & fail & fail \\
+0.25 & 12db & 15.17 & fail & fail & fail & 8.1 & 12.52 & fail \\
+0.5 & 6db & fail & fail & 11.11 & fail & 10.13 & 11.09 & fail \\
+0.7 & 2.5db & fail & fail & 10.31 & 20.59 & 7.79 & fail & fail \\
+\\
+\end{tabular}}
+\\
+\caption{Translation Tracking}
+\label{table:trans}
+\end{table}
 
 
+Results show that the basic FVR method is generally the most accurate in terms of registration across the range of camera translation magnitudes and noise levels. In comparison, the FFVR method reduces processing time at the expense of accuracy, results show that in general it is only capable of up to 5cm of translation registration. FVR3D and the 2D feature matching method are capable of registering 5-10cm with larger levels of noise. However, both methods fail to register the full 15cm of camera translation well. \\
+
+ICP performed next best, capable of performing well up to 15cm of translation, but failing to register twice during the tests. PCA was able to handle up to 10cm of too but often had larger registration errors. For the 15cm translation tests, the FVR performed the best followed by ICP, which failed once but outperformed FVR within the two lowest noise brackets. \\
+
+
+It can be shown that, despite being limited to a single axis of rotation, the FVR algorithm can consistently register camera movements up to 15cm better than other algorithms from the literature. To put these camera translations into perspective at video frame rates, a displacement of 10cm per frame equates to camera velocity of 3 meters per second, this is twice the average person's walking speed making both the FVR method and FVR3D suitable for a majority of applications. \\
+
+
+\section{Camera Rotation Tracking}
+\label{Sec:CamRoteTrackExp}
+
+Table \ref{table:rote} shows results for camera rotation experiments. These experiments were captured with the ASUS Xtion PRO LIVE camera using the same scene as results in section \ref{Sec:CamTransTrackExp}. These frames are each separated by 10, 20 and 30 degrees of camera rotation about the y-axis. These degrees were chosen because they are significantly large enough to be difficult for these algorithms to register against.  \\
+
+Again, different levels of noise were added to both frames prior to registration. This experiment was designed to test the robustness of the FVR method in registering camera pose. \\
 
 
 %rotation
@@ -35,140 +84,6 @@ Noise & SNR & \textbf{FM2D} & \textbf{FM3D} & \textbf{ICP} & \textbf{PCA} & \tex
 \label{table:rote}
 \end{table}
 
-
-%translation
-\begin{table}[!htb]
-\centering
-\scalebox{1.0}{
-\begin{tabular}{ccccccccc}
-\\ \textbf{5cm} &   &   &   &   &   &   &   &   \\ 
-Noise & SNR & \textbf{FM2D} & \textbf{FM3D} & \textbf{ICP} & \textbf{PCA} & \textbf{FVR} & \textbf{FFVR} & \textbf{FVR3D} \\ \hline
-0 & inf & 5.07 & 4.75 & 12.35 & 3.73 & 4.04 & fail & 6.24 \\
-0.1 & 522437 & 18.96 & fail & fail & 2.33 & 2.73 & 14.6 & 5.63 \\
-0.25 & 83426.9 & 5.12 & 4.3 & 2.03 & 4.2 & 4.13 & 5.51 & 2.3 \\
-0.5 & 20879 & 5.61 & 1.95 & 3.71 & 6.83 & 3.7 & 7.73 & 2.83 \\
-0.7 & 10623.7 & 5.02 & 8.57 & 6.41 & 20.94 & 2.24 & 6.5 & 4.33 \\
-\\ \textbf{10cm} &   &   &   &   &   &   &   &   \\ 
-Noise & SNR & \textbf{FM2D} & \textbf{FM3D} & \textbf{ICP} & \textbf{PCA} & \textbf{FVR} & \textbf{FFVR} & \textbf{FVR3D} \\ \hline
-0 & inf & 15.35 & fail & 10.26 & 16.87 & 3.47 & fail & 7.07 \\
-0.1 & 522437 & 18.2 & 15.36 & 6.24 & fail & 3.89 & fail & 11.45 \\
-0.25 & 83426.9 & fail & 24.12 & 6.02 & 20.12 & 5.4 & fail & 7.53 \\
-0.5 & 20879 & fail & 4.42 & 5 & 3.96 & 4.65 & fail & 9.47 \\
-0.7 & 10623.7 & 7.27 & 8.57 & 3.98 & 7.85 & 15.45 & fail & 4.3 \\
-\\ \textbf{15cm} &   &   &   &   &   &   &   &   \\ 
-Noise & SNR & \textbf{FM2D} & \textbf{FM3D} & \textbf{ICP} & \textbf{PCA} & \textbf{FVR} & \textbf{FFVR} & \textbf{FVR3D} \\ \hline
-0 & inf & fail & fail & 7.85 & fail & 25.87 & fail & fail \\
-0.1 & 522437 & fail & fail & 7.13 & fail & 12.27 & fail & fail \\
-0.25 & 83426.9 & 15.17 & fail & fail & fail & 8.1 & 12.52 & fail \\
-0.5 & 20879 & fail & fail & 11.11 & fail & 10.13 & 11.09 & fail \\
-0.7 & 10623.7 & fail & fail & 10.31 & 20.59 & 7.79 & fail & fail \\
-\\
-\end{tabular}}
-\\
-\caption{Translation Tracking}
-\label{table:trans}
-\end{table}
-
-
-%translation
-\begin{table}[!htb]
-\centering
-\scalebox{1.0}{
-\begin{tabular}{cccccccc}
-\\ \textbf{5cm} &   &   &   &   &   &   &   \\ 
- & \textbf{FM2D} & \textbf{FM3D} & \textbf{ICP} & \textbf{PCA} & \textbf{FVR} & \textbf{FFVR} & \textbf{FVR3D} \\ \hline
-0 &  5.07 & 4.75 & 12.35 & 3.73 & 4.04 & fail & 6.24 \\
-0.1 &  18.96 & fail & fail & 2.33 & 2.73 & 14.6 & 5.63 \\
-0.25 &  5.12 & 4.3 & 2.03 & 4.2 & 4.13 & 5.51 & 2.3 \\
-0.5 &  5.61 & 1.95 & 3.71 & 6.83 & 3.7 & 7.73 & 2.83 \\
-0.7 &  5.02 & 8.57 & 6.41 & 20.94 & 2.24 & 6.5 & 4.33 \\
-\\ \textbf{10cm} &   &   &   &   &   &   &   \\ 
- & \textbf{FM2D} & \textbf{FM3D} & \textbf{ICP} & \textbf{PCA} & \textbf{FVR} & \textbf{FFVR} & \textbf{FVR3D} \\ \hline
-0 &  15.35 & fail & 10.26 & 16.87 & 3.47 & fail & 7.07 \\
-0.1 &  18.2 & 15.36 & 6.24 & fail & 3.89 & fail & 11.45 \\
-0.25 &  fail & 24.12 & 6.02 & 20.12 & 5.4 & fail & 7.53 \\
-0.5 &  fail & 4.42 & 5 & 3.96 & 4.65 & fail & 9.47 \\
-0.7 &  7.27 & 8.57 & 3.98 & 7.85 & 15.45 & fail & 4.3 \\
-\\ \textbf{15cm} &   &   &   &   &   &   &   \\ 
- & \textbf{FM2D} & \textbf{FM3D} & \textbf{ICP} & \textbf{PCA} & \textbf{FVR} & \textbf{FFVR} & \textbf{FVR3D} \\ \hline
-0 &  fail & fail & 7.85 & fail & 25.87 & fail & fail \\
-0.1 &  fail & fail & 7.13 & fail & 12.27 & fail & fail \\
-0.25 &  15.17 & fail & fail & fail & 8.1 & 12.52 & fail \\
-0.5 &  fail & fail & 11.11 & fail & 10.13 & 11.09 & fail \\
-0.7 &  fail & fail & 10.31 & 20.59 & 7.79 & fail & fail \\
-\\
-\end{tabular}}
-\\
-\caption{Translation Tracking}
-\label{table:trans}
-\end{table}
-
-
-
-
-
-   
-%translation
-\begin{table}[!htb]
-\centering
-\scalebox{1.0}{
-\begin{tabular}{ccccc}
-\hline
-\textbf{translation (cm)} & \textbf{noise range (\%)} & \textbf{SNR} & \textbf{error (cm)} & \textbf{error (voxel)}\\ \hline
-5cm & 0 & $\infty$ & 0 & 0\\
-5cm & 10 & 20db & 0 & 0\\
-5cm & 25 & 12db & 0 & 0\\
-5cm & 50 & 6db & 0 & 0\\
-5cm & 75 & 2.5db & 112.28 & 89.83\\
-10cm & 0 & $\infty$ & 0 & 0\\
-10cm & 10 & 20db & 0 & 0\\
-10cm & 25 & 12db & 0 & 0\\
-10cm & 50 & 6db & 156.65 & 125.32\\
-15cm & 0 & $\infty$ & 2.8 & 2.24\\
-15cm & 10 & 20db & 2.8 & 2.24\\
-15cm & 25 & 12db & 2.8 & 2.24\\
-15cm & 50 & 6db & 198.55 & 158.84\\
-\\
-\end{tabular}}
-\\
-\caption{Translation Tracking}
-\label{table:trans}
-\end{table}
-
-Results show that the FVR method is accurately able to register frames up to 15 centimeters apart and for camera movements below 5 centimeters per frame, the FVR method can accurately register them. Results also indicate that, for these camera movements the FVR method can handle up to 75\% noise within the frame, which is a Signal to Noise (SNR) ratio of as little as 2.5 decibels. \\
-
-It can be shown that the registration of camera movements using the FVR can handle movements up to 15cm as long as the SNR is higher than or equal to 6.0, meaning the FVR method is highly robust to noise. To put these camera translations into perspective at video frame rates, a displacement of 10 centimeters per frame equates to camera velocity of 3 meters per second which is about twice the normal walking speed. This is suitable for a majority of applications. \\
-
-
-\section{Camera Rotation Tracking}
-\label{Sec:CamRoteTrackExp}
-
-Table \ref{table:rote} shows results for camera rotation experiments. The experiments, also captured with the ASUS Xtion PRO LIVE active camera, were created by capturing the first frame befroe rotating the camera about the y-axis by a number of degrees. The degrees were measured between rotations. Degrees of separation tested include: 10, 20 and 30 degrees. \\
-
-Again, different levels of noise were added to both frames prior to registration. This experiment was designed to test the robustness of the FVR method in registering camera pose. The scene captured was the same office environment used in the translation experiment from section \ref{Sec:CamTransTrackExp}. \\
-
-\begin{table}[!htb]
-\centering
-\scalebox{1.0}{
-\begin{tabular}{ccccc}
-\hline
-\textbf{rotation} & \textbf{noise (\%)} & \textbf{SNR} & \textbf{error ($\theta$)} & \textbf{error (voxel)}\\ \hline
-$10^{\circ}$ & 0 & $\infty$ & 0.31 & 0\\
-$10^{\circ}$ & 10 & 20db & 0.31 & 0\\
-$10^{\circ}$ & 25 & 12db & 0.63 & 1\\
-$10^{\circ}$ & 30 & 10.5db & 90.62 & 96\\
-$20^{\circ}$ & 0 & $\infty$ & 0.31 & 0\\
-$20^{\circ}$ & 10 & 20db & 0.63 & 1\\
-$20^{\circ}$ & 15 & 16.5db & 38.13 & 40\\
-$30^{\circ}$ & 0 & $\infty$ & 3.75 & 4\\
-$30^{\circ}$ & 10 & 20db & 3.28 & 3\\
-$30^{\circ}$ & 15 & 16.5db & 30 & 32\\
-\\
-\end{tabular}}
-\\
-\caption{Rotation Tracking}
-\label{table:rote}
-\end{table}
 
 Twelve degrees per frame is almost a full rotation per second in video rates. This is so fast that most cameras would acquire too much motion blur for registration to be possible. Therefore this test indicates the robustness of the FVR method within the context of camera pose estimation. \\
 
