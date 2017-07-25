@@ -52,9 +52,9 @@ It can be shown that, despite being limited to a single axis of rotation, the FV
 \section{Camera Rotation Tracking}
 \label{Sec:CamRoteTrackExp}
 
-Table \ref{table:rote} shows results for camera rotation experiments. These experiments were captured with the ASUS Xtion PRO LIVE camera using the same scene as results in section \ref{Sec:CamTransTrackExp}. These frames are each separated by 10, 20 and 30 degrees of camera rotation about the y-axis. These degrees were chosen because they are significantly large enough to be difficult for these algorithms to register against.  \\
+Table \ref{table:rote} shows results for camera rotation experiments. These experiments were captured with the ASUS Xtion PRO LIVE camera using the same scene as results in section \ref{Sec:CamTransTrackExp}. 3D frames of these scenes are separated by 10, 20 and 30 degrees of camera rotation about the y-axis. These degrees were chosen because they are significantly large enough to be difficult for these algorithms to register against.  \\
 
-Again, different levels of noise were added to both frames prior to registration. This experiment was designed to test the robustness of the FVR method in registering camera pose. \\
+Again, different levels of noise were added to each frame prior to registration. This experiment was designed to test the robustness of the FVR based methods in registering camera pose. \\
 
 
 %rotation
@@ -64,19 +64,19 @@ Again, different levels of noise were added to both frames prior to registration
 \begin{tabular}{ccccccccc}
 \\ \textbf{10deg} &   &   &   &   &   &   &   &   \\ 
 Noise & SNR & \textbf{FM2D} & \textbf{FM3D} & \textbf{ICP} & \textbf{PCA} & \textbf{FVR} & \textbf{FFVR} & \textbf{FVR3D} \\ \hline
-0 & infinity & 0.17 & 9.77 & 0.19 & 0.3 & 0.18 & 0.35 & 4.05 \\
-0.1 & 418950 & 0.21 & 0.41 & 0.17 & 0.67 & 0.15 & 0.21 & 10.54 \\
-0.25 & 66897.2 & 0.16 & 0.34 & 0.13 & 0.39 & 0.15 & 0.44 & 5.44 \\
+0 & $\infty$ & 0.17 & 9.77 & 0.19 & 0.3 & 0.18 & 0.35 & 4.05 \\
+0.1 & 20db & 0.21 & 0.41 & 0.17 & 0.67 & 0.15 & 0.21 & 10.54 \\
+0.25 & 12 & 0.16 & 0.34 & 0.13 & 0.39 & 0.15 & 0.44 & 5.44 \\
 \\ \textbf{20deg} &   &   &   &   &   &   &   &   \\ 
 Noise & SNR & \textbf{FM2D} & \textbf{FM3D} & \textbf{ICP} & \textbf{PCA} & \textbf{FVR} & \textbf{FFVR} & \textbf{FVR3D} \\ \hline
-0 & infinity & 1.37 & 13.1 & 1.81 & 16.93 & 7.29 & 1.32 & 3.18 \\
-0.1 & 418950 & 1.35 & 14.32 & 15.29 & 2.97 & 0.7 & 2.03 & 1.92 \\
-0.25 & 66897.2 & 1.6 & 3.26 & 14.7 & 0.64 & 1.54 & 4.29 & 2.24 \\
+0 & $\infty$ & 1.37 & 13.1 & 1.81 & 16.93 & 7.29 & 1.32 & 3.18 \\
+0.1 & 20db & 1.35 & 14.32 & 15.29 & 2.97 & 0.7 & 2.03 & 1.92 \\
+0.25 & 12db & 1.6 & 3.26 & 14.7 & 0.64 & 1.54 & 4.29 & 2.24 \\
 \\ \textbf{30deg} &   &   &   &   &   &   &   &   \\ 
 Noise & SNR & \textbf{FM2D} & \textbf{FM3D} & \textbf{ICP} & \textbf{PCA} & \textbf{FVR} & \textbf{FFVR} & \textbf{FVR3D} \\ \hline
-0 & infinity & 3.87 & 10.15 & 3.16 & 9.97 & 2.11 & 5.68 & 3.63 \\
-0.1 & 418950 & 3.77 & 16.65 & 39.37 & 77.6 & 3.84 & 2.82 & 1.39 \\
-0.25 & 66897.2 & 3.68 & 2.76 & 5.12 & 5.78 & 3.3 & 7.15 & 6.38 \\
+0 & $\infty$ & 3.87 & 10.15 & 3.16 & 9.97 & 2.11 & 5.68 & 3.63 \\
+0.1 & 20db & 3.77 & 16.65 & 39.37 & 77.6 & 3.84 & 2.82 & 1.39 \\
+0.25 & 12db & 3.68 & 2.76 & 5.12 & 5.78 & 3.3 & 7.15 & 6.38 \\
 \\
 \end{tabular}}
 \\
@@ -84,40 +84,10 @@ Noise & SNR & \textbf{FM2D} & \textbf{FM3D} & \textbf{ICP} & \textbf{PCA} & \tex
 \label{table:rote}
 \end{table}
 
+In the first sub-table, registration errors for 10 degrees of rotation are presented. Results show that the FVR method outperforms the other methods. Here, ICP performs next best followed by the 2D feature matching method. This was expected as the FVR method was designed to be both robust to noise and to handle larger rotations. It can also be seen that in the 20 degree and 30 degree tests, the FVR method also beats both of these algorithms in terms of having to lower registration error. FFVR also worked well at different noise levels up to 30 degrees of rotation. FVR3D was found to be as robust as ICP at registering rotation but not at accurate as the 2D feature matching method. \\ 
 
-Twelve degrees per frame is almost a full rotation per second in video rates. This is so fast that most cameras would acquire too much motion blur for registration to be possible. Therefore this test indicates the robustness of the FVR method within the context of camera pose estimation. \\
+It should be noted that twelve degrees of camera rotation per frame is almost a full rotation per second in video rates. This is so fast that most cameras would acquire too much motion blur for registration to be possible. Therefore this test indicates the robustness of the FVR method in comparison with the other algorithms within the context of camera pose estimation. \\
 
-Given 10 degrees of separation, the error was below 1 degree for noise levels less than or equal to 30\%. This base line error is due to the sampling resolution of the volume, as voxel error was in fact zero. This metric removes the error which is primarily due to quantization noise. As with the translation experiments, the effect of noise increases with camera disparity. At 30 degrees of camera rotation, little matching information is available in order to perform a registration for most techniques. However, for noise levels of 10\% or less, voxel distance error was as low as 4 with an angular error less than $3.8$ degrees. As mentioned, rotations of this magnitude are unlikely as motion blur would occur. Therefore these results show both the effectiveness of the FVR in terms of pose registration, as well as robustness to noise interference. \\
-
-
-\section{Object Motion Experiments}
-\label{Sec:FVRMotionExp}
-
-\begin{table}[!htb]
-\centering
-\scalebox{1.0}{
-\begin{tabular}{ccc}
-\hline
-\textbf{Object Size} & \textbf{error (cm)} & \textbf{error (voxel)}\\ \hline
-0.35 & 0 & 0\\
-2.95 & 0 & 0\\
-6.22 & 0 & 0\\
-12.28 & 0 & 0\\
-19.82 & 0 & 0\\
-22.39 & 0 & 0\\
-26.09 & 0 & 0\\
-31.00 & 0 & 0\\
-48.23 & 38.42 & 15\\
-74.32 & 113.57 & 44\\
-\\
-\end{tabular}}
-\\
-\caption{Object Motion Test}
-\label{table:OBJECT_MOVE_EXP}
-\end{table}
-
-
-In order to assess robustness to object motion, experiments were conducted by moving the ASUS Xtion PRO LIVE active camera backwards along the z-axis by 5 centimeters per frame whilst moving objects were placed in and out of the scene so that they only appear in one of the volumes being registered. Various sized objects including stacks of CDs, large boxes, people and several pieces of furniture were used and are measured by the percentage of the frame they occupy. Results from table \ref{table:OBJECT_MOVE_EXP} show the proposed method was accurate upto an object size of 31\%, but failed for objects taking up over 48.23\%.
 
 \section{Reconstructed Scenes}
 \label{Sec:FVRQual1Exp}
