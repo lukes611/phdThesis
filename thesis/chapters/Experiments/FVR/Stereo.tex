@@ -1,4 +1,4 @@
-
+	
 In these experiments, several current techniques (2D Feature Matching (FM-2D), 3D Feature Matching (FM-3D), ICP and PCA) are compared to the FVR technique in terms of stereo camera registration accuracy. To this end, several datasets from the Kitti Vision Benchmark dataset are used, these data were discussed in section \ref{TestDataSection}. As discussed, these are of complicated outdoor environments and a majority of frames contain moving objects which interfere with the registration process of several algorithms. \\
 
 Experiments are tabled in full at per frame intervals in the appendix (Appendix \ref{StereoResultsRaw}). Here, registration errors are presented where frame $n$ is registered against frame $n+1$ and the registration error is reported for each algorithm. The error function used is the Mean Squared Error $MSE(P,Q)$. This error is computed between the consecutive frames after registration. This error value is computed as in equation \ref{eqn:msesota}. Here, the function $Register(x)$ is replaced by the registration method being tested. \\
@@ -52,7 +52,7 @@ FVR3D	& 4.61 & 25.33\%\\
 \end{figure} 
 
 
-Table \ref{tab:kittidata0002sync} presents median error and \% best result statistics for the Kitti 0002 Sync Data Set. The road in which this scene contains some parked cars to the left as well as a building, some grass and some large trees. To the right there is an orange brick wall and some trees and gardens as well as two moving cyclists. Results show that the ICP method once again achieved the lowest median registration error at 4.43. The FVR3D algorithm achieved the next best result at 4.61 and the FM2D method achieved the 3rd best result. Interestingly FM3D and PCA achieved a lower median error and higher percent of best results as compared to the FVR method. Combined, the FVR based methods achieved the best result ~38.66\% of the time compared to ICP's 34.67\%. On this scene, the FM3D method did not have as many registration failures and achieved a better result compared to the FVR, FFVR and PCA methods. 
+Table \ref{tab:kittidata0002sync} presents median error and \% best result statistics for the Kitti 0002 Sync Data Set. The road in which this scene contains some parked cars to the left as well as a building, some grass and some large trees. To the right there is an orange brick wall and some trees and gardens as well as two moving cyclists. Results for the full 83 frames of the data set show that the ICP method once again achieved the lowest median registration error at 4.43. The FVR3D algorithm achieved the next best result at 4.61 and the FM2D method achieved the 3rd best result. Interestingly FM3D and PCA achieved a lower median error and higher percent of best results as compared to the FVR method. Combined, the FVR based methods achieved the best result ~38.66\% of the time compared to ICP's 34.67\%. On this scene, the FM3D method did not have as many registration failures and achieved a better result compared to the FVR, FFVR and PCA methods. 
 
 
 
@@ -75,7 +75,7 @@ FVR3D	& 3.52 & 16.99\%\\
 \label{tab:kittidata0005sync}
 \end{figure} 
 
-Statistics for the Kitti 0005 Sync Data Set are presented in table \ref{tab:kittidata0005sync}. The scene captured in this dataset was more difficult than previous scenes as it contains 2 moving cyclists and 1 large van which are both moving around in the scene without any relation to camera movement. In other words, these non-static objects cause major difficulties in most registration algorithms. Here, FM2D performed best with the lowest median error and highest percentage of best results. Next, ICP also performed well with the second best median error and percentage of best results measurement. Again, FVR3D came third best achieving the third best median error and percentage of best results. In the results for this dataset, FVR outperformed the FFVR method in terms of median registration error, but FFVR had a higher 
+Statistics for the Kitti 0005 Sync Data Set are presented in table \ref{tab:kittidata0005sync}. The scene captured in this dataset was more difficult than previous scenes as it contains 2 moving cyclists and 1 large van which are both moving around in the scene without any relation to camera movement. In other words, these non-static objects cause major difficulties in most registration algorithms. In the full 160 frames of the dataset, FM2D performed best with the lowest median error and highest percentage of best results. Next, ICP also performed well with the second best median error and percentage of best results measurement. Again, FVR3D came third best achieving the third best median error and percentage of best results. In the results for this dataset, FVR outperformed the FFVR method in terms of median registration error, but FFVR had a higher percentage of best results. \\
 
 %% kitti dataset 0091 Sync
 
@@ -90,12 +90,13 @@ ICP	& 3.61 & 23.6\%\\
 PCA	& 4.1 & 1.77\%\\
 FVR	& 3.93 & 12.09\%\\
 FFVR	& 3.78 & 10.03\%\\
-FVR3D	& 3.61 & 25.37\%\\
+FVR3D	& 3.6 & 25.37\%\\
 \end{tabular}
 \caption{Statistics for the Kitti Data 0091 Sync Data Set}
 \label{tab:kittidata0091sync}
 \end{figure} 
 
+Table \ref{tab:kittidata0091sync} presents results for the Kitti 0091 Data Set. This is the largest data set tested at 346 frames. The scene filmed in this dataset is that of an outdoors inner city. It contains many moving agents making it a scene which is difficult to register for most registrations algorithms. Specifically, it contains two cars, a van, 42 pedestrians and 8 cyclists. Registration results show FVR3D and FM2D achieved the best median error result with ICP achieving a close third place. In terms of this metric, FFVR outperforms FVR and they both outperform PCA and FM3D. Regarding the percentage of best results metric, FM2D achieved the highest percentage with ~\%25.96. FVR3D achieved the second best result at ~25.37\%. The FVR based methods performed well on this dataset, a hybrid approach would have achieved the best results 47.49\% of the time.  \\  	
 
 %% sync 0095
 
@@ -115,3 +116,6 @@ FVR3D	& 4.13 & 37.45\%\\
 \caption{Statistics for the Kitti Data 0095 Sync Data Set}
 \label{tab:kittidata0095sync}
 \end{figure} 
+
+Results for the Kitti 00095 Data Set are presented in table \ref{tab:kittidata0095sync}. This scene was much more static than the previous scenes. It contains primarily parked cars and buildings in an inner city environment. There are a few pedestrians and cyclists which are moving agents within the scene. This dataset is 274 frames and results show that FVR3D achieves both the best (lowest) median error score and the highest percentage of best results score at ~37.45\%. The FVR based methods have a hybrid percentage of best results value of 60.3\%. ICP achieved the seconds highest percentage of best results and FM2D achieved the 3rd best result. \\  
+
