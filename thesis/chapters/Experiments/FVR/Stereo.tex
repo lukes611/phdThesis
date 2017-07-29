@@ -75,11 +75,12 @@ FVR3D	& 3.52 & 16.99\%\\
 \label{tab:kittidata0005sync}
 \end{figure} 
 
-Statistics for the Kitti 0005 Sync Data Set are presented in table \ref{tab:kittidata0005sync}. The scene captured in this dataset was more difficult 
+Statistics for the Kitti 0005 Sync Data Set are presented in table \ref{tab:kittidata0005sync}. The scene captured in this dataset was more difficult than previous scenes as it contains 2 moving cyclists and 1 large van which are both moving around in the scene without any relation to camera movement. In other words, these non-static objects cause major difficulties in most registration algorithms. Here, FM2D performed best with the lowest median error and highest percentage of best results. Next, ICP also performed well with the second best median error and percentage of best results measurement. Again, FVR3D came third best achieving the third best median error and percentage of best results. In the results for this dataset, FVR outperformed the FFVR method in terms of median registration error, but FFVR had a higher 
 
 %% kitti dataset 0091 Sync
 
 \begin{figure}
+\centering
 \begin{tabular}{ccc}
 \hline
 \textbf{Algorithm} & \textbf{Median Error $\times$ 1000} & \textbf{\% best results}\\ \hline
