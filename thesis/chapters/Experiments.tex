@@ -51,6 +51,29 @@
 %the basic tracking stuff
 \input{chapters/Experiments/FVR/BasicTracking}
 
+\subsection{Comparison}
+
+\begin{table}[!t]
+\label{tab:GridRT}
+\centering
+\begin{tabular}{ccccccccc}\hline
+\textbf{Algorithm} & \textbf{translation} & \textbf{rotation} & \textbf{scale} & \textbf{non-static object motion} & \textbf{handles wide baselines well} & \textbf{monocular} & \textbf{stereo} & \textbf{active camera}\\ \hline
+FVR & yes & 1 axis only & yes & yes & yes & no & yes & yes\\
+FFVR & yes & 1 axis only & no & yes & no & no & yes & yes\\
+FVR-3D & yes & yes & yes & yes & no & no & yes & yes\\
+MMVR & yes & no & no & no  & no & yes & no & no\\
+\\
+\end{tabular}
+\\[10pt]
+\caption{Table Name}
+\end{table}
+
+
+Here we present a look-up table to assess the various abilities of each 3D reconstruction algorithm in terms or translation, rotation, scale, non-static object motion robustness and ability to handle various sensory types. Table \ref{tab:GridRT} presents these results. 
+
+
+
+
 %PTPTPT
 \section{Plane-Tree Experiments}
 \input{chapters/Experiments/PT/Intro}

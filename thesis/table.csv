@@ -1,0 +1,5 @@
+Algorithm,translation,rotation,scale,object motion,wide baselines,monocular	stereo,RGB-D
+FVR,yes,1 axis only,yes,yes,yes,no,yes,yes
+FFVR,yes,1 axis only,no,yes,no,no,yes,yes
+FVR-3D,yes,yes,yes,yes,no,no,yes,yes
+MMVR,yes,no,no,no,no,yes,no,no
