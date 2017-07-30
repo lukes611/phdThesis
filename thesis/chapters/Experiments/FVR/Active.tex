@@ -1,5 +1,4 @@
 
-Experiments evaluating the performance of the set of FVR related algorithms on active sensor camera input are presented here. These data-sets are all 25 frames long and captured of different environments using different camera movements. Due to the limitations of the ASUS Xtion PRO LIVE active camera used, indoor scenes were captured primarily. Similarly to the results presented in section \ref{StereoSOTA} statistics are presented for algorithms from the literature (FM2D, FM3D, ICP \& PCA) as well as FVR based algorithms (FVR, FFVR \& FVR-3D) in the form of the median registration error and the percentage of best results. 
 
 %%Apartment Texture Rotate:
 \begin{figure}
@@ -18,6 +17,11 @@ FVR3D	& 2.05 & 28\%\\
 \caption{Statistics for the Apartment Texture Rotate Data Set}
 \label{tab:apartmenttexturerotate}
 \end{figure} 
+
+
+Experiments evaluating the performance of the set of FVR related algorithms on active sensor camera input are presented here. These data-sets are all 24-25 frames long and captured of different environments using different camera movements. Due to the limitations of the ASUS Xtion PRO LIVE active camera used, indoor scenes were captured primarily. Similarly to the results presented in section \ref{StereoSOTA} statistics are presented for algorithms from the literature (FM2D, FM3D, ICP \& PCA) as well as FVR based algorithms (FVR, FFVR \& FVR-3D) in the form of the median registration error and the percentage of best results. Raw frame registration errors are presented in appendix \ref{ActiveResultsRaw}. \\
+
+Table \ref{tab:apartmenttexturerotate} shows results for the Apartment Texture Rotate Data Set. The scene filled in these data's frames are of an apartment living room, where the camera is rotated approximately 90 degrees over 25 frames. The scene contains an abundance of texture information. Results show that the FVR3D method achieved the lowest median error result, making it the top performer in terms of this metric. FM2D performed next best, and then ICP. Again, the FFVR algorithm outperformed the FVR algorithm. In terms of the percentage of best results metric, FM2D achieved the highest percentage at 28\%, FVR3D came second at ~28\%. A hybrid FVR method would have gathered a 44\% record of achieving the best registration result on these frames. \\
 
 
 
@@ -39,6 +43,7 @@ FVR3D	& 1.87 & 56\%\\
 \label{tab:apartmenttexturex-axisrotation}
 \end{figure} 
 
+Results for the Apartment Texture X-Axis Rotation Data Set are presented in table \ref{tab:apartmenttexturex-axisrotation}. This scene was captured by rotating the ASUS Xtion PRO LIVE active camera about the x-axis. The scene contains a Christmas tree as well as some bags on the floor in the center of an apartment room as well as some chairs to the right of the frame. Out of the set of FVR based techniques, only FVR-3D is capable of full 3D rotation registration, FVR and FFVR are only capable of being robust to this type of registration (handling it in the best way possible using translation, scaling and y-axis rotational transforms). Results show that the ICP method achieved the lowest median registration error with FVR-3D achieving the second best result. Interestingly, both FVR and FFVR outperformed PCA and FM3D despite these method's ability to register full 3D rotation (including x-axis). In terms of the percentage of best match metric, FVR-3D achieved the best result, outperforming the other algorithms 56\% of the time. \\
 
 %% desk texture translation
 \begin{figure}
@@ -58,7 +63,7 @@ FVR3D	& 1.23 & 16\%\\
 \label{tab:desktexturetranslation}
 \end{figure} 
 
-
+In table \ref{tab:desktexturetranslation} results are shown for the Desk Texture Translation scene. This scene includes a desk, a computer and computer monitor as well as several items including: books, a hat and pair of glasses and some books. The scene was captured by moving the ASUS Xtion PRO LIVE active camera directly down the x-axis to the right in a purely translational movement. Results show that the FVR-3D method achieved the lowest median registration error, with ICP performing second best. In this test, the FVR method outperformed the others in terms of median registration error. This is likely due to the fact that the camera was moved in a purely translational way compared to previous tests. The next lowest median error value was achieved by the FVR-3D algorithm, with FM2D trailing behind. Interestingly in the percentage of best results metric, ICP, which achieved a higher median error than all algorithms but FM3D, had the highest individual percentage of best results value of 28\%. Combined though, the FVR, FVR-3D and FFVR methods achieved the best frame registration around 48\% of the time.
 
 %%Office Textured Blindspot Rotation
 \begin{figure}
@@ -74,9 +79,11 @@ FVR	& 2.07 & 0\%\\
 FFVR	& 2.92 & 0\%\\
 FVR3D	& 1.1 & 24\%\\
 \end{tabular}
-\caption{Statistics for the Office Textured Blindspot Rotation Data Set}
+\caption{Statistics for the Office Textured Blind-spot Rotation Data Set}
 \label{tab:officetexturedblindspotrotation}
 \end{figure} 
+
+In table \ref{tab:officetexturedblindspotrotation} results are shown for the Office Textured Blind-spot Rotation Data Set. The scene is identical to the previous one (where results were presented in table \ref{tab:desktexturetranslation}, but the camera was rotated about the y-axis rather than translated about the x-axis. The scene contains a large blind-spot in which a part of the scene is hidden by a divider, the effect of which was to intentionally reduce overlap in terms of frame registration making it more difficult for these algorithms to compute registration accurately. Results show that the FVR-3D method achieved the lowest median error, but tied in second place with FM2D in terms of percentage of best results. In this data-set, ICP achieved the highest percentage of best results. \\
 
 %%Office Textured Items Translation
 \begin{figure}
@@ -96,6 +103,7 @@ FVR3D	& 2.83 & 44\%\\
 \label{tab:officetextureditemstranslation}
 \end{figure} 
 
+Table \ref{tab:officetextureditemstranslation} presents results for the Office Textured Items Translation Data Set. This scene was captured of a large room with large pieces of furniture, a large screen and a set of desks and chairs. This is another scene in which x-axis translation was the primary camera movement. Results show that the FVR-3D algorithm achieved both the lowest median error and the highest percentage of best results. Combined, the FVR methods achieved the best result ~72\% of the time. After FVR-3D and FFVR, FM2D performed next best with the second lowest median error score and 3rd highest percentage of best result score. \\
 
 %%office texture rotation
 \begin{figure}
@@ -114,4 +122,6 @@ FVR3D	& 4.35 & 23.08\%\\
 \caption{Statistics for the Office Texture Rotation Data Set}
 \label{tab:officetexturerotation}
 \end{figure} 
+
+In the final experiment using the ASUS Xtion PRO LIVE Active sensor camera, another large office space was filmed with y-axis rotation being the primary camera movement. This scene was named the Office Texture Rotation Data Set and statistics for registration results are presented in table \ref{tab:officetexturerotation}. These results reveal the FVR3D method achieved the lowest median error result but only the third highest percentage of best results score. A hybrid FVR based method would have achieved the best result around 38.46\% of the time. In terms of median error, FM2D beat ICP but the position was reversed in the percentage of best results metric. 
 
