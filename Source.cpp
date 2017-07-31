@@ -385,7 +385,7 @@ void quantitativeExperimentKitti10(string algorithm_name, string data_name, vect
 
 
 
-int main()
+int mainBasic()
 {
 	//currate("rotation.10deginc.office1", 0, 1, "10deg");
 	string tsets[1] = {
@@ -421,7 +421,7 @@ int main()
 
 
 
-int main2(int argc, char * * argv)
+int main(int argc, char * * argv)
 {
 
 	string namesList[20] = {
@@ -514,7 +514,7 @@ int main2(int argc, char * * argv)
 	int countList[5] = {107, 76, 153, 339, 267};
 
 	//for (int i = 2; i < 5; i++)
-	{
+	if(0){
 		int i = 2;
 		string kittiData = namesList2[i];
 		vector<int> inds = ll_experiments::rng(0, countList[i], 1);
@@ -531,19 +531,19 @@ int main2(int argc, char * * argv)
 	}
 
 	{
-		string fn = namesList[12];
+		string fn = namesList[0];
 		//exp1("Apartment.Texture.rotate", ll_experiments::rng(15, 20, 1));
 		int start = 4, to = 30, inc = 1;
 		vector<int> inds = ll_experiments::rng(start, to, inc);
-		quantitativeExperiment20("none", fn, inds);
-		quantitativeExperiment20("FM2D", fn, inds);
-		quantitativeExperiment20("FM3D", fn, inds);
-		quantitativeExperiment20("ICP", fn, inds);
-		quantitativeExperiment20("PCA", fn, inds);
+		//quantitativeExperiment20("none", fn, inds);
+		//quantitativeExperiment20("FM2D", fn, inds);
+		//quantitativeExperiment20("FM3D", fn, inds);
+		//quantitativeExperiment20("ICP", fn, inds);
+		//quantitativeExperiment20("PCA", fn, inds);
 		quantitativeExperiment20("FVR", fn, inds);
 		quantitativeExperiment20("FVR3D", fn, inds);
 		quantitativeExperiment20("FVR3D-2", fn, inds);
-		quantitativeExperiment20("FFVR", fn, inds);
+		//quantitativeExperiment20("FFVR", fn, inds);
 
 
 	}
