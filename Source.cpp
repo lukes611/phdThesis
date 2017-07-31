@@ -531,7 +531,7 @@ int main(int argc, char * * argv)
 	}
 
 	{
-		string fn = namesList[0];
+		string fn = namesList[7];
 		//exp1("Apartment.Texture.rotate", ll_experiments::rng(15, 20, 1));
 		int start = 4, to = 30, inc = 1;
 		vector<int> inds = ll_experiments::rng(start, to, inc);
