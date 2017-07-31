@@ -533,7 +533,7 @@ int main(int argc, char * * argv)
 	{
 		string fn = namesList[1];
 		//exp1("Apartment.Texture.rotate", ll_experiments::rng(15, 20, 1));
-		int start = 4, to = 30, inc = 1;
+		int start = 20/*4*/, to = 30, inc = 1;
 		vector<int> inds = ll_experiments::rng(start, to, inc);
 		//quantitativeExperiment20("none", fn, inds);
 		//quantitativeExperiment20("FM2D", fn, inds);
@@ -541,9 +541,9 @@ int main(int argc, char * * argv)
 		//quantitativeExperiment20("ICP", fn, inds);
 		//quantitativeExperiment20("PCA", fn, inds);
 		
-		quantitativeExperiment20("FVR3D", fn, inds);
+		//quantitativeExperiment20("FVR3D", fn, inds);
 		quantitativeExperiment20("FVR3D-2", fn, inds);
-		quantitativeExperiment20("FVR", fn, inds);
+		//quantitativeExperiment20("FVR", fn, inds);
 		
 		//quantitativeExperiment20("FFVR", fn, inds);
 
