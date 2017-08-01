@@ -514,23 +514,23 @@ int main(int argc, char * * argv)
 	int countList[5] = {107, 76, 153, 339, 267};
 
 	//for (int i = 2; i < 5; i++)
-	if(0){
-		int i = 2;
+	{
+		int i = 1;
 		string kittiData = namesList2[i];
 		vector<int> inds = ll_experiments::rng(0, countList[i], 1);
 		vector<int> inds2 = ll_experiments::rng(99, countList[i], 1);
 		//quantitativeExperimentKitti10("none", kittiData, inds);
 		//quantitativeExperimentKitti10("FM2D", kittiData, inds2);
 		//quantitativeExperimentKitti10("FM3D", kittiData, inds);
-		quantitativeExperimentKitti10("ICP", kittiData, inds);
-		quantitativeExperimentKitti10("PCA", kittiData, inds);
+		//quantitativeExperimentKitti10("ICP", kittiData, inds);
+		//quantitativeExperimentKitti10("PCA", kittiData, inds);
 		quantitativeExperimentKitti10("FVR", kittiData, inds);
-		quantitativeExperimentKitti10("FVR3D", kittiData, inds);
-		quantitativeExperimentKitti10("FVR3D-2", kittiData, inds);
-		quantitativeExperimentKitti10("FFVR", kittiData, inds);
+		//quantitativeExperimentKitti10("FVR3D", kittiData, inds);
+		//quantitativeExperimentKitti10("FVR3D-2", kittiData, inds);
+		//quantitativeExperimentKitti10("FFVR", kittiData, inds);
 	}
 
-	{
+	if(0){
 		string fn = namesList[1];
 		//exp1("Apartment.Texture.rotate", ll_experiments::rng(15, 20, 1));
 		int start = 20/*4*/, to = 30, inc = 1;
