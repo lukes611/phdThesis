@@ -515,7 +515,7 @@ int main(int argc, char * * argv)
 
 	//for (int i = 2; i < 5; i++)
 	{
-		int i = 1;
+		int i = 0;
 		string kittiData = namesList2[i];
 		vector<int> inds = ll_experiments::rng(0, countList[i], 1);
 		vector<int> inds2 = ll_experiments::rng(99, countList[i], 1);
@@ -524,9 +524,10 @@ int main(int argc, char * * argv)
 		//quantitativeExperimentKitti10("FM3D", kittiData, inds);
 		//quantitativeExperimentKitti10("ICP", kittiData, inds);
 		//quantitativeExperimentKitti10("PCA", kittiData, inds);
-		quantitativeExperimentKitti10("FVR", kittiData, inds);
-		//quantitativeExperimentKitti10("FVR3D", kittiData, inds);
-		//quantitativeExperimentKitti10("FVR3D-2", kittiData, inds);
+		//
+		quantitativeExperimentKitti10("FVR3D", kittiData, inds);
+		quantitativeExperimentKitti10("FVR3D-2", kittiData, inds);
+		//quantitativeExperimentKitti10("FVR", kittiData, inds);
 		//quantitativeExperimentKitti10("FFVR", kittiData, inds);
 	}
 
