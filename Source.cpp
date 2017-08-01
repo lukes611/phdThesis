@@ -525,9 +525,9 @@ int main(int argc, char * * argv)
 		//quantitativeExperimentKitti10("ICP", kittiData, inds);
 		//quantitativeExperimentKitti10("PCA", kittiData, inds);
 		//
-		quantitativeExperimentKitti10("FVR3D", kittiData, inds);
-		quantitativeExperimentKitti10("FVR3D-2", kittiData, inds);
-		//quantitativeExperimentKitti10("FVR", kittiData, inds);
+		//quantitativeExperimentKitti10("FVR3D", kittiData, inds);
+		//quantitativeExperimentKitti10("FVR3D-2", kittiData, inds);
+		quantitativeExperimentKitti10("FVR", kittiData, inds);
 		//quantitativeExperimentKitti10("FFVR", kittiData, inds);
 	}
 
