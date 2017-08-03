@@ -15,13 +15,13 @@ Error(frame_1, frame_2) =  \frac{Register(frame_1), frame2}{MSE(frame_1,frame_2)
 \begin{tabular}{ccc}
 \hline
 \textbf{Algorithm} & \textbf{Median Error $\times$ 1000} & \textbf{\% best results}\\ \hline
-FM2D	& 5.28 & 18.87\%\\
-FM3D	& 9235.71 & 1.89\%\\
-ICP	& 5.15 & 34.91\%\\
+FM2D	& 5.28 & 13.21\%\\
+FM3D	& 9235.71 & 0.94\%\\
+ICP	& 5.15 & 27.36\%\\
 PCA	& 5.66 & 2.83\%\\
-FVR	& 5.99 & 6.6\%\\
-FFVR	& 5.59 & 9.43\%\\
-FVR3D	& 5.38 & 25.47\%\\
+FVR	& 5.5 & 13.21\%\\
+FFVR	& 5.59 & 7.55\%\\
+FVR3D	& 5.1 & 34.91\%\\
 \end{tabular}
 \caption{Statistics for the Kitti Data 0001 Sync Data Set}
 \label{tab:kittidata0001sync}
@@ -29,7 +29,7 @@ FVR3D	& 5.38 & 25.47\%\\
 
 The summary of these results is also tabled here for convenience. For each algorithm, the median registration error is provided. This is computed by listing and sorting the registration error values for a particular algorithm and selecting the value in the middle. Assisting this is the percent of best results metric. This measures in percentage, the frequency of times a particular algorithm achieved the best (lowest error) registration result compared to the other algorithms tested. An algorithm with a lower median error compared to another algorithm would be said to have performed better overall. Additionally, if an algorithm has a higher percentage of best results, it outperformed the other algorithms a majority of the time. If an algorithm achieved an average percentage of bests results but a higher median error, this could be explained by outliers. If an algorithm achieved a lower median error but did not achieve the highest percentage of best results, it may be due to having a very competitive and consistent registration error. \\
 
-Table \ref{tab:kittidata0001sync} presents results for the Kitti 0001 Sync Data Set. The road in which this scene was filmed contains a tram-line and moving tram as well as a garden area to the right and a line of parked cars and houses under cover of shadows to the left. Registration statistics were taken over the full length of this data set, which is 105 frames for the Kitti 0001 Sync Data Set. Results show that ICP achieved the lowest median registration error, FM2D achieved the next lowest and the presented FVR3D method achieved the 3rd best result. Although FM2D achieved a lower median registration error, FVR3D achieved a higher percentage of best best frame registration results at ~25.47\% compared to FM2D's ~18.87\%. ICP did a achieve the highest percentage of best results on its own at ~34.91\% but combined, the FVR methods achieved the best result 41.5\% of the time. By using a hybrid registration method based on FVR, FFVR and FVR3D, these set of methods would achieve the best result on this dataset. The FVR method alone could only achieve a greater percentage of best results measurement than the FM3D method (which had several frame registration failures, as is evident in its statistics) and the PCA method. Of greater interest is the performance of the FFVR method in comparison to the FVR method. It can be seen that although FVR performs far better than the FFVR on wide baselines, the FFVR actually has better performance at smaller ones such as the Kitti Vision Benchmark Dataset. \\ 
+Table \ref{tab:kittidata0001sync} presents results for the Kitti 0001 Sync Data Set. The road in which this scene was filmed contains a tram-line and moving tram as well as a garden area to the right and a line of parked cars and houses under cover of shadows to the left. Registration statistics were taken over the full length of this data set, which is 105 frames for the Kitti 0001 Sync Data Set. Results show that FVR3D achieved the lowest median registration error, ICP achieved the next lowest followed by FM2D and the FVR method. FVR3D also achieved the highest percentage of best best frame registration results at ~34.91\% compared to runner-up ICP's ~27.36\%. If the FVR methods were combined as a single hybrid method, they would have computed the best registration result 55.67\% of the time. The FVR method alone outperformed FFVR, PCA and FM3D. The FM3D method (which had several frame registration failures, as is evident in its statistics) and the PCA method were the worse performers on this dataset. It can be seen that the FFVR, whilst faster than the FVR method is slightly worse off in terms of performance. \\ 
 
 
 %% sync 0002
