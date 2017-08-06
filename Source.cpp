@@ -515,7 +515,7 @@ int main(int argc, char * * argv)
 
 	//for (int i = 2; i < 5; i++)
 	{
-		int i = 3;
+		int i = 4;
 		string kittiData = namesList2[i];
 		vector<int> inds = ll_experiments::rng(252, countList[i], 1);
 		//vector<int> inds2 = ll_experiments::rng(99, countList[i], 1);
