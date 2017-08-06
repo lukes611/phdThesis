@@ -3,7 +3,7 @@ The Fourier Volume Reconstruction (FVR) method described in sections \ref{Sec:Vo
 
 Below, in section \ref{subsec:DSBR} both the advantages and limitations of 3D reconstruction via active depth sensors are discussed. It was discovered that the closer computed depth is to true depth (either via a stereo camera pair, active camera or monocular camera) the better the camera pose registration using the FVR method would be. Section \ref{subsec:SCBR} covers stereo input. Stereo pair computed depth has the potential to be the most accurate in terms of depth accuracy and resolution. Since the resolution only depends on the camera pair used, it can be high in contrast to active cameras. Budget active cameras such as the Microsoft Kinect and ASUS Xtion PRO LVIE camera, typically have a lower resolution than budget HD video cameras. \\
 
-In section \ref{subsec:MVVRMethodology} the FVR is applied to monocular data. This technique is named Monocular View Volume Reconstruction (MVVR). The MVVR is discussed in terms of process and limitations in this section. Experiments in section \ref{Sec:MonocularExperimentsSection} show that the MVVR method is capable of camera translation tracking using noisy depth data generated using only monocular methods. However, its accuracy greatly depends on the quality of the 3D frames generated. \\
+In section \ref{subsec:MVVRMethodology} the FVR is applied to monocular data. This technique is named Monocular View Volume Reconstruction (MVVR). The MVVR is discussed in terms of process and limitations in this section. Experiments in section \ref{Sec:MonocularSOTA} show that the MVVR method is capable of camera translation tracking using noisy depth data generated using only monocular methods. However, its accuracy greatly depends on the quality of the 3D frames generated. \\
 
 \subsubsection{Depth Sensor Based Reconstruction}
 \label{subsec:DSBR}
@@ -141,4 +141,4 @@ Using the concept of parallax, we know that the magnitude of the displacement ve
  
 \subsubsection{Limitations of MVVR}
 
-During experiments it was discovered that due to the high levels of noise, the MVVR method was limited to registration of translation information only. This was due to the difficulty in computing depth data using basic methods such as stereo methods between frames and optical flow. Despite this limitation, the FVR method was able to register up to 15 centimetres of camera translation (see experiments in section \ref{Sec:MonocularExperimentsSection}).  
+During experiments it was discovered that due to the high levels of noise, the MVVR method was limited to registration of translation information only. This was due to the difficulty in computing depth data using basic methods such as stereo methods between frames and optical flow. Despite this limitation, the MVVR method was able to register camera translation (see experiments in section \ref{Sec:MonocularSOTA}).  

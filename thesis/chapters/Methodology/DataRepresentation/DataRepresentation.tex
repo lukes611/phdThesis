@@ -97,7 +97,7 @@ The linear tree representation stores each leaf node individually. Each leaf is 
 
 \label{sec:dr:coding}
 
-The Shade-Tree compression system \ref{Gonzalez07ShadeTree} was designed for the compression of 2D image data. However, this method is easily extended to 3D Volumetric data. In this system, Octants are decomposed in the same manner as with a regular octree but the leaf node representation is different. In the Shade-Tree, the corner values in the volume are sampled for each node.  \\
+The Shade-Tree compression system \cite{Gonzalez07ShadeTree} was designed for the compression of 2D image data. However, this method is easily extended to 3D Volumetric data. In this system, Octants are decomposed in the same manner as with a regular octree but the leaf node representation is different. In the Shade-Tree, the corner values in the volume are sampled for each node.  \\
 
 
 To model the geometric information within each node using the corner values, interpolation is used. By interpolating between these 4 corner values, a model of the data within the geometric subspace within the node may be generated. This representation saves space by storing only 4 corner values rather than explicitly storing the dense volumetric data. As in the 2D Shade-Tree this method allows for nodes to share data further compressing the structure. For example, if two leaf nodes happen to share a corner, then the corner only needs to be encoded at the node which is visited first according to the ordering of the tree (breadth first or depth first). This constitutes no additional coding for the representation. \\

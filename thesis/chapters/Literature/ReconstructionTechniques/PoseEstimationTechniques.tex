@@ -153,12 +153,12 @@ The method works by computing camera pose, transforming depth data by a computin
 
 \begin{figure}[!htb]
 \centering
-%\includegraphics[width=12cm]{images/ch1/Newcombe11KinectFusion1}
+\includegraphics[width=12cm]{images/ch1/Newcombe11KinectFusion1}
 \caption{Kinect Fusion Algorithm Pipeline \cite{Newcombe11Kinectfusion}}
 \label{KFusionPipeliciteHne}
 \end{figure}
 
-Kinect Fusion has four main steps as illustrated in figure \ref{KFusionPipeline}. The first step performs pre-processing on the depth data as well as generation of additional information for use by Kinect Fusion. Each depth map frame is first passed through a bilateral filter. From this, a dense vertex map (map of 3D points projected using a known projection matrix associated with the Kinect) is generated, as well as a normal map. For both the vertex and normal maps, a 3 level image pyramid is constructed. This makes the coarse to fine grain ICP technique possible. \\
+Kinect Fusion has four main steps as illustrated in figure \ref{KFusionPipeliciteHne}. The first step performs pre-processing on the depth data as well as generation of additional information for use by Kinect Fusion. Each depth map frame is first passed through a bilateral filter. From this, a dense vertex map (map of 3D points projected using a known projection matrix associated with the Kinect) is generated, as well as a normal map. For both the vertex and normal maps, a 3 level image pyramid is constructed. This makes the coarse to fine grain ICP technique possible. \\
 
 Next, the dense coarse to fine grain ICP is used to compute pose between the fused frames and the current frame. The authors exploit the fact that the transformation between frames is small because camera motion is slow when computing against every frame. With coarse-to-fine grain ICP they use projective data association \cite{Blais95Registering} and the point-plane metric for pose optimization \cite{Rusinkiewicz02Real}. The ICP based pose estimation computes pose given both a predicted and measured depth map. \\
 
@@ -169,7 +169,7 @@ As mentioned, Kinect fusion uses pose prediction and fuses each depth map into t
 
 \subsubsection{FOVIS and ICP Integration}
 
-Whelan et al improved \cite{Whelan13Robust} upon their previous method \cite{Whelan12Kintinous} by integrating FOVIS and ICP together on the GPU, and adding an advanced colour fusion model to the technique. The primary improvement lies in switching between FOVIS and ICP whenever the error using FOVIS is too high, ICP is used. They also integrate using a global model rather than a local one. \\
+Whelan et al improved \cite{Whelan13Robust} upon their previous method \cite{Whelan12Kintinuous} by integrating FOVIS and ICP together on the GPU, and adding an advanced colour fusion model to the technique. The primary improvement lies in switching between FOVIS and ICP whenever the error using FOVIS is too high, ICP is used. They also integrate using a global model rather than a local one. \\
 
 
 \subsection{Direct Optimization Methods}
