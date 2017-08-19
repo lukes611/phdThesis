@@ -1,12 +1,8 @@
 Title Pages
+	notes:
+		2 - now I only mentioned I reference any previous work
 
-2. [now I only mentioned I reference any previous work]
-
-Abstact
-
-4. "3D reconstruction algorithms generate 3D data from image or video data." ==>  should be changed to "Three dimensional reconstruction algorithms generate 3D data from two dimensional image or video data.
-
-5. "Fourier Volume Registration was explored in order to document the effects of 3D reconstruction and registration. ==>  should be changed to "This thesis investigates the application of Fourier Volume Registration to 3D reconstruction".
+Abstract
 
 6. "it is a closed solution" ==>  should be changed to "it is a closed form solution"
 
