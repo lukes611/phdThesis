@@ -1,7 +1,5 @@
 Title Pages
 
-1, the title is hierarchical and phase correlation techniques for 3d reconstruction, but the thesis does not discuss any hierarchical methods for 3d reconstruction. I think you need to change the title to be something more like "Non iterative Three dimensional reconstruction and representation"
-
 2. In the statement of the originality you claim "This work has not previously been submitted for a degree or diploma to any university" yet  starting from page 120 much of the text is copied straight from your honours thesis and the impression is made in the body of the thesis that as a whole it is a new contribution. This needs to be clarified
 
 Abstact
