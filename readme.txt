@@ -1,6 +1,6 @@
 Title Pages
 
-2. In the statement of the originality you claim "This work has not previously been submitted for a degree or diploma to any university" yet  starting from page 120 much of the text is copied straight from your honours thesis and the impression is made in the body of the thesis that as a whole it is a new contribution. This needs to be clarified
+2. [now I only mentioned I reference any previous work]
 
 Abstact
 
