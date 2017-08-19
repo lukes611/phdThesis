@@ -4,8 +4,6 @@ Title Pages
 
 Abstact
 
-3. Starting a sentence with an abbreviation, in this case in the abstract that starts "3D reconstruction" is informal and in appropriate. It needs to be  "Three dimensional reconstruction"
-
 4. "3D reconstruction algorithms generate 3D data from image or video data." ==>  should be changed to "Three dimensional reconstruction algorithms generate 3D data from two dimensional image or video data.
 
 5. "Fourier Volume Registration was explored in order to document the effects of 3D reconstruction and registration. ==>  should be changed to "This thesis investigates the application of Fourier Volume Registration to 3D reconstruction".
