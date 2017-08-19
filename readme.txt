@@ -2,19 +2,11 @@ Title Pages
 	notes:
 		2 - now I only mentioned I reference any previous work
 
-Abstract
-
-6. "it is a closed solution" ==>  should be changed to "it is a closed form solution"
-
-7. The abstract should reflect that the plane tree was first proposed in your honours thesis, give a reference your honour's thesis and  then discuss what additional work or improvements you have made over that. 
-
-8.  "The findings presented on both the Fourier Volume Reg- istration method and the Plane-Tree indicate an improvement over existing methods and may lead to new research into the areas of Fourier registration and Hierarchical data representation research." ==> delete the second half of this sentence
-
 Sect 1.2 Contributions
+	notes:
+		9 - it is a new algorithm compared to the honours though
 
-9. "In terms of compression research, a novel data representation based on Octree 3D data compression is proposed" ==> this is confusing since this contribution was made in your honours thesis. State what improvements or modifications have you made since then.
-
-Chapter 2 
+Chapter 2
 
 10. I stopped looking at the english and just focused on content. I have no specific comments for chap 2
 
