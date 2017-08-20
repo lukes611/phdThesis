@@ -11,21 +11,26 @@ Chapter 3
 		12. Be sure in include the complexity discussion of SIFT in section 3.14 that I gave you the reference for.
 			sift complexity 
 				N = N^2 is the no. pixels in the image
-				w = gausian filter size 
-				s = number of octaves
-				α,a = the fraction of extrema in the image [0-1]
-				β,b = fraction of extrema which are features [0-1]
-				γ,y = additional keypoints found after rotation is investigated 
-				x = the size of the descriptor neighbourhood
+				w = gausian filter size  eg 5
+				s = number of octaves eg. 3
+				α,a = the fraction of extrema in the image [0-1] eg .006
+				β,b = fraction of extrema which are features [0-1] eg .35
+				γ,y = additional keypoints found after rotation is investigated, eg .0004
+				x = the size of the descriptor neighbourhood eg 8
 
 				number key-points = (αβ + γ)(N^2)
 				number of operations = complexity = N^2(s(4w^2 + 100a + 156) + 1520x^2(ab + y))
 				number of operations per feature (f=num features) = N^2(1520fx^2 + 48s) + 100sf 
+				
+				complexity given feature percentage: f
+				feature percentage is 
+				N^2(s(4w^2 + 100*0.006 + 156) + 1520x^2f)
+				
 			surf complexity
 				from: https://github.com/herbertbay/SURF
 				N = N^2 is number of pixels
-				s = num octaves
-				u = sample scalar
+				s = num octaves, eg 3
+				u = sample scalar eg 3
 				f = fraction of pixels which are features
 					create integral image: N^2 + N ops
 					fast hessian: [668(N/u*2^i)^2 for i in range(1,s)]
@@ -37,23 +42,13 @@ Chapter 3
 				= O(p^2N^2+p^3)
 				= O(9N^2 + 27)
 			ransac complexity
-				I = num iterations
-				i = num feature matches
+				I = num iterations eg 500
+				i = num feature matches eg 200
 				
 				I * (i * (26 + 108))
 				
 			3d fm complexity
-				N = N^3 is the no. pixels in the 3d image
-				w = gausian filter size 
-				s = number of octaves
-				α,a = the fraction of extrema in the image [0-1]
-				β,b = fraction of extrema which are features [0-1]
-				γ,y = additional keypoints found after rotation is investigated 
-				x = the size of the descriptor neighbourhood
-
-				number key-points = (αβ + γ)(N^3)
-				number of operations = complexity = N^3(s(4w^3 + 100a + 156) + 1520x^3(ab + y))
-				number of operations per feature (f=num features) = N^2(1520fx^3 + 48s) + 100sf 
+				similar to 2d
 			icp complexity
 				I * knn * ([leastsq]12i + 4i + 96) * i*21[transforms]
 			k-nearest neighbours:
