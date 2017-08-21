@@ -14,7 +14,7 @@ A block diagram integrating these speed improvements into the FVR method introdu
 The magnitude of the frequency domain is independent to translation and any rotation and scale occurs about the center of both volumes. Both frequency domain volumes are then transformed into 2D spherical space using the $Spherical2DMap$ function. This function produces an image in which 3D y-axis rotation from the original volume is interpreted as 2D translation. To recover the rotation parameter, phase correlation is used to measure the translational component separating the spherical-map domain images. This translational component is then processed to compute the y-axis rotational factor separating the original input volumes. The rotation factor can be directly output as a parameter if required. \\
 
 
-\begin{figure}[!htb]
+\begin{figure}[!h]
 \centering
 \includegraphics[width=5.0in]{images/ch2/pipeline3}
 \caption{System Diagram for Fast Volume Registration}
@@ -201,3 +201,83 @@ Figure \ref{fig:perfComp} provides a visualization of the performance improvemen
 \caption{Comparison of performance between FVR and FFVR.}
 \label{fig:perfComp}
 \end{figure}
+
+\subsubsection{Performance Comparison}
+
+In this section, the computational complexities of the FVR related techniques are compared with common algorithms used for 3D reconstruction from the literature. These include: 2D/3D Feature Matching (SURF/SIFT) with RANSAC, PCA, and ICP. These algorithms are compared with the complexity of the FVR, FFVR and FVR-3D (Note: the complexity of MVVR is similar to FVR). Here we use $N$ to represent volume size, for example the FVR based methods usually use a volume of size $N^3$. $W$ is used to describe the size of images processed (used to describe the number of pixels in a $W\times W$ image, projected into a $W\times W$ 3D point cloud). \\
+
+
+First, the two feature matching methods SIFT and SURF are evaluated. The complexity evaluation of SIFT was taken from work by Vinukonda \cite{Vinukonda11Study} whilst the complexity of SURF was computed based on a public implementation found at \url{https://github.com/lukes611/phdThesis}. The complexity of SIFT is based on the image size $W$, the Gaussian filter size $w$ (typically 5), the number of octaves $s$ (3 are used in experiments), the fraction of extrema in the image $\alpha$ (found to be approximately 6\%), the fraction of extrema which are features $\beta$ (found to be approximately 35\%), the number of additional features found $\gamma$ (found to be approximately .04\%) and the size of the descriptor neighbourhood $x$ (typically 8). \\
+
+
+The complexity of finding SIFT features and computing a SIFT descriptor for an image was found to be,
+
+\begin{equation} \label{eqn:SIFT_PERF}
+W^2(s(4w^2 + 100\alpha + 156) + 1520x^2(\alpha \beta + \gamma))
+\end{equation}
+
+by plugging in the usual values we can form a computational cost as a function of $W$ and variables $\alpha$, $\beta$ and $\gamma$, the variables representing the fraction of pixels which are features.
+
+\begin{equation} \label{eqn:SIFT_PERF_FINAL}
+W^2(300\alpha + 768 + 97280(\alpha \beta + \gamma))
+\end{equation}
+
+The complexity of SURF is based on several similar factors. Again, $W$ is the image size, $s$ is the number of octaves (3 is the default), $\alpha$ is a scalar (with a default value of 3), and $f$ the fraction of image pixels which are detected as features. Functions which make up the SURF feature detection and descriptor extraction include integral image creation of complexity $W^2 + W$, computation of Hessian feature detection of complexity $\sum_{i=1}^{s} 668(\frac{N}{2^i\alpha})^2$ and the computation of the SURF descriptors of complexity $213434N^2f$. Plugging in default values, the complexity may be formed as a function of the image size, $W$ and the percentage of pixels found to be features $f$.
+
+\begin{equation} \label{eqn:SURF_PERF_FINAL}
+W^2 + W + N^2(1972.688 + 213434f)
+\end{equation}
+
+The complexity of RANSAC was also analysed. Based the implementation used to compute camera pose from feature matches and corresponding 3D points, the complexity is dependent on $W$ the image size, $I$ the number of iterations (we use 500) and $f$ the fraction of pixels which are matched features. The total complexity is given in equation \ref{eqn:RANSAC_PERF_FINAL}.
+
+\begin{equation} \label{eqn:RANSAC_PERF_FINAL}
+134IN^2f
+\end{equation}
+
+Therefore the total complexities of SURF + RANSAC and SIFT + RANSAC are given in equations \ref{eqn:SURFRANSAC_PERF_FINAL} and \ref{eqn:SIFTRANSAC_PERF_FINAL} respectively.
+
+\begin{equation} \label{eqn:SIFTRANSAC_PERF_FINAL}
+W^2(300\alpha + 768 + 97280(\alpha \beta + \gamma)) + 134IN^2(\alpha \beta + \gamma)
+\end{equation}
+
+\begin{equation} \label{eqn:SURFRANSAC_PERF_FINAL}
+W^2 + W + N^2(1972.688 + 213434f) + 134IN^2f
+\end{equation}
+
+The complexity of the 3D extension of the SIFT feature matching + RANSAC method  is shown in equation \ref{eqn:SIFT3DRANSAC_PERF_FINAL}, where $N^3$ is the volume size used to project the 3D data into.
+
+\begin{equation} \label{eqn:SIFT3DRANSAC_PERF_FINAL}
+N^3(1968 + 300\alpha + 41040(\alpha \beta + \gamma)) + 134IN^3(\alpha \beta + \gamma)
+\end{equation}
+
+The complexity of the PCA method was found in \cite{Johnstone04Sparse}. It is a function of $W$ (again where the number of pixels in the image is $W^2$) and $p = 3$ the dimensionality of the 3D points. The complexity was found to be $p^2W^2+p^3$, plugging in 3 for $p$ gives the complexity as a function of $W$ provided in equation \ref{eqn:PCA_PERF_FINAL}.
+
+\begin{equation} \label{eqn:PCA_PERF_FINAL}
+9W^2 + 27
+\end{equation}
+
+Finally the complexity of ICP is described. The complexity of ICP in the context of pose estimation is based on the complexity of computing the K Nearest Neighbours (KNN) algorithm between point clouds ($3W^2f$), and also computing the least squares optimal pose based on the matches ($16W^2f + 96$) and testing the computed pose $21W^2f$. Here, $W$ is the image size and $f$ is the fraction of projected pixels used in the ICP algorithm. This is performed up to 500 times leading to the complexity in equation \ref{eqn:ICP_PERF_FINAL}.
+
+\begin{equation} \label{eqn:ICP_PERF_FINAL}
+1008W^8f^3 + 6048W^4f^2
+\end{equation}
+
+The complexities for each of the algorithms mentioned are shown in table \ref{table:ALG_COMPLEX_TBL}.
+
+\begin{table}[!t]
+\label{table:ALG_COMPLEX_TBL}
+\centering
+\begin{tabular}{cc}\hline
+\textbf{Algorithm} & \textbf{Complexity}\\ \hline
+FM2D + RANSAC & $W^2 + W + W^2(1972.688 + 213434f) + 134IW^2f$\\
+FM3D + RANSAC & $N^3(1968 + 41040f) + 134IN^3f$\\
+PCA & $9W^2 + 27$\\
+ICP & $1008W^8f^3 + 6048W^4f^2$\\
+FVR & $8N^3\log{N^3} + 4N^3 + 322$\\
+FFVR & $2N^3\log{N^3} + 9N^2\log{N^2} + 6N^2 + 169$\\
+FVR3D & $8N^3\log{N^3} + 4N^3 + 349 + 9W^2$\\
+\\
+\end{tabular}
+\\[10pt]
+\caption{Algorithm Complexities}
+\end{table}
