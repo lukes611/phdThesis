@@ -262,7 +262,7 @@ Finally the complexity of ICP is described. The complexity of ICP in the context
 1008W^8f^3 + 6048W^4f^2
 \end{equation}
 
-The complexities for each of the algorithms mentioned are shown in table \ref{table:ALG_COMPLEX_TBL}.
+The complexities for each of the algorithms mentioned are shown in table \ref{table:ALG_COMPLEX_TBL}. Figure \ref{fig:COMPLEX_COMP_CHART} compares complexity as a function of percentage of pixels used as features. In this figure, both ICP and FM3D were left out as they had theoretical performances which were so large they skewed the comparison. In these tests, we used a RANSAC iteration count of 500, image sizes of $1024^2$ and volume sizes of $256^3$. The RANSAC iteration count was chosen as it worked well in experiments, the image sizes were chosen to be HD and the volume size was chosen based on the experiments performed using the FVR based algorithms. Comparing these results, FM2D has the largest complexity. FVR and FVR-3D had essentially the same complexity and FFVR was found to be slightly faster than these, as it was designed to be. PCA is the simplest algorithm and the fastest here. Both ICP and FM3D had complexities which were found to increase exponentially as the percentage of pixels increased, whilst FM2D increased linearly. PCA and the FVR based methods have flat complexities which do not vary with the amount of features used since they use the entire point cloud or volume. \\
 
 \begin{table}[!t]
 \label{table:ALG_COMPLEX_TBL}
@@ -281,3 +281,11 @@ FVR3D & $8N^3\log{N^3} + 4N^3 + 349 + 9W^2$\\
 \\[10pt]
 \caption{Algorithm Complexities}
 \end{table}
+
+
+\begin{figure}
+        \centering
+        \includegraphics[width=5.0in]{images/theoreticalSpeedComparison}
+        \caption{Theoretical Complexity Comparison}
+        \label{fig:COMPLEX_COMP_CHART}
+\end{figure}

@@ -9,6 +9,6 @@ rm *.brf
 rm *.toc
 rm *.bak
 rm *.bbl
-rm *.pdf
+rm phdThesis.pdf
 rm *.dvi
 rm *.zip

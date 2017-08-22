@@ -9,6 +9,6 @@ del *.brf
 del *.toc
 del *.bak
 del *.bbl
-del *.pdf
+del phdThesis.pdf
 del *.dvi
 del *.zip
