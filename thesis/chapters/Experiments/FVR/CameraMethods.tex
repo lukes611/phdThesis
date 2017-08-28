@@ -3,8 +3,71 @@
 
 Experiments show that the FVR based techniques are capable of registration across the three primary types of sensors used in 3D reconstruction and SLAM research. These sensors include: Stereo sensors, which are capable of generating dense depth data with the highest accuracy and resolution, active cameras which are efficient hardware based solutions to depth generation and monocular cameras, which produce the least accurate and most noisy depth maps. As mentioned in the literature review these sensor types have associated advantages and disadvantages. \\
 
-In section \ref{StereoSOTA}, results testing the stereo Kitti dataset are presented. These show that FVR based methods, particularly FVR3D are suitable for dense 3D reconstruction and are highly robust to noise, object movement and outdoor scenes. In particular it is shown that the FVR3D method is capable of outperforming other algorithms used in the literature in terms of registration accuracy. \\
+In section \ref{StereoSOTA}, results testing the stereo Kitti dataset are presented. These show that FVR based methods, particularly FVR3D are suitable for dense 3D reconstruction and are highly robust to noise, object movement and outdoor scenes. In particular it is shown that the FVR3D method is capable of outperforming other algorithms used in the literature in terms of registration accuracy. Below is a list of data included in the Kitti Benchmark Dataset, data used in experiments are documented in the list. \\
 
-Section \ref{ActiveSOTA} presents results testing scenes captured using the ASUS Xtion PRO LIVE active camera. Various types of scenes and camera movements were recorded and results show the FVR based methods perform robust and accurate 3D reconstruction. In particular it is shown that FVR3D can outperform other techniques from the literature, even when faced with a reduction in depth resolution when using the active camera as opposed to the stereo set-up tested with the Kitti Vision Benchmark Dataset.  \\
 
-Lastly, section \ref{Sec:MonocularSOTA} presents results on the MVVR method, the FVR extension for monocular sensor input datasets. Experiments have revealed that the MVVR is not able to robustly handle rotation due to the noise generated when building the depth map, however translation is possibly. It can be said based on empirical results that the FVR based technique's accuracy and robustness increases with the resolution and accuracy of the depth maps used as input. \\
+
+\begin{easylist}[itemize]
+\ListProperties(Space*=-1em,Space=-1em)
+& Grayscale stereo images
+&& Synced and Rectified
+&& resolution: 1390 x 512
+&& captured with a 0.5 mega-pixel camera
+&& used in experiments
+& RGB-Color stereo images
+&& Synced and Rectified
+&& resolution: 1390 x 512
+&& captured with a 0.5 mega-pixel camera
+&& used in experiments
+& 3D point clouds
+&& generated using a Velodyne laser scanner
+&& max depth: 120m
+&& ~100,000 points per frame
+&& stored as a list of float based vectors in binary format
+&& used in experiments
+& 3D GPS / IMU data
+&& location, speed, acceleration and other meta-data information
+&& text format
+& Calibration Data 
+&& Camera
+&& Camera to GPU/IMU
+&& Camera to Velodyne [used in experiments]
+&& text file
+& 3D object tracklet labels
+&& cars, trucks, trams, pedestrians and cyclists
+&& xml file
+\end{easylist}
+
+
+Section \ref{ActiveSOTA} presents results testing scenes captured using the ASUS Xtion PRO LIVE active camera. Various types of scenes and camera movements were recorded and results show the FVR based methods perform robust and accurate 3D reconstruction. In particular it is shown that FVR3D can outperform other techniques from the literature, even when faced with a reduction in depth resolution when using the active camera as opposed to the stereo set-up tested with the Kitti Vision Benchmark Dataset. A list of data within this dataset is shown below.  \\
+
+\begin{easylist}[itemize]
+\ListProperties(Space*=-1em,Space=-1em)
+& RGB-Color images
+&& Synced \& Calibrated
+&& resolution: 640 x 480 (when calibrated), (1240 x 1080 max)
+&& 30-60 frames per second
+&& used in experiments
+& 3D point clouds
+&& generated using a structured light technique
+&& depth range: 0.8m - 3.5m
+&& low resolution: 640 x 480
+&& 30 frames per second
+&& used in experiments
+& 3D GPS / IMU data
+\end{easylist}
+
+
+Lastly, section \ref{Sec:MonocularSOTA} presents results on the MVVR method, the FVR extension for monocular sensor input datasets. Experiments have revealed that the MVVR is not able to robustly handle rotation due to the noise generated when building the depth map, however translation is possibly. It can be said based on empirical results that the FVR based technique's accuracy and robustness increases with the resolution and accuracy of the depth maps used as input. Below is a list of data used in these experiments. \\
+
+\begin{easylist}[itemize]
+\ListProperties(Space*=-1em,Space=-1em)
+& RGB-Color images
+&& ASUS Xtion PRO LIVE camera
+&&& resolution: 1240 x 1080
+&&& 30 frames per second
+&& Microsoft Life-Cam HD3000
+&&& resolution: 1240 x 1080
+&&& 30 frames per second
+\end{easylist}
+

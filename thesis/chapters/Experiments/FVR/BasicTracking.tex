@@ -3,7 +3,7 @@ Experiments measuring the error after moving the camera in specific increments u
 
 Different levels of noise were added to both frames prior to 3D registration in order to measure each method's ability to register frames with large amounts of noise. The Signal to Noise Ratio (SNR) metric is used to describe the noise added to both captured frames, prior to any registration. This noise effects any registration method's ability to accurately estimate the transformation separating two sets of data. In a given experiment, a noise range value of $x$ means random noise was added in the range [$\frac{-x}{2}$, $\frac{x}{2}$] to a signal within the range [0, 1]. Reconstruction error is measured in mean squared error (as presented in section \ref{metricsSection}). \\
 
-Table \ref{table:trans} shows the results of these tests, they illustrate the FVR's robustness to noise whilst registering frames which are captured during different camera translation intervals. Each sub-table is labelled with a distance in centimeters in which frames were separated prior to registration. The first two columns represent the amount of noise added both in terms of noise-range and the subsequent Signal to Noise ratio computed from it. The rest of the columns represent the registration error using the Mean Squared Error metric.  \\
+Table \ref{table:trans} shows the results of these tests, they illustrate the FVR's robustness to noise whilst registering frames which are captured during different camera translation intervals. Each sub-table is labelled with a distance in centimeters in which frames were separated prior to registration. The first two columns represent the amount of noise added both in terms of noise-range and the subsequent Signal to Noise ratio computed from it. The rest of the columns represent the registration error using the Mean Squared Error metric. Errors above 30 are capped, the final row of each table shows the average error for every noise level. \\
 
 %translation
 \begin{table}[!htb]
@@ -12,25 +12,28 @@ Table \ref{table:trans} shows the results of these tests, they illustrate the FV
 \begin{tabular}{ccccccccc}
 \\ \textbf{5cm} &   &   &   &   &   &   &   &   \\ 
 Noise & SNR & \textbf{FM2D} & \textbf{FM3D} & \textbf{ICP} & \textbf{PCA} & \textbf{FVR} & \textbf{FFVR} & \textbf{FVR3D} \\ \hline
-0 & $\infty$ & 5.07 & 4.75 & 12.35 & 3.73 & 4.04 & fail & 6.24 \\
-0.1 & 20db & 18.96 & fail & fail & 2.33 & 2.73 & 14.6 & 5.63 \\
+0 & $\infty$ & 5.07 & 4.75 & 12.35 & 3.73 & 4.04 & 30 & 6.24 \\
+0.1 & 20db & 18.96 & 30 & 30 & 2.33 & 2.73 & 14.6 & 5.63 \\
 0.25 & 12db & 5.12 & 4.3 & 2.03 & 4.2 & 4.13 & 5.51 & 2.3 \\
 0.5 & 6db & 5.61 & 1.95 & 3.71 & 6.83 & 3.7 & 7.73 & 2.83 \\
 0.75 & 2.5db & 5.02 & 8.57 & 6.41 & 20.94 & 2.24 & 6.5 & 4.33 \\
+Average & - & 7.96 & 9.91 & 10.91 & 7.61 & 3.37 & 12.87 & 4.27 \\
 \\ \textbf{10cm} &   &   &   &   &   &   &   &   \\ 
 Noise & SNR & \textbf{FM2D} & \textbf{FM3D} & \textbf{ICP} & \textbf{PCA} & \textbf{FVR} & \textbf{FFVR} & \textbf{FVR3D} \\ \hline
-0 & $\infty$ & 15.35 & fail & 10.26 & 16.87 & 3.47 & fail & 7.07 \\
-0.1 & 20db & 18.2 & 15.36 & 6.24 & fail & 3.89 & fail & 11.45 \\
-0.25 & 12db & fail & 24.12 & 6.02 & 20.12 & 5.4 & fail & 7.53 \\
-0.5 & 6db & fail & 4.42 & 5 & 3.96 & 4.65 & fail & 9.47 \\
-0.7 & 2.5db & 7.27 & 8.57 & 3.98 & 7.85 & 15.45 & fail & 4.3 \\
+0 & $\infty$ & 15.35 & 30 & 10.26 & 16.87 & 3.47 & 30 & 7.07 \\
+0.1 & 20db & 18.2 & 15.36 & 6.24 & 30 & 3.89 & 30 & 11.45 \\
+0.25 & 12db & 30 & 24.12 & 6.02 & 20.12 & 5.4 & 30 & 7.53 \\
+0.5 & 6db & 30 & 4.42 & 5 & 3.96 & 4.65 & 30 & 9.47 \\
+0.7 & 2.5db & 7.27 & 8.57 & 3.98 & 7.85 & 15.45 & 30 & 4.3 \\
+Average & - & 20.16 & 16.49 & 6.3 & 15.76 & 6.57 & 30 & 7.96 \\
 \\ \textbf{15cm} &   &   &   &   &   &   &   &   \\ 
 Noise & SNR & \textbf{FM2D} & \textbf{FM3D} & \textbf{ICP} & \textbf{PCA} & \textbf{FVR} & \textbf{FFVR} & \textbf{FVR3D} \\ \hline
-0 & $\infty$ & fail & fail & 7.85 & fail & 25.87 & fail & fail \\
-0.1 & 20db & fail & fail & 7.13 & fail & 12.27 & fail & fail \\
-0.25 & 12db & 15.17 & fail & fail & fail & 8.1 & 12.52 & fail \\
-0.5 & 6db & fail & fail & 11.11 & fail & 10.13 & 11.09 & fail \\
-0.7 & 2.5db & fail & fail & 10.31 & 20.59 & 7.79 & fail & fail \\
+0 & $\infty$ & 30 & 30 & 7.85 & 30 & 25.87 & 30 & 30 \\
+0.1 & 20db & 30 & 30 & 7.13 & 30 & 12.27 & 30 & 30 \\
+0.25 & 12db & 15.17 & 30 & 30 & 30 & 8.1 & 12.52 & 30 \\
+0.5 & 6db & 30 & 30 & 11.11 & 30 & 10.13 & 11.09 & 30 \\
+0.7 & 2.5db & 30 & 30 & 10.31 & 20.59 & 7.79 & 30 & 30 \\
+Average & - & 27.03 & 30 & 13.28 & 28.12 & 12.83 & 22.44 & 30 \\
 \\
 \end{tabular}}
 \\
@@ -39,7 +42,7 @@ Noise & SNR & \textbf{FM2D} & \textbf{FM3D} & \textbf{ICP} & \textbf{PCA} & \tex
 \end{table}
 
 
-Results show that the basic FVR method is generally the most accurate in terms of registration across the range of camera translation magnitudes and noise levels. In comparison, the FFVR method reduces processing time at the expense of accuracy and robustness over a wide-baseline. Results show that in general it is only capable of up to 5cm of translation registration. FVR3D and the 2D feature matching method are capable of registering 5-10cm with larger levels of noise. However, both methods fail to register the full 15cm of camera translation well. \\
+Results show that the basic FVR method is generally the most accurate in terms of registration across the range of camera translation magnitudes and noise levels. In comparison, the FFVR method reduces processing time at the expense of accuracy and robustness over a wide-baseline. Results show that in general it is only capable of up to 5cm of translation registration. FVR3D and the 2D feature matching method are capable of registering 5-10cm with larger levels of noise. However, both methods fail to register the full 15cm of camera translation well. In both the 5cm and the 15cm experiments, the FVR method has the lowest average error, and the second lowest in the 10cm camera translation tests. \\
 
 ICP performed next best, capable of performing well up to 15cm of translation, but failing to register twice during the tests. PCA was able to handle up to 10cm of too but often had larger registration errors. For the 15cm translation tests, the FVR performed the best followed by ICP, which failed once but outperformed FVR within the two lowest noise brackets. \\
 
@@ -63,16 +66,19 @@ Noise & SNR & \textbf{FM2D} & \textbf{FM3D} & \textbf{ICP} & \textbf{PCA} & \tex
 0 & $\infty$ & 0.17 & 9.77 & 0.19 & 0.3 & 0.18 & 0.35 & 4.05 \\
 0.1 & 20db & 0.21 & 0.41 & 0.17 & 0.67 & 0.15 & 0.21 & 10.54 \\
 0.25 & 12 & 0.16 & 0.34 & 0.13 & 0.39 & 0.15 & 0.44 & 5.44 \\
+Average & - & 0.18 & 3.51 & 0.16 & 0.45 & 0.16 & 0.33 & 6.68 \\
 \\ \textbf{20deg} &   &   &   &   &   &   &   &   \\ 
 Noise & SNR & \textbf{FM2D} & \textbf{FM3D} & \textbf{ICP} & \textbf{PCA} & \textbf{FVR} & \textbf{FFVR} & \textbf{FVR3D} \\ \hline
-0 & $\infty$ & 1.37 & 13.1 & 1.81 & fail & 7.29 & 1.32 & 3.18 \\
-0.1 & 20db & 1.35 & fail & fail & 2.97 & 0.7 & 2.03 & 1.92 \\
-0.25 & 12db & 1.6 & 3.26 & fail & 0.64 & 1.54 & 4.29 & 2.24 \\
+0 & $\infty$ & 1.37 & 13.1 & 1.81 & 30 & 7.29 & 1.32 & 3.18 \\
+0.1 & 20db & 1.35 & 30 & 30 & 2.97 & 0.7 & 2.03 & 1.92 \\
+0.25 & 12db & 1.6 & 3.26 & 30 & 0.64 & 1.54 & 4.29 & 2.24 \\
+Average & - & 1.44 & 15.45 & 20.60 & 11.20 & 3.18 & 2.55 & 2.45 \\
 \\ \textbf{30deg} &   &   &   &   &   &   &   &   \\ 
 Noise & SNR & \textbf{FM2D} & \textbf{FM3D} & \textbf{ICP} & \textbf{PCA} & \textbf{FVR} & \textbf{FFVR} & \textbf{FVR3D} \\ \hline
 0 & $\infty$ & 3.87 & 10.15 & 3.16 & 9.97 & 2.11 & 5.68 & 3.63 \\
-0.1 & 20db & 3.77 & fail & fail & fail & 3.84 & 2.82 & 1.39 \\
+0.1 & 20db & 3.77 & 30 & 30 & 30 & 3.84 & 2.82 & 1.39 \\
 0.25 & 12db & 3.68 & 2.76 & 5.12 & 5.78 & 3.3 & 7.15 & 6.38 \\
+Average & - & 3.77 & 14.30 & 12.76 & 15.25 & 3.08 & 5.22 & 3.8 \\
 \\
 \end{tabular}}
 \\
@@ -80,7 +86,7 @@ Noise & SNR & \textbf{FM2D} & \textbf{FM3D} & \textbf{ICP} & \textbf{PCA} & \tex
 \label{table:rote}
 \end{table}
 
-In the first sub-table, registration errors for 10 degrees of rotation are presented. Results show that the FVR method outperforms the other methods. Here, ICP performs next best followed by the 2D feature matching method. This was expected as the FVR method was designed to be both robust to noise and to be able to handle larger rotations. It can also be seen that in the 20 degree and 30 degree tests, the FVR method also beats both of these algorithms in terms of having to lower registration error. FFVR also worked well at different noise levels up to 30 degrees of rotation. FVR3D was found to be as robust as ICP at registering rotation but not at accurate as the 2D feature matching method. \\ 
+In the first sub-table, registration errors for 10 degrees of rotation are presented. Results show that the FVR method outperforms the other methods. Here, ICP performs next best followed by the 2D feature matching method. This was expected as the FVR method was designed to be both robust to noise and to be able to handle larger rotations. It can also be seen that in the 20 degree and 30 degree tests, the FVR method also beats both of these algorithms in terms of having to lower registration error. Interestingly, FFVR and FVR3D also worked well at different noise levels up to 30 degrees of rotation. FVR3D was found to be as robust as ICP at registering rotation but not at accurate as the 2D feature matching method. In the 20 degree rotation experiments, the 2D feature matching method was shown to perform best in terms of average error, but in the 30 degree experiments, FVR was the top performer.  \\ 
 
 It should be noted that twelve degrees of camera rotation per frame is almost a full rotation per second in video rates. This is so fast that most cameras would acquire too much motion blur for registration to be possible. Therefore this test indicates the robustness of the FVR method in comparison with the other algorithms within the context of camera pose estimation. \\
 
