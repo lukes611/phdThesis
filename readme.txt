@@ -19,8 +19,6 @@ Chapter 3
 
 Chapter 4 
 	TODO
-		16. The results in 4.4.3 look good but you need to state the specific parameters you used with the FM2D and FM3D and ICP methods. Did you use the default values? What were they? Ie # scale factors used, gaussian window size, descriptor region radius etc.
-
 		18. In sec 4.4.5 there are not a lot of no comparative results it would be nicer to have something more.
 
 		21. You should make some comment in section 4.5 and 4.6 that since you are using the active camera data source that don't give the best results that it affects the performance margin of FVR compared to the FM and ICP methods
