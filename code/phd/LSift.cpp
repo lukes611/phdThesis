@@ -47,22 +47,22 @@ namespace LukeLincoln
     Point2f SiftFeature2D::truePoint()
     {
 
-        return Point2f(x * pow(2.0f, (double)octave), y * pow(2.0f, (double)octave));
+        return Point2f(x * (float)pow(2.0f, (double)octave), y * (float)pow(2.0f, (double)octave));
     }
 
     R3 SiftFeature3D::truePointR3()
     {
-        return R3(x * pow(2.0f, (double)octave), y * pow(2.0f, (double)octave), z * pow(2.0f, (double)octave));
+        return R3(x * (float)pow(2.0f, (double)octave), y * (float)pow(2.0f, (double)octave), z * (float)pow(2.0f, (double)octave));
     }
 
 	Point3f SiftFeature3D::truePoint()
 	{
-		return Point3f(x * pow(2.0f, (double)octave), y * pow(2.0f, (double)octave), z * pow(2.0f, (double)octave));
+		return Point3f(x * (float)pow(2.0f, (double)octave), y * (float)pow(2.0f, (double)octave), z * (float)pow(2.0f, (double)octave));
 	}
 
     float SiftFeature2D::trueRad()
     {
-        return pow(2.0, octave) + (float)scale;
+        return (float)pow(2.0, (double)octave) + (float)scale;
     }
 
     double gaussian(double x, double y, double sigma)
@@ -214,6 +214,7 @@ namespace LukeLincoln
         if(mag == 0.0f) return p;
         p.x = atan(d.y / d.x) * 57.2958f;
         p.y = acos(d.z / mag) * 57.2958f;
+		return p;
     }
 
     float computeMagnitude(int x, int y, Mat & m)
@@ -296,8 +297,8 @@ namespace LukeLincoln
         Mat hesMat = Mat(Size(3,3), CV_32FC1, _ptr);
 
         //compute trace and determinant
-		float tr = trace(hesMat)[0];
-		float det = determinant(hesMat);
+		float tr = (float)trace(hesMat)[0];
+		float det = (float)determinant(hesMat);
 
 
 
@@ -321,10 +322,10 @@ namespace LukeLincoln
 	vector<float> computeOrientations(SiftFeature2D & feature, Mat & image)
     {
         vector<float> ret;
-        float roiSizef = 5.0f * feature.scale;
+        float roiSizef = 5.0f * (float)feature.scale;
         float roiSizefb = roiSizef + 0.0f;
-        Mat g = getGaussianImage(Size(roiSizefb, roiSizefb), roiSizef);
-        Mat roi = image(Rect(feature.x - roiSizefb*0.5f, feature.y - roiSizefb*0.5f, (int)roiSizefb, (int)roiSizefb));
+        Mat g = getGaussianImage(Size((int)roiSizefb, (int)roiSizefb), (double)roiSizef);
+        Mat roi = image(Rect(feature.x - (int)(roiSizefb*0.5f), feature.y - (int)(roiSizefb*0.5f), (int)roiSizefb, (int)roiSizefb));
 
         Mat angles = Mat::zeros(Size(36, 1), CV_32FC1);
         for(int y = 1; y < roi.size().height-1; y++)
@@ -349,7 +350,7 @@ namespace LukeLincoln
             if(best < v)
             {
                 best = v;
-                bestInd = ret.size() - 1;
+                bestInd = (int)ret.size() - 1;
             }
         }
         return ret;
@@ -358,7 +359,7 @@ namespace LukeLincoln
 	vector<Point2f> computeOrientations(SiftFeature3D & feature, VMat & image)
 	{
 		vector<Point2f> ret;
-		float roiSizef = 5.0f * feature.scale;
+		float roiSizef = 5.0f * (float)feature.scale;
 		int rsf = (int)(roiSizef + 0.5f);
 		VMat g = getGaussianImage(rsf, roiSizef);
 		int rsfh = (int)(roiSizef * 0.5f);
@@ -702,7 +703,7 @@ namespace LukeLincoln
             int octave = i;
             double ns = input.s / pow(2.0, (double)octave);
 
-            VMat x = input.resize(ns);
+            VMat x = input.resize((int)ns);
             findFeatures(ret, octave, x);
         }
         return ret;
@@ -743,8 +744,8 @@ namespace LukeLincoln
 				-> bool { return get<2>(a) < get<2>(b); };
 			std::sort(matches.begin(), matches.end(), f);
 
-			int am = limit == -1 ? matches.size() : limit;
-			int N = am < matches.size() ? am : matches.size();
+			int am = limit == -1 ? (int)matches.size() : limit;
+			int N = am < matches.size() ? am : (int)matches.size();
 			for (int i = 0; i < N; i++)
 			{
 				tuple<SiftFeature2D, SiftFeature2D, double> & match = matches[i];
@@ -805,8 +806,8 @@ namespace LukeLincoln
 				-> bool { return get<2>(a) < get<2>(b); };
 			std::sort(matches.begin(), matches.end(), f);
 
-			int am = limit == -1 ? matches.size() : limit;
-			int N = am < matches.size() ? am : matches.size();
+			int am = limit == -1 ? (int)matches.size() : limit;
+			int N = am < matches.size() ? am : (int)matches.size();
 			for (int i = 0; i < N; i++)
 			{
 				tuple<SiftFeature3D, SiftFeature3D, double> & match = matches[i];
@@ -841,7 +842,7 @@ namespace LukeLincoln
 		src.at<double>(2, 0) = 1.0;
 
 		Mat dst = M*src; //USE MATRIX ALGEBRA
-		return cv::Point2f(dst.at<double>(0, 0), dst.at<double>(1, 0));
+		return cv::Point2f((float)dst.at<double>(0, 0), (float)dst.at<double>(1, 0));
 	}
 
 	cv::Point3f operator*(cv::Mat M, const cv::Point3f& p)
@@ -887,10 +888,10 @@ namespace LukeLincoln
 			float X, Y;
 			R3::GetUnitPointFromAngle(f[i].angle, X, Y);
 			double rad = 2.0 * f[i].trueRad();
-			X *= rad, Y *= rad;
+			X *= (float)rad, Y *= (float)rad;
 			Point2i p2(p1.x + (int)X, p1.y + (int)Y);
 			cv::line(x, p1, p2, Scalar(255));
-			cv::circle(x, p1, rad, Scalar(255));
+			cv::circle(x, p1, (int)rad, Scalar(255));
 		}
 		return x.clone();
 	}
@@ -908,7 +909,7 @@ namespace LukeLincoln
 
 		Mat check = Mat::zeros(im.size(), CV_8UC1);
 
-		int Total = f1.size();
+		int Total = (int)f1.size();
 		int Count = 0;
 
 		for (int i = 0; i < f2.size(); i++)
@@ -944,7 +945,7 @@ namespace LukeLincoln
 
 		bool * check = new bool[im.s3]; for(int i = 0; i < im.s3; i++) check[i] = false;
 
-		int Total = f1.size();
+		int Total = (int)f1.size();
 		int Count = 0;
 
 		for (int i = 0; i < f2.size(); i++)
@@ -997,10 +998,10 @@ namespace LukeLincoln
 
 		for (int i = 0; i < p1.size(); i++)
 		{
-			Point2f pa(p1[i].x, p1[i].y);
-			Point2f pb(p2[i].x, p2[i].y);
+			Point2f pa((float)p1[i].x, (float)p1[i].y);
+			Point2f pb((float)p2[i].x, (float)p2[i].y);
 			pa = M * pa;
-			float dist = ll_distance<float>(pa.x, pa.y, pb.x, pb.y);
+			float dist = (float)ll_distance<float>(pa.x, pa.y, pb.x, pb.y);
 			if (dist < 1.5f)
 			{
 				Count++;

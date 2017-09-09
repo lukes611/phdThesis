@@ -329,8 +329,8 @@ namespace LukeLincoln
         //gets the index into the volume given a real point
         cv::Point3i index(ll_R3::R3 & p)
         {
-            ll_R3::R3 x = (p - corner) / resolution;
-            return cv::Point3i(x.x + 0.5f, x.y + 0.5f, x.z + 0.5f);
+            ll_R3::R3 x = (p - corner) / (float)resolution;
+            return cv::Point3i((int)(x.x + 0.5f), (int)(x.y + 0.5f), (int)(x.z + 0.5f));
         }
 
         //gets the real point from a given volume index
@@ -393,7 +393,7 @@ namespace LukeLincoln
             //std::cout << "should change the newS to " << newMx << std::endl;
             //else compute the new sizes and return true
             newMx = (newMx-newCorner) / resolution;
-            newSizes = cv::Point3i(newMx.x, newMx.y, newMx.z);
+            newSizes = cv::Point3i((int)newMx.x, (int)newMx.y, (int)newMx.z);
 
             return true;
 
@@ -423,12 +423,12 @@ namespace LukeLincoln
         int add(std::vector<R3> & points, std::vector<T> & data)
         {
             R3 nc; cv::Point3i ns;
-            bool mr = mustResize(points, nc, ns);
+            bool mr = this->mustResize(points, nc, ns);
 
             if(!mr) return addWithoutResize(points, data);
             else
             {
-                double sizeMB = (sizeof(T) * ns.x * ns.y * ns.z);
+                double sizeMB = ((double)sizeof(T) * ns.x * ns.y * ns.z);
                 sizeMB /= (1024.0 * 1024.0);
                 //std::cout << "sz: " << sizeMB << std::endl;
                 if(sizeMB > 3000.0) return addWithoutResize(points, data);

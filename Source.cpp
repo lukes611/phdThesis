@@ -1,387 +1,166 @@
-#include "code/phd/experiments.h"
-#ifdef HASGL
-#include "code/basics/ll_gl.h"
-#endif
-#include <iostream>
-#include <string>
-#include <vector>
-#include "code/basics/locv3.h"
-#include "code/phd/experiments.h"
-#include "code/basics/R3.h"
-#include "code/basics/llCamera.h"
-#include "code/basics/VMatF.h"
-#include "code/basics/LTimer.h"
-#include "code/phd/Licp.h"
-#include "code/phd/measurements.h"
-#include "code/phd/fmRansac.h"
-#include "code/pc/TheVolumePhaseCorrelator.h"
-#include "code/phd/Lpcr.h"
-#include "code/script/LScript.h"
-#include "code/phd/LSift.h"
-#include "code/phd/LCamExperiments.h"
+#include "code\phd\LPhDHelper.h"
 
-
-using namespace std;
-using namespace cv;
-using namespace ll_R3;
-using namespace ll_cam;
-using namespace ll_measure;
-using namespace ll_fmrsc;
-using namespace ll_experiments;
-
-/*
-
-V1.0
-filename:
-data_name.algorithm_name
-version number,
-data name
-description
-frame number
-frame number 2
-amount of error added
-errors...
-
-
-v2.0
-rules: save name of file as [data-name].[versionNo].csv
-
-headers:
-algorithm name, frame-index-1, frame-index-2, seconds, error (hausdorff-distance)
-
-toJSON function ->
-{
-    results : [
-        {
-            dataset : {
-                algorithm : [
-                    name : string,
-                    errors : array,
-                    seconds : array
-                ]
-            }
-        }
-    ]
+Mat getColorIm(int n){
+	stringstream ss;
+	ss << string(LCPPDATA_DIR) << "/outfolder/color/" << n << ".png";
+	Mat ret = imread(ss.str());
+	return ret.clone();
 }
 
-*/
-#define HASFFTW
+Mat getDepthIm(int n){
+	stringstream ss;
+	ss << string(LCPPDATA_DIR) << "/outfolder/depth/" << n << ".png";
+	Mat ret = imread(ss.str());
+	return ret.clone();
+}
 
+unsigned char getMedian2(vector<unsigned char> l)
+{
+	if(l.size() == 0) return 0.0f;
+	sort(l.begin(), l.end());
+	int mI = l.size() / 2;
+	return l[mI];
+}
 
-#include "code/basics/BitReaderWriter.h"
-
-
-
-
-
-
-//single experiment, only tests one algorithm at a time
-void exp1(string name, vector<int> frames)
+unsigned char getMedian(vector<unsigned char> l)
 {
 
-	CapturePixel3DSet video = ll_experiments::openData(name, 1);
+	int avg = 0;
+	if(l.size() == 0) return 0;
+	for(int i = 0; i < l.size(); i++) avg += l[i];
+	return (unsigned char)((avg / (float)l.size()) + 0.5f);
+}
 
-	LukeLincoln::LVol<Vec3b> output(64, 64, 64, Vec3b(0,0,0));
 
-    output(20,20,20) = Vec3b(255, 0,0);
-
-	Mat accMatrix = Mat::eye(Size(4, 4), CV_32FC1);
-	Pix3D frame1, frame2;
-	Pixel3DSet a, b;
-
-	//add first frame to the output
-	video.read_frame(frame1, frames[0]);
+void fixHole(unsigned char histogram[255], int i, vector<unsigned char> * histogram_)
+{
+	bool hasPrev = false, hasNext = false;
+	int prevVal = 0, nextVal = 0;
+	for(int j = i-1; j > 0; j--)
 	{
-        Pixel3DSet _frame1(frame1);
-        output.add(_frame1.points, _frame1.colors);
+		if(histogram_[j].size() > 0)
+		{
+			hasPrev = true;
+			prevVal = histogram[j];
+		}
+	}
+	for(int j = i+1; j < 255; j++)
+	{
+		if(histogram_[j].size() > 0)
+		{
+			hasNext = true;
+			nextVal = histogram[j];
+		}
+	}
+	if(!hasNext && !hasPrev) return;
+	if(!hasNext && hasPrev)
+	{
+		histogram[i] = prevVal;
+		return;
+	}
+	if(hasNext && !hasPrev)
+	{
+		histogram[i] = nextVal;
+		return;
+	}
+	int mn = nextVal < prevVal ? nextVal : prevVal;
+	int mx = nextVal < prevVal ? prevVal : nextVal;
+	histogram[i] = (mx-mn)/2 + mn;
+}
+
+Mat getDepthIm(int n, Mat m){
+	stringstream ss;
+	ss << string(LCPPDATA_DIR) << "/outfolder/depth/" << n << ".png";
+	Mat ret = imread(ss.str(), CV_LOAD_IMAGE_GRAYSCALE);
+	int Y = m.size().height;
+	int X = m.size().width;
+	Vec3b red(0, 0, 255);
+
+	vector<unsigned char> histogram_[255];
+	unsigned char histogram[255];
+
+	kitti::KittiPix3dSet ki = kitti::open("2011_09_26_drive_0001_sync", n);
+
+	Mat dm = ki.getDepthMap();
+	ll_32F1_to_UCF1(dm);
+	
+	
+	Mat vdi = ki.validDepthImage.clone();
+	//cout << ki.points.size() << " : " << (vdi.size().width * vdi.size().height) << endl;
+	//imshow("vdi", dm);
+	
+
+
+	for(int y = 0; y < Y; y++)
+	{
+		for(int x = 0; x < X; x++)
+		{
+			if(m.at<Vec3b>(y,x) == red)
+				ret.at<unsigned char>(y,x) = 0;
+			if(ret.at<unsigned char>(y,x) > 0)ret.at<unsigned char>(y,x) = 255 - ret.at<unsigned char>(y,x);
+			if(vdi.at<unsigned char>(y,x) > 0) //include this pixel in the mapping computation
+			{
+				histogram_[ret.at<unsigned char>(y,x)].push_back(dm.at<unsigned char>(y,x));
+			}
+		}
+	}
+	for(int i = 0; i < 255; i++)
+	{
+		histogram[i] = getMedian(histogram_[i]);
+		
+	}
+	for(int i = 0; i < 255; i++)
+	{
+		if(histogram_[i].size() < 1)
+		{
+			fixHole(histogram, i, histogram_);
+		}
+		//cout << i << " => " << (int)histogram[i] << endl;
 	}
 
-
-	for (int _i = 1; _i < frames.size(); _i++)
+	for(int y = 0; y < Y; y++)
 	{
-		int currentIndex = frames[_i];
-		//get match _m from i+1 to i
-		double seconds = 0.0, error = 0.0; int iters = 0;
-		Pixel3DSet _;
-
-		video.read_frame(frame2, currentIndex);
-
-		a = frame1; b = frame2;
-
-		Mat _m = Mat::eye(Size(4, 4), CV_32FC1);
-
-		cout << "matching " << currentIndex << " with " << frames[_i - 1] << " ";
-		//cout << "worked " << ll_fmrsc::registerPix3D("surf", frame2, frame1, _m, seconds, true, 50) << endl;
-		_m = LukeLincoln::sift3DRegister(b, a, seconds, true, 256);
-		//_m = ll_pc::pc_register_pca_i(b, a, seconds);
-		//_m = ll_pc::pc_register(b, a, seconds);
-		//_m = ll_pc::pc_register_pca(b, a, seconds, true, 256);
-		//_m.convertTo(_m, CV_32FC1);
-		//_m = Licp::icp(b, a, _, error, seconds, iters);
-
-		//_m = ll_pca::register_pca(b, a, seconds, 256);
-
-		//_m.convertTo(_m, CV_32FC1);
-		//cout << "error: " << error << endl;
-
-
-		//b.transform_set(_m);
-
-		//optionally measure the error here
-
-		//if (error >= 1.0) continue;
-		//m = m * _m : either is fine
-		accMatrix = accMatrix * _m;
-		//accMatrix = _m * accMatrix;
-		//multiply i by m and add to output
-		//cout << nm.size() << " -> " << ll_type(nm.type()) << endl;
-		//double hde, msee, pme;
-
-		b.transform_set(accMatrix);
-
-		double hde, msee, pme;
-		LTimer ___; ___.start();
-		ll_measure::error_metrics(a, b, hde, msee, pme);
-		___.stop(); cout << "measuring error takes" << ___.getSeconds() << endl;
-
-		cout << hde << " " << msee << " " << pme << endl;
-
-
-		cout << "adding " << output.add(b.points, b.colors) << " out of " << b.points.size() << endl;;
-
-		frame1 = frame2;
-	}
-	//cout << "saving" << endl;
-
-	Pixel3DSet obj = LukeLincoln::makePixel3DSet(output);
-	obj.save_obj(string(DESKTOP_DIR) + "/one.obj");
-
-	#ifdef HASGL
-	//LLPointers::setPtr("object", &obj);
-    //ll_experiments::viewPixel3DSet();
-    #endif
-
-
-}
-
-
-//saves to version 2.0 data file
-void saveV20(string data_name, string alg_name, int frame1, int frame2, float seconds, float hd)
-{
-    //save output to file
-    cout << "saving v2.0..." << endl;
-    string outDirName = EXPS_DIR;
-    //save name of file as [data-name].[versionNo].csv
-    stringstream outFn; outFn << outDirName << "/" << data_name << ".v2.csv";
-    //header: algorithm name, frame-index-1, frame-index-2, seconds, error (hausdorff-distance)
-    string header = "alg,frame1,frame2,seconds,hd";
-    string fileName = outFn.str();
-    stringstream outData;
-    outData <<
-    alg_name << "," <<
-    frame1 << "," <<
-    frame2 << "," <<
-    seconds << "," <<
-    hd;
-
-    cout << outData.str() << endl;
-
-    appendData(fileName, header, outData.str());
-
-
-
-}
-
-
-void quantitativeExperiment20(string algorithm_name, string data_name, vector<int> frames)
-{
-    CapturePixel3DSet video = ll_experiments::openData(data_name, 1);
-
-
-	Pix3D frame1, frame2;
-	Pixel3DSet a, b;
-
-	video.read_frame(frame1, frames[0]);
-
-
-
-	for (int _i = 1; _i < frames.size(); _i++)
-	{
-		int currentIndex = frames[_i];
-		//get match _m from i+1 to i
-		double seconds = 0.0;
-		double hde;
-		int iters = 0;
-		Pixel3DSet _;
-
-
-		cout << algorithm_name << ", completed " << _i << " of " << frames.size() << endl;
-
-		video.read_frame(frame2, currentIndex);
-
-		a = frame1; b = frame2;
-
-		Mat _m = Mat::eye(Size(4, 4), CV_32FC1);
-
-		//algorithms here:
-		if (algorithm_name == "none") {
-            //do-nothing
+		for(int x = 0; x < X; x++)
+		{
+			if(ret.at<unsigned char>(y,x) > 0)
+			{
+				ret.at<unsigned char>(y,x) = histogram[ret.at<unsigned char>(y,x)];
+			}
 		}
-#if defined(HASCUDA) || defined(HASFFTW)
-		else if (algorithm_name == "FVR") {
-			_m = ll_pc::pc_register(b, a, seconds);
-		}
-
-		else if (algorithm_name == "FVR3D") {
-			_m = ll_pc::pc_register_pca_i(b, a, seconds);
-		}
-		else if (algorithm_name == "FVR3D-2") {
-			_m = ll_pc::pc_pca_icp(b, a, seconds);
-		}else if (algorithm_name == "FFVR"){
-            _m = ll_pc::ffvr(b, a, seconds);
-		}
-#endif
-        else if(algorithm_name == "PCA"){
-            _m = ll_pca::register_pca(b, a, seconds);
-        }else if (algorithm_name == "ICP") {
-			_m = Licp::icp(b, a, _, hde, seconds, iters);
-		}
-		else if (algorithm_name == "FM2D") {
-			ll_fmrsc::registerPix3D("surf", frame2, frame1, _m, seconds, true, 150);
-		}else if(algorithm_name == "FM3D"){
-		    _m = LukeLincoln::sift3DRegister(b, a, seconds, true, 256);
-		}
-
-
-
-		//:end
-
-		//compute the errors
-		b.transform_set(_m);
-		//hde = ll_measure::hausdorff(a, b);
-		double msee, pme;
-		hde = 21.0;
-		ll_measure::error_metrics(a, b, hde, msee, pme);
-
-		//void saveV20(string data_name, string alg_name, int frame1, int frame2, float seconds, float hd)
-		saveV20(data_name, algorithm_name, frames[_i], frames[_i-1], seconds, hde);
-
-
-		frame1 = frame2;
 	}
 
-
-
-
+	return ret.clone();
 }
 
-
-//saves to kitti data file
-void saveKitti(string data_name, string alg_name, int frame1, int frame2, float seconds, float hd)
-{
-    //save output to file
-    cout << "saving v2.0..." << endl;
-    string outDirName = EXPS_DIR;
-    //save name of file as [data-name].[versionNo].csv
-    stringstream outFn; outFn << outDirName << "/" << data_name << ".kitti.v2.csv";
-    //header: algorithm name, frame-index-1, frame-index-2, seconds, error (hausdorff-distance)
-    string header = "alg,frame1,frame2,seconds,hd";
-    string fileName = outFn.str();
-    stringstream outData;
-    outData <<
-    alg_name << "," <<
-    frame1 << "," <<
-    frame2 << "," <<
-    seconds << "," <<
-    hd;
-
-    cout << outData.str() << endl;
-
-    appendData(fileName, header, outData.str());
-
-
-
+Mat getMaskIm(){
+	stringstream ss;
+	ss << string(LCPPDATA_DIR) << "/outfolder/mask.png";
+	Mat ret = imread(ss.str());
+	return ret.clone();
 }
 
+//get depth - mask it, then read in the same depth map truth:
 
-
-void quantitativeExperimentKitti10(string algorithm_name, string data_name, vector<int> frames)
+int main()
 {
-    kitti::KittiPix3dSet frame1, frame2;
-	Pixel3DSet a, b;
-
-    frame1 = kitti::open(data_name, frames[0]);
-
-	for (int _i = 1; _i < frames.size(); _i++)
+	Mat m = getMaskIm();
+	cout << "working on monoexperiments" << endl;
+	int i = 0;
+	for(i = 0; i < 107; i++)
 	{
-		int currentIndex = frames[_i];
-		//get match _m from i+1 to i
-		double seconds = 0.0;
-		double hde;
-		int iters = 0;
-		Pixel3DSet _;
-
-
-		cout << algorithm_name << ", completed " << _i << " of " << frames.size() << endl;
-
-		frame2 = kitti::open(data_name, currentIndex);
-
-
-		a = frame1.getPoints(); b = frame2.getPoints();
-
-		Mat _m = Mat::eye(Size(4, 4), CV_32FC1);
-
-		//algorithms here:
-		if (algorithm_name == "none") {
-            //do-nothing
-		}
-#if defined(HASCUDA) || defined(HASFFTW)
-		else if (algorithm_name == "FVR") {
-			_m = ll_pc::pc_register(b, a, seconds);
-		}
-
-		else if (algorithm_name == "FVR3D") {
-			_m = ll_pc::pc_register_pca_i(b, a, seconds);
-		}
-		else if (algorithm_name == "FVR3D-2") {
-			_m = ll_pc::pc_pca_icp(b, a, seconds);
-		}else if (algorithm_name == "FFVR"){
-            _m = ll_pc::ffvr(b, a, seconds);
-		}
-#endif
-        else if(algorithm_name == "PCA"){
-            _m = ll_pca::register_pca(b, a, seconds);
-        }else if (algorithm_name == "ICP") {
-			_m = Licp::icp(b, a, _, hde, seconds, iters);
-		}
-		else if (algorithm_name == "FM2D") {
-			ll_fmrsc::registerPix3D("surf", frame2, frame1, _m, seconds, true, -1);
-		}else if(algorithm_name == "FM3D"){
-		    _m = LukeLincoln::sift3DRegister(b, a, seconds, true, 256);
-		}
-
-
-
-		//:end
-
-		//compute the errors
-		b.transform_set(_m);
-		//hde = ll_measure::hausdorff(a, b);
-		double msee, pme;
-		hde = 21.0;
-		ll_measure::error_metrics(a, b, hde, msee, pme);
-
-		//void saveV20(string data_name, string alg_name, int frame1, int frame2, float seconds, float hd)
-		saveKitti(data_name, algorithm_name, frames[_i], frames[_i-1], seconds, hde);
-
-
-		frame1 = frame2;
+		kitti::KittiPix3dSet ki = kitti::open("2011_09_26_drive_0001_sync", i);
+		Mat c = getColorIm(i);
+		Mat d = getDepthIm(i, m);
+		imshow("color", c);
+		imshow("depth", d);
+		imshow("td", ki.getDepthMap());
+		waitKey();
 	}
-
-
-
-
+	return 0;
 }
+
+
+
 
 
 
@@ -421,7 +200,7 @@ int mainBasic()
 
 
 
-int main(int argc, char * * argv)
+int mainOld(int argc, char * * argv)
 {
 
 	string namesList[20] = {
