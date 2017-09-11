@@ -132,6 +132,7 @@ namespace ll_experiments
 			std::vector<ll_R3::R3> points;
 
 			cv::Mat getDepthMap();
+			cv::Mat getDepthMap2();
 			cv::Mat getColoredDepthMap();
 			cv::Mat getAugmentedDepthMap();
 

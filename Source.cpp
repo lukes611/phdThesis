@@ -14,7 +14,7 @@ Mat getDepthIm(int n){
 	return ret.clone();
 }
 
-unsigned char getMedian2(vector<unsigned char> l)
+unsigned char getMedian(vector<unsigned char> l)
 {
 	if(l.size() == 0) return 0.0f;
 	sort(l.begin(), l.end());
@@ -22,7 +22,7 @@ unsigned char getMedian2(vector<unsigned char> l)
 	return l[mI];
 }
 
-unsigned char getMedian(vector<unsigned char> l)
+unsigned char getMedian2(vector<unsigned char> l)
 {
 
 	int avg = 0;
@@ -32,13 +32,13 @@ unsigned char getMedian(vector<unsigned char> l)
 }
 
 
-void fixHole(unsigned char histogram[255], int i, vector<unsigned char> * histogram_)
+void fixHole(unsigned char histogram[255], int i, bool * missing)
 {
 	bool hasPrev = false, hasNext = false;
 	int prevVal = 0, nextVal = 0;
 	for(int j = i-1; j > 0; j--)
 	{
-		if(histogram_[j].size() > 0)
+		if(missing[j])
 		{
 			hasPrev = true;
 			prevVal = histogram[j];
@@ -46,7 +46,7 @@ void fixHole(unsigned char histogram[255], int i, vector<unsigned char> * histog
 	}
 	for(int j = i+1; j < 255; j++)
 	{
-		if(histogram_[j].size() > 0)
+		if(missing[j])
 		{
 			hasNext = true;
 			nextVal = histogram[j];
@@ -56,16 +56,19 @@ void fixHole(unsigned char histogram[255], int i, vector<unsigned char> * histog
 	if(!hasNext && hasPrev)
 	{
 		histogram[i] = prevVal;
+		missing[i] = false;
 		return;
 	}
 	if(hasNext && !hasPrev)
 	{
 		histogram[i] = nextVal;
+		missing[i] = false;
 		return;
 	}
 	int mn = nextVal < prevVal ? nextVal : prevVal;
 	int mx = nextVal < prevVal ? prevVal : nextVal;
 	histogram[i] = (mx-mn)/2 + mn;
+	missing[i] = false;
 }
 
 Mat getDepthIm(int n, Mat m){
@@ -78,10 +81,12 @@ Mat getDepthIm(int n, Mat m){
 
 	vector<unsigned char> histogram_[255];
 	unsigned char histogram[255];
+	bool missing[256];
 
 	kitti::KittiPix3dSet ki = kitti::open("2011_09_26_drive_0001_sync", n);
 
 	Mat dm = ki.getDepthMap();
+	//dm *= 4;
 	ll_32F1_to_UCF1(dm);
 	
 	
@@ -107,13 +112,14 @@ Mat getDepthIm(int n, Mat m){
 	for(int i = 0; i < 255; i++)
 	{
 		histogram[i] = getMedian(histogram_[i]);
+		missing[i] = histogram_[i].size() == 0;
 		
 	}
 	for(int i = 0; i < 255; i++)
 	{
-		if(histogram_[i].size() < 1)
+		if(missing[i])
 		{
-			fixHole(histogram, i, histogram_);
+			fixHole(histogram, i, missing);
 		}
 		//cout << i << " => " << (int)histogram[i] << endl;
 	}
@@ -124,7 +130,7 @@ Mat getDepthIm(int n, Mat m){
 		{
 			if(ret.at<unsigned char>(y,x) > 0)
 			{
-				ret.at<unsigned char>(y,x) = histogram[ret.at<unsigned char>(y,x)];
+				ret.at<unsigned char>(y,x) = (unsigned char)(.5f * histogram[ret.at<unsigned char>(y,x)] + 0.5f * ret.at<unsigned char>(y,x));
 			}
 		}
 	}
@@ -140,22 +146,188 @@ Mat getMaskIm(){
 }
 
 //get depth - mask it, then read in the same depth map truth:
+Pixel3DSet project(Mat ci, Mat dm)
+{
+	Pixel3DSet r;
+	
+
+	float scalar = 0.001f;
+	int Y = ci.size().height;
+	int X = ci.size().width;
+	int hx = X/2;
+	int hy = Y/2;
+	for(int y = 0; y < Y; y++)
+	{
+		for(int x = 0; x < X; x++)
+		{
+			unsigned char d = dm.at<unsigned char>(y,x);
+			if(d == 0) continue;
+			float D = d/255.0f * 3000;
+			R3 p((x - hx) * D * scalar, (y-hy) * D * scalar, D);
+			Vec3b c = ci.at<Vec3b>(y,x);
+			p.y = -p.y;
+			r.push_back(p, c);
+		}
+	}
+	cout << r.size() << endl;
+	R3 mn,mx;
+	r.min_max_R3(mn, mx);
+	cout << mn << " / " << mx << endl;
+	return r;
+}
+
+kitti::KittiPix3dSet monoFrame(int i, Mat * _mask = NULL)
+{
+	Mat mask;
+	if(_mask == NULL) mask = getMaskIm();
+	else mask = *_mask;
+	kitti::KittiPix3dSet ret;
+	ret.colorImage = getColorIm(i);
+	ret.validDepthImage = Mat::zeros(ret.colorImage.size(), CV_8UC1);
+	ret.points = vector<R3>(ret.colorImage.size().width * ret.colorImage.size().height);
+
+	Mat d = getDepthIm(i, mask);
+
+	float scalar = 0.001f;
+	int Y = ret.colorImage.size().height;
+	int X = ret.colorImage.size().width;
+	int hx = X/2;
+	int hy = Y/2;
+	for(int y = 0; y < Y; y++)
+	{
+		for(int x = 0; x < X; x++)
+		{
+			unsigned char de = d.at<unsigned char>(y,x);
+			if(de == 0) continue;
+			float D = de/255.0f * 3000;
+			R3 p((x - hx) * D * scalar, (y-hy) * D * scalar, D);
+			//Vec3b co = ret.colorImage.at<Vec3b>(y,x);
+			p.y = -p.y;
+			//r.push_back(p, co);
+			ret.validDepthImage.at<unsigned char>(y,x) = 0xFF;
+			ret.points[y * X + x] = p;
+		}
+	}
+
+	return ret;
+}
+
+void quantitativeExperimentKittiMono(string algorithm_name, int from = 0)
+{
+    kitti::KittiPix3dSet frame1, frame2;
+	Pixel3DSet a, b;
+	Mat mask = getMaskIm();
+
+    frame1 = monoFrame(from, &mask);
+
+	for (int _i = from+1; _i < 107; _i++)
+	{
+		int currentIndex = _i;
+		//get match _m from i+1 to i
+		double seconds = 0.0;
+		double hde;
+		int iters = 0;
+		Pixel3DSet _;
+
+
+		cout << algorithm_name << ", completed " << _i << " of " << 107 << endl;
+
+		frame2 = monoFrame(currentIndex, &mask);
+
+
+		a = frame1.getPoints(); b = frame2.getPoints();
+
+		Mat _m = Mat::eye(Size(4, 4), CV_32FC1);
+
+		//algorithms here:
+		if (algorithm_name == "none") {
+            //do-nothing
+		}
+#if defined(HASCUDA) || defined(HASFFTW)
+		else if (algorithm_name == "FVR") {
+			_m = ll_pc::pc_register(b, a, seconds);
+		}
+
+		else if (algorithm_name == "FVR3D") {
+			_m = ll_pc::pc_register_pca_i(b, a, seconds);
+		}
+		else if (algorithm_name == "FVR3D-2") {
+			_m = ll_pc::pc_pca_icp(b, a, seconds);
+		}else if (algorithm_name == "FFVR"){
+            _m = ll_pc::ffvr(b, a, seconds);
+		}
+#endif
+        else if(algorithm_name == "PCA"){
+            _m = ll_pca::register_pca(b, a, seconds);
+        }else if (algorithm_name == "ICP") {
+			_m = Licp::icp(b, a, _, hde, seconds, iters);
+		}
+		else if (algorithm_name == "FM2D") {
+			ll_fmrsc::registerPix3D("surf", frame2, frame1, _m, seconds, true, -1);
+		}else if(algorithm_name == "FM3D"){
+		    _m = LukeLincoln::sift3DRegister(b, a, seconds, true, 256);
+		}
+
+
+
+		//:end
+
+		//compute the errors
+		b.transform_set(_m);
+		//hde = ll_measure::hausdorff(a, b);
+		double msee, pme;
+		hde = 21.0;
+		ll_measure::error_metrics(a, b, hde, msee, pme);
+
+		//void saveV20(string data_name, string alg_name, int frame1, int frame2, float seconds, float hd)
+		saveKitti("kitti.mono_experiments", algorithm_name, _i, _i-1, seconds, hde);
+
+
+		frame1 = frame2;
+	}
+
+
+
+
+}
+
 
 int main()
+{
+		//quantitativeExperimentKittiMono("none");
+		//quantitativeExperimentKittiMono("FM2D");
+		//quantitativeExperimentKittiMono("FM3D", 39);
+		//quantitativeExperimentKittiMono("ICP");
+		//quantitativeExperimentKittiMono("PCA", 78);
+		//quantitativeExperimentKittiMono("FVR3D");
+		//quantitativeExperimentKittiMono("FVR3D-2");
+		//quantitativeExperimentKittiMono("FVR", 12);
+		quantitativeExperimentKittiMono("FFVR");
+	return 0;
+}
+
+int mainTestMono()
 {
 	Mat m = getMaskIm();
 	cout << "working on monoexperiments" << endl;
 	int i = 0;
 	for(i = 0; i < 107; i++)
 	{
-		kitti::KittiPix3dSet ki = kitti::open("2011_09_26_drive_0001_sync", i);
-		Mat c = getColorIm(i);
-		Mat d = getDepthIm(i, m);
-		imshow("color", c);
-		imshow("depth", d);
-		imshow("td", ki.getDepthMap());
-		waitKey();
+		kitti::KittiPix3dSet km = monoFrame(i, &m);
+		//kitti::KittiPix3dSet ki = kitti::open("2011_09_26_drive_0001_sync", i);
+		//Mat c = getColorIm(i);
+		//Mat d = getDepthIm(i, m);
+		imshow("color", km.colorImage);
+		//imshow("depth", km.getDepthMap());
+		//imshow("td", ki.getDepthMap());
+		//waitKey();
+		//Pixel3DSet px = project(c, d);
+		Pixel3DSet px = km.getPoints();
+		LLPointers::setPtr("object", &px);
+		viewPixel3DSet();
 	}
+	
+
 	return 0;
 }
 

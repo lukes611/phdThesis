@@ -337,6 +337,20 @@ namespace kitti
 		return ret.clone();
 	}
 
+	Mat KittiPix3dSet::getDepthMap2()
+	{
+		Mat ret = Mat::zeros(this->colorImage.size(), CV_32FC1);
+		for (int y = 0; y < ret.size().height; y++)
+		{
+			for (int x = 0; x < ret.size().width; x++)
+			{
+				if(this->validDepthImage.at<unsigned char>(y,x))
+					ret.at<float>(y, x) = this->points[y * ret.size().width + x].z / 255.0f;
+			}
+		}
+		return ret.clone();
+	}
+
 	Mat KittiPix3dSet::getColoredDepthMap()
 	{
 		Mat depthImage = this->getDepthMap();
