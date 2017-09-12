@@ -6,11 +6,16 @@
 		25. In sect 4.8 - 4.12 you should only present results that are novel and compare them against those in your honours thesis. - these are novel from my adelaide paper
 
 	TODO
-		13. Section 3.2 needs to mention my honours thesis
-		18. In sec 4.4.5 there are not a lot of no comparative results it would be nicer to have something more.
 		22. Figure 4.27 shows reconstructions for FVR but none for ICP and FM you state that they are difficult to reconstruct with these, but a picture is worth 1000 words the worse they look the better it is for you. If you really can not reconstruct these then please given specific and detailed justification of why they are difficult to reconstruct.
 
 		
+		
+today's todo list::>
+	todo:
+	look at a construction via sync 0001 or best one for me :)
+	look at one of my experiments
+	compare and choose best
+	compute and compare with ICP and FM2D
 		
 
 		

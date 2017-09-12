@@ -152,7 +152,7 @@ function out(ds, d, from, to){
   function addRow(elems){
     document.getElementById('stats-out').innerHTML += '<tr>'+elems.map(x => `<td>${x}</td>`).join('')+'</td>';
   }
-  let algorithmNames = 'FM2D,FM3D,ICP,PCA,FVR,FFVR,FVR3D'.split(',').filter(n=>results[n]!==undefined);
+  let algorithmNames = 'FM2D,FM3D,ICP,PCA,FVR,FVR3D'.split(',').filter(n=>results[n]!==undefined);
   addRow(['_'].concat(algorithmNames));
   addRow(['mean'].concat(algorithmNames.map(name => {
     let l = results[name].errors.length;
@@ -189,9 +189,9 @@ function getLatexTable(datasetname, algorithmNames, data){
     let id = datasetname.replace(/\s/g, '').toLowerCase();
     let ret = `\\begin{figure}
 \\centering
-\\begin{tabular}{cccccccc}
+\\begin{tabular}{ccccccc}
 \\hline
-\\textbf{frame} & \\textbf{FM-2D} & \\textbf{FM-3D} & \\textbf{ICP} & \\textbf{PCA} & \\textbf{FVR} & \\textbf{FFVR} & \\textbf{FVR-3D}
+\\textbf{frame} & \\textbf{FM-2D} & \\textbf{FM-3D} & \\textbf{ICP} & \\textbf{PCA} & \\textbf{FVR} & \\textbf{FVR-3D}
 \\\\ \\hline
 `;
 for(let i = 0; i < data.FM2D.errors.length; i++){
