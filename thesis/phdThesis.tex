@@ -35,6 +35,8 @@ colorlinks = true, hyperindex = true, hyperfigures] {hyperref}
 
 \renewcommand{\bibname}{Reference List}
 
+
+
 \begin{document}
 \raggedbottom
 %\openup .60em
@@ -44,9 +46,9 @@ colorlinks = true, hyperindex = true, hyperfigures] {hyperref}
 \setlength{\marginparwidth}{57pt}
 \setlength{\footskip}{30pt}
 \openup 1em
-\input{chapters/Title}
 \frontmatter
-\includepdf[pages={1,2}]{title}
+\includepdf[]{title}
+\input{chapters/Statement} % Statement of originality
 \input{chapters/Abstract} % Abstract
 \input{chapters/Acknowledgements}
 \tableofcontents
