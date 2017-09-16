@@ -292,7 +292,7 @@ void quantitativeExperimentKittiMono(string algorithm_name, int from = 0)
 }
 
 
-int main()
+int main33()
 {
 		//quantitativeExperimentKittiMono("none");
 		//quantitativeExperimentKittiMono("FM2D");
@@ -302,7 +302,7 @@ int main()
 		//quantitativeExperimentKittiMono("FVR3D");
 		//quantitativeExperimentKittiMono("FVR3D-2");
 		//quantitativeExperimentKittiMono("FVR", 12);
-		quantitativeExperimentKittiMono("FFVR");
+		//quantitativeExperimentKittiMono("FFVR");
 	return 0;
 }
 
@@ -372,7 +372,7 @@ int mainBasic()
 
 
 
-int mainOld(int argc, char * * argv)
+int main(int argc, char * * argv)
 {
 
 	string namesList[20] = {
@@ -400,7 +400,10 @@ int mainOld(int argc, char * * argv)
     };
 
     //string fn = "PlantsOutdoors.tc.rotation";
-
+	//vs icp on exp 5 with skip of 10
+	//vs fm2d and icp on 19
+	vector<int> fmes = ll_experiments::rng(5, 10, 1);
+	qualitativeExperiment("FM3D-2", namesList[1], fmes);
 
 
 	//save images: 4 per video file
@@ -464,6 +467,10 @@ int mainOld(int argc, char * * argv)
 	};
 	int countList[5] = {107, 76, 153, 339, 267};
 
+
+
+	return 0;
+
 	//for (int i = 2; i < 5; i++)
 	{
 		int i = 4;
@@ -478,7 +485,7 @@ int mainOld(int argc, char * * argv)
 		//
 		//quantitativeExperimentKitti10("FVR3D", kittiData, inds);
 		//quantitativeExperimentKitti10("FVR3D-2", kittiData, inds);
-		quantitativeExperimentKitti10("FVR", kittiData, inds);
+		//quantitativeExperimentKitti10("FVR", kittiData, inds);
 		//quantitativeExperimentKitti10("FFVR", kittiData, inds);
 	}
 
@@ -494,7 +501,7 @@ int mainOld(int argc, char * * argv)
 		//quantitativeExperiment20("PCA", fn, inds);
 		
 		//quantitativeExperiment20("FVR3D", fn, inds);
-		quantitativeExperiment20("FVR3D-2", fn, inds);
+		//quantitativeExperiment20("FVR3D-2", fn, inds);
 		//quantitativeExperiment20("FVR", fn, inds);
 		
 		//quantitativeExperiment20("FFVR", fn, inds);

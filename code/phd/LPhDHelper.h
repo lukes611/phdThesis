@@ -46,6 +46,7 @@ void quantitativeExperiment20(string algorithm_name, string data_name, vector<in
 void saveKitti(string data_name, string alg_name, int frame1, int frame2, float seconds, float hd);
 void quantitativeExperimentKitti10(string algorithm_name, string data_name, vector<int> frames);
 
+void qualitativeExperiment(string algorithm_name, string data_name, vector<int> frames);
 
 
 

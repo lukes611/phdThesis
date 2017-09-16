@@ -306,3 +306,96 @@ void quantitativeExperimentKitti10(string algorithm_name, string data_name, vect
 
 
 }
+
+/**
+ * @desc - added on 12.9.2017
+ */
+void qualitativeExperiment(string algorithm_name, string data_name, vector<int> frames)
+{
+    CapturePixel3DSet video = ll_experiments::openData(data_name, 1);
+
+
+	Pix3D frame1, frame2;
+	Pixel3DSet a, b;
+
+	LukeLincoln::LVol<Vec3b> output(512, 512, 512, Vec3b(0,0,0));
+	cout << output.resolution << " was res" << endl;
+	output.resolution = 0.5;
+
+    //output(20,20,20) = Vec3b(255, 0,0);
+
+	Mat accMatrix = Mat::eye(Size(4, 4), CV_32FC1);
+	
+
+	video.read_frame(frame1, frames[0]);
+
+
+
+	for (int _i = 1; _i < frames.size(); _i++)
+	{
+		int currentIndex = frames[_i];
+		//get match _m from i+1 to i
+		double seconds = 0.0;
+		double hde;
+		int iters = 0;
+		Pixel3DSet _;
+
+
+		cout << algorithm_name << ", completed " << _i << " of " << frames.size() << endl;
+
+		video.read_frame(frame2, currentIndex);
+
+		a = frame1; b = frame2;
+
+		Mat _m = Mat::eye(Size(4, 4), CV_32FC1);
+
+		//algorithms here:
+		if (algorithm_name == "none") {
+            //do-nothing
+		}
+#if defined(HASCUDA) || defined(HASFFTW)
+		else if (algorithm_name == "FVR") {
+			_m = ll_pc::pc_register(b, a, seconds);
+		}
+
+		else if (algorithm_name == "FVR3D") {
+			_m = ll_pc::pc_register_pca_i(b, a, seconds);
+		}
+		else if (algorithm_name == "FVR3D-2") {
+			_m = ll_pc::pc_pca_icp(b, a, seconds);
+		}else if (algorithm_name == "FFVR"){
+            _m = ll_pc::ffvr(b, a, seconds);
+		}
+#endif
+        else if(algorithm_name == "PCA"){
+            _m = ll_pca::register_pca(b, a, seconds);
+        }else if (algorithm_name == "ICP") {
+			_m = Licp::icp(b, a, _, hde, seconds, iters);
+		}
+		else if (algorithm_name == "FM2D") {
+			ll_fmrsc::registerPix3D("surf", frame2, frame1, _m, seconds, true, 150);
+		}else if(algorithm_name == "FM3D"){
+		    _m = LukeLincoln::sift3DRegister(b, a, seconds, true, 256);
+		}
+
+
+		accMatrix = accMatrix * _m;
+		b.transform_set(accMatrix);
+		
+
+		cout << "adding " << output.add(b.points, b.colors) << " out of " << b.points.size() << endl;;
+
+		frame1 = frame2;
+	}
+
+
+	Pixel3DSet obj = LukeLincoln::makePixel3DSet(output);
+	//obj.save_obj(string(DESKTOP_DIR) + "/one.obj");
+
+	#ifdef HASGL
+	LLPointers::setPtr("object", &obj);
+    ll_experiments::viewPixel3DSet();
+    #endif
+
+
+}
