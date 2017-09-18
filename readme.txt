@@ -8,14 +8,11 @@
 	TODO
 		22. Figure 4.27 shows reconstructions for FVR but none for ICP and FM you state that they are difficult to reconstruct with these, but a picture is worth 1000 words the worse they look the better it is for you. If you really can not reconstruct these then please given specific and detailed justification of why they are difficult to reconstruct.
 
+	CLARE-TODO
+		page 20. highlight big picture? ask clare about this
+		replace color with colour throughout
+	
 		
-		
-today's todo list::>
-	todo:
-	look at a construction via sync 0001 or best one for me :)
-	look at one of my experiments
-	compare and choose best
-	compute and compare with ICP and FM2D
 		
 
 		
