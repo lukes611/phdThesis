@@ -9,6 +9,6 @@ Typically an occupancy grid or octree is used to represent the map \cite{Wurm10O
 
 \subsubsection{Bundle Adjustment}
 \label{sec:ba}
-Bundle Adjustment is another optimization technique used in SLAM and 3D reconstruction \cite{Lourakis09Sba}. In this context a bundle refers to the light leaving each camera projected into world coordinates. This technique refines both camera pose and visual reconstruction. Bundle Adjustment requires some estimate for camera pose, 3D world point positions and image point locations for each view as input. \\
+Bundle Adjustment is another optimization technique used in SLAM and 3D reconstruction \cite{Lourakis09Sba}. In this context, a bundle refers to the light leaving each camera projected into world coordinates. This technique refines both camera pose and visual reconstruction. Bundle Adjustment requires some estimate for camera pose, 3D world point positions and image point locations for each view as input. \\
 
 Using these data and any non-linear optimization method (such as Gauss-Newton or the Levenberg–Marquardt algorithm) the rigid motion based camera movement and the 3D world-coordinates of the points are optimized. In the literature, Fioraio \cite{Fioraio11Realtime} presented a system which uses bundle adjustment to align RGB-D data. It has also been used in conjunction with feature matching to produce sparse 3D reconstructions \cite{Klein07Parallel,Agarwal09Building}.
