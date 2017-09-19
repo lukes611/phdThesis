@@ -11,6 +11,9 @@
 	CLARE-TODO
 		page 20. highlight big picture? ask clare about this
 		replace color with colour throughout
+		page 79 "while -"?
+		check all figures come after mentioned
+		cannot find reference to figure 3.2
 	
 		
 		
