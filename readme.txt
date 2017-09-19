@@ -14,7 +14,7 @@
 		page 79 "while -"?
 		check all figures come after mentioned
 		cannot find reference to figure 3.2
-	
+		make sure asus xtion is stable
 		
 		
 
