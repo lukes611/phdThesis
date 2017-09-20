@@ -15,7 +15,8 @@
 		check all figures come after mentioned
 		cannot find reference to figure 3.2
 		make sure asus xtion is stable
-		
+		make figure 3.4A: A Projected Frame (a bit larger)
+		check listing 3.3 after
 		
 
 		
