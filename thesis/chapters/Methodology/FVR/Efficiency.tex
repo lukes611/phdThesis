@@ -21,9 +21,9 @@ The magnitude of the frequency domain is independent of translation and any rota
 \label{fig:PIPELINE3}
 \end{figure}
 
-Next, the first 3D frame, $Volume_1$ is transformed by the computed rotation factor. This leaves only a 3D translation transform separating both inputs $Volume_1$ and $Volume_2$. Two projection map transforms of both $Volume_1$ and $Volume_2$ (equivalent to 4 transforms in total) are then used to efficiently find this translation factor. The first projection map transform is along the z-axis. The z-axis projection map transform of $Volume_1$ produces 2D image, $Image_{za}$ the z-axis projection map transform of $Volume_2$ produces 2D image, $Image_{zb}$. Both $Image_{za}$ and $Image_{zb}$ may be phase correlated producing the x and y axis components of the translation separating $Volume_1$ and $Volume_2$. \\
+Next, the first 3D frame, $Volume_1$ is transformed by the computed rotation factor. This leaves only a 3D translation transform separating both inputs $Volume_1$ and $Volume_2$. Two projection map transforms of both $Volume_1$ and $Volume_2$ (equivalent to four transforms in total) are then used to efficiently find this translation factor. The first projection map transform is along the z-axis. The z-axis projection map transform of $Volume_1$ produces 2D image, $Image_{za}$ the z-axis projection map transform of $Volume_2$ produces 2D image, $Image_{zb}$. Both $Image_{za}$ and $Image_{zb}$ may be phase correlated producing the x and y axis components of the translation separating $Volume_1$ and $Volume_2$. \\
 
-The other two projection map transforms are along the x-axis. The projection map transform of $Volume_1$ produces $Image_{wa}$, whilst the projection map transform of $Volume_2$ produces $Image_{wb}$. These two images ($Image_{wa}$ and $Image_{wb}$) may be phase correlated producing the z-axis component of the translation. A composite registration matrix aligning $Volume_1$ to $Volume_2$ may be formed by translating each volume's center to the origin, rotating by the computed rotation factor, translating the origin to the volume's center and finally translating by the $[X,Y,Z]^T$ translation vector computed. \\
+The other two projection map transforms are along the x-axis. The projection map transform of $Volume_1$ produces $Image_{wa}$, whilst the projection map transform of $Volume_2$ produces $Image_{wb}$. These two images ($Image_{wa}$ and $Image_{wb}$) may be phase correlated producing the z-axis component of the translation. A composite registration matrix aligning $Volume_1$ to $Volume_2$ may be formed by translating each volume's centre to the origin, rotating by the computed rotation factor, translating the origin to the volume's centre and finally translating by the $[X,Y,Z]^T$ translation vector computed. \\
 
 Noticeably, the Hanning window function and post $|DFT|(x)$ $Log(x)$ function from the original pipeline (figure \ref{fig:PIPELINENo1}) are missing. The Hanning window function may be incorporated in the first phase correlation procedure, which processes 2D images, therefore the Hanning window function would be in 2D rather than 3D which also improves efficiency as an entire dimension is removed from the process. The log function may also be performed as part of the phase correlation procedure, however it was found that the FFVR procedure estimates rotation more reliably using the spherical-transform if the log function is not performed. Consequentially, this saves computational cost. \\
 
@@ -32,9 +32,9 @@ It is advantageous to use 2D phase correlation over 3D phase correlation from a 
 \subsubsection{Spherical-map transform}
 \label{SMTransform}
 
-As noted, the Spherical-Map transform both reduces the 3D volume to a 2D image whilst retaining information about y-axis rotation. In the new domain, and rotation about the y-axis becomes x-axis translation within the output image. The transform requires a single iteration over the input volume, so it has identical complexity to the 3D Log-Polar transform whilst additionally reducing computational complexity further down the pipeline by compacting the data to process from three dimensions to two dimensions.  \\
+As noted, the Spherical-Map transform reduces the 3D volume to a 2D image whilst retaining information about y-axis rotation. In the new domain, and rotation about the y-axis becomes x-axis translation within the output image. The transform requires a single iteration over the input volume, so it has identical complexity to the 3D Log-Polar transform whilst reducing computational complexity further down the pipeline by compacting the data to process from three dimensions to two dimensions.  \\
 
-An example of an input model (figure \ref{fig:bunnyOrigAA}) and the Spherical-Map domain of the model (figure \ref{fig:bunnySPTed}) is shown in figure \ref{fig:smtExample}. The relationship between the input 3D volume $Vol$ and the output 2D image $Im$ is defined using equations \ref{eqn:invLPFuncs}, \ref{eqn:invLPVVF} and \ref{eqn:smtUpdate}. The value of pixel $Im_{x,y}$ located at coordinate $x,y$ is computed by summing the values along a given ray within the volume. The ray is defined by the vector valued function $Ray(x,y,r)$ found in equation \ref{eqn:invLPVVF}. This function takes the x and y coordinates within the image as well as a radius value (the index from the summation in equation \ref{eqn:smtUpdate}) and returns a vector. The vector is used to index the volume and allows the output pixel to include all the values along the ray. \\
+An example of an input model (Figure \ref{fig:bunnyOrigAA}) and the Spherical-Map domain of the model (figure \ref{fig:bunnySPTed}) is shown in Figure \ref{fig:smtExample}. The relationship between the input 3D volume $Vol$ and the output 2D image $Im$ is defined using equations \ref{eqn:invLPFuncs}, \ref{eqn:invLPVVF} and \ref{eqn:smtUpdate}. The value of pixel $Im_{x,y}$ located at coordinate $x,y$ is computed by summing the values along a given ray within the volume. The ray is defined by the vector valued function $Ray(x,y,r)$ found in equation \ref{eqn:invLPVVF}. This function takes the x and y coordinates within the image as well as a radius value (the index from the summation in equation \ref{eqn:smtUpdate}) and returns a vector. The vector is used to index the volume and allows the output pixel to include all the values along the ray. \\
 
 \begin{figure}[!htb]
         \centering
@@ -72,16 +72,16 @@ Ray(x,y,r) = [Ray_x(x,y,r), Ray_y(x,y,r), Ray_z(x,y,r)]^T
 Im_{x,y} = \sum_{r=1}^{(2^{-1}N)^{1.5}}{Vol(Ray(x,y,r))} 
 \end{equation}
 
-In the Log-Spherical transform described in section \ref{Sec:RoteZoomingSection} re-arranges the rotation and scale transforms along two axis, the third axis retains information and increases the accuracy of the solution. By reducing the other axis from size $N$ to the average value (size 1) information is lost, however computational complexity is reduced by an entire dimension. This is a complexity/performance trade off. Computational complexity may be afforded given input data contains relatively little noise. The output image maps 3D y-axis rotation to 2D x-axis translation is the output image. \\
+In the Log-Spherical transform described in section \ref{Sec:RoteZoomingSection} re-arranges the rotation and scale transforms along two axis, the third axis retains information and increases the accuracy of the solution. By reducing the other axis from size $N$ to the average value (size 1) information is lost, however computational complexity is reduced by an entire dimension. This is a complexity/performance trade off. Computational complexity may be afforded given input data contains relatively little noise. The output image maps 3D y-axis rotation to 2D x-axis translation. \\
 
 
-This process essentially sums up the values along a given ray defined by scaling spherical coordinates and adding up the values intersecting the ray. The resulting image, maps 3D y-axis rotation to 2D x-axis translation. Once two 3D frame volumes $V_a$ and $V_b$ are transformed into their corresponding spherical-map domain $SM_a$ and $SM_b$ respectively, the two may be phase correlated  in order to measure the x-axis translation separating them. This x-axis translation may then be mapped directly to the rotational angle separating the two input 3D camera frames. The relationship may be computed as $\frac{360x}{M}$ where $x$ is the x-axis translation and $M$ is the width and height of the spherical map domain image. \\
+This process essentially sums up the values along a given ray defined by scaling spherical coordinates and adding up the values intersecting the ray. The resulting image, maps 3D y-axis rotation to 2D x-axis translation. Once two 3D frame volumes $V_a$ and $V_b$ are transformed into their corresponding spherical-map domain $SM_a$ and $SM_b$ respectively, the two may be phase correlated to measure the x-axis translation separating them. This x-axis translation may then be mapped directly to the rotational angle separating the two input 3D camera frames. The relationship may be computed as $\frac{360x}{M}$ where $x$ is the x-axis translation and $M$ is the width and height of the spherical map domain image. \\
 
 
 \subsubsection{Projection-map transform}
 \label{sec:PMTramsform}
 
-The projection map transform is similar in spirit to an orthogonal projection of the volume along a particular axis. Instead of simply projecting the closest point as in projections for visualization purposes, the sum of values computed along the ray is used for representation. The projection map transform is described here in terms of an output projection map image $Im$ and an input 3D volume frame $Vol$, which may be input from a sensor or software system which is able to generate 3D frames of the environment. Each pixel in $Im$ has its value defined mathematically as the summation of values along a particular axis given the x,y coordinates. The Projection-map x-axis transform and the Projection-map z-axis transform are defined in equations \ref{eqn:xPMT} and \ref{eqn:zPMT} respectively. \\
+The projection map transform is similar to an orthogonal projection of the volume along a particular axis. Instead of simply projecting the closest point as done in projections for visualization purposes, the sum of values computed along the ray is used for representation. The projection map transform is described here in terms of an output projection map image $Im$ and an input 3D volume frame $Vol$, which may be input from a sensor or software system which is able to generate 3D frames of the environment. Each pixel in $Im$ has its value defined mathematically as the summation of values along a particular axis given the x,y coordinates. The Projection-map x-axis transform and the Projection-map z-axis transform are defined in equations \ref{eqn:xPMT} and \ref{eqn:zPMT} respectively. \\
 
 \begin{figure}[!htb]
         \centering
@@ -118,7 +118,7 @@ Im(z,y) = \sum_{x=0}^{N}{Vol(x,y,z)}
 Im(x,y) = \sum_{z=0}^{N}{Vol(x,y,z)}
 \end{equation}
 
-In these equations the Projection map transform along the x-axis is computed via summing up values along the x-axis in the input 3D frame,. In this was, any 3D z-axis translation in $Vol$ maps to 2D x-axis translation in the output image $Im$. Additionally any y-axis translation in the input 3D frame $Vol$ is mapped to a corresponding y-axis translation in the output 2D Projection map domain $Im$. If both the width and height of the output image $Im$ is equal to the width, height and depth of the input 3D frame then the relationship is a $1:1$ mapping between 3D z-axis translation and 2D x-axis translation as well as 3D y-axis translation to 2D y-axis translation. \\
+In these equations the Projection map transform along the x-axis is computed via summing up values along the x-axis in the input 3D frame. In this way, any 3D z-axis translation in $Vol$ corresponds to 2D x-axis translation in the output image $Im$. Additionally any y-axis translation in the input 3D frame $Vol$ is mapped to a corresponding y-axis translation in the output 2D Projection map domain $Im$. If both the width and height of the output image $Im$ is equal to the width, height and depth of the input 3D frame then the relationship is a $1:1$ mapping between 3D z-axis translation and 2D x-axis translation as well as 3D y-axis translation to 2D y-axis translation. \\
 
 The corresponding z-axis Projection map transform sums up values along the z-axis. Here, 3D y-axis translations within the original 3D frame also produce 2D y-axis translations in the output Projection map domain. However, all x-axis translations occurring within the 3D frame domain are mapped to 2D x-axis translations in the output Projection map domain image $Im$. \\
 
@@ -126,13 +126,14 @@ Given both of these Projection map transforms, the 3D translation separating two
 
 \subsubsection{Performance Analysis}
 
-In order to assess the efficiency gain between the Fast Fourier Volume Registration method over the original FVR method, the computational complexity of the FVR is assessed. The computational complexity is dependent on two factors: the size of the input depth map $W \times H$ and the width/height/depth of the 3D volumes used in the volume registration procedure. Since the computational complexity is fixed no matter the input data (depending only on the sizes specified by the user), this method is considered a closed form solution. \\
+To assess the efficiency gain between the Fast Fourier Volume Registration method over the original FVR method, the computational complexity of the FVR is assessed. The computational complexity is dependent on two factors: the size of the input depth map $W \times H$ and the width/height/depth of the 3D volumes used in the volume registration procedure. Since the computational complexity is fixed no matter the input data (depending only on the sizes specified by the user), this method is considered a closed form solution. \\
 
 The FVR method makes use of several sub-procedures including: 2 $\times$ 3D projections (of the depth frame to a 3D volume frame), 2 $\times$ Hanning window filters, 2 $\times$ 3D FFTs, 2 $\times$ element-wise Log filters, 2 $\times$ Log-spherical transforms, 2 $\times$ 3D phase correlation processes and 2 $\times$ linear transformations. The 3D phase correlation method makes use of several sub-procedures including: 3 $\times$ 3D FFTs, 1 $\times$ spectra multiplication and 1 $\times$ 3D peak finding operation. The number of operations required by each of these methods are listed in table \ref{table:complexities}. \\
 
 
 \begin{table}[ht]
 \centering
+\caption{Complexities for given Procedures}
 \scalebox{0.75}{
 \begin{tabular}{cc}
 \hline
@@ -149,12 +150,11 @@ Geometric Transform & 30 (GPGPU)\\
 \\
 \end{tabular}}
 \\
-\caption{Complexities for given Procedures}
 \label{table:complexities}
-\end{table}[ht]
+\end{table}
 
 
-Adding these operations up whilst scaling them by the number of times they are used gives the total complexity for the FVR method. This complexity is given in equation \ref{eqn:FULLPERFORMANCE}. The complexity of the 3D Phase Correlation procedure adds up to the complexity shown in equation \ref{eqn:PCFULLPERFORMANCE}. \\
+Summing these operations whilst scaling them by the number of times they are used gives the total complexity for the FVR method. This complexity is given in equation \ref{eqn:FULLPERFORMANCE}. The complexity of the 3D Phase Correlation procedure adds up to the complexity shown in equation \ref{eqn:PCFULLPERFORMANCE}. \\
 
 \begin{equation} \label{eqn:FULLPERFORMANCE}
 8N^3\log{N^3} + 4N^3 + 28WH + 322
@@ -165,12 +165,13 @@ Adding these operations up whilst scaling them by the number of times they are u
 \end{equation}
 
 
-The full complexity of the FVR method (equation \ref{eqn:FULLPERFORMANCE}) is next compared to the performance of the FFVR method to assess performance gain. The FFVR methods makes use of several of the procedures found in table \ref{table:complexities} as well as a few others. These include: 2 $\times$ 3D FFTs, 2 $\times$ Spherical-Map transforms, 3 $\times$ 2D Phase Correlation procedures, 1 $\times$ 3D geometric transform and 4 $\times$ Projection-Map transforms. The 2D phase correlation method makes use of several sub-procedures including: 3 $\times$ 2D FFTs, 1 $\times$ spectra multiplication and 1 $\times$ 2D peak finding operation. Table \ref{table:complexities2} cites the complexities for the additional operations including: the Spherical-Map transform, the Projection-Map transform, 2D Peak finding, 2D FFT and 2D Phase Correlation (made up of multiple sub-procedures). \\
+The full complexity of the FVR method (equation \ref{eqn:FULLPERFORMANCE}) is next compared to the performance of the FFVR method to assess performance gain. The FFVR methods makes use of several of the procedures found in Table \ref{table:complexities} and several others. These include: 2 $\times$ 3D FFTs, 2 $\times$ Spherical-Map transforms, 3 $\times$ 2D Phase Correlation procedures, 1 $\times$ 3D geometric transform and 4 $\times$ Projection-Map transforms. The 2D phase correlation method makes use of several sub-procedures including: 3 $\times$ 2D FFTs, 1 $\times$ spectra multiplication and 1 $\times$ 2D peak finding operation. Table \ref{table:complexities2} cites the complexities for the additional operations including: Spherical-Map transform, Projection-Map transform, 2D Peak finding, 2D FFT and 2D Phase Correlation (made up of multiple sub-procedures). \\
 
 
 
 \begin{table}[!htb]
 \centering
+\label{table:complexities2}
 \scalebox{0.75}{
 \begin{tabular}{cc}
 \hline
@@ -184,16 +185,15 @@ Projection-Map Transform & 1 (GPGPU) \\
 \end{tabular}}
 \\
 \caption{Complexities for given Procedures}
-\label{table:complexities2}
-\end{table}[!htb]
+\end{table}
 
-From figure \ref{fig:PIPELINE3} we can see that the FFVR method is made up of multiple sub-procedures. These include: 2 $\times$ 3D projections, $2 \times$ 3D FFTs, $2 \times$ Spherical-Map transforms, $1 \times$ 3D geometrical transformation, $3 \times$ 2D phase correlations and $4 \times$ Projection-Map transforms. The total complexity is added up for all of these functions and given in equation \ref{eqn:FULLPERF2}. \\
+From Figure \ref{fig:PIPELINE3} we can see that the FFVR method is made up of multiple sub-procedures. These include: 2 $\times$ 3D projections, $2 \times$ 3D FFTs, $2 \times$ Spherical-Map transforms, $1 \times$ 3D geometrical transformation, $3 \times$ 2D phase correlations and $4 \times$ Projection-Map transforms. The total complexity is summed for all of these functions and given in equation \ref{eqn:FULLPERF2}. \\
 
 \begin{equation} \label{eqn:FULLPERF2}
 2N^3\log{N^3} + 9N^2\log{N^2} + 6N^2 + 28WH + 169
 \end{equation}
 
-Figure \ref{fig:perfComp} provides a visualization of the performance improvement which the FFVR method achieves over the original FVR approach. The graph exposes the performance of both methods at different volume sizes increasing logarithmically. The FFVR method is around ~1.8 times faster for $64^3$ volumes, ~3.4 times faster for $128^3$ volumes, ~4.1 times faster for $256^3$ volumes and ~4.2 times faster for $512^3$ volumes. This is due to the reduction in the amount of data to process afforded by the novel spherical-map transform and projection map transform methods.
+Figure \ref{fig:perfComp} provides a visualization of the performance improvement which the FFVR method achieves over the original FVR approach. The graph displays the performance of both methods at different volume sizes increasing logarithmically. The FFVR method is around ~1.8 times faster for $64^3$ volumes, ~3.4 times faster for $128^3$ volumes, ~4.1 times faster for $256^3$ volumes and ~4.2 times faster for $512^3$ volumes. This is due to the reduction in the amount of data to process afforded by the novel spherical-map transform and projection map transform methods.
 
 \begin{figure}[!htb]
 \centering
@@ -207,7 +207,7 @@ Figure \ref{fig:perfComp} provides a visualization of the performance improvemen
 In this section, the computational complexities of the FVR related techniques are compared with common algorithms used for 3D reconstruction from the literature. These include: 2D/3D Feature Matching (SURF/SIFT) with RANSAC, PCA, and ICP. These algorithms are compared with the complexity of the FVR, FFVR and FVR-3D (Note: the complexity of MVVR is similar to FVR). Here we use $N$ to represent volume size, for example the FVR based methods usually use a volume of size $N^3$. $W$ is used to describe the size of images processed (used to describe the number of pixels in a $W\times W$ image, projected into a $W\times W$ 3D point cloud). \\
 
 
-First, the two feature matching methods SIFT and SURF are evaluated. The complexity evaluation of SIFT was taken from work by Vinukonda \cite{Vinukonda11Study} whilst the complexity of SURF was computed based on a public implementation found at \url{https://github.com/lukes611/phdThesis}. The complexity of SIFT is based on the image size $W$, the Gaussian filter size $w$ (typically 5), the number of octaves $s$ (3 are used in experiments), the fraction of extrema in the image $\alpha$ (found to be approximately 6\%), the fraction of extrema which are features $\beta$ (found to be approximately 35\%), the number of additional features found $\gamma$ (found to be approximately .04\%) and the size of the descriptor neighbourhood $x$ (typically 8). \\
+First, the two feature matching methods SIFT and SURF are evaluated. The complexity evaluation of SIFT was taken from work by Vinukonda \cite{Vinukonda11Study} whilst the complexity of SURF was computed based on a public implementation found at \url{https://github.com/lukes611/phdThesis}. The complexity of SIFT is based on the image size $W$, the Gaussian filter size $w$ (typically 5), the number of octaves $s$ (3 are used in experiments), the fraction of extrema in the image $\alpha$ (found to be approximately 6\%), the fraction of extrema which are features $\beta$ (found to be approximately 35\%), the number of additional features found $\gamma$ (found to be approximately 0.04\%) and the size of the descriptor neighbourhood $x$ (typically 8). \\
 
 
 The complexity of finding SIFT features and computing a SIFT descriptor for an image was found to be,
@@ -216,13 +216,13 @@ The complexity of finding SIFT features and computing a SIFT descriptor for an i
 W^2(s(4w^2 + 100\alpha + 156) + 1520x^2(\alpha \beta + \gamma))
 \end{equation}
 
-by plugging in the usual values we can form a computational cost as a function of $W$ and variables $\alpha$, $\beta$ and $\gamma$, the variables representing the fraction of pixels which are features.
+By plugging in the usual values (equation \ref{eqn:SIFT_PERF_FINAL}), we can form a computational cost as a function of $W$ and variables $\alpha$, $\beta$ and $\gamma$, the variables representing the fraction of pixels which are features.
 
 \begin{equation} \label{eqn:SIFT_PERF_FINAL}
 W^2(300\alpha + 768 + 97280(\alpha \beta + \gamma))
 \end{equation}
 
-The complexity of SURF is based on several similar factors. Again, $W$ is the image size, $s$ is the number of octaves (3 is the default), $\alpha$ is a scalar (with a default value of 3), and $f$ the fraction of image pixels which are detected as features. Functions which make up the SURF feature detection and descriptor extraction include integral image creation of complexity $W^2 + W$, computation of Hessian feature detection of complexity $\sum_{i=1}^{s} 668(\frac{N}{2^i\alpha})^2$ and the computation of the SURF descriptors of complexity $213434N^2f$. Plugging in default values, the complexity may be formed as a function of the image size, $W$ and the percentage of pixels found to be features $f$.
+The complexity of SURF is based on several similar factors. Again, $W$ is the image size, $s$ is the number of octaves (3 is the default), $\alpha$ is a scalar (with a default value of 3), and $f$ the fraction of image pixels which are detected as features. Functions which make up the SURF feature detection and descriptor extraction include integral image creation of complexity $W^2 + W$, computation of Hessian feature detection of complexity $\sum_{i=1}^{s} 668(\frac{N}{2^i\alpha})^2$ and the computation of the SURF descriptors of complexity $213434N^2f$. Plugging in default values (equation \ref{eqn:SURF_PERF_FINAL}), the complexity may be formed as a function of the image size, $W$ and the percentage of pixels found to be features $f$.
 
 \begin{equation} \label{eqn:SURF_PERF_FINAL}
 W^2 + W + N^2(1972.688 + 213434f)
@@ -234,15 +234,17 @@ The complexity of RANSAC was also analysed. Based the implementation used to com
 134IN^2f
 \end{equation}
 
-Therefore the total complexities of SURF + RANSAC and SIFT + RANSAC are given in equations \ref{eqn:SURFRANSAC_PERF_FINAL} and \ref{eqn:SIFTRANSAC_PERF_FINAL} respectively.
+Therefore, the total complexities of SURF + RANSAC and SIFT + RANSAC are given in equations \ref{eqn:SURFRANSAC_PERF_FINAL} and \ref{eqn:SIFTRANSAC_PERF_FINAL} respectively.
+
+
+\begin{equation} \label{eqn:SURFRANSAC_PERF_FINAL}
+W^2 + W + N^2(1972.688 + 213434f) + 134IN^2f
+\end{equation}
 
 \begin{equation} \label{eqn:SIFTRANSAC_PERF_FINAL}
 W^2(300\alpha + 768 + 97280(\alpha \beta + \gamma)) + 134IN^2(\alpha \beta + \gamma)
 \end{equation}
 
-\begin{equation} \label{eqn:SURFRANSAC_PERF_FINAL}
-W^2 + W + N^2(1972.688 + 213434f) + 134IN^2f
-\end{equation}
 
 The complexity of the 3D extension of the SIFT feature matching + RANSAC method  is shown in equation \ref{eqn:SIFT3DRANSAC_PERF_FINAL}, where $N^3$ is the volume size used to project the 3D data into.
 
@@ -250,23 +252,21 @@ The complexity of the 3D extension of the SIFT feature matching + RANSAC method 
 N^3(1968 + 300\alpha + 41040(\alpha \beta + \gamma)) + 134IN^3(\alpha \beta + \gamma)
 \end{equation}
 
-The complexity of the PCA method was found in \cite{Johnstone04Sparse}. It is a function of $W$ (again where the number of pixels in the image is $W^2$) and $p = 3$ the dimensionality of the 3D points. The complexity was found to be $p^2W^2+p^3$, plugging in 3 for $p$ gives the complexity as a function of $W$ provided in equation \ref{eqn:PCA_PERF_FINAL}.
+The complexity of the PCA method was taken from \cite{Johnstone04Sparse}. It is a function of $W$ (again where the number of pixels in the image is $W^2$) and $p = 3$, the dimensionality of the 3D points. The complexity was found to be $p^2W^2+p^3$, plugging in 3 for $p$ gives the complexity as a function of $W$ provided in equation \ref{eqn:PCA_PERF_FINAL}.
 
 \begin{equation} \label{eqn:PCA_PERF_FINAL}
 9W^2 + 27
 \end{equation}
 
-Finally the complexity of ICP is described. The complexity of ICP in the context of pose estimation is based on the complexity of computing the K Nearest Neighbours (KNN) algorithm between point clouds ($3W^2f$), and also computing the least squares optimal pose based on the matches ($16W^2f + 96$) and testing the computed pose $21W^2f$. Here, $W$ is the image size and $f$ is the fraction of projected pixels used in the ICP algorithm. This is performed up to 500 times leading to the complexity in equation \ref{eqn:ICP_PERF_FINAL}.
+Finally the complexity of ICP is described. The complexity of ICP in the context of pose estimation is based on the complexity of (i) computing the K Nearest Neighbours (KNN) algorithm between point clouds ($3W^2f$), (ii) computing the least squares optimal pose based on the matches ($16W^2f + 96$), and (iii) testing the computed pose $21W^2f$. Here, $W$ is the image size and $f$ is the fraction of projected pixels used in the ICP algorithm. This is performed up to 500 times leading to the complexity in equation \ref{eqn:ICP_PERF_FINAL}.
 
 \begin{equation} \label{eqn:ICP_PERF_FINAL}
 1008W^8f^3 + 6048W^4f^2
 \end{equation}
 
-The complexities for each of the algorithms mentioned are shown in table \ref{table:ALG_COMPLEX_TBL}. Figure \ref{fig:COMPLEX_COMP_CHART} compares complexity as a function of percentage of pixels used as features. In this figure, both ICP and FM3D were left out as they had theoretical performances which were so large they skewed the comparison. In these tests, we used a RANSAC iteration count of 500, image sizes of $1024^2$ and volume sizes of $256^3$. The RANSAC iteration count was chosen as it worked well in experiments, the image sizes were chosen to be HD and the volume size was chosen based on the experiments performed using the FVR based algorithms. Comparing these results, FM2D has the largest complexity. FVR and FVR-3D had essentially the same complexity and FFVR was found to be slightly faster than these, as it was designed to be. PCA is the simplest algorithm and the fastest here. Both ICP and FM3D had complexities which were found to increase exponentially as the percentage of pixels increased, whilst FM2D increased linearly. PCA and the FVR based methods have flat complexities which do not vary with the amount of features used since they use the entire point cloud or volume. \\
-
 \begin{table}[!t]
-\label{table:ALG_COMPLEX_TBL}
 \centering
+\caption{Algorithm Complexities}
 \begin{tabular}{cc}\hline
 \textbf{Algorithm} & \textbf{Complexity}\\ \hline
 FM2D + RANSAC & $W^2 + W + W^2(1972.688 + 213434f) + 134IW^2f$\\
@@ -279,8 +279,10 @@ FVR3D & $8N^3\log{N^3} + 4N^3 + 349 + 9W^2$\\
 \\
 \end{tabular}
 \\[10pt]
-\caption{Algorithm Complexities}
+\label{table:ALG_COMPLEX_TBL}
 \end{table}
+
+The complexities for each of the algorithms mentioned are shown in Table \ref{table:ALG_COMPLEX_TBL}. Figure \ref{fig:COMPLEX_COMP_CHART} compares complexity as a function of percentage of pixels used as features. In this figure, both ICP and FM-3D were omitted as they had theoretical performances which were so large they skewed the comparison. In these tests, we used a RANSAC iteration count of 500, image sizes of $1024^2$ and volume sizes of $256^3$. The RANSAC iteration count was chosen as it worked well in experiments, the image sizes were chosen to be HD and the volume size was chosen based on the experiments performed using the FVR based algorithms. Comparing these results, FM2D has the largest complexity. FVR and FVR-3D had essentially the same complexity and FFVR was found to be slightly faster than these, as it was designed to be. PCA is the simplest algorithm and the fastest here. Both ICP and FM-3D had complexities which increased exponentially as the percentage of pixels increased, whilst FM2D increased linearly. PCA and the FVR based methods have flat complexities which do not vary with the number of features used since they use the entire point cloud or volume. \\
 
 
 \begin{figure}

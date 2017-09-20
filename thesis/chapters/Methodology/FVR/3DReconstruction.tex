@@ -1,15 +1,15 @@
 
-This section explains how the FVR algorithm may be extended to recover full 3D camera pose rotation in addition to translation and scale differences between a pair of captured 3D frames. Proposed is a novel method which uses Principal Components Analysis as a pre-processing step in order to achieve full 3D rotation estimation. This method is named FVR-3D. Both the FVR method, the FFVR method and the FVR-3D method have unique advantages and disadvantages. FVR is designed to be a robust and efficient method of estimating camera pose and location on wider baselines whilst remaining robust to the effects of noise. It is robust to 3D rotations (not just y-axis rotation) but cannot register them, if 3D rotation recovery is required, the FVR-3D method discussed in this section provides an efficient solution, but is less robust to noise and wider baselines. The FFVR method may also be used, it works similarly to the FVR method but is computationally more efficient at the expense of accuracy and noise robustness. It also cannot handle wide baselines well. However, it is up to 4 times more efficient than the FVR for realistic volume sizes. \\
+This section explains how the FVR algorithm may be extended to recover full 3D camera pose rotation in addition to translation and scale differences between a pair of captured 3D frames. We propose a novel method which uses Principal Components Analysis (PCA) as a pre-processing step to achieve full 3D rotation estimation. This method is named FVR-3D. The FVR method, the FFVR method and the FVR-3D method all have unique advantages and disadvantages. FVR is designed to be an accurate and efficient method of estimating camera pose and location on wider baselines whilst remaining robust to the effects of noise. It is robust to 3D rotations (not just y-axis rotation) but cannot register them, if 3D rotation recovery is required, the FVR-3D method discussed in this section provides an efficient solution, but is less robust to noise and wider baselines. The FFVR method may also be used, it works similarly to the FVR method but is computationally more efficient at the expense of accuracy and noise robustness. FFVR also cannot handle wide baselines well, but is up to 4 times more efficient than the FVR for realistic volume sizes. \\
 
-In order to integrate 3D rotation into the standard FVR method, a single axis relating the two 3D models must be known. If such an axis is known prior to executing the FVR method, both 3D frames may be aligned vertically (along the y-axis) with respect to the found axis. Once aligned, the FVR method may be used to register both relative to the final y-axis rotational separation which can be used to recover rotation and scale factors so translation may also be recovered. \\
+To integrate 3D rotation into the standard FVR method, a single axis relating the two 3D models must be known. If such an axis is known prior to executing the FVR method, both 3D frames may be aligned vertically (along the y-axis) with respect to the found axis. Once aligned, the FVR method may be used to register both frames relative to the final y-axis rotational separation which can be used to recover rotation and scale factors so translation may also be recovered. \\
 
-Several techniques were explored to compute this axis. These include computing the average normal value, the axis defined as the vector between the furthest two points and some other techniques based on feature matching. The use of Principal Components Analysis (PCA) was also tested. Based on empirically driven factors PCA was chosen to compute the common axis for use in the FVR-3D method. PCA of course may be used to compute the full rotation separating two 3D frames but this typically fails when noise or non-overlapping parts of the frames are present. To be more robust to noise and non-overlapping features within the frame, only the primary axis is used to align both frames with their primary axis pointing directly up. This is more robust because the primary axis has a stronger presence within the data. This leaves the y-axis rotation to be solved. After which, the full 3D rotation factors may be computed via the FVR method. \\
+Several techniques were explored to compute this commonly rotated axis. These include computing the average normal value, the axis defined as the vector between the furthest two points as well as other techniques based on feature matching. The use of PCA was also tested. Based on empirically driven factors, PCA was chosen to compute the common axis for use in the FVR-3D method. PCA may be used to compute the full rotation separating two 3D frames but this typically fails when noise or non-overlapping parts of the frames are present. To be more robust to noise and non-overlapping features within the frame, only the primary axis is used to align both frames with their primary axes pointing directly up. This alignment is more robust because the primary axis has a stronger presence within the data. Once the y-axis rotation is solved, the full 3D rotation factors may be computed via the FVR method. \\
 
 Experiments evaluating FVR-3D in section \ref{Sec:FVRSOTA} show it outperforms other popular methods used for 3D camera pose estimation in terms of accuracy on a wide range of scene types. Additional experiments prove its robustness in the face of noise when registering camera pose. \\
 
 \subsubsection{Computing a Principal Axis}
 
-Computing the principal axis used in FVR-3D is discussed in this section. As mentioned, PCA is used to compute this axis. Both 3D frames have their axis computed separately before they are used to align both frames to a common axis. To compute the common axis using PCA, both the eigen-values and eigen-vectors of the covariance matrix of the 3D frames must be computed. The eigen-vector with the largest corresponding eigen-value is set to be the primary axis. The procedure works as follows. \\
+Using PCA to compute the principal axis used in FVR-3D is discussed in this section. Both 3D frames have their axis computed separately before they are used to align both frames to a common axis. To compute the common axis using PCA, both the eigen-values and eigen-vectors of the covariance matrix of the 3D frames must be computed. The eigen-vector with the largest corresponding eigen-value is set as the primary axis. The procedure works as follows. \\
 
 Given a 3D point cloud $A$ of $N$ points, which may be generated via monocular methods, stereo disparity estimation or active sensor (Kinect, Asus XTion Pro-LIVE), the co-variance of the points between two of the dimensions ($x$ and $y$) is computed as the summation of each $x$ component subtracted by the mean $x$ value multiplied by the $y$ component subtracted by the mean $y$ component value (see equation \ref{eqn:Covariance3DSignal}, $A_{x_{mean}}$ and $A_{y_{mean}}$ refer to the mean values of these x and y dimensions of $A$). \\
 
@@ -17,7 +17,7 @@ Given a 3D point cloud $A$ of $N$ points, which may be generated via monocular m
 Cov(A_x,A_y) = \sum_{i=0}^{N}(A_{x_i} - A_{x_{mean}})(A_{y_i} - A_{y_{mean}})
 \end{equation}
 
-Using the formula for covariance the covariance matrix may be computed for an $N$ dimensional signal. In the case of 3D construction, this matrix is a $3 \times 3$ covariance matrix where each column/row index represents a covariance relationship. This covariance matrix is shown in equation \ref{eqn:CovarMatrix}. This matrix forms a description about how each coordinate axis changes with respect to each other coordinate. The eigen-vectors of this matrix constitute the principal components of the 3D point cloud frame. \\
+Using the formula for covariance the covariance matrix may be computed for an $N$ dimensional signal. In the case of 3D construction, this matrix is a $3 \times 3$ covariance matrix where each column/row index represents a covariance relationship. This covariance matrix is shown in equation \ref{eqn:CovarMatrix}. This matrix describes how each coordinate axis changes with respect to each other coordinate. The eigen-vectors of this matrix constitute the principal components of the 3D point cloud frame. \\
 
 \begin{equation} \label{eqn:CovarMatrix}
 \left[
@@ -29,103 +29,7 @@ Cov(A_z, B_x) & Cov(A_z, A_y) & Cov(A_z, A_z) \\
 \right]
 \end{equation}
 
-The 3 eigen-vectors of the covariance matrix describe the primary axis of the 3D frame $A$ and the 3 corresponding eigen-values describe the dominance of these vectors. The eigen-vector/axis with the largest corresponding eigen-value is the principal component in PCA and is used as the aligning axis in the FVR-3D method. Here this principal axis is used to align data to a common axis defined to be the vertical y-axis. For simplicity, the principal axis of a 3D frame $A$ is written as $A_{pa}$. During the process of PCA the centroid of the point cloud is also computed. This is simply the average point location within the input point cloud. For simplicity in later discussions, the centroid of a 3D frame $A$ is written as $A_{mean_{location}}$. A visualization of the principal axis and centroid may be seen in figure \ref{fig:FVR3D111}. Here two input frames (\ref{fig:fvr3DINA} and \ref{fig:fvr3DINB}) are corrected such that their mean is translated to the center of the volume and their principal axis is aligned with the vertical axis (figures \ref{fig:fvr3DAAlign} and \ref{fig:fvr3DBAlign}). \\
-
-\subsubsection{Alignment Pre-Process}
-
-Using the PCA method, for each input 3D frame $V$, the procedure to compute $V_{pa}$, the principal axis of $V$ computed and used along with the centroid $V_{mean_location}$ to align the input 3D frame using the principal axis $V_{pa}$ as the new vertical axis. To this end, a transformation matrix is formed and is used to rotate the volume such that the principal axis $V_{pa}$ points up. This is useful because if a 3D frame pair are both rotated with respect to their principal axis, and both frames share enough overlap, then only 3D y-axis rotation, 3D translation (and possibly 3D scale) separate the two frames. As discussed in section \ref{Sec:AFVRApproach}, these parameters may be recovered using the FVR method. The matrix used to normalize the 3D frames in terms of their principal axis is discussed here. \\
-
-If $V_{pa}$ (the vector pointing along the principal axis of $V$) is to be set at the new y-axis for the volume, then the other axes must also be computed (x-axis and z-axis). The z-axis, named the forward ($Fwd$) axis is computed based on the cross product between the then x-axis and the principal axis $V_{pa}$ (taken as the y-axis) which gives a psuedo z-axis. The cross product between the principal axis and this pseudo z-axis gives an accurate x-axis. Lastly the cross product between this x-axis and the y-axis (the principal axis) gives the corresponding z-axis in the form of the variable $Fwd$. This is shown in equation \ref{eqn:fwdVector}. \\
-
-
-\begin{equation} \label{eqn:fwdVector}
-Fwd = \left(\left[
-\begin{array}{c}
-V_{pa_{x}}\\
-V_{pa_{y}}\\
-V_{pa_{z}}\\
-\end{array}
-\right] \times \left(\left[
-\begin{array}{c}
-1\\
-0\\
-0\\
-\end{array}
-\right] \times \left[
-\begin{array}{c}
-V_{pa_{x}}\\
-V_{pa_{y}}\\
-V_{pa_{z}}\\
-\end{array}
-\right]\right)\right) \times \left[
-\begin{array}{c}
-V_{pa_{x}}\\
-V_{pa_{y}}\\
-V_{pa_{z}}\\
-\end{array}
-\right]
-\end{equation}
-
-The final axis completing the new space is the x-axis defined at the cross product between the principal axis (the new y-axis) and the z-axis (the $Fwd$ vector) and is named $Rgt$ (standing for right facing axis). Equation \ref{eqn:rgtVector} shows this calculation. This completes the new space defined by x-axis $Rgt$, y-axis $V_{pa}$ and z-axis $Fwd$. A rotation matrix transforming original space to the new space given by these axes may be computed using the $Rgt$, $V_{pa}$ and $Fwd$ axes as the column vectors of the rotation matrix. The inverse, that is the transformation from the new space to the original space may computed using the transpose of that rotation matrix. The rotation of the point cloud from the new space defined by the principal axis to the original space is useful as it aligns the principal axis to the y-axis leaving only 3D y-axis rotation, 3D translation and possibly scale to be registered. \\ 
-
-
-\begin{equation} \label{eqn:rgtVector}
-Rgt = \left[
-\begin{array}{c}
-V_{pa_{x}}\\
-V_{pa_{y}}\\
-V_{pa_{z}}\\
-\end{array}
-\right] \times \left[
-\begin{array}{c}
-Fwd_x\\
-Fwd_y\\
-Fwd_z\\
-\end{array}
-\right]
-\end{equation}
-
-The input 3D frame $V$ may be aligned by its principal axis as the new y-axis by first transforming the centroid to the origin. Next the 3D frame may be rotated from the new space to the default identity space. This sets $Rgt$ to be the new x-axis, $V_{pa}$ to be the new y-axis and $Fwd$ to be the new z-axis. The rotation matrix may be computed as the row vectors of these axes. Finally, after the rotation the 3D frame $V$ may be transformed back to the centroid. This aligns the 3D frame so that $V_{pa}$ points towards the y-axis. The compounded transformation to perform this alignment is fully defined in equation \ref{eqn:CorrectUpMat}. \\
-
-\begin{equation} \label{eqn:CorrectUpMat}
-CorrectMat(V) = \left[
-\begin{array}{cccc}
-1 & 0 & 0 & V_{mean_x} \\
-0 & 1 & 0 & V_{mean_y} \\
-0 & 0 & 1 & V_{mean_z} \\
-0 & 0 & 0 & 1 \\
-\end{array}
-\right] \left[
-\begin{array}{cccc}
-Rgt_x & Rgt_y & Rgt_z & 0 \\
-V_{pa_x} & V_{pa_y} & V_{pa_z} & 0 \\
-Fwd_x & Fwd_y & Fwd_z & 0 \\
-0 & 0 & 0 & 1 \\
-\end{array}
-\right] \left[
-\begin{array}{cccc}
-1 & 0 & 0 & -V_{mean_x} \\
-0 & 1 & 0 & -V_{mean_y} \\
-0 & 0 & 1 & -V_{mean_z} \\
-0 & 0 & 0 & 1 \\
-\end{array}
-\right]
-\end{equation}
-
-\subsubsection{3D Rotation Registration}
-
-To recover a matrix for full 3D rotation separating two input 3D frames $A$ and $B$ which have been taken from two different locations (translation separation) with two different poses (3D rotational separation) and possibly projected differently (scale separation), the first step is to align both frames by their principal axis. The alignment matrix for $A$ can be computed as $C_A = CorrectMat(A)$ and the alignment matrix for $B$ may be computed as $C_B = CorrectMat(B)$. Transforming both $A$ and $B$ by their alignment matrix gives two volumes $A_{aligned} = Transform(A, C_A)$ and $B_{aligned} = Transform(B, C_B)$ which are now only separated by 3D y-axis rotation, 3D translation and 3D scaling factors. As discussed in sections \ref{Sec:VolumeRegistrationSection} and \ref{Sec:AFVRApproach} these factors may be computed and a registration matrix aligning $A_{aligned}$ and $B_{aligned}$. This matrix is computed as $R_{y}ST = FVR(A_{aligned},B_{aligned})$. Using this registration matrix and the alignment matrices $C_{A}$ and $C_{B}$, the full 3D rotation, 3D scale and 3D translation registration matrix, $R_{x,y,z}ST$ transforming $A$ to $B$ may be computed may be recovered as the the matrix which aligns $A$, registers it using $R_{y}ST$ (which aligns it with $B_{aligned}$) then inverse transforms it by $C_{B}$ which un-aligns it according to the alignment matrix $C_B$. This can be followed as in equation \ref{eqn:FullRSTTransform}. \\
-
-
-Additionally, figure \ref{fig:FVR3D222} (along with figure \ref{fig:FVR3D111}) shows the output at different stages of the FVR-3D technique. Once two input frames (figures \ref{fig:fvr3DINA} and \ref{fig:fvr3DINB}) are aligned via PCA (figures \ref{fig:fvr3DAAlign} and \ref{fig:fvr3DAAlign}), they must be registered using the FVR method. This is shown in figure \ref{fig:fvr3DFVRPCAAB}, without any further registration, the reconstruction would not be correct (see figure \ref{fig:fvr3DPCAAB}). By reversing Frame B's PCA alignment stage on the frame in figure \ref{fig:fvr3DFVRPCAAB} the full FVR-3D registration output is revealed (figure \ref{fig:fvr3DFVRPCAAB}). This registration is very accurate in comparison to zero registration being performed prior to integration, which is shown in figure \ref{fig:fvr3DPCAAB}. \\
- 
-
-\begin{equation} \label{eqn:FullRSTTransform}
-R_{x,y,z}ST Matrix = C_{B}^{-1} \times R_{y}ST \times C_A
-\end{equation}
-
-This explanation completes the FVR-3D technique. FVR-3D is a capable registration method which extends Fourier registration to take into account full 3D rotation. The complexity of the technique adds a single layer of complexity over the FVR method. The additional computational complexity is primarily made up of computing the covariance matrix, which adds a complexity of $N^3$ which is minimal compared to the rest of the FVR technique. \\
-
+The three eigen-vectors of the covariance matrix describe the primary axis of the 3D frame $A$ and the three corresponding eigen-values describe the dominance of these vectors. The eigen-vector/axis with the largest corresponding eigen-value is the principal component in PCA and is used as the aligning axis in the FVR-3D method. This principal axis is used to align data to a common axis defined as the vertical y-axis. For simplicity, the principal axis of a 3D frame $A$ is written as $A_{pa}$. During the PCA process, the centroid of the point cloud is also computed. This is simply the average point location within the input point cloud. For simplicity in later discussions, the centroid of a 3D frame $A$ is written as $A_{mean_{location}}$. A visualization of the principal axis and centroid are shown in Figure \ref{fig:FVR3D111}. Here two input frames (Figures \ref{fig:fvr3DINA} and \ref{fig:fvr3DINB}) are corrected such that their mean is translated to the centre of the volume and their principal axis is aligned with the vertical axis (Figures \ref{fig:fvr3DAAlign} and \ref{fig:fvr3DBAlign}). \\
 
 \begin{figure}[!htb] 
         \centering
@@ -159,6 +63,103 @@ This explanation completes the FVR-3D technique. FVR-3D is a capable registratio
        \caption{Early stages of FVR-3D}
        \label{fig:FVR3D111}
 \end{figure}
+
+
+
+\subsubsection{Alignment Pre-Process}
+
+Using the PCA method, for each input 3D frame $V$, the computed principal axis $V_{pa}$ and the centroid $V_{mean_location}$ are used to align the input 3D frame using $V_{pa}$ as the new vertical axis. To this end, a transformation matrix is formed and used to rotate the volume so the principal axis $V_{pa}$ points up. This is useful because if a 3D frame pair are both rotated with respect to their principal axis, and both frames share enough overlap, then only 3D y-axis rotation, 3D translation (and possibly 3D scale) separate the two frames. As discussed in section \ref{Sec:AFVRApproach}, these parameters may be recovered using the FVR method. The matrix used to normalize the 3D frames in terms of their principal axis is discussed here. \\
+
+If $V_{pa}$ (the vector pointing along the principal axis of $V$) is to be set as the new y-axis for the volume, then the other axes must also be computed (x-axis and z-axis). The z-axis, named the forward ($Fwd$) axis, is computed based on the cross product between the then x-axis and the principal axis $V_{pa}$ (taken as the y-axis) which gives a psuedo z-axis. The cross product between the principal axis and this pseudo z-axis gives an accurate x-axis. Lastly the cross product between this x-axis and the y-axis (the principal axis) gives the corresponding z-axis in the form of the variable $Fwd$. This is shown in equation \ref{eqn:fwdVector}. \\
+
+
+\begin{equation} \label{eqn:fwdVector}
+Fwd = \left(\left[
+\begin{array}{c}
+V_{pa_{x}}\\
+V_{pa_{y}}\\
+V_{pa_{z}}\\
+\end{array}
+\right] \times \left(\left[
+\begin{array}{c}
+1\\
+0\\
+0\\
+\end{array}
+\right] \times \left[
+\begin{array}{c}
+V_{pa_{x}}\\
+V_{pa_{y}}\\
+V_{pa_{z}}\\
+\end{array}
+\right]\right)\right) \times \left[
+\begin{array}{c}
+V_{pa_{x}}\\
+V_{pa_{y}}\\
+V_{pa_{z}}\\
+\end{array}
+\right]
+\end{equation}
+
+The final axis completing the new space is the x-axis defined at the cross product between the principal axis (the new y-axis) and the z-axis (the $Fwd$ vector) and is named $Rgt$ (standing for right facing axis). Equation \ref{eqn:rgtVector} shows this calculation. The new space is now defined by x-axis $Rgt$, y-axis $V_{pa}$ and z-axis $Fwd$. A rotation matrix transforming original space to the new space defined by these axes may be computed using the $Rgt$, $V_{pa}$ and $Fwd$ axes as the column vectors of the rotation matrix. The inverse, that is the transformation from the new space to the original space may be computed using the transpose of the rotation matrix. The rotation of the point cloud from the new space defined by the principal axis to the original space is useful as it aligns the principal axis to the y-axis leaving only 3D y-axis rotation, 3D translation and possibly scale to be registered. \\ 
+
+
+\begin{equation} \label{eqn:rgtVector}
+Rgt = \left[
+\begin{array}{c}
+V_{pa_{x}}\\
+V_{pa_{y}}\\
+V_{pa_{z}}\\
+\end{array}
+\right] \times \left[
+\begin{array}{c}
+Fwd_x\\
+Fwd_y\\
+Fwd_z\\
+\end{array}
+\right]
+\end{equation}
+
+The input 3D frame $V$ may be aligned by its principal axis as the new y-axis by first transforming the centroid to the origin. Next the 3D frame may be rotated from the new space to the default identity space. This sets $Rgt$ as the new x-axis, $V_{pa}$ as the new y-axis and $Fwd$ as the new z-axis. The rotation matrix may be computed as the row vectors of these axes. Finally, after rotation the 3D frame $V$ may be transformed back to the centroid. This aligns the 3D frame so that $V_{pa}$ points towards the y-axis. The compounded transformation to perform this alignment is fully defined in equation \ref{eqn:CorrectUpMat}. \\
+
+\begin{equation} \label{eqn:CorrectUpMat}
+CorrectMat(V) = \left[
+\begin{array}{cccc}
+1 & 0 & 0 & V_{mean_x} \\
+0 & 1 & 0 & V_{mean_y} \\
+0 & 0 & 1 & V_{mean_z} \\
+0 & 0 & 0 & 1 \\
+\end{array}
+\right] \left[
+\begin{array}{cccc}
+Rgt_x & Rgt_y & Rgt_z & 0 \\
+V_{pa_x} & V_{pa_y} & V_{pa_z} & 0 \\
+Fwd_x & Fwd_y & Fwd_z & 0 \\
+0 & 0 & 0 & 1 \\
+\end{array}
+\right] \left[
+\begin{array}{cccc}
+1 & 0 & 0 & -V_{mean_x} \\
+0 & 1 & 0 & -V_{mean_y} \\
+0 & 0 & 1 & -V_{mean_z} \\
+0 & 0 & 0 & 1 \\
+\end{array}
+\right]
+\end{equation}
+
+\subsubsection{3D Rotation Registration}
+
+To recover a matrix for full 3D rotation separating two input 3D frames $A$ and $B$ which have been taken from two different locations (translation separation) with two different poses (3D rotational separation) and possibly projected differently (scale separation), the first step is to align both frames by their principal axis. The alignment matrix for $A$ can be computed as $C_A = CorrectMat(A)$ and the alignment matrix for $B$ may be computed as $C_B = CorrectMat(B)$. Transforming both $A$ and $B$ by their alignment matrix gives two volumes $A_{aligned} = Transform(A, C_A)$ and $B_{aligned} = Transform(B, C_B)$ which are now only separated by 3D y-axis rotation, 3D translation and 3D scaling factors. As discussed in sections \ref{Sec:VolumeRegistrationSection} and \ref{Sec:AFVRApproach} these factors may be computed and a registration matrix aligning $A_{aligned}$ and $B_{aligned}$ generated. This matrix is computed as $R_{y}ST = FVR(A_{aligned},B_{aligned})$. Using this registration matrix and the alignment matrices $C_{A}$ and $C_{B}$, the full 3D registration matrix $R_{x,y,z}ST$, which transforms $A$ to $B$, may be computed. Matrix $R_{x,y,z}ST$ aligns $A$, registers it using $R_{y}ST$ (which aligns it with $B_{aligned}$) then inverse transforms it by $C_{B}$ which un-aligns it according to alignment matrix $C_B$. This can be followed as in equation \ref{eqn:FullRSTTransform}. \\
+
+
+Figure \ref{fig:FVR3D222} (along with Figure \ref{fig:FVR3D111}) shows the output at different stages of the FVR-3D technique. Once two input frames (Figures \ref{fig:fvr3DINA} and \ref{fig:fvr3DINB}) are aligned via PCA (Figures \ref{fig:fvr3DAAlign} and \ref{fig:fvr3DBAlign}), they must be registered using the FVR method. This is shown in Figure \ref{fig:fvr3DFVRPCAAB}, as without any further registration, the reconstruction would not be correct (see Figure \ref{fig:fvr3DPCAAB}). By reversing Frame B's PCA alignment stage on the frame in Figure \ref{fig:fvr3DFVRPCAAB} the full FVR-3D registration output is revealed (Figure \ref{fig:fvr3DFVRPCAAB}). This registration is very accurate in comparison to zero registration being performed prior to integration, which is shown in Figure \ref{fig:fvr3DPCAAB}. \\
+ 
+
+\begin{equation} \label{eqn:FullRSTTransform}
+R_{x,y,z}ST Matrix = C_{B}^{-1} \times R_{y}ST \times C_A
+\end{equation}
+
+FVR-3D is a capable registration method which extends Fourier registration to take into account full 3D rotation. The complexity of the technique adds a single layer of complexity over the FVR method. The additional computational complexity ($N^3$), which is primarily made up of computing the covariance matrix, is minimal compared to the rest of the FVR technique. \\
 
 
 \begin{figure}[!htb] 
@@ -200,7 +201,7 @@ This explanation completes the FVR-3D technique. FVR-3D is a capable registratio
 
 \label{METHOD_SECLL}
 
-The proposed SLAM/3D reconstruction routine for the FVR-3D is almost identical to the routine for the FVR method in listings \ref{algorithm:PCSLAMNo1}. First, 3D frame $f_1$ is read in and projected to construct a point cloud $PointCloud$. $PointCloud$ is then integrated using volumetric integration into the global reconstruction. Matrix $M$ is initialized to the identity matrix in order to accumulate the registration matrices so future frames may be efficiently integrated. $Camera_{location}$ and $Camera_{pose}$ accumulate camera location and 3D rotational pose and are used along with a list of these parameters per frame named $Cameras$. These variables may be omitted in the case of 3D reconstruction, or output in the case of 3D SLAM. Next a loop is used for each new frame input into the system. In this loop, 3D frame $f_2$ is read in. Both $f_2$ and $f_1$ are projected and voxelized into $V_1$ and $V_2$ respectively. \\
+The proposed SLAM/3D reconstruction routine for the FVR-3D is almost identical to the routine for the FVR method in Listing \ref{algorithm:PCSLAMNo1}. First, the 3D frame $f_1$ is read in and projected to construct a point cloud $PointCloud$. $PointCloud$ is then integrated using volumetric integration into the global reconstruction. Matrix $M$ is initialized to the identity matrix to accumulate the registration matrices so future frames may be efficiently integrated. $Camera_{location}$ and $Camera_{pose}$ accumulate camera location and 3D rotational pose, respectively, and are combined and listed in $Cameras$ on a per frame basis. These variables may be omitted in the case of 3D reconstruction, or output in the case of 3D SLAM. Next, a loop is used for each new frame input into the system. In this loop, 3D frame $f_2$ is read in. Both $f_2$ and $f_1$ are projected and voxelized into $V_1$ and $V_2$, respectively. \\
 
 \begin{figure}
 \begin{lstlisting}[language=c++,caption=Phase Correlation Based SLAM Algorithm,label=algorithm:FVR3DSLAM,mathescape,basicstyle=\ttfamily]
@@ -231,11 +232,11 @@ while(more frames){
 \end{lstlisting}
 \end{figure}
 
-Next, the FVR-3D method is used in place of the FVR method computing the full six (plus 1 for scale) degrees of freedom required for 3D SLAM or 3D reconstruction. A temporary variable $Temp$ is used to hold this rigid transformation matrix. $M$ is then updated to take into account the previous registration transforms plus the current one. Using the updated transformation matrix, $M$ is applied to $points_1$ to register it with the current global reconstruction, next it is integrated with the final reconstruction. Next, $Camera_{location}$ and $Camera_{pose}$ are updated and the new camera pose and location values are added to the $Cameras list$. \\
+Next, the FVR-3D method is used in place of the FVR method to compute the full six (plus 1 for scale) degrees of freedom required for 3D SLAM or 3D reconstruction. A temporary variable $Temp$ is used to hold this rigid transformation matrix. $M$ is then updated to take into account the previous registration transforms plus the current one. Using the updated transformation matrix, $M$ is applied to $points_1$ to register it with the current global reconstruction, then integrated with the final reconstruction. Next, $Camera_{location}$ and $Camera_{pose}$ are updated and the new camera pose and location values are added to the $Cameras list$. \\
 
 
 
-Figure \ref{fig:PIPELINE8} shows a pipe-line for the FVR-3D technique. Here, two 3D frames are input as $Volume_1$ and $Volume_2$. The seconds frame may be taken after the camera has changed location and pose. The two frames may also be taken by different cameras with differing projection procedures projecting depth map values into frames. First the alignment matrices $C_a$ and $C_b$ based on the principal axis computed by the PCA algorithm. These are then used to align $Volume_1$ and $Volume_2$ to a common axis. Only then can the proposed FVR method be used to register the final axis of rotation along with scale and translation changes. Finally a full registration matrix may be formed by the alignments matrices and the output registration matrix via the FVR procedure. \\
+Figure \ref{fig:PIPELINE8} shows a pipe-line for the FVR-3D technique. Here, two 3D frames are input as $Volume_1$ and $Volume_2$. The second frame may be taken after the camera has changed location and pose. The two frames may also be taken by different cameras with differing projection procedures projecting depth map values into frames. First the alignment matrices $C_a$ and $C_b$ based on the principal axis are computed by the PCA algorithm. These matrices are then used to align $Volume_1$ and $Volume_2$ to a common axis. Only then can the proposed FVR method be used to register the final axis of rotation along with scale and translation changes. Finally a full registration matrix may be formed by the alignments matrices and the output registration matrix via the FVR procedure. \\
 
 \begin{figure}[!htb]
 \centering
@@ -247,7 +248,7 @@ Figure \ref{fig:PIPELINE8} shows a pipe-line for the FVR-3D technique. Here, two
 
 \subsubsection{Limitations}
 
-Experiments (sections \ref{Sec:FVRSOTA} and \ref{Sec:CamTransTrackExp}) show that the FVR-3D algorithm is a capable 3D reconstruction method in terms of accuracy, however it is less robust to noise and wide-baselines as compared to the FVR method, this is due to the fact that PCA is much more affected by noise than the FVR method on its own. So whilst the FVR method is limited to y-axis rotational registration, it is more robust under noisy conditions. In order to solve this, whenever FVR-3D is used, the plain FVR method is also used and the best registration is chosen on a per frame basis. Despite the reduction in accuracy at wide baselines or when more noise is present, the FVR-3D method outperforms several algorithms used by the state of the art in terms of registering 3D frames produced by different sensor types, including: stereo and active camera set-ups. \\
+Experiments (sections \ref{Sec:FVRSOTA} and \ref{Sec:CamTransTrackExp}) show that the FVR-3D algorithm is a capable 3D reconstruction method in terms of accuracy, however, it is less robust to noise and wide-baselines than the FVR method. This is due to PCA being much more affected by noise than the FVR method on its own. Therefore, whilst the FVR method is limited to y-axis rotational registration, it is more robust under noisy conditions. To solve this noise issue associated with FVR-3D, the plain FVR method is also used whenever FVR-3D is used and the best registration is chosen on a per frame basis. Despite the reduced accuracy at wide baselines or when more noise is present, the FVR-3D method outperforms several state-of-the-art algorithms used in registering 3D frames produced by different sensor types, including: stereo and active camera set-ups. \\
 
 
 

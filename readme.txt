@@ -17,6 +17,13 @@
 		make sure asus xtion is stable
 		make figure 3.4A: A Projected Frame (a bit larger)
 		check listing 3.3 after
+		check capitalization for Phase Correlation vs phase correlation
+		ask clare about what she means on page 101 / 105 in ms word (fig 3.7)
+		figure 3.8 is not reffered to in text
+		tables should have their titles/captions above the table
+		projection map transform - this algorithm name should be capitalised???
+		make sure fm3d is FM-3D everywhere
+		in 3DReconstruction.tex:line-207 listing labeled:"Phase Correlation Based SLAM Algorithm" is not referenced in text
 		
 
 		
