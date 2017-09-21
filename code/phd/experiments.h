@@ -4,6 +4,7 @@
 #include <vector>
 #include <map>
 #include "../basics/Pixel3DSet.h"
+#include "../basics/llCamera.h"
 
 
 //#define AT_UNI //i am at uni
@@ -156,6 +157,6 @@ namespace ll_experiments
 
 #ifdef HASGL
 	//set Pixel3DSet object in LLPointers by key "object"
-	void viewPixel3DSet();
+	void viewPixel3DSet(ll_cam::Fps_cam cameraInput = ll_cam::Fps_cam(ll_R3::R3(40,40,-60), 90.0f, 90.0f));
 #endif
 }

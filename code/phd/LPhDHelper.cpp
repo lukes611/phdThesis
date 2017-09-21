@@ -1,4 +1,7 @@
 #include "LPhDHelper.h"
+#include "../basics/llCamera.h"
+using namespace ll_cam;
+
 
 void exp1(string name, vector<int> frames)
 {
@@ -391,10 +394,11 @@ void qualitativeExperiment(string algorithm_name, string data_name, vector<int> 
 
 	Pixel3DSet obj = LukeLincoln::makePixel3DSet(output);
 	//obj.save_obj(string(DESKTOP_DIR) + "/one.obj");
+	Fps_cam cam(R3(-25.6504, 70, -39.8557) , 54.000000, 98.000000);
 
 	#ifdef HASGL
 	LLPointers::setPtr("object", &obj);
-    ll_experiments::viewPixel3DSet();
+    ll_experiments::viewPixel3DSet(cam);
     #endif
 
 

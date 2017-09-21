@@ -402,8 +402,8 @@ int main(int argc, char * * argv)
     //string fn = "PlantsOutdoors.tc.rotation";
 	//vs icp on exp 5 with skip of 10
 	//vs fm2d and icp on 19
-	vector<int> fmes = ll_experiments::rng(5, 10, 1);
-	qualitativeExperiment("FM3D-2", namesList[1], fmes);
+	vector<int> fmes = ll_experiments::rng(0, 38, 4);
+	qualitativeExperiment("FVR", namesList[14], fmes);
 
 
 	//save images: 4 per video file

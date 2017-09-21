@@ -449,11 +449,12 @@ namespace kitti
 
 #ifdef HASGL
 
-void viewPixel3DSet()
+void viewPixel3DSet(Fps_cam cameraInput)
 {
 	ll_gl::default_glut_main("lukes phd project", 640, 480);
 
 	Fps_cam * camera = new Fps_cam(R3(40,40,-60), 90.0f, 90.0f);
+	*camera = cameraInput;
 	LLPointers::setPtr("camera", camera);
 
 	glutDisplayFunc([]()->void
