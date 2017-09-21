@@ -25,7 +25,9 @@
 		make sure fm3d is FM-3D everywhere
 		in 3DReconstruction.tex:line-207 listing labeled:"Phase Correlation Based SLAM Algorithm" is not referenced in text
 		check all Octree is uppercase O
+		ask ruben about para 3 in intro in experiments section subsection 4.1
 
+		
 		
 
 
