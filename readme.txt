@@ -27,6 +27,18 @@
 		check all Octree is uppercase O
 		ask ruben about para 3 in intro in experiments section subsection 4.1
 		in tools remove anything about microsoft cam
+		fix all table / figure numbers see figure 4.2 / 4.1
+		find all dataset and Data Set to "data set"
+		do all fm3d to FM-3D
+
+
+	ask ruben:
+		questions from above
+		what i need to do to be ready to submit
+		do i need to print it?
+		what formatting do i need
+		what referencing do i need
+		
 
 		
 		
