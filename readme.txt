@@ -30,7 +30,7 @@
 		fix all table / figure numbers see figure 4.2 / 4.1
 		find all dataset and Data Set to "data set"
 		do all fm3d to FM-3D
-
+		change all my active data set names from X Axis set ... to X-Axis set
 
 	ask ruben:
 		questions from above
