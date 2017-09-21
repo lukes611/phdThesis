@@ -24,7 +24,7 @@
 		projection map transform - this algorithm name should be capitalised???
 		make sure fm3d is FM-3D everywhere
 		in 3DReconstruction.tex:line-207 listing labeled:"Phase Correlation Based SLAM Algorithm" is not referenced in text
-		
+		check all Octree is uppercase O
 
 		
 
