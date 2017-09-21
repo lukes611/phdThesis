@@ -32,6 +32,7 @@
 		do all fm3d to FM-3D
 		change all my active data set names from X Axis set ... to X-Axis set
 		capitals in table headers
+		table 4.5 fvr comparison table should be under the paragraph see docx file page 203
 
 	ask ruben:
 		questions from above
