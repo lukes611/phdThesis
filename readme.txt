@@ -13,22 +13,26 @@
 		
 		4. projection-map transform -> "Projection-map transform"
 		6. octree -> ?
-		9. x-axis -> ?
+		9. x-axis (my data structure names) -> ?
 		3. phase correlation -> phase correlation
 		10. capitals in table headers = check AMA
 		
+	Tables and Figures:
+		1. place figures and tables after references
+		
+		
 	Other Major:
 		1. fix tables
+			a. tables should have their titles/captions above the table
 			cannot find reference to figure 3.2
 			make figure 3.4A: A Projected Frame (a bit larger)
 			check listing 3.3 after
 			figure 3.8 is not reffered to in text
-			tables should have their titles/captions above the table
 			in 3DReconstruction.tex:line-207 listing labeled:"Phase Correlation Based SLAM Algorithm" is not referenced in text
 			fix all table / figure numbers see figure 4.2 / 4.1
 			change all my active data set names from X Axis set ... to X-Axis set
 			table 4.5 fvr comparison table should be under the paragraph see docx file page 203
-			check all figures come after mentioned
+			
 		
 	Submission Preparation:
 		1. Research PhD Submission on Griffith Site

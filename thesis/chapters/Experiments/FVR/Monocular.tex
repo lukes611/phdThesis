@@ -7,8 +7,9 @@ Depth maps computed using the block matching method are only estimates of true s
 
 Results on the Kitti Benchmark 0001 Sync data set are shown in Table \ref{table:MVVRQuantitativeExperimentResults}. In these results, ICP outperformed the other methods, with each algorithm having larger errors due to the inaccurate depth maps. Here, FVR achieved the best result ~29.25 \% of the time. Compared to results in Table \ref{tab:kittidata0001sync}, the MVVR method was less competitive than ICP. Due to the low-quality projections, FM2D and PCA failed were not able to register every frame. Most of the algorithms had incorrectly registered frames at some point.
 
-\begin{figure}
+\begin{table}[t]
 \centering
+\caption{Reconstruction Errors for the Kitti Data 0001 Sync Data Set Using Monocular (RGB) Input Only}
 \begin{tabular}{ccc}
 \hline
 \textbf{Algorithm} & \textbf{Median Error $\times$ 1000} & \textbf{\% best results}\\ \hline
@@ -18,8 +19,7 @@ ICP	& 772.48 & 50.94\%\\
 PCA	& 2046.96 & 2.83\%\\
 MVVR	& 944.81 & 29.25\%\\
 \end{tabular}
-\caption{Statistics for the Kitti Data 0001 Sync Data Set}
 \label{table:MVVRQuantitativeExperimentResults}
-\end{figure} 
+\end{table} 
 
 These results, and those from the Stereo and Active camera experiments, indicate that, if the quality of the depth maps had been higher, the FVR based methods would have produced better results. \\
