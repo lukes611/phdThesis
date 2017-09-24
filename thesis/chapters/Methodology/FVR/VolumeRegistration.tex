@@ -65,6 +65,9 @@ correlate(translate(V_1, x,y,z), V_2)
 
 The range of camera location vectors to test is dependent on the dimensions of the raw 3D input data. If the data is scaled to fit an $N^3$ space, as is a requirement when using Fourier based techniques, the camera location values along the x, y and z axis would range between 0 and $N$. To compute the optimal camera location change using the phase correlation method would therefore have complexity $N^3$. There are $N^3$ values to test, and the correlation function must be called for each iteration with a complexity also equivalent to $N^3$, $N^3 \times N^3 = N^6$. This is significantly complex, even for smaller volume sizes. Note that the smaller the volume size, the faster the algorithm, however the more quantized the original data is. The more the input data is quantized, the more the camera location change estimates will be restricted in terms of precision. Accuracy will also be affected as quantization introduces unwanted effects of its own. The answer is to use the properties of the Fourier transform to speed up the process.  \\
 
+The 3D Fourier transform transforms a volume from the 3D spatial domain into the 3D frequency domain (see Figure \ref{fig:FrequencyDomainExample}). The frequency domain is a complex valued volume made up of sinusoids. Each voxel in the frequency domain represents the magnitude, phase and direction of a wave. The importance of these properties for computing camera pose will be discussed upcoming sections. An efficient software implementation of the Fourier transform, named the Fast Fourier Transform (FFT), can compute the frequency domain given N-dimensional data. \\
+
+
 \begin{figure}[!htb]
 \centering
 \includegraphics[width=6cm]{images/methodology/FVR/capFrameOriginal}
@@ -73,7 +76,6 @@ The range of camera location vectors to test is dependent on the dimensions of t
 \label{fig:FrequencyDomainExample}
 \end{figure}
  
-The 3D Fourier transform transforms a volume from the 3D spatial domain into the 3D frequency domain (see Figure \ref{fig:FrequencyDomainExample}). The frequency domain is a complex valued volume made up of sinusoids. Each voxel in the frequency domain represents the magnitude, phase and direction of a wave. The importance of these properties for computing camera pose will be discussed upcoming sections. An efficient software implementation of the Fourier transform, named the Fast Fourier Transform (FFT), can compute the frequency domain given N-dimensional data. \\
 
 Exploiting the properties of the FFT and the frequency domain, cross-correlation may be carried out efficiently to compute the optimal camera location change between frames. In the 2D approach, this algorithm is named phase correlation and is a popular approach in 2D image processing to align two images. Applied to two 3D frames captured by sensors (or partially generated via software) it may also be used to register the frames for 3D reconstruction as well as compute the translation part of the camera pose change for SLAM algorithms. This procedure is defined here as a function named $PhaseCorrelation$ (Eq. \ref{eqn:PC_basic}). This function takes two frames (3D volumes) as input and returns the best translation alignment between them in terms of maximizing correlation.  \\
 

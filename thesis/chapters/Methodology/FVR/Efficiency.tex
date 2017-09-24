@@ -171,6 +171,7 @@ The full complexity of the FVR method (equation \ref{eqn:FULLPERFORMANCE}) is ne
 
 \begin{table}[!htb]
 \centering
+\caption{Complexities for given Procedures}
 \label{table:complexities2}
 \scalebox{0.75}{
 \begin{tabular}{cc}
@@ -184,7 +185,6 @@ Projection-Map Transform & 1 (GPGPU) \\
 \\
 \end{tabular}}
 \\
-\caption{Complexities for given Procedures}
 \end{table}
 
 From Figure \ref{fig:PIPELINE3} we can see that the FFVR method is made up of multiple sub-procedures. These include: 2 $\times$ 3D projections, $2 \times$ 3D FFTs, $2 \times$ Spherical-Map transforms, $1 \times$ 3D geometrical transformation, $3 \times$ 2D phase correlations and $4 \times$ Projection-Map transforms. The total complexity is summed for all of these functions and given in equation \ref{eqn:FULLPERF2}. \\

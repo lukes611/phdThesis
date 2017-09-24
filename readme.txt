@@ -17,21 +17,11 @@
 		3. phase correlation -> phase correlation
 		10. capitals in table headers = check AMA
 		
-	Tables and Figures:
-		1. place figures and tables after references
-		
 		
 	Other Major:
 		1. fix tables
-			a. tables should have their titles/captions above the table
-			cannot find reference to figure 3.2
-			make figure 3.4A: A Projected Frame (a bit larger)
-			check listing 3.3 after
-			figure 3.8 is not reffered to in text
-			in 3DReconstruction.tex:line-207 listing labeled:"Phase Correlation Based SLAM Algorithm" is not referenced in text
-			fix all table / figure numbers see figure 4.2 / 4.1
+			cannot find reference to figure 3.2 and 3.8
 			change all my active data set names from X Axis set ... to X-Axis set
-			table 4.5 fvr comparison table should be under the paragraph see docx file page 203
 			
 		
 	Submission Preparation:
@@ -40,7 +30,7 @@
 		2. Remind Ruben to fill out such a form
 		3. Inquire to HDR office about print-out and submission [if 1. fails]
 		
-		
+	Final Re-write
 
 		
 		
