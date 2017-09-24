@@ -10,7 +10,6 @@
 		3. what do you mean on page 101 / (105 in ms word (fig 3.7))
 		
 	Replace:
-		2. asus xtion pro live -> Asus Xtion Pro Live
 		3. phase correlation -> phase correlation
 		4. projection-map transform -> "Projection-map transform"
 		5. fm3d -> FM-3D
