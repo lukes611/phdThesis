@@ -4,6 +4,8 @@
 		24. There is no run time comparison to verify your theoretical complexity in sect 3.1.4. Why not?
 			 - since i have a theoretical one can I skip it?
 		25. In sect 4.8 - 4.12 you should only present results that are novel and compare them against those in your honours thesis. - these are novel from my adelaide paper
+		add in second graph comparing icp with fvr theoretically 
+		redo the label for mono experiments
 
 	TODO
 		22. Figure 4.27 shows reconstructions for FVR but none for ICP and FM you state that they are difficult to reconstruct with these, but a picture is worth 1000 words the worse they look the better it is for you. If you really can not reconstruct these then please given specific and detailed justification of why they are difficult to reconstruct.
@@ -37,9 +39,11 @@
 	ask ruben:
 		questions from above
 		what i need to do to be ready to submit
+			get a form: i have to fill out a form for submitting
+			ask goul
+			ruben has to fill out a form
 		do i need to print it?
-		what formatting do i need
-		what referencing do i need
+			ask hdr office if required
 		
 
 		
