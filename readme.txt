@@ -1,49 +1,44 @@
-	notes:
-		2 - now I only mentioned I reference any previous work
-		9 - it is a new algorithm compared to the honours though
-		24. There is no run time comparison to verify your theoretical complexity in sect 3.1.4. Why not?
-			 - since i have a theoretical one can I skip it?
-		25. In sect 4.8 - 4.12 you should only present results that are novel and compare them against those in your honours thesis. - these are novel from my adelaide paper
-		add in second graph comparing icp with fvr theoretically 
-		redo the label for mono experiments
-
-	TODO
-		22. Figure 4.27 shows reconstructions for FVR but none for ICP and FM you state that they are difficult to reconstruct with these, but a picture is worth 1000 words the worse they look the better it is for you. If you really can not reconstruct these then please given specific and detailed justification of why they are difficult to reconstruct.
-
-	CLARE-TODO
-		page 20. highlight big picture? ask clare about this
-		replace color with colour throughout
-		page 79 "while -"?
-		check all figures come after mentioned
-		cannot find reference to figure 3.2
-		make sure asus xtion is stable
-		make figure 3.4A: A Projected Frame (a bit larger)
-		check listing 3.3 after
-		check capitalization for Phase Correlation vs phase correlation
-		ask clare about what she means on page 101 / 105 in ms word (fig 3.7)
-		figure 3.8 is not reffered to in text
-		tables should have their titles/captions above the table
-		projection map transform - this algorithm name should be capitalised???
-		make sure fm3d is FM-3D everywhere
-		in 3DReconstruction.tex:line-207 listing labeled:"Phase Correlation Based SLAM Algorithm" is not referenced in text
-		check all Octree is uppercase O
-		ask ruben about para 3 in intro in experiments section subsection 4.1
-		in tools remove anything about microsoft cam
-		fix all table / figure numbers see figure 4.2 / 4.1
-		find all dataset and Data Set to "data set"
-		do all fm3d to FM-3D
-		change all my active data set names from X Axis set ... to X-Axis set
-		capitals in table headers
-		table 4.5 fvr comparison table should be under the paragraph see docx file page 203
-
-	ask ruben:
-		questions from above
-		what i need to do to be ready to submit
-			get a form: i have to fill out a form for submitting
-			ask goul
-			ruben has to fill out a form
-		do i need to print it?
-			ask hdr office if required
+	Medium Changes:
+		1. Try the new CUDA framework, test the speed of FVR and compare it to the others
+		2. Add a theoretical performance graph to compare FVR and ICP
+		3. Redo the labels for the Monocular camera results tables.
+		4. Add the figure comparing ICP, FM2D and FVR qualitatively
+		
+	Ask Clare:
+		1. Inquire about what was meant by "Highlight big picture" on Page 20
+		2. Page 79. "while -" why the dash
+		3. what do you mean on page 101 / (105 in ms word (fig 3.7))
+		
+	Replace:
+		2. asus xtion pro live -> Asus Xtion Pro Live
+		3. phase correlation -> phase correlation
+		4. projection-map transform -> "Projection-map transform"
+		5. fm3d -> FM-3D
+		7. microsoft camera -> undefined
+		8. dataset -> data set
+		6. octree -> ?
+		9. x-axis -> ?
+		10. capitals in table headers = check AMA
+		
+	Other Major:
+		1. fix tables
+			cannot find reference to figure 3.2
+			make figure 3.4A: A Projected Frame (a bit larger)
+			check listing 3.3 after
+			figure 3.8 is not reffered to in text
+			tables should have their titles/captions above the table
+			in 3DReconstruction.tex:line-207 listing labeled:"Phase Correlation Based SLAM Algorithm" is not referenced in text
+			fix all table / figure numbers see figure 4.2 / 4.1
+			change all my active data set names from X Axis set ... to X-Axis set
+			table 4.5 fvr comparison table should be under the paragraph see docx file page 203
+			check all figures come after mentioned
+		
+	Submission Preparation:
+		1. Research PhD Submission on Griffith Site
+		1. Email Goul, Ask him about the form to be filled, and the process
+		2. Remind Ruben to fill out such a form
+		3. Inquire to HDR office about print-out and submission [if 1. fails]
+		
 		
 
 		
