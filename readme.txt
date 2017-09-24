@@ -20,7 +20,6 @@
 		
 	Other Major:
 		1. fix tables
-			cannot find reference to figure 3.2 and 3.8
 			change all my active data set names from X Axis set ... to X-Axis set
 			
 		
