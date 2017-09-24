@@ -12,8 +12,6 @@
 	Replace:
 		
 		4. projection-map transform -> "Projection-map transform"
-		7. microsoft camera -> undefined
-		8. dataset -> data set
 		6. octree -> ?
 		9. x-axis -> ?
 		3. phase correlation -> phase correlation
