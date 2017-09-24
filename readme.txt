@@ -10,13 +10,13 @@
 		3. what do you mean on page 101 / (105 in ms word (fig 3.7))
 		
 	Replace:
-		3. phase correlation -> phase correlation
+		
 		4. projection-map transform -> "Projection-map transform"
-		5. fm3d -> FM-3D
 		7. microsoft camera -> undefined
 		8. dataset -> data set
 		6. octree -> ?
 		9. x-axis -> ?
+		3. phase correlation -> phase correlation
 		10. capitals in table headers = check AMA
 		
 	Other Major:
