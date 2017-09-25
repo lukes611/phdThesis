@@ -1,6 +1,5 @@
 	Medium Changes:
 		1. Try the new CUDA framework, test the speed of FVR and compare it to the others
-		2. Add a theoretical performance graph to compare FVR and ICP
 		
 	Ask Clare:
 		1. Inquire about what was meant by "Highlight big picture" on Page 20
