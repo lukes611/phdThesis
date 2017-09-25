@@ -1,31 +1,32 @@
-	Medium Changes:
-		1. Try the new CUDA framework, test the speed of FVR and compare it to the others
+	1. Medium Changes:
+		a. Try the new CUDA framework, test the speed of FVR and compare it to the others
+		b. write up about the empirical performance
 		
-	Ask Clare:
-		1. Inquire about what was meant by "Highlight big picture" on Page 20
-		2. Page 79. "while -" why the dash
-		3. what do you mean on page 101 / (105 in ms word (fig 3.7))
+	2. Ask Clare:
+		a. Inquire about what was meant by "Highlight big picture" on Page 20
+		b. Page 79. "while -" why the dash
+		c. what do you mean on page 101 / (105 in ms word (fig 3.7))
 		
-	Replace:
-		
-		4. projection-map transform -> "Projection-map transform"
-		6. octree -> ?
-		9. x-axis (my data structure names) -> ?
-		3. phase correlation -> phase correlation
-		10. capitals in table headers = check AMA
-		
-		
-	Other Major:
-		1. fix tables
-			change all my active data set names from X Axis set ... to X-Axis set
+	3. To Replace:
+		a. projection-map transform -> "Projection-map transform"
+		b. octree -> ?
+		c. x-axis (my data structure names) -> ?
+		d. phase correlation -> phase correlation
+		e. Change my RGB-D experiment data names: from X Axis set ... to X-Axis set
 			
-		
-	Submission Preparation:
-		1. Research PhD Submission on Griffith Site
-		2. Remind Ruben to fill out such a form
-		
-	Final Re-write
+	4. Final:
+		a. Re-write:
+			conclusion
+		b. Check-up:
+			intro
+			lit review
+			metho
+			exps
 
+	5. Submission Preparation:
+		a. Research PhD Submission on Griffith Site
+		b. Remind Ruben to fill out such a form
+		
 		
 		
 
