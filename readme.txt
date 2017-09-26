@@ -3,7 +3,6 @@
 		b. write up about the empirical performance
 		
 	3. To Replace:
-		a. projection-map transform -> "Projection-map transform"
 		b. octree -> ?
 		c. x-axis (my data structure names) -> ?
 		d. phase correlation -> phase correlation

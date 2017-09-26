@@ -21,9 +21,9 @@ The magnitude of the frequency domain is independent of translation and any rota
 \label{fig:PIPELINE3}
 \end{figure}
 
-Next, the first 3D frame, $Volume_1$ is transformed by the computed rotation factor. This leaves only a 3D translation transform separating both inputs $Volume_1$ and $Volume_2$. Two projection map transforms of both $Volume_1$ and $Volume_2$ (equivalent to four transforms in total) are then used to efficiently find this translation factor. The first projection map transform is along the z-axis. The z-axis projection map transform of $Volume_1$ produces 2D image, $Image_{za}$ the z-axis projection map transform of $Volume_2$ produces 2D image, $Image_{zb}$. Both $Image_{za}$ and $Image_{zb}$ may be phase correlated producing the x and y axis components of the translation separating $Volume_1$ and $Volume_2$. \\
+Next, the first 3D frame, $Volume_1$ is transformed by the computed rotation factor. This leaves only a 3D translation transform separating both inputs $Volume_1$ and $Volume_2$. Two Projection-map transforms of both $Volume_1$ and $Volume_2$ (equivalent to four transforms in total) are then used to efficiently find this translation factor. The first Projection-map transform is along the z-axis. The z-axis Projection-map transform of $Volume_1$ produces 2D image, $Image_{za}$ the z-axis Projection-map transform of $Volume_2$ produces 2D image, $Image_{zb}$. Both $Image_{za}$ and $Image_{zb}$ may be phase correlated producing the x and y axis components of the translation separating $Volume_1$ and $Volume_2$. \\
 
-The other two projection map transforms are along the x-axis. The projection map transform of $Volume_1$ produces $Image_{wa}$, whilst the projection map transform of $Volume_2$ produces $Image_{wb}$. These two images ($Image_{wa}$ and $Image_{wb}$) may be phase correlated producing the z-axis component of the translation. A composite registration matrix aligning $Volume_1$ to $Volume_2$ may be formed by translating each volume's centre to the origin, rotating by the computed rotation factor, translating the origin to the volume's centre and finally translating by the $[X,Y,Z]^T$ translation vector computed. \\
+The other two Projection-map transforms are along the x-axis. The Projection-map transform of $Volume_1$ produces $Image_{wa}$, whilst the Projection-map transform of $Volume_2$ produces $Image_{wb}$. These two images ($Image_{wa}$ and $Image_{wb}$) may be phase correlated producing the z-axis component of the translation. A composite registration matrix aligning $Volume_1$ to $Volume_2$ may be formed by translating each volume's centre to the origin, rotating by the computed rotation factor, translating the origin to the volume's centre and finally translating by the $[X,Y,Z]^T$ translation vector computed. \\
 
 Noticeably, the Hanning window function and post $|DFT|(x)$ $Log(x)$ function from the original pipeline (figure \ref{fig:PIPELINENo1}) are missing. The Hanning window function may be incorporated in the first phase correlation procedure, which processes 2D images, therefore the Hanning window function would be in 2D rather than 3D which also improves efficiency as an entire dimension is removed from the process. The log function may also be performed as part of the phase correlation procedure, however it was found that the FFVR procedure estimates rotation more reliably using the spherical-transform if the log function is not performed. Consequentially, this saves computational cost. \\
 
@@ -81,7 +81,7 @@ This process essentially sums up the values along a given ray defined by scaling
 \subsubsection{Projection-map transform}
 \label{sec:PMTramsform}
 
-The projection map transform is similar to an orthogonal projection of the volume along a particular axis. Instead of simply projecting the closest point as done in projections for visualization purposes, the sum of values computed along the ray is used for representation. Figure \ref{fig:pmtExample} shows an example model (Figure \ref{fig:bunnyOrigAA2}) and three projection map transformations of the model along three different axes (Figures \ref{fig:xaxPMDOM}, \ref{fig:yaxPMDOM} and \ref{fig:zaxPMDOM}). The projection map transform is described here in terms of an output projection map image $Im$ and an input 3D volume frame $Vol$, which may be input from a sensor or software system which is able to generate 3D frames of the environment. Each pixel in $Im$ has its value defined mathematically as the summation of values along a particular axis given the x,y coordinates. The Projection-map x-axis transform and the Projection-map z-axis transform are defined in equations \ref{eqn:xPMT} and \ref{eqn:zPMT} respectively. \\
+The Projection-map transform is similar to an orthogonal projection of the volume along a particular axis. Instead of simply projecting the closest point as done in projections for visualization purposes, the sum of values computed along the ray is used for representation. Figure \ref{fig:pmtExample} shows an example model (Figure \ref{fig:bunnyOrigAA2}) and three Projection-map transformations of the model along three different axes (Figures \ref{fig:xaxPMDOM}, \ref{fig:yaxPMDOM} and \ref{fig:zaxPMDOM}). The Projection-map transform is described here in terms of an output Projection-map image $Im$ and an input 3D volume frame $Vol$, which may be input from a sensor or software system which is able to generate 3D frames of the environment. Each pixel in $Im$ has its value defined mathematically as the summation of values along a particular axis given the x,y coordinates. The Projection-map x-axis transform and the Projection-map z-axis transform are defined in equations \ref{eqn:xPMT} and \ref{eqn:zPMT} respectively. \\
 
 \begin{figure}[!htb]
         \centering
@@ -92,20 +92,20 @@ The projection map transform is similar to an orthogonal projection of the volum
         \end{subfigure}%
         \begin{subfigure}[b]{1.5in}
                 \includegraphics[width=1.5in]{images/methodology/FVR/xaxis}
-                \caption{X-Axis Projection Map Domain}
+                \caption{X-Axis Projection-Map Domain}
                 \label{fig:xaxPMDOM}
         \end{subfigure}
         \begin{subfigure}[b]{1.5in}
                 \includegraphics[width=1.5in]{images/methodology/FVR/yaxis}
-                \caption{Y-Axis Projection Map Domain}
+                \caption{Y-Axis Projection-Map Domain}
                 \label{fig:yaxPMDOM}
         \end{subfigure}%
         \begin{subfigure}[b]{1.5in}
                 \includegraphics[width=1.5in]{images/methodology/FVR/zaxis}
-                \caption{Z-Axis Projection Map Domain}
+                \caption{Z-Axis Projection-Map Domain}
                 \label{fig:zaxPMDOM}
         \end{subfigure}
-        \caption{The Projection Map Transform.}
+        \caption{The Projection-Map Transform.}
        \label{fig:pmtExample}
 \end{figure}
 
@@ -118,11 +118,11 @@ Im(z,y) = \sum_{x=0}^{N}{Vol(x,y,z)}
 Im(x,y) = \sum_{z=0}^{N}{Vol(x,y,z)}
 \end{equation}
 
-In these equations the Projection map transform along the x-axis is computed via summing up values along the x-axis in the input 3D frame. In this way, any 3D z-axis translation in $Vol$ corresponds to 2D x-axis translation in the output image $Im$. Additionally any y-axis translation in the input 3D frame $Vol$ is mapped to a corresponding y-axis translation in the output 2D Projection map domain $Im$. If both the width and height of the output image $Im$ is equal to the width, height and depth of the input 3D frame then the relationship is a $1:1$ mapping between 3D z-axis translation and 2D x-axis translation as well as 3D y-axis translation to 2D y-axis translation. \\
+In these equations the Projection-map transform along the x-axis is computed via summing up values along the x-axis in the input 3D frame. In this way, any 3D z-axis translation in $Vol$ corresponds to 2D x-axis translation in the output image $Im$. Additionally any y-axis translation in the input 3D frame $Vol$ is mapped to a corresponding y-axis translation in the output 2D Projection-map domain $Im$. If both the width and height of the output image $Im$ is equal to the width, height and depth of the input 3D frame then the relationship is a $1:1$ mapping between 3D z-axis translation and 2D x-axis translation as well as 3D y-axis translation to 2D y-axis translation. \\
 
-The corresponding z-axis Projection map transform sums up values along the z-axis. Here, 3D y-axis translations within the original 3D frame also produce 2D y-axis translations in the output Projection map domain. However, all x-axis translations occurring within the 3D frame domain are mapped to 2D x-axis translations in the output Projection map domain image $Im$. \\
+The corresponding z-axis Projection-map transform sums up values along the z-axis. Here, 3D y-axis translations within the original 3D frame also produce 2D y-axis translations in the output Projection-map domain. However, all x-axis translations occurring within the 3D frame domain are mapped to 2D x-axis translations in the output Projection-map domain image $Im$. \\
 
-Given both of these Projection map transforms, the 3D translation separating two 3D frames may be registered with respect to 3D translation. This 3D translation also has an inverse relationship to the camera location separation between the two frames. Both 3D frames are transformed into the z-axis Projection map domain. By phase correlating these domains, both the x and y axis translation may be retrieved which map directly to the 3D translation x and y coordinates separating the input frames. The 3D z-axis translation may be computed by transforming both frames into the x-axis Projection map domain. Once the two Projection map domains are phase correlated, the x-axis translation separating the domains can be mapped directly to the corresponding z-axis translation separating the two input 3D frames. In total, using $2 \times$ Projection map transforms and $1 \times$ 2D phase correlation method, the 3D translation parameters separating two 3D frames may be computed. \\
+Given both of these Projection-map transforms, the 3D translation separating two 3D frames may be registered with respect to 3D translation. This 3D translation also has an inverse relationship to the camera location separation between the two frames. Both 3D frames are transformed into the z-axis Projection-map domain. By phase correlating these domains, both the x and y axis translation may be retrieved which map directly to the 3D translation x and y coordinates separating the input frames. The 3D z-axis translation may be computed by transforming both frames into the x-axis Projection-map domain. Once the two Projection-map domains are phase correlated, the x-axis translation separating the domains can be mapped directly to the corresponding z-axis translation separating the two input 3D frames. In total, using $2 \times$ Projection-map transforms and $1 \times$ 2D phase correlation method, the 3D translation parameters separating two 3D frames may be computed. \\
 
 \subsubsection{Performance Analysis}
 
@@ -193,7 +193,7 @@ From Figure \ref{fig:PIPELINE3} we can see that the FFVR method is made up of mu
 2N^3\log{N^3} + 9N^2\log{N^2} + 6N^2 + 28WH + 169
 \end{equation}
 
-Figure \ref{fig:perfComp} provides a visualization of the performance improvement which the FFVR method achieves over the original FVR approach. The graph displays the performance of both methods at different volume sizes increasing logarithmically. The FFVR method is around ~1.8 times faster for $64^3$ volumes, ~3.4 times faster for $128^3$ volumes, ~4.1 times faster for $256^3$ volumes and ~4.2 times faster for $512^3$ volumes. This is due to the reduction in the amount of data to process afforded by the novel spherical-map transform and projection map transform methods.
+Figure \ref{fig:perfComp} provides a visualization of the performance improvement which the FFVR method achieves over the original FVR approach. The graph displays the performance of both methods at different volume sizes increasing logarithmically. The FFVR method is around ~1.8 times faster for $64^3$ volumes, ~3.4 times faster for $128^3$ volumes, ~4.1 times faster for $256^3$ volumes and ~4.2 times faster for $512^3$ volumes. This is due to the reduction in the amount of data to process afforded by the novel spherical-map transform and Projection-map transform methods.
 
 \begin{figure}[!htb]
 \centering
