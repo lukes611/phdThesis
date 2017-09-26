@@ -8,12 +8,10 @@
 		c. x-axis (my data structure names) -> ?
 		d. phase correlation -> phase correlation
 		e. Change my RGB-D experiment data names: from X Axis set ... to X-Axis set
+		f. bit rates -> 
 			
 	4. Final:
-		a. Re-write:
-			conclusion
 		b. Check-up:
-			intro
 			lit review
 			metho
 			exps
