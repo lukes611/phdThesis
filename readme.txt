@@ -1,6 +1,7 @@
 	1. Changes:
 		a. Try the new CUDA framework, test the speed of FVR and compare it to the others
 		b. write up about the empirical performance
+		c. add in a picture comparing the lidar depth with monocular depth
 	2. To Replace:
 		a. octree -> ?
 		b. x-axis (my data structure names) -> ?
