@@ -3,11 +3,9 @@
 		b. write up about the empirical performance
 		c. add in a picture comparing the lidar depth with monocular depth
 	2. To Replace:
-		a. octree -> ?
-		b. x-axis (my data structure names) -> ?
+		b. x-axis (my data structure names) -> x-axis, for my data structures: X-axis
 		c. phase correlation -> phase correlation
-		d. Change my RGB-D experiment data names: from X Axis set ... to X-Axis set
-		e. bit rates -> 
+		e. bit rates -> bit-rate
 	3. Check-up:
 		a. lit review
 		b. metho

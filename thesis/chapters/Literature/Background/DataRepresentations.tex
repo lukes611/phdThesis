@@ -1,5 +1,5 @@
 
-In this section, we describe several 3D data representations which are not only commonly used in 3D graphics and computer vision, but in 3D reconstruction as well. First, the popular mesh representation is described and a few popular methods for compression are surveyed. We also surveyed 3D volume and point cloud data as some other popular alternatives. Some newer representations are then discussed (image based methods and Signed Distance Functions). Finally, the Octree, a common data structure used for 3D compression is discussed. \\
+In this section, we describe several 3D data representations which are not only commonly used in 3D graphics and computer vision, but in 3D reconstruction as well. First, the popular mesh representation is described and a few popular methods for compression are surveyed. We also surveyed 3D volume and point cloud data as some other popular alternatives. Some newer representations are then discussed (image based methods and Signed Distance Functions). Finally, the octree, a common data structure used for 3D compression is discussed. \\
 
 \subsubsection{Mesh}
 
@@ -69,7 +69,7 @@ Elfes et al. \cite{Elfes87Sensor} use a Baysian probability of occupancy measure
 
 \subsubsection{Image Based Representations}
 
-3D reconstructions may also be represented by means of elevation maps \cite{Herbert89Terrain} and multi-level surface maps \cite{Triebel06Multi} however these methods cannot store known and unknown areas of occupancy in a volumetric way. Additionally compression is often not considered and these methods do not have the search capabilities which the Octree and volumetric representations have, nor the fine detail available in a mesh or point cloud representation. An example of an elevation map is shown in figure \ref{fig:HeightMapExample}.\\
+3D reconstructions may also be represented by means of elevation maps \cite{Herbert89Terrain} and multi-level surface maps \cite{Triebel06Multi} however these methods cannot store known and unknown areas of occupancy in a volumetric way. Additionally compression is often not considered and these methods do not have the search capabilities which the octree and volumetric representations have, nor the fine detail available in a mesh or point cloud representation. An example of an elevation map is shown in figure \ref{fig:HeightMapExample}.\\
 
 
 \begin{figure}[!htb]
@@ -84,9 +84,9 @@ Gu et al. \cite{Gu02Geometry} devised a solution for representing 3D models as 2
 
 \subsubsection{Octree}
 
-The Octree is a hierarchical data representation ideal for storage, search and processing of 3D data. Other hierarchical structures exist (such as K-D tree and BSP-tree) \cite{Samet06Foundations} but these are not as useful for compression as the Octree, which is the aim of this research. The Octree is described in detail below in section \ref{OTDesc}. An important technique based on the Octree and used by many 3D reconstruction methods is the Octomap \cite{Wurm10Octomap}. It essentially records a volume occupancy grid using an Octree. This method models data probabilistically whilst simultaneously reducing memory size. The Octomap representation is lossless and is can reduce the file size of the reconstruction by up to 50\%. \\
+The octree is a hierarchical data representation ideal for storage, search and processing of 3D data. Other hierarchical structures exist (such as K-D tree and BSP-tree) \cite{Samet06Foundations} but these are not as useful for compression as the octree, which is the aim of this research. The octree is described in detail below in section \ref{OTDesc}. An important technique based on the octree and used by many 3D reconstruction methods is the Octomap \cite{Wurm10Octomap}. It essentially records a volume occupancy grid using an octree. This method models data probabilistically whilst simultaneously reducing memory size. The Octomap representation is lossless and is can reduce the file size of the reconstruction by up to 50\%. \\
 
-Other methods also explore the Octree for 3D reconstruction and SLAM \cite{Fournier07Mapping,Meagher82Geometric,Fairfield07Real} however these methods do not really address storage advantages. 
+Other methods also explore the octree for 3D reconstruction and SLAM \cite{Fournier07Mapping,Meagher82Geometric,Fairfield07Real} however these methods do not really address storage advantages. 
 
 
 
