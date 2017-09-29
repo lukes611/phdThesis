@@ -375,6 +375,23 @@ int mainBasic()
 int main(int argc, char * * argv)
 {
 
+	string namesList2[5] = {
+		"2011_09_26_drive_0001_sync",
+		"2011_09_26_drive_0002_sync",
+		"2011_09_26_drive_0005_sync",
+		"2011_09_26_drive_0091_sync",
+		"2011_09_26_drive_0095_sync"
+	};
+	int countList[5] = {107, 76, 153, 339, 267};
+
+	kitti::KittiPix3dSet k = kitti::open(namesList2[0], 17);
+	Mat m = k.getColoredDepthMap();
+	imshow("m", m);
+	waitKey();
+
+
+	return 0;
+
 	string namesList[20] = {
 
         "Apartment.Texture.rotate", //0
@@ -458,15 +475,7 @@ int main(int argc, char * * argv)
 
 	*/
 
-	string namesList2[5] = {
-		"2011_09_26_drive_0001_sync",
-		"2011_09_26_drive_0002_sync",
-		"2011_09_26_drive_0005_sync",
-		"2011_09_26_drive_0091_sync",
-		"2011_09_26_drive_0095_sync"
-	};
-	int countList[5] = {107, 76, 153, 339, 267};
-
+	
 
 
 	return 0;
