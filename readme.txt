@@ -4,7 +4,6 @@
 		c. add in a picture comparing the lidar depth with monocular depth
 	2. To Replace:
 		a. x-axis (my data structure names) -> x-axis, for my data structures: X-axis
-		b. bit rates -> bit-rate
 	3. Check-up:
 		a. lit review
 		b. metho
