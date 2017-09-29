@@ -26,7 +26,7 @@ The $Log(x)$ function is also a per voxel operation which may be computed in a p
 \end{figure*}
 
 
-The Phase Correlation operation is made up of multiple FFTs and their inverse, as well as computing the cross power spectrum between two volumes. All these operations may be performed on GPGPUs. Searching for the output peak is, however, a sequential process. Parallel techniques, such as reduction, may be used but the performance gain is minimal for volumes of size $256^3$. \\
+The phase correlation operation is made up of multiple FFTs and their inverse, as well as computing the cross power spectrum between two volumes. All these operations may be performed on GPGPUs. Searching for the output peak is, however, a sequential process. Parallel techniques, such as reduction, may be used but the performance gain is minimal for volumes of size $256^3$. \\
 
 Transforming the input volume is another process which may be performed using parallel techniques. The final phase correlation procedure is also parallel in nature apart from the peak value search on the phase correlation surface which is a sequential process. \\
 

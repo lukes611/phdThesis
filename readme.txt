@@ -3,9 +3,8 @@
 		b. write up about the empirical performance
 		c. add in a picture comparing the lidar depth with monocular depth
 	2. To Replace:
-		b. x-axis (my data structure names) -> x-axis, for my data structures: X-axis
-		c. phase correlation -> phase correlation
-		e. bit rates -> bit-rate
+		a. x-axis (my data structure names) -> x-axis, for my data structures: X-axis
+		b. bit rates -> bit-rate
 	3. Check-up:
 		a. lit review
 		b. metho
