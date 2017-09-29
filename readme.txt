@@ -1,5 +1,5 @@
 	1. Changes:
-		a. page 20. (in Word)/ page 6: add something to this section as to the big picture implications of your work
+		a. re-write the intro overview last sentences
 		b. present bio-tree from honours into this work
 		c. Try the new CUDA framework, test the speed of FVR and compare it to the others
 		d. write up about the empirical performance
