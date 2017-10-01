@@ -1,5 +1,7 @@
 	1. Changes:
 		a. present bio-tree from honours into this work
+			3 x pt vs octree
+			4 x pt vs sota
 		b. Try the new CUDA framework, test the speed of FVR and compare it to the others
 		c. write up about the empirical performance
 	2. Check-up:
