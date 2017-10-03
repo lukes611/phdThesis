@@ -1,6 +1,8 @@
 	1. Changes:
-		b. Try the new CUDA framework, test the speed of FVR and compare it to the others
-		c. write up about the empirical performance
+		a. Try the new CUDA framework, test the speed of FVR and compare it to the others
+		b. write up about the empirical performance
+		c. add in list of publications
+		d. remove those quotes from thesis
 	2. Check-up:
 		d. lit review
 		e. metho
