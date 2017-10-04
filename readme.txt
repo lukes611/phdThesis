@@ -3,7 +3,6 @@
 		b. write up about the empirical performance
 		c. add in list of publications
 		d. remove those quotes from thesis
-		t. discuss difference between SOT and Plane-Tree
 		u. discuss qualitative results as vs. the competitors
 		v. in references you say masters and honours, how can it be both?
 	2. Check-up:
