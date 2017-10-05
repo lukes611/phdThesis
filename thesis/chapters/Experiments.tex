@@ -51,6 +51,8 @@ Here we present a summary table (Table \ref{tab:GridRT}) to assess the various a
 Only the FVR and FVR-3D methods were capable of registering against scale. From the literature, ICP and PCA are not capable of handling such transformations without some modification. Results have shown that these algorithms are capable of handling non-static object motion well. Results on the Kitti Vision benchmark show that FVR-3D outperforms the state-of-the-art, even on data sets which have non-static moving agents. Results also showed that the FVR was the most accurate in the registration of wide baselines, that is translations above 5 cm and rotations above 5 degrees. The FVR algorithm outperformed the others, including the top methods used in the literature. Of these methods, MVVR was shown to be able to register monocular sensor data against translation when noise levels were low. The closer the depth data computed via monocular methods approaches perfectly accurate depth images, the closer the MVVR algorithm approaches FVR performance. In terms of both stereo and active sensor input, FVR, FFVR and FVR-3D are all capable of handling this type of input data well. \\
 
 
+Given each algorithm, the number of seconds required to perform frame registration is recorded in table \ref{tab:SECSPERFR}. Results show that the PCA algorithm is fastest. This was expected, as the PCA method had the least amount of processing operations per feature. Next, FM2D and ICP took around 0.3 seconds at best. During testing, SURF features were sorted by their strength of match so FM2D's time per registration varied little. On the contrary, ICP was highly dependent on how many points were used. ICP varied from 0.3 seconds to ~11 seconds. FFVR was next fastest, and took ~0.4 seconds to register frames. The FVR method was slower than this, at ~1 second per registration. FVR-3D was slowest, and took around 10 seconds per registration. Unlike ICP however, FVR-3D did not vary based on the number of points used in computing the camera transform. The GPU used in these experiments has just 384 cores. The time it takes to compute the FVR, FFVR and FVR-3D methods is reduced inversely relative to the number of cores available for computation. We suspect as parallel processing technology improves, methods such as FVR, FFVR and FVR-3D will become faster. 
+
 \begin{table}[h]
 \centering
 \caption{FVR Comparison Table \label{tab:GridRT}}
@@ -63,6 +65,25 @@ FVR-3D & yes & yes & yes & yes & no & no & yes & yes\\
 MMVR & yes & no & no & no & no & yes & no & no\\
 \end{tabular}}
 \label{tab:ExperimentsBooleanSummary}
+\end{table}
+
+
+\begin{table}[!t]
+\centering
+\begin{tabular}{cc}\hline
+\textbf{Algorithm} & \textbf{Seconds per Frame Registration}\\ \hline
+PCA & 0.014\\
+FM2D & 0.3\\
+ICP & 0.3 - 11\\
+FFVR & 0.4\\
+FVR & 1\\
+FVR-3D & 10\\
+FM3D & 15\\
+\\
+\end{tabular}
+\\[10pt]
+\caption{Seconds Per Frame Registration}
+\label{tab:SECSPERFR}
 \end{table}
 
 

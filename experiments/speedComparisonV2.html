@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+	<head></head>
+	<body>
+	
+		<textarea id="ta" style="width:600px;">alg,frame1,frame2,seconds,hd
+
+</textarea>
+		
+		<div id="out"></div>
+		
+		<script>
+		
+		function go(){
+			let inp = document.getElementById('ta').value.split('\n').filter(s => !s.startsWith('alg'));
+			let algs = {};
+			inp = inp.map(x => x.split(',')).map(x => new Object({speed: Number(x[3]), name: x[0]}));
+			inp.forEach(experiment => {
+				if(experiment.name.length < 1) return;
+				if(!algs[experiment.name]) algs[experiment.name] = [];
+				algs[experiment.name].push(experiment.speed);
+			});
+			
+			Object.keys(algs).forEach(k => {
+				let mn = 0, mx = 0, avg = 0, median = 0;
+				let a = algs[k].sort();
+				console.log(k, a);
+				mn = a[0]
+				mx = a[a.length-1]
+				median = a[Math.floor(a.length /2)]
+				avg = a.reduce((a,b) => a+b, 0) / a.length
+				algs[k] = {
+					avg: avg,
+					max: mx,
+					min: mn,
+					median
+				};
+			});;
+			
+			let out = document.getElementById('out');
+			let st = '<table>';
+			st += `<tr><td>${'name,minimum,maximum,average,median'.split(',').join('</td><td>')}</td></tr>`;
+			Object.keys(algs).forEach(k => {
+				let o = algs[k]
+				st += `<tr><td>${[k,o.min,o.max,o.avg,o.median].join('</td><td>')}</td></tr>`;
+			});
+			st += '</table>'
+			out.innerHTML = st;
+		
+		}
+		
+		//window.onload = go;
+		
+		
+		</script>
+		<button onclick="go()">go</button>
+	</body>
+</html>
