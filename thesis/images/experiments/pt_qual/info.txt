@@ -9,3 +9,4 @@ others: bpv: 4.1bpv
 Khodakovsky:
 	bytes: 			1369
 	bpv: 			0.314396
+	camera:			Fps_cam(R3(252.828491,290.000000,728.048950), 266.000000, 100.000000);
