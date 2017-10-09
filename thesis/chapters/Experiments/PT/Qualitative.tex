@@ -57,3 +57,56 @@ In Figure \ref{fig:FIGS} we present qualitative results for the Plane-Tree. The 
 
 In the second row, each model was compressed with the Plane-Tree at a threshold of 1.0. In these experiments, there is little detail missing compared with the physical model. When looking at the bunny's legs, the same ripples are present. In the rabbit model, the outlines inside the ears and on the eyes are still present. On the horse model, the creases on the body and shoulder of the horse are still present. Here, the bunny is compressed to around 70 $\times$ less storage space, the rabbit at around 265 $\times$ less and the horse around 90 $\times$ less storage space. \\
 
+
+\begin{figure}[H] 
+        \begin{center}
+ 		\begin{subfigure}[b]{3in}
+ 			   \centering
+ 			   \includegraphics[width=2.8in]{images/experiments/pt_qual/original1}
+                \caption{Original\\518.78 bpv\\2,258,902 bytes}
+                \label{fig:FIG_BUNNYB}
+        \end{subfigure}%
+        \begin{subfigure}[b]{3in}
+                \includegraphics[width=2.8in]{images/experiments/pt_qual/planetree_shade}
+                \caption{Plane-Tree\\3.88 bpv\\16,896 bytes}
+                \label{fig:FIG_RABBITB}
+        \end{subfigure}
+        \begin{subfigure}[b]{3in}
+                \includegraphics[width=2.8in]{images/experiments/pt_qual/tg}
+                \caption{Touma and Gotsman \cite{touma98triangle}\\4.1 bpv\\17,852 bytes}
+                \label{fig:FIG_HORSEB}
+        \end{subfigure}%
+        \begin{subfigure}[b]{3in}
+                \includegraphics[width=2.8in]{images/experiments/pt_qual/kg}
+                \caption{Karni and Gotsman \cite{Karni00Spectral}\\4.1 bpv\\17,852 bytes}
+                \label{fig:FIG_BUNNYD}
+        \end{subfigure}
+       \caption{The Bunny Model Compressed Using the Plane-Tree, Karni and Gotsman and Touma and Gotsman.}
+       \label{fig:qualSOTA1}
+       \end{center}
+\end{figure}
+
+
+\begin{figure}[H] 
+        \begin{center}
+ 		\begin{subfigure}[b]{2in}
+ 			   \centering
+ 			   \includegraphics[width=1.8in]{images/experiments/pt_qual/original2}
+                \caption{Original\\518.78 bpv\\2,258,902 bytes}
+                \label{fig:FIG_BUNNYB}
+        \end{subfigure}%
+        \begin{subfigure}[b]{2in}
+                \includegraphics[width=1.8in]{images/experiments/pt_qual/planetree2_shade}
+                \caption{Plane-Tree\\0.31 bpv\\1,349 bytes}
+                \label{fig:FIG_RABBITB}
+        \end{subfigure}%
+        \begin{subfigure}[b]{2in}
+                \includegraphics[width=1.8in]{images/experiments/pt_qual/khodakovsky_shade}
+                \caption{Khodakovsky et al. \cite{Khodakovsky00Progressive}\\0.31 bpv\\1,349 bytes}
+                \label{fig:FIG_HORSEB}
+        \end{subfigure}
+       \caption{The Bunny Model Compressed Using the Plane-Tree and Khodakovsky et al.}
+       \label{fig:qualSOTA2}
+       \end{center}
+\end{figure}
+
