@@ -3,7 +3,7 @@ Bunny: 34835 vertices
 Plane-Tree Bunny:
 	bytes: 			16896.6
 	bpv: 			3.88038
-	camera-angle:	Fps_cam(R3(86.078979,390.000000,678.281860), 290.000000, 108.000000);
+	camera-angle:	Fps_cam(R3(-24.495419,360.000000,963.405701), 292.000000, 108.000000)
 others: bpv: 4.1bpv
 
 
