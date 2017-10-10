@@ -4,13 +4,18 @@ Plane-Tree Bunny:
 	bytes: 			16896.6
 	bpv: 			3.88038
 	camera-angle:	Fps_cam(R3(-24.495419,360.000000,963.405701), 292.000000, 108.000000)
+11004:
+	bytes: 			11003
+	bpv:			2.52
 others: bpv: 4.1bpv
 
 
 Plane-Tree Bunny2
-	bytes:			1382
-	bpv: 			0.317439
+	bytes:			1349
+	bpv: 			0.311
 Khodakovsky:
-	bytes: 			1369
-	bpv: 			0.314396
+	bytes: 			1349
+	bpv: 			0.311
 	camera:			Fps_cam(R3(252.828491,290.000000,728.048950), 266.000000, 100.000000);
+	
+	
