@@ -130,15 +130,24 @@ The accumulation matrix $M$ is then updated using this information and $points_1
 
 Using the concept of parallax, we know that the magnitude of the displacement vector computed using block matching is an approximation of the actual depth for each corresponding location in both images. Due to noise, however, the resulting displacement vectors can be very noisy. Figure \ref{fig:DepthGenerationExample} shows how noisy this estimated depth information can be compared with input from an RGB-D device. As mentioned previously, the noise can be largely eliminated using spatiotemporal filtering. \\
 
-
-\begin{figure}[!htb]
-\centering
-\includegraphics[width=6cm]{images/methodology/FVR/home_depth_frame_mono}
-\includegraphics[width=6cm]{images/methodology/FVR/home_depth_frame}
-\caption{Comparison between block matching estimated depth (left) and RGBD device depth (right).}
-\label{fig:DepthGenerationExample}
+\begin{figure}[!htb] 
+        \centering
+        \begin{subfigure}[b]{5.0in}
+                \includegraphics[width=5.0in]{images/methodology/FVR/mono/depth}
+                \caption{Colour Image}
+                \label{fig:COLEXAMPLE}
+        \end{subfigure}
+        \begin{subfigure}[b]{5.0in}
+                \includegraphics[width=5.0in]{images/methodology/FVR/mono/colorinv}
+                \caption{Depth Image}
+                \label{fig:DEPTHEXAMPLE}
+        \end{subfigure}
+       \caption{Comparison Between Block Matching Estimated Depth (Top) and RGBD Device Depth (Bottom).}
+       \label{fig:DepthGenerationExample}
 \end{figure}
- 
+
+
+
 \subsubsection{Limitations of MVVR}
 
 During experiments, it was discovered that the MVVR method was limited to registration of translation information and small scale rotation only due to the high levels of noise. These high noise levels  were caused by the difficulty in computing depth data using basic methods, such as stereo methods, between frames and optical flow. Despite this limitation, the MVVR method was able to register camera translation (see experiments in section \ref{Sec:MonocularSOTA}).  
