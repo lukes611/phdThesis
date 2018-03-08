@@ -110,6 +110,20 @@ Final Todo:
 			only 11 out of 194 references are from past 4 years
 			
 			
+	Reviewer #2:
+		section 3.1 does not explain enough for the non-technical reader
+		refer to why using fft and lpt are unique in the research context
+		fix citation method??
+		references in alphabetical order
+		page 3. line 14: insert space after occurs
+		page 6 line 4: FVR 4.5, what does 4.5 stand for?
+		chapter 4: figures 20 and 21: are out of sequence
+		chapter 3 is not cover it enough
+		should have more critical interpretation in the lit review
+		sec 3.1 says fft is new; make this more clear
+		references should be of format: page numbers, dashed page numbers, year of pub, page range
+			and the publisher
+		
 				
 		
 		
