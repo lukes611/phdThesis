@@ -124,6 +124,18 @@ Final Todo:
 		references should be of format: page numbers, dashed page numbers, year of pub, page range
 			and the publisher
 		
+	Chairman:
+		signpostign and summaries on conclusions and intros (revert to research questiond)
+		explain my use of research question
+		improve: flow,readability, and presentation and the methods of getting the lit rev papers
+		explain the quantit and quali research methodologies better
+		improve flow
+		explain things for laymen better
+		chapter 3 should explain 3d recon better, note what are the roles image registration plays in 3d recon
+		why is 3d fft new? lp too?
+		citations should include page numbers
+		
+		
 				
 		
 		
