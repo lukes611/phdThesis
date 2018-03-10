@@ -3,6 +3,7 @@ In this section, a novel 3D frame data representation and compression method is 
 The Plane-Tree compresses 3D data and it was also inspired by the Interpolating Leaf Quad-Tree and Shade-Tree representations \cite{Lincoln13Interpolating,Gonzalez07ShadeTree} which are used for image compression. These techniques make use of Quad-Tree decomposition and have been shown to outperform several transform based methods of compression. 
 
 \subsection{Octree Overview}
+\label{sec:method_pt_overview}
 
 In this section octree decomposition is explained. This strategy forms a cubic shaped space around some 3D data. In the case of 3D reconstruction, it may be the 3D frame input from an active sensor, stereo method or monocular depth estimation procedure. A geometric representation is then computed for the data contained within the cubic space. This representation may be as simplistic as recording the cube's centre or using the cube to represent the space, or may be complex, employing splines and curvature representation techniques to represent the space. \\
 
@@ -107,6 +108,7 @@ The Shade-Tree coding method can quantize the corner values and map them into va
 %This data representation may also be used to represent Signed Distance Functions, which are now commonly used in 3d reconstruction as a means of representation. In fact, such a scheme would greatly benefit the compression method of the Shade-Tree since its data is typically represented as smooth changes along a given path. \\
 
 \subsection{Plane-Tree Coding}
+\label{sec:pt_ptcoding}
 
 The proposed Plane-Tree method is also based on octree subdivision. The technique places the input 3D frame/mesh or volume into a cubic space. It checks whether the representation corresponding to this single cube is at a desired level of quality. If it is not, the cube is decomposed into 8 sub-cubes. For each sub-cube associated with the 3D data, the process repeats. This process is further controlled using an error threshold and a maximum depth value. At each level of subdivision, the error between the sub-cube (or node) representation of the space is compared to the original geometric information within the sub-space of the cube. If the error is below the error threshold, decomposition stops. This way, the desired level of accuracy can be more easily controlled rather than manually inspecting the quality prior to subdivision. Likewise, the level of subdivision may freely continue until the maximum tree depth is reached, this also assists in controlling the quality vs. compression ratio. To this end, the depth of each node is compared to the maximum depth. If the maximum depth is reached, decomposition stops and other nodes are visited until the procedure ends. \\
 
@@ -117,6 +119,7 @@ In the following sections, we present the details of the Plane-Tree in terms of 
 
 
 \subsection{Octree Subdivision}
+\label{sec:pt_ptsubdiv}
 
 Prior to compression, the input 3D model is normalized into a $512^3$ space. Starting with the cube which represents the entire space, a 3D Plane representation is computed based on the data within the cube. The mean squared error metric is computed between the sampled points of the plane and the sampled points of the 3D object (which lie within the cube). If this value is below a given threshold, or the maximum level of subdivision is reached, decomposition stops. Alternatively if both predicates (maximum depth and error threshold) are not met, the cube is divided into 8 sub-cubes. Each sub-cube is then tested to see whether part of the mesh lies within it. If so, the process it repeated for that cube, otherwise no further action is taken. \\
 
@@ -146,11 +149,13 @@ Each cube has 12 edges in total, so 4 bits are used for the edge number, another
 
 
 \subsection{Compression and Decompression}
+\ref{sec:pt_ptcd}
 
 To compress our data structure we iterate through the tree in depth-first order. If we encounter a non-leaf node, we first store a single bit of $1_2$. Then the configuration of the sub-nodes (since not every sub-node intersects the object) is stored as a single byte. Each bit is labelled $1_2$ if a particular sub-node exists and $0_2$ if it does not. This is possible since we order our sub-nodes in a predefined order. If a leaf node is encountered, we store a $0_2$, then record our 20 bit leaf node representation in three other files: the normal data, the distance variables and edge numbers, totalling 4 files (tree, normals, distances and edge numbers). After the entire structure is stored we employ entropy encoding on each of these files. \\
 
 To decompress our structure, we read the first bit of the output file. This step checks if the current node is a leaf or not. If it is, we read out a 20 bit plane representation (from the three separate files) and generate a list of triangles representing where the plane intersects the node (explained in section \ref{NRep}). These triangles are then added to a final database which represents the decoded model. If we reach a non-leaf node, we read out the 8 bit sub-node configuration and repeat the process for each existing sub-node in the predefined order. \\  
 
 \subsection{The Plane-Tree vs. the SOT}
+\ref{sec:pt_ptvssot}
 
 The Plane-Tree differs from the SOT in many ways. In both representations, the leaf nodes are represented as flat planes, but the computation and storage of the leaf nodes differs. The SOT computes planes using the average normal and location within and around a node whereas the Plane-Tree uses least-squares decomposition to compute the plane. The SOT stores a directional code and four distance codes per node, but nodes may share distance codes. The Plane-Tree uses a quantized distance vector, a single distance code and a coded edge. Compared to the SOT, the Plane-Tree has better compression and representation of leaf nodes.
