@@ -13,18 +13,38 @@ Currently, there exist many methods capable of extracting 3D reconstructions and
 During 3D reconstruction research, it became apparent that 3D reconstruction data uses large amounts of storage. Since 3D reconstruction algorithms may be storing multiple 3D frames, and may also use some global representation for output, a compression could improve data processing, transmission and storage. Whilst lossless compression research for such data has begun, lossy compression remains unexplored. Therefore, research on a lossy compression system for 3D data is also presented in this thesis. \\
 
 
-\section{Research Aims \& Contributions}
+\section{Research Aims}
 
 In the current state of 3D reconstruction research, Fourier based methods have not been investigated. Research has proven 2D Fourier based registration techniques able to register wide base-lines and to be reliable, accurate and robust to noise, but in the context of 3D registration, such research does not exist. It is beneficial to use Fourier techniques as they are robust to noise, accurate and work well on wide base-lines. Fourier based approaches are also closed form solutions, in that their complexity does not depend on their input data only upon the dimension sizes of the data. In the case of compression systems for 3D reconstruction purposes, lossy compression methods based on the hierarchical octree data structure and modifications \cite{Lincoln13Interpolating} were investigated for compression of 3D data including 3D reconstruction frames and outputs. \\
 
-The primary aim of this research is to improve the accuracy, noise robustness, speed and storage, quantitative quality and perceptual quality of 3D models generated from image data. To this end, Fourier based registration schemes were investigated as well as hierarchical data compression systems. Investigation into Fourier methods motivated the research questions, ``Can Fourier based registration techniques improve accuracy and noise robustness in 3D reconstruction applications?'' and ``Can hierarchical techniques improve compression, storage and processing of 3D reconstruction data?'' \\
+The primary aim of this research is to improve the accuracy, noise robustness, speed and storage, quantitative quality and perceptual quality of 3D models generated from image data. To this end, Fourier based registration schemes were investigated as well as hierarchical data compression systems. Investigation into Fourier methods motivated the research questions, \\
 
+1. ``Can Fourier based registration techniques improve accuracy and noise robustness in 3D reconstruction applications?'' \\
+
+and \\
+
+2. ``Can hierarchical techniques improve compression, storage and processing of 3D reconstruction data?'' \\
+
+Answering these questions would contribute several missing links in the research field. Firstly, since using Fourier based techniques for 3D reconstruction has not been tried before, researchers will be able to know whether to investigate such techniques further, not only in 3D reconstruction but in other emerging fields such as virtual reality and augmented reality. Next, by investigating the second research question will not only product one or several new hierarchical compression methods, but if proven true, encourages further investigation into hierarchical compression methods which may further improve upon the state-of-the-art.
+
+\section{Research Contributions}
+\label{sec:INTO_RESEARCH_CONTRIBUTIONS}
 Efforts to answer these questions have led to several novel algorithms and data structures being proposed. These are presented and discussed in Chapter \ref{ch:Metho}. Firstly, a novel method applying Fourier based registration to 3D reconstruction named Fourier Volume Reconstruction (FVR) is proposed \cite{Lincoln16Fourier,Lincoln16Dense}. This algorithm is able to generate accurate and dense 3D reconstructions whilst being robust to noise (see sections \ref{Sec:CamTransTrackExp} and \ref{Sec:FVRSOTA}). The FVR method works well when provided with dense 3D frames from which to reconstruct a global model. The FVR method may be used to reconstruct data input via a RGB-D active camera or stereo camera set-up. To provide support for monocular camera sensors, a novel algorithm based on FVR was proposed named Monocular View Volume Reconstruction (MVVR) \cite{Lincoln16Monocular}. Our research suggests, the higher the quality of the input depth data (produced via active, stereo or software based methods), the better the registration produced by FVR (section \ref{Sec:CamTransTrackExp}). \\
 
 Since, the FVR method is only able to register against a single axis of camera rotation, a novel method which incorporates PCA into FVR is proposed. This method named FVR-3D outperforms several pose registration methods used in state-of-the-art 3D reconstruction algorithms using different input sensors (stereo \& active) in terms of accuracy and robustness (see section \ref{Sec:FVRSOTA} for results). A novel speed-up for the FVR algorithm is also proposed (section \ref{Sec:Efficiency}). This method, named Fast Fourier Volume Reconstruction (FFVR) improves efficiency by reducing the data to be processed by an entire dimension. Our results suggest this method improves upon the FVR method at the expense of registration accuracy. \\
 
 In terms of compression research, a novel data representation based on octree 3D data compression is proposed named the Plane-Tree data representation \cite{Lincoln15Plane}. This data representation and subsequent compression and decompression algorithm outperform the generic octree as well as several state-of-the-art 3D data compression algorithms. \\
 
+\section{Publications Resulting from Thesis}
+
+A number of research publications resulted from the work completed for this thesis. The contributions within these research publications were discussed in the previous section (section \ref{sec:INTO_RESEARCH_CONTRIBUTIONS}) but the publications themselves are listed below for reference.
+
+\begin{enumerate}
+  \item Fourier Volume Registration based Dense 3D Mapping \cite{Lincoln16Fourier}
+  \item Dense 3D Mapping Using Volume Registration \cite{Lincoln16Dense}
+  \item Dense 3D Mapping Using Volume Reigstration from Monocular View \cite{Lincoln16Monocular}
+  \item Plane-Tree Low-Bitrate Mesh Compression \cite{Lincoln15Plane}
+\end{enumerate}
 
 \section{Overview}
 
