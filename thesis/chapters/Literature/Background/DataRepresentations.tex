@@ -7,13 +7,21 @@ Mesh data is popular due to its simplicity and integration into GPU technology. 
 
 For processing purposes, polygons are usually triangulated, which means all polygons are sub-divided into triangles. Any mesh may be triangulated, an example of this is provided on the right hand side in figure \ref{MeshExamples}. In a typical data representation, vertices are stored in a list and triangles are stored using three references to this list. The number of bits per vertex (bpv) is typically used to measure storage requirements for mesh data. \\
 
-\begin{figure}[!htb]
-\centering
-\includegraphics[width=6cm]{images/ch2/PolygonMeshExample}
-\includegraphics[width=6cm]{images/ch2/TriangleMeshExample}
-\caption{Left: Polygonal Mesh, Right: Triangulated Mesh}
-\label{MeshExamples}
-\end{figure}
+\begin{figure*}[t!] 
+	\centering
+	\begin{subfigure}[b]{6.8cm}
+		\includegraphics[width=6.5cm]{images/ch2/PolygonMeshExample}
+		\caption{Polygonal Mesh}
+		\label{fig:MeshExamples_polygon}
+	\end{subfigure}%
+	\begin{subfigure}[b]{6.8cm}
+		\includegraphics[width=6.5cm]{images/ch2/TriangleMeshExample}
+		\caption{Triangulated Mesh}
+		\label{fig:MeshExamples_triangle}
+	\end{subfigure}%
+	\caption{Mesh Types}
+	\label{MeshExamples}
+\end{figure*}
 
 
 The Feature-Oriented Geometric Progressive Lossless Mesh coder (FOLProM) \cite{Peng10Feature} is a state-of-the-art codec which is progressive. It also aims to be an effective low-bitrate codec. It classifies segments of the mesh as being visually salient or not. Salient segments are preserved more during compression compared to non-salient ones. \\
@@ -39,14 +47,22 @@ The point cloud structure stores a list of 3D points. This representation can be
 
 In this representation, points are sampled into a 3D cubic space of sub-cubes called voxels. Such a space may have separate dimensions for width, height and depth or the space may be a true cube. In the context of 3D reconstruction, this data-representation is common and is used to store boolean values describing the occupancy of a space \cite{Rusinkiewicz02Real}. A visualization of a 3D volume showing a reconstruction is shown in figure \ref{fig:VolExamples}. This data type is useful because it allows for quick updates. Downsides include, large storage space and the fact that 3D space represented cannot be dynamically changed without significant cost. \\
 
-\begin{figure}[!htb]
-\centering
-\includegraphics[width=6cm]{images/literature/bunnyVol32}
-\includegraphics[width=6cm]{images/literature/bunnyVol128}
-\caption{Left: Bunny sampled into a ${32}^3$ volume, Right: Bunny sampled into a ${128}^3$ volume. Both images credit: \cite{Passalis07General}}
-\label{fig:VolExamples}
-\end{figure}
 
+\begin{figure*}[t!] 
+	\centering
+	\begin{subfigure}[b]{6.8cm}
+		\includegraphics[width=6.5cm]{images/literature/bunnyVol32}
+		\caption{Bunny sampled into a ${32}^3$ volume}
+		\label{fig:Volume_Example32}
+	\end{subfigure}%
+	\begin{subfigure}[b]{6.8cm}
+		\includegraphics[width=6.5cm]{images/literature/bunnyVol128}
+		\caption{Bunny sampled into a ${128}^3$ volume}
+		\label{fig:Volume_Example128}
+	\end{subfigure}%
+	\caption{3D Volumes \cite{Passalis07General}}
+	\label{fig:VolExamples}
+\end{figure*}
 
 \subsubsection{Signed Distance Functions}
 
