@@ -16,6 +16,7 @@ Given a 3D point cloud $A$ of $N$ points, which may be generated via monocular m
 \begin{equation} \label{eqn:Covariance3DSignal}
 Cov(A_x,A_y) = \sum_{i=0}^{N}(A_{x_i} - A_{x_{mean}})(A_{y_i} - A_{y_{mean}})
 \end{equation}
+\myequations{Covariance for PCA}
 
 Using the formula for covariance the covariance matrix may be computed for an $N$ dimensional signal. In the case of 3D construction, this matrix is a $3 \times 3$ covariance matrix where each column/row index represents a covariance relationship. This covariance matrix is shown in equation \ref{eqn:CovarMatrix}. This matrix describes how each coordinate axis changes with respect to each other coordinate. The eigen-vectors of this matrix constitute the principal components of the 3D point cloud frame. \\
 
@@ -28,6 +29,7 @@ Cov(A_z, B_x) & Cov(A_z, A_y) & Cov(A_z, A_z) \\
 \end{array}
 \right]
 \end{equation}
+\myequations{Covariance Matrix for PCA}
 
 The three eigen-vectors of the covariance matrix describe the primary axis of the 3D frame $A$ and the three corresponding eigen-values describe the dominance of these vectors. The eigen-vector/axis with the largest corresponding eigen-value is the principal component in PCA and is used as the aligning axis in the FVR-3D method. This principal axis is used to align data to a common axis defined as the vertical y-axis. For simplicity, the principal axis of a 3D frame $A$ is written as $A_{pa}$. During the PCA process, the centroid of the point cloud is also computed. This is simply the average point location within the input point cloud. For simplicity in later discussions, the centroid of a 3D frame $A$ is written as $A_{mean_{location}}$. A visualization of the principal axis and centroid are shown in Figure \ref{fig:FVR3D111}. Here two input frames (Figures \ref{fig:fvr3DINA} and \ref{fig:fvr3DINB}) are corrected such that their mean is translated to the centre of the volume and their principal axis is aligned with the vertical axis (Figures \ref{fig:fvr3DAAlign} and \ref{fig:fvr3DBAlign}). \\
 
@@ -100,6 +102,7 @@ V_{pa_{z}}\\
 \end{array}
 \right]
 \end{equation}
+\myequations{Forward Alignment Matrix for PCA}
 
 The final axis completing the new space is the x-axis defined at the cross product between the principal axis (the new y-axis) and the z-axis (the $Fwd$ vector) and is named $Rgt$ (standing for right facing axis). Equation \ref{eqn:rgtVector} shows this calculation. The new space is now defined by x-axis $Rgt$, y-axis $V_{pa}$ and z-axis $Fwd$. A rotation matrix transforming original space to the new space defined by these axes may be computed using the $Rgt$, $V_{pa}$ and $Fwd$ axes as the column vectors of the rotation matrix. The inverse, that is the transformation from the new space to the original space may be computed using the transpose of the rotation matrix. The rotation of the point cloud from the new space defined by the principal axis to the original space is useful as it aligns the principal axis to the y-axis leaving only 3D y-axis rotation, 3D translation and possibly scale to be registered. \\ 
 
@@ -119,6 +122,8 @@ Fwd_z\\
 \end{array}
 \right]
 \end{equation}
+\myequations{Right Alignment Matrix for PCA}
+
 
 The input 3D frame $V$ may be aligned by its principal axis as the new y-axis by first transforming the centroid to the origin. Next the 3D frame may be rotated from the new space to the default identity space. This sets $Rgt$ as the new x-axis, $V_{pa}$ as the new y-axis and $Fwd$ as the new z-axis. The rotation matrix may be computed as the row vectors of these axes. Finally, after rotation the 3D frame $V$ may be transformed back to the centroid. This aligns the 3D frame so that $V_{pa}$ points towards the y-axis. The compounded transformation to perform this alignment is fully defined in equation \ref{eqn:CorrectUpMat}. \\
 

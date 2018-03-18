@@ -1,6 +1,7 @@
 \documentclass[12pt]{book}
 %\usepackage[twoside,margin=1in,bindingoffset=0.5in]{geometry}
 %\usepackage[round,authoryear]{natbib}
+\usepackage{tocloft}
 \usepackage{amssymb}
 %\usepackage{tocbibind}
 \usepackage{graphicx}
@@ -38,6 +39,13 @@ colorlinks = true, hyperindex = true, hyperfigures] {hyperref}
 
 \renewcommand{\bibname}{Reference List}
 
+%%gmedina solution
+\newcommand{\listequationsname}{List of Equations}
+\newlistof{myequations}{equ}{\listequationsname}
+\newcommand{\myequations}[1]{%
+\addcontentsline{equ}{myequations}{\protect\numberline{\theequation}#1}\par}
+\setlength{\cftmyequationsnumwidth}{2.5em}% Width of equation number in List of Equations
+
 
 
 \begin{document}
@@ -57,7 +65,14 @@ colorlinks = true, hyperindex = true, hyperfigures] {hyperref}
 \tableofcontents
 
 \listoffigures
+\clearpage
 \listoftables
+\newpage
+\phantomsection
+\addcontentsline{toc}{chapter}{List of Equations}
+\listofmyequations
+\pagebreak
+
 \mainmatter
 %item : complete / required
 

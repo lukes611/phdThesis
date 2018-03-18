@@ -15,6 +15,7 @@ To describe camera translation, let us say a camera produces 3D scans of a scene
 \end{array}
 \right]
 \end{equation}
+\myequations{Transformation Registration Matrix}
 
 The volume data has shifted in the opposite direction. Therefore to register the data, frame 1 may be transformed by the matrix in equation \ref{eqn:TransRegMatrix} to align it with frame 2. Conversely, the camera pose may be updated by adding $T_{frame-1,frame-2} \times -1$ to the camera's location.  \\
 

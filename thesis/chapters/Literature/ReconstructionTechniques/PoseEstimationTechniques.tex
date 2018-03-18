@@ -34,7 +34,6 @@ This formula is based on the assumption that no distortion is present in the cam
 
 Using the Essential or Fundamental matrices, we may compute both camera pose, and stereo calibration. The camera pose is computed by using singular value decomposition (SVD) on the essential matrix. This breaks it down =into 3 matrices ($W$, $U$ and $V$). Then, both the translation part (equation \ref{eqn:FundaTrans}) and rotational part (equation \ref{eqn:FundaRote}) of the camera pose may be computed.
 
-
 \begin{equation} \label{eqn:FundaTrans}
 Translation Matrix = W\left[
 \begin{array}{ccc}
@@ -44,6 +43,7 @@ Translation Matrix = W\left[
 \end{array}
 \right]W^{T}
 \end{equation}
+\myequations{Translational Part of Fundamental Matrix}
 
 \begin{equation} \label{eqn:FundaRote}
 Rotation Matrix = W\left[
@@ -54,6 +54,7 @@ Rotation Matrix = W\left[
 \end{array}
 \right]V^{T}
 \end{equation}
+\myequations{Rotational Part of Fundamental Matrix}
 
 Looking at figure \ref{fig:INTRO_FMA1} again, line $E_1$ represents an epipolar line, this line lies on the plane in which both cameras and point $P$ lie on. Line $E_1$ is the epipolar line belonging to the left frame and $E_2$ is the epipolar line belonging to the right frame. Point $e_1$ is the epipole of the left frame and point $e_2$ is the epipole of the right frame. Epipoles are the projection of one camera's location onto the frame of another camera. The projection of $C_2$ onto the left frame by camera $C_1$ is the epipole $e_1$. If the fundamental matrix is multiplied by a particular point it produces a vector in $R^3$ which represents the epipolar line as $[a b c]^T$ in which $a,b$ and $c$ represent the line equation $ax^2 + bx + c$. The epipolar line corresponding to $Q$ and $Q_1$ passes through a common point with the other epipolar line $E_1$. All epipolar lines intersect at the epipole. \\
 
@@ -82,6 +83,7 @@ In the case of camera pose estimation, the subset is used to compute the camera 
 \begin{equation} \label{eqn:CovarMatForFMRansac}
 X = \sum_{i=1}^{N} (P_i - P_{mean}) \times (Q_i - Q_{mean})^T
 \end{equation}
+\myequations{Covariance Matrix for Computing the Fundamental Matrix}
 
 Given the covariance matrix $X$ we compute its singular value decomposition matrices $W$, $U$ and $V$. Then the rotation part of the pose may be computed as $R = V^T \times U^T$. The camera movement can be computed by $T = -R \times P_{mean} + Q_{mean}$. If scale must be computed, it can be computed as $S = (Q_i - Q_{mean}) / (R \times(P_i - P_{mean}))$ for any $i$. \\
 
