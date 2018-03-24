@@ -63,14 +63,17 @@ Ray_y(x,y,r) & = r \times cos\left(\frac{180y}{M}\right) + \frac{N}{2} \\
 Ray_z(x,y,r) & = r \times sin\left(\frac{360x}{M}\right)sin\left(\frac{180y}{M}\right) + \frac{N}{2}
 \end{split}
 \end{equation}
+\myequations{Inverse Log-Polar Function}
 
 \begin{equation} \label{eqn:invLPVVF}
 Ray(x,y,r) = [Ray_x(x,y,r), Ray_y(x,y,r), Ray_z(x,y,r)]^T
 \end{equation}
+\myequations{Spherical Transform Components}
 
 \begin{equation} \label{eqn:smtUpdate}
 Im_{x,y} = \sum_{r=1}^{(2^{-1}N)^{1.5}}{Vol(Ray(x,y,r))} 
 \end{equation}
+\myequations{Spherical Transform}
 
 In the Log-Spherical transform described in section \ref{Sec:RoteZoomingSection} re-arranges the rotation and scale transforms along two axis, the third axis retains information and increases the accuracy of the solution. By reducing the other axis from size $N$ to the average value (size 1) information is lost, however computational complexity is reduced by an entire dimension. This is a complexity/performance trade off. Computational complexity may be afforded given input data contains relatively little noise. The output image maps 3D y-axis rotation to 2D x-axis translation. \\
 
@@ -113,10 +116,12 @@ The Projection-map transform is similar to an orthogonal projection of the volum
 \begin{equation} \label{eqn:xPMT}
 Im(z,y) = \sum_{x=0}^{N}{Vol(x,y,z)}
 \end{equation}
+\myequations{Projection Map X-Axis Transform}
 
 \begin{equation} \label{eqn:zPMT}
 Im(x,y) = \sum_{z=0}^{N}{Vol(x,y,z)}
 \end{equation}
+\myequations{Projection Map Z-Axis Transform}
 
 In these equations the Projection-map transform along the x-axis is computed via summing up values along the x-axis in the input 3D frame. In this way, any 3D z-axis translation in $Vol$ corresponds to 2D x-axis translation in the output image $Im$. Additionally any y-axis translation in the input 3D frame $Vol$ is mapped to a corresponding y-axis translation in the output 2D Projection-map domain $Im$. If both the width and height of the output image $Im$ is equal to the width, height and depth of the input 3D frame then the relationship is a $1:1$ mapping between 3D z-axis translation and 2D x-axis translation as well as 3D y-axis translation to 2D y-axis translation. \\
 
@@ -159,10 +164,12 @@ Summing these operations whilst scaling them by the number of times they are use
 \begin{equation} \label{eqn:FULLPERFORMANCE}
 8N^3\log{N^3} + 4N^3 + 28WH + 322
 \end{equation}
+\myequations{Number of Operations in FVR}
 
 \begin{equation} \label{eqn:PCFULLPERFORMANCE}
 3N^3\log{N^3} + 2N^3 + 15
 \end{equation}
+\myequations{Number of Operations in 3D Phase Correlation}
 
 
 The full complexity of the FVR method (equation \ref{eqn:FULLPERFORMANCE}) is next compared to the performance of the FFVR method to assess performance gain. The FFVR methods makes use of several of the procedures found in Table \ref{table:complexities} and several others. These include: 2 $\times$ 3D FFTs, 2 $\times$ Spherical-Map transforms, 3 $\times$ 2D phase correlation procedures, 1 $\times$ 3D geometric transform and 4 $\times$ Projection-Map transforms. The 2D phase correlation method makes use of several sub-procedures including: 3 $\times$ 2D FFTs, 1 $\times$ spectra multiplication and 1 $\times$ 2D peak finding operation. Table \ref{table:complexities2} cites the complexities for the additional operations including: Spherical-Map transform, Projection-Map transform, 2D Peak finding, 2D FFT and 2D phase correlation (made up of multiple sub-procedures). \\
@@ -192,6 +199,7 @@ From Figure \ref{fig:PIPELINE3} we can see that the FFVR method is made up of mu
 \begin{equation} \label{eqn:FULLPERF2}
 2N^3\log{N^3} + 9N^2\log{N^2} + 6N^2 + 28WH + 169
 \end{equation}
+\myequations{Number of Operations in FFVR}
 
 Figure \ref{fig:perfComp} provides a visualization of the performance improvement which the FFVR method achieves over the original FVR approach. The graph displays the performance of both methods at different volume sizes increasing logarithmically. The FFVR method is around ~1.8 times faster for $64^3$ volumes, ~3.4 times faster for $128^3$ volumes, ~4.1 times faster for $256^3$ volumes and ~4.2 times faster for $512^3$ volumes. This is due to the reduction in the amount of data to process afforded by the novel spherical-map transform and Projection-map transform methods.
 
@@ -215,24 +223,28 @@ The complexity of finding SIFT features and computing a SIFT descriptor for an i
 \begin{equation} \label{eqn:SIFT_PERF}
 W^2(s(4w^2 + 100\alpha + 156) + 1520x^2(\alpha \beta + \gamma))
 \end{equation}
+\myequations{Number of Operations in SIFT Feature Finding}
 
 By plugging in the usual values (equation \ref{eqn:SIFT_PERF_FINAL}), we can form a computational cost as a function of $W$ and variables $\alpha$, $\beta$ and $\gamma$, the variables representing the fraction of pixels which are features.
 
 \begin{equation} \label{eqn:SIFT_PERF_FINAL}
 W^2(300\alpha + 768 + 97280(\alpha \beta + \gamma))
 \end{equation}
+\myequations{Number of Operations in SIFT}
 
 The complexity of SURF is based on several similar factors. Again, $W$ is the image size, $s$ is the number of octaves (3 is the default), $\alpha$ is a scalar (with a default value of 3), and $f$ the fraction of image pixels which are detected as features. Functions which make up the SURF feature detection and descriptor extraction include integral image creation of complexity $W^2 + W$, computation of Hessian feature detection of complexity $\sum_{i=1}^{s} 668(\frac{N}{2^i\alpha})^2$ and the computation of the SURF descriptors of complexity $213434N^2f$. Plugging in default values (equation \ref{eqn:SURF_PERF_FINAL}), the complexity may be formed as a function of the image size, $W$ and the percentage of pixels found to be features $f$.
 
 \begin{equation} \label{eqn:SURF_PERF_FINAL}
 W^2 + W + N^2(1972.688 + 213434f)
 \end{equation}
+\myequations{Number of Operations in SURF}
 
 The complexity of RANSAC was also analysed. Based the implementation used to compute camera pose from feature matches and corresponding 3D points, the complexity is dependent on $W$ the image size, $I$ the number of iterations (we use 500) and $f$ the fraction of pixels which are matched features. The total complexity is given in equation \ref{eqn:RANSAC_PERF_FINAL}.
 
 \begin{equation} \label{eqn:RANSAC_PERF_FINAL}
 134IN^2f
 \end{equation}
+\myequations{Number of Operations in RANSAC}
 
 Therefore, the total complexities of SURF + RANSAC and SIFT + RANSAC are given in equations \ref{eqn:SURFRANSAC_PERF_FINAL} and \ref{eqn:SIFTRANSAC_PERF_FINAL} respectively.
 
@@ -240,10 +252,12 @@ Therefore, the total complexities of SURF + RANSAC and SIFT + RANSAC are given i
 \begin{equation} \label{eqn:SURFRANSAC_PERF_FINAL}
 W^2 + W + N^2(1972.688 + 213434f) + 134IN^2f
 \end{equation}
+\myequations{Number of Operations in SURF / RANSAC}
 
 \begin{equation} \label{eqn:SIFTRANSAC_PERF_FINAL}
 W^2(300\alpha + 768 + 97280(\alpha \beta + \gamma)) + 134IN^2(\alpha \beta + \gamma)
 \end{equation}
+\myequations{Number of Operations in SIFT / RANSAC}
 
 
 The complexity of the 3D extension of the SIFT feature matching + RANSAC method  is shown in equation \ref{eqn:SIFT3DRANSAC_PERF_FINAL}, where $N^3$ is the volume size used to project the 3D data into.
@@ -251,18 +265,21 @@ The complexity of the 3D extension of the SIFT feature matching + RANSAC method 
 \begin{equation} \label{eqn:SIFT3DRANSAC_PERF_FINAL}
 N^3(1968 + 300\alpha + 41040(\alpha \beta + \gamma)) + 134IN^3(\alpha \beta + \gamma)
 \end{equation}
+\myequations{Number of Operations in 3D SIFT / RANSAC}
 
 The complexity of the PCA method was taken from \cite{Johnstone04Sparse}. It is a function of $W$ (again where the number of pixels in the image is $W^2$) and $p = 3$, the dimensionality of the 3D points. The complexity was found to be $p^2W^2+p^3$, plugging in 3 for $p$ gives the complexity as a function of $W$ provided in equation \ref{eqn:PCA_PERF_FINAL}.
 
 \begin{equation} \label{eqn:PCA_PERF_FINAL}
 9W^2 + 27
 \end{equation}
+\myequations{Number of Operations in PCA}
 
 Finally the complexity of ICP is described. The complexity of ICP in the context of pose estimation is based on the complexity of (i) computing the K Nearest Neighbours (KNN) algorithm between point clouds ($3W^2f$), (ii) computing the least squares optimal pose based on the matches ($16W^2f + 96$), and (iii) testing the computed pose $21W^2f$. Here, $W$ is the image size and $f$ is the fraction of projected pixels used in the ICP algorithm. This is performed up to 500 times leading to the complexity in equation \ref{eqn:ICP_PERF_FINAL}.
 
 \begin{equation} \label{eqn:ICP_PERF_FINAL}
 1008W^8f^3 + 6048W^4f^2
 \end{equation}
+\myequations{Number of Operations in ICP}
 
 \begin{table}[!t]
 \centering

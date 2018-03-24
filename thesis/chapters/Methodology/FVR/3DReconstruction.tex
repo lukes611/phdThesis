@@ -151,6 +151,7 @@ Fwd_x & Fwd_y & Fwd_z & 0 \\
 \end{array}
 \right]
 \end{equation}
+\myequations{Correction Matrix for FVR-3D}
 
 \subsubsection{3D Rotation Registration}
 
@@ -163,6 +164,7 @@ Figure \ref{fig:FVR3D222} (along with Figure \ref{fig:FVR3D111}) shows the outpu
 \begin{equation} \label{eqn:FullRSTTransform}
 R_{x,y,z}ST Matrix = C_{B}^{-1} \times R_{y}ST \times C_A
 \end{equation}
+\myequations{FVR-3D Registration Matrix}
 
 FVR-3D is a capable registration method which extends Fourier registration to take into account full 3D rotation. The complexity of the technique adds a single layer of complexity over the FVR method. The additional computational complexity ($N^3$), which is primarily made up of computing the covariance matrix, is minimal compared to the rest of the FVR technique. \\
 

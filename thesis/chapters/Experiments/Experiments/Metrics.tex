@@ -7,6 +7,7 @@ In both cases, a robust way to measure the similarity/difference between two 3D 
 \begin{equation} \label{eqn:NN}
 NN(p, V) =  \{ q \in V | (Dist(q, p) < Dist(k, p))  \forall k \in V \}
 \end{equation}
+\myequations{Nearest Neighbour Function}
 
 For all purposes within this research, the function $Dist(x,y)$ is simply the Euclidean distance between the two input points. Using this definition of a nearest neighbour, several metrics may be used to compute the distance between two models. The one-way distance between two models is defined as the summation of distances for each point in one model to its nearest neighbour from the other model. The one-way mean error between two 3D models, $P$ and $Q$ is given in equation \ref{eqn:HDOW}. The full mean error between two objects is then computed as the average of the $Mean-Error_{one-way}$ function from model $P$ to $Q$ and model $Q$ to $P$. This is defined in equation \ref{eqn:MEANERRORMETRIC1}. \\
 
@@ -14,11 +15,13 @@ For all purposes within this research, the function $Dist(x,y)$ is simply the Eu
 \begin{equation} \label{eqn:HDOW}
 ME_{1-way}(P, Q) = \frac{1}{N}\sum_{k=0}^{N} Dist(P_k, NN(P_k, Q))
 \end{equation}
+\myequations{One-Way Mean Error Function}
 
 
 \begin{equation} \label{eqn:MEANERRORMETRIC1}
 ME(P, Q) = \frac{ME_{1-way}(P,Q) + ME_{1-way}(Q,P)}{2}
 \end{equation}
+\myequations{Mean Error Function}
 
 Other metrics may also be used, for example the mean squared error can be used instead of mean error. The mean squared error (MSE) may then replace the mean error used in equation \ref{eqn:HDOW}. The one-way and full error functions based on the MSE are provided in equations \ref{eqn:MSEOW} and \ref{eqn:MEANSQERRORMETRIC1}. \\
 
@@ -26,11 +29,13 @@ Other metrics may also be used, for example the mean squared error can be used i
 \begin{equation} \label{eqn:MSEOW}
 MSE_{1-way}(P, Q) = \frac{1}{N}\sum_{k=0}^{N} Dist(P_k, NN(P_k, Q))^2
 \end{equation}
+\myequations{One-Way Mean Squared Error Function}
 
 
 \begin{equation} \label{eqn:MEANSQERRORMETRIC1}
 MSE(P,Q) = \frac{MSE_{1-way}(P,Q) + MSE_{1-way}(Q,P)}{2}
 \end{equation}
+\myequations{Mean Squared Error Function}
 
 
 The mean error based on the nearest neighbour is often referred to as the Hausdorff error. In this research, we used the Hausdorff error and the Mean Squared Error (MSE) based on the nearest neighbour technique, as well as a percentage of total matches. The one-way percentage of total matches is the computation of the percent of points from one model which have a nearest neighbour with a distance below a given threshold. This metric is defined in equation \ref{eqn:PERCMATCHOW}. \\
@@ -42,6 +47,7 @@ PM_{1-way}(P, Q) = \frac{100}{N}\sum_{k=0}^{N} x, where
     x=0  & \quad otherwise\\
   \end{cases}
 \end{equation}
+\myequations{One-Way Match Percentage Metric}
 
 Following this, the full Percent-Match function may be defined as the average of the $PM_{1-way}$ function in both directions. These three metrics are used along with several others in 3D reconstruction experiments. Additionally, the camera tracking error is computed as the euclidean distance between the ground truth camera movement from one frame to another and the estimated camera movement computed via the FVR method. The voxel error is also measured. Since the camera distance metric measures the real positions moved by the camera, it theoretically has the accuracy of the real number system. Conversely, FVR uses voxel spaces (3D volumes) to find the translation and rotation (location and pose) between frames. Therefore, the result must be quantized. By quantizing the ground truth prior to comparison, the accuracy up to the resolution of the voxel grid may be computed. This is important since it measures the error of the FVR 3D reconstruction method without penalizing it based on the effects of quantization which reduce the larger the volume. \\
 
@@ -50,9 +56,11 @@ In experiments comparing the Plane-Tree with state-of-the-art algorithms, the ro
 \begin{equation} \label{eqn:MEANSQERRORMETRIC2}
 MSE_{volume}(V_1,V_2) = \frac{1}{N^3}\sum_{z=0}^{N}\sum_{y=0}^{N}\sum_{x=0}^{N} \left(V_1(x,y,z) - V_2(x,y,z)\right)^2
 \end{equation}
+\myequations{Mean Squared Error over Volumes}
 
 The PSNR metric is then defined as in equation \ref{eqn:PSNR1}. This metric is commonly used in image compression comparisons and since 3D images are being compared in this test, it is used here also. The PSNR metric is inversely related to error, so the larger the PSNR the lower the error between the two models.
 
 \begin{equation} \label{eqn:PSNR1}
 PSNR(V_1,V_2) = 10 \times \log10{\frac{255^2}{MSE_{volume}(V_1, V_2)}}
 \end{equation}
+\myequations{Peak Signal to Noise Ratio over 3D Volumes}

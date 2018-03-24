@@ -1,4 +1,48 @@
 \contentsline {myequations}{\numberline {2.1}Translational Part of Fundamental Matrix}{51}{equation.2.3.1}
 \contentsline {myequations}{\numberline {2.2}Rotational Part of Fundamental Matrix}{51}{equation.2.3.2}
 \contentsline {myequations}{\numberline {2.3}Covariance Matrix for Computing the Fundamental Matrix}{55}{equation.2.3.3}
-\contentsline {myequations}{\numberline {3.1}Transformation Registration Matrix}{86}{equation.3.2.1}
+\contentsline {myequations}{\numberline {3.1}Camera Translation Matrix Example}{86}{equation.3.2.1}
+\contentsline {myequations}{\numberline {3.2}Correlation Equation}{88}{equation.3.2.2}
+\contentsline {myequations}{\numberline {3.3}Translation Correlation Error Function}{91}{equation.3.2.3}
+\contentsline {myequations}{\numberline {3.4}PhaseCorrelation Function}{93}{equation.3.2.4}
+\contentsline {myequations}{\numberline {3.5}Normalized Cross Power Spectrum}{94}{equation.3.2.5}
+\contentsline {myequations}{\numberline {3.6}Hanning Window Function}{95}{equation.3.2.6}
+\contentsline {myequations}{\numberline {3.7}3D Hanning Window Filter}{100}{equation.3.2.7}
+\contentsline {myequations}{\numberline {3.8}Log-Spherical Function}{103}{equation.3.2.8}
+\contentsline {myequations}{\numberline {3.9}Rotation and Scale Parameter Calculations}{104}{equation.3.2.9}
+\contentsline {myequations}{\numberline {3.10}Phase Correlation Computed Rotational Registration Matrix}{105}{equation.3.2.10}
+\contentsline {myequations}{\numberline {3.11}Phase Correlation Computed Scale Registration Matrix}{105}{equation.3.2.11}
+\contentsline {myequations}{\numberline {3.12}Depth Map to 3D Coordinates Projection}{122}{equation.3.2.12}
+\contentsline {myequations}{\numberline {3.13}Inverse Log-Polar Function}{139}{equation.3.2.13}
+\contentsline {myequations}{\numberline {3.14}Spherical Transform Components}{140}{equation.3.2.14}
+\contentsline {myequations}{\numberline {3.15}Spherical Transform}{140}{equation.3.2.15}
+\contentsline {myequations}{\numberline {3.16}Projection Map X-Axis Transform}{142}{equation.3.2.16}
+\contentsline {myequations}{\numberline {3.17}Projection Map Z-Axis Transform}{142}{equation.3.2.17}
+\contentsline {myequations}{\numberline {3.18}Number of Operations in FVR}{145}{equation.3.2.18}
+\contentsline {myequations}{\numberline {3.19}Number of Operations in 3D Phase Correlation}{146}{equation.3.2.19}
+\contentsline {myequations}{\numberline {3.20}Number of Operations in FFVR}{147}{equation.3.2.20}
+\contentsline {myequations}{\numberline {3.21}Number of Operations in SIFT Feature Finding}{149}{equation.3.2.21}
+\contentsline {myequations}{\numberline {3.22}Number of Operations in SIFT}{149}{equation.3.2.22}
+\contentsline {myequations}{\numberline {3.23}Number of Operations in SURF}{150}{equation.3.2.23}
+\contentsline {myequations}{\numberline {3.24}Number of Operations in RANSAC}{150}{equation.3.2.24}
+\contentsline {myequations}{\numberline {3.25}Number of Operations in SURF / RANSAC}{151}{equation.3.2.25}
+\contentsline {myequations}{\numberline {3.26}Number of Operations in SIFT / RANSAC}{151}{equation.3.2.26}
+\contentsline {myequations}{\numberline {3.27}Number of Operations in 3D SIFT / RANSAC}{151}{equation.3.2.27}
+\contentsline {myequations}{\numberline {3.28}Number of Operations in PCA}{151}{equation.3.2.28}
+\contentsline {myequations}{\numberline {3.29}Number of Operations in ICP}{152}{equation.3.2.29}
+\contentsline {myequations}{\numberline {3.30}Covariance for PCA}{158}{equation.3.2.30}
+\contentsline {myequations}{\numberline {3.31}Covariance Matrix for PCA}{159}{equation.3.2.31}
+\contentsline {myequations}{\numberline {3.32}Forward Alignment Matrix for PCA}{162}{equation.3.2.32}
+\contentsline {myequations}{\numberline {3.33}Right Alignment Matrix for PCA}{163}{equation.3.2.33}
+\contentsline {myequations}{\numberline {3.34}Correction Matrix for FVR-3D}{163}{equation.3.2.34}
+\contentsline {myequations}{\numberline {3.35}FVR-3D Registration Matrix}{165}{equation.3.2.35}
+\contentsline {myequations}{\numberline {3.36}Plane-Fitting Error Function}{184}{equation.3.3.36}
+\contentsline {myequations}{\numberline {4.1}Nearest Neighbour Function}{195}{equation.4.3.1}
+\contentsline {myequations}{\numberline {4.2}One-Way Mean Error Function}{196}{equation.4.3.2}
+\contentsline {myequations}{\numberline {4.3}Mean Error Function}{196}{equation.4.3.3}
+\contentsline {myequations}{\numberline {4.4}One-Way Mean Squared Error Function}{196}{equation.4.3.4}
+\contentsline {myequations}{\numberline {4.5}Mean Squared Error Function}{196}{equation.4.3.5}
+\contentsline {myequations}{\numberline {4.6}One-Way Match Percentage Metric}{197}{equation.4.3.6}
+\contentsline {myequations}{\numberline {4.7}Mean Squared Error over Volumes}{198}{equation.4.3.7}
+\contentsline {myequations}{\numberline {4.8}Peak Signal to Noise Ratio over 3D Volumes}{199}{equation.4.3.8}
+\contentsline {myequations}{\numberline {4.9}Registration Error Metric}{208}{equation.4.4.9}

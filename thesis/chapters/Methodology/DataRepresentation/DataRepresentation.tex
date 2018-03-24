@@ -140,6 +140,7 @@ The triangles representing the plane within the node are then sampled along with
  \label{eqn:MSE_1}
 MSE(pts_1, pts_2) = \frac{1}{N}\sum_{i=0}^{N} (pts_{1_i} - closest(pts_{1_i}, pts_2))^2
 \end{equation}
+\myequations{Plane-Fitting Error Function}
 
 Using this equation, the sampled points from the plane triangles $p$, and the sampled points from the mesh $m$ (which lie within the cube), we take the average of both mean squared errors as a measurement of total error, $error = \frac{1}{2}MSE(p,m) + \frac{1}{2}MSE(m,p)$. This is the value which is compared with the error threshold to decide whether decomposition should stop. \\
 

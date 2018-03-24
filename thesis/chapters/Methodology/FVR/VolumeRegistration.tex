@@ -15,7 +15,7 @@ To describe camera translation, let us say a camera produces 3D scans of a scene
 \end{array}
 \right]
 \end{equation}
-\myequations{Transformation Registration Matrix}
+\myequations{Camera Translation Matrix Example}
 
 The volume data has shifted in the opposite direction. Therefore to register the data, frame 1 may be transformed by the matrix in equation \ref{eqn:TransRegMatrix} to align it with frame 2. Conversely, the camera pose may be updated by adding $T_{frame-1,frame-2} \times -1$ to the camera's location.  \\
 
@@ -30,6 +30,7 @@ The measure of correlation between $V_1$ and $V_2$ can be found by shifting $V_1
 \begin{equation} \label{eqn:CorrelationEquation}
 \sum_{z=0}^{N}\sum_{y=0}^{N}\sum_{x=0}^{N}(V_1(x,y,z)-avg(V_1)) \times (V_2(x,y,z)-avg(V_2))
 \end{equation}
+\myequations{Correlation Equation}
 
 As mentioned, correlation may be used to measure the similarity between two volumes' shapes. In the context of registration for 3D reconstruction algorithms, it can be used to measure the accuracy of a registration. This again uses $V_1$ as frame 1 and $V_2$ as frame 2, given a supposed transform $T_{est}$ to register $V_1$ to $V_2$. The measure of registration may be defined as $correlate(T_{est}(V_1), V_2)$. The measure may be used to compare two registrations, possibly to select the better registration in terms of correlation measure. The two frames may be captured under different lighting conditions and the correlation measure can still be used to select the best transform. \\
 
@@ -63,6 +64,7 @@ Cross correlation is typically used in signal processing to compute the best ali
 \begin{equation} \label{eqn:CrossCorrelationEquation11}
 correlate(translate(V_1, x,y,z), V_2)
 \end{equation}
+\myequations{Translation Correlation Error Function}
 
 The range of camera location vectors to test is dependent on the dimensions of the raw 3D input data. If the data is scaled to fit an $N^3$ space, as is a requirement when using Fourier based techniques, the camera location values along the x, y and z axis would range between 0 and $N$. To compute the optimal camera location change using the phase correlation method would therefore have complexity $N^3$. There are $N^3$ values to test, and the correlation function must be called for each iteration with a complexity also equivalent to $N^3$, $N^3 \times N^3 = N^6$. This is significantly complex, even for smaller volume sizes. Note that the smaller the volume size, the faster the algorithm, however the more quantized the original data is. The more the input data is quantized, the more the camera location change estimates will be restricted in terms of precision. Accuracy will also be affected as quantization introduces unwanted effects of its own. The answer is to use the properties of the Fourier transform to speed up the process.  \\
 
@@ -83,12 +85,14 @@ Exploiting the properties of the FFT and the frequency domain, cross-correlation
 \begin{equation} \label{eqn:PC_basic}
 T(x, y, z) = PhaseCorrelation(V_x, V_y)
 \end{equation}
+\myequations{PhaseCorrelation Function}
 
 The $PhaseCorrelation$ consists of four steps. In the first step the two captured 3D frames $V_1$ and $V_2$ are transformed into the frequency domain using the Fast Fourier Transform. This computes two new volumes $F_{1_{x,y,z}} = FFT(V_1)$ and $F_{2_{x,y,z}} = FFT(V_2)$. Applying the Fourier Shift Theorem to the context of camera pose estimation, if frames $V_1$ and $V_2$ are separated by some camera translation, then $F_{1_{x,y,z}}$ and $F_{2_{x,y,z}}$ will have phase values shifted relative to each-other. The normalized cross power spectrum (equation \ref{eqn:PHCOR_eq}) of the two complex valued Fourier spaces may then be used to find the camera translation change. The normalized cross power spectrum of $F_{1_{x,y,z}}$ and $F_{2_{x,y,z}}$ is another complex valued volume of the same size. \\
 
 \begin{equation} \label{eqn:PHCOR_eq}
 F_{3_{x,y,z}} = \frac{F_{1_{x,y,z}} \circ F_{2_{x,y,z}}^*}{ | F_{1_{x,y,z}} \circ F_{2_{x,y,z}}^* | }
 \end{equation}
+\myequations{Normalized Cross Power Spectrum}
 
 In equation \ref{eqn:PHCOR_eq}, $\circ$ is an element-wise multiplication and $|x|$ is the magnitude function or absolute value function. The Inverse Fast Fourier Transform ($IFFT$, $FFT^{-1}$) may then be used on the output of the normalized cross power spectrum volume to produce a phase correlation surface. The peak value on the phase correlation surface represents the optimal value of the correlation function applied to the two original real valued 3D frames. Therefore, the $PhaseCorrelation$ procedure is equivalent to the cross-correlation procedure, but rather than being complexity $N^6$, phase correlation reduces the complexity to approximately $6N^3 \times Log(N)$. \\
 
@@ -98,6 +102,7 @@ Due to the nature of camera capture, if the camera is translated by some vector 
 \begin{equation} \label{eqn:HanningFunction}
 Hanning(x) = \frac{1}{2}\left(1 - cos\left(\frac{2\pi x}{\frac{N}{2} - 1}\right)\right)
 \end{equation}
+\myequations{Hanning Window Function}
 
 Noise on the phase correlation surface may also be present if other types of transforms are present. In this case, the true camera translation may be lost. Therefore, camera pose/rotation must be computed prior to computing the camera translation. Other artefacts which may produce noise on the phase correlation surface include moving objects. If an object is present in one scene and not the other, it will cause some noise to be present in the phase correlation surface, making finding the peak more difficult but not impossible. Alternatively if there is an object whose location is changed between frames, the same thing may happen. The phase correlation procedure should already be robust to these artefacts but filtering approaches may also prove useful in selecting the correct peak which optimizes the translation used to register the 3D camera frames. \\
 
@@ -134,6 +139,7 @@ HW_{x,y,z} = \frac{1}{2}\left(
 \right)
 \right)
 \end{equation}
+\myequations{3D Hanning Window Filter}
 
 The translation separating the camera frames must be removed from the equation prior to estimating the rotation and scale. As mentioned previously, the magnitude of the frequency domain is independent of the effects of translation. So, the magnitude of the frequency domains of both frames are taken, $M_1 = |FFT(V_1)|$, $M_2 = |FFT(V_2)|$. The zero frequency, which is at the corners of the volume (because the discrete frequency domain is assumed to be circularly repeating infinitely) must be transformed to the centre of the volume. In this way, any rotation or scaling occurs about the centre of the volume. Then, both $M_1$ and $M_2$ are filtered using an element-wise log function. The frequency domain contains larger values around the zero mean and low frequency areas and smaller values around the higher frequency areas, but for the purposes of computing the camera rotation and any possible scale factor, all frequencies should be treated equally. The element-wise log function therefore suppresses the lower frequency values bringing the higher frequencies up to a similar level. \\
 
@@ -167,6 +173,7 @@ Z_{log-spherical} & =\frac{log\left(
 \right)N}{log\left( \frac{N}{2.56} \right)} \\
 \end{split}
 \end{equation}
+\myequations{Log-Spherical Function}
 
 The log-spherical transforms of $M'_1$ and $M'_2$ are then related by translation. The translation relationship describes the camera rotation and the scale factor separating both of the original frames. The exact translational differences can easily be recovered using phase correlation. The resulting peak location from the phase-correlation procedure, $(x_{M'},y_{M'},z_{M'}) = PhaseCorrelation(M'_1, M'_2)$ is used to estimate the rotation and the scale. The phase correlation surface of these two volumes is often very noisy. It is usually noisier than phase correlating data from the spatial domain. Filtering techniques may be used to alleviate this issue. If multiple peaks are detected, the rotation and scale may also be tested for each candidate peak. The rotation $\theta$ and scale factor $\varphi$ separating the two original frames, $V_1$ and $V_2$ can then be computed using the peak values on the phase correlation surface, $(x_{M'},y_{M'},z_{M'})$. The functions to compute $\theta$ and $\varphi$ are given in equation \ref{eqn:ROTATIONSCALEFROMXM}. \\
  
@@ -180,6 +187,7 @@ The log-spherical transforms of $M'_1$ and $M'_2$ are then related by translatio
 }
 \end{split}
 \end{equation}
+\myequations{Rotation and Scale Parameter Calculations}
 
 The $x_{M'}$ coordinate is mapped to a unit number in the range $[0,1]$ and is scaled by $-360$ resulting in $\theta$, the angle of rotation which may be used to align the frames. The $z_{M'}$ coordinate is also mapped to a unit number, it is then scaled by $\frac{N}{256}$ to align the result prior to inverting the log function effects. The value is negated also, this gives the relationship relative to frame 1 rather than frame 2. Finally, the log function is reversed using the exponential function. The resulting rotation matrix may be formed as in equation \ref{eqn:RoteRegMatrix}. This conjuncted matrix first transforms the centre of the volume to the origin and then rotates it by $\theta$, then transforms it back to the centre of the volume. \\
 
@@ -209,6 +217,7 @@ cos(\theta) & 0 & sin(\theta) & 0 \\
 \end{array}
 \right]
 \end{equation}
+\myequations{Phase Correlation Computed Rotational Registration Matrix}
 
 The resulting scaling matrix is formed similarly (equation \ref{eqn:ScaleRegMatrix}) by transforming the volume centre to the origin, scaling the geometry and then transforming the data back to the centre of the volume. The resulting matrix to un-do both the scale and rotational effects of the camera movement can therefore be computed as the scale matrix multiplied by the rotational matrix, $SR_{matrix} = S_{matrix} \times R_{matrix}$. \\
 
@@ -238,6 +247,7 @@ The resulting scaling matrix is formed similarly (equation \ref{eqn:ScaleRegMatr
 \end{array}
 \right]
 \end{equation}
+\myequations{Phase Correlation Computed Scale Registration Matrix}
 
 If frame 1, $V_1$ is then transformed by the scale-rotation matrix $SR_{matrix}$, the resulting volumes are separated only by translation. The translation matrix separating them may then be computed using phase correlation. The result of this procedure is that the rotation factor $\theta$, the scale factor $\varphi$ and the translation factors $x$, $y$ and $z$ have all been recovered. Given the translation matrix, $T$, formed by the translation factors $x$, $y$ \& $z$, the full registration matrix aligning frames $V_1$ and $V_2$ may be computed as, $M_{T,\varphi,\theta} = T \times SR_{matrix}$. $M_{T,\varphi,\theta}$. This matrix can be used to align frame 1 to frame 2 prior to integration. Alternatively frame 2 may be aligned with frame 1 by transforming it by $M_{T,\varphi,\theta}^{-1}$. \\
 
