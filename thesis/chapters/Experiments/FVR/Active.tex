@@ -17,13 +17,13 @@ Table \ref{tab:apartmenttexturerotate} shows results for the Apartment Texture R
 \begin{tabular}{ccc}
 \hline
 \textbf{Algorithm} & \textbf{Median Error $\times$ 1000} & \textbf{\% best results}\\ \hline
+FVR-3D	& 2 & 36\%\\
 FM2D	& 2.13 & 28\%\\
-FM3D	& 5.14 & 0\%\\
-ICP	& 2.42 & 8\%\\
-PCA	& 8.61 & 4\%\\
 FVR	& 2.26 & 16\%\\
 FFVR	& 2.7 & 8\%\\
-FVR-3D	& 2 & 36\%\\
+ICP	& 2.42 & 8\%\\
+FM3D	& 5.14 & 0\%\\
+PCA	& 8.61 & 4\%\\
 \end{tabular}
 \label{tab:apartmenttexturerotate}
 \end{table} 
@@ -62,13 +62,13 @@ Results for the Apartment Texture X-Axis Rotation Data Set are presented in Tabl
 \begin{tabular}{ccc}
 \hline
 \textbf{Algorithm} & \textbf{Median Error $\times$ 1000} & \textbf{\% best results}\\ \hline
-FM2D	& 1.97 & 4\%\\
-FM3D	& 2.58 & 0\%\\
 ICP	& 1.78 & 28\%\\
-PCA	& 3.81 & 0\%\\
+FVR-3D	& 1.82 & 64\%\\
+FM2D	& 1.97 & 4\%\\
 FVR	& 1.99 & 4\%\\
 FFVR	& 2.01 & 0\%\\
-FVR-3D	& 1.82 & 64\%\\
+FM3D	& 2.58 & 0\%\\
+PCA	& 3.81 & 0\%\\
 \end{tabular}
 \label{tab:apartmenttexturex-axisrotation}
 \end{table} 
@@ -107,13 +107,13 @@ Table \ref{tab:desktexturetranslation} shows the results for the Desk Texture Tr
 \begin{tabular}{ccc}
 \hline
 \textbf{Algorithm} & \textbf{Median Error $\times$ 1000} & \textbf{\% best results}\\ \hline
-FM2D	& 1.24 & 8\%\\
-FM3D	& 2.48 & 12\%\\
-ICP	& 1.59 & 28\%\\
-PCA	& 1.51 & 4\%\\
 FVR	& 1.16 & 16\%\\
-FFVR	& 1.29 & 16\%\\
 FVR-3D	& 1.23 & 16\%\\
+FM2D	& 1.24 & 8\%\\
+FFVR	& 1.29 & 16\%\\
+FM3D	& 2.48 & 12\%\\
+PCA	& 1.51 & 4\%\\
+ICP	& 1.59 & 28\%\\
 \end{tabular}
 \label{tab:desktexturetranslation}
 \end{table} 
@@ -153,13 +153,13 @@ Table \ref{tab:officetexturedblindspotrotation} shows the results for the Office
 \begin{tabular}{ccc}
 \hline
 \textbf{Algorithm} & \textbf{Median Error $\times$ 1000} & \textbf{\% best results}\\ \hline
-FM2D	& 1.39 & 24\%\\
-FM3D	& 5.92 & 0\%\\
+FVR-3D	& 1.1 & 24\%\\
 ICP	& 1.2 & 44\%\\
-PCA	& 4.83 & 8\%\\
+FM2D	& 1.39 & 24\%\\
 FVR	& 2.07 & 0\%\\
 FFVR	& 2.92 & 0\%\\
-FVR-3D	& 1.1 & 24\%\\
+PCA	& 4.83 & 8\%\\
+FM3D	& 5.92 & 0\%\\
 \end{tabular}
 \label{tab:officetexturedblindspotrotation}
 \end{table} 
@@ -198,13 +198,14 @@ Table \ref{tab:officetextureditemstranslation} presents results for the Office T
 \begin{tabular}{ccc}
 \hline
 \textbf{Algorithm} & \textbf{Median Error $\times$ 1000} & \textbf{\% best results}\\ \hline
+
+FVR-3D	& 2.83 & 44\%\\
 FM2D	& 2.89 & 24\%\\
-FM3D	& 5.45 & 0\%\\
 ICP	& 2.93 & 4\%\\
+FFVR	& 3.06 & 28\%\\
 PCA	& 3.79 & 0\%\\
 FVR	& 5.04 & 0\%\\
-FFVR	& 3.06 & 28\%\\
-FVR-3D	& 2.83 & 44\%\\
+FM3D	& 5.45 & 0\%\\
 \end{tabular}
 \label{tab:officetextureditemstranslation}
 \end{table} 
@@ -244,13 +245,13 @@ Table \ref{tab:parkplantsandtables} presents results for the Park Plants and Tab
 \begin{tabular}{ccc}
 \hline
 \textbf{Algorithm} & \textbf{Median Error $\times$ 1000} & \textbf{\% best results}\\ \hline
-FM2D	& 10.2 & 4\%\\
-FM3D	& 19.7 & 0\%\\
-ICP	& 15.03 & 12\%\\
-PCA	& 24 & 0\%\\
 FVR	& 8.03 & 76\%\\
+FM2D	& 10.2 & 4\%\\
+ICP	& 15.03 & 12\%\\
 FFVR	& 16.47 & 0\%\\
 FVR-3D	& 19.4 & 8\%\\
+FM3D	& 19.7 & 0\%\\
+PCA	& 24 & 0\%\\
 \end{tabular}
 \label{tab:parkplantsandtables}
 \end{table} 
@@ -278,9 +279,6 @@ FVR-3D	& 19.4 & 8\%\\
 \label{fig:parksplantandtable}
 \end{figure*}
 
-
-
-
 In the final experiment using the Asus Xtion Pro Live Active sensor camera, another large office space was filmed with y-axis rotation being the primary camera movement, some example frames are shown in Figure \ref{fig:Office_Texture_rotation}. This scene was named the Office Texture Rotation Data Set and statistics for the registration results are presented in Table \ref{tab:officetexturerotation}. These results reveal the FVR-3D method achieved the lowest median error result but only the third highest percentage of best results score. A hybrid FVR based method would have achieved the best result around 38.46 \% of the time. In terms of median error, FM2D was better than ICP but their positions were reversed in the percentage of best results metric. 
 
 %%office texture rotation
@@ -290,13 +288,13 @@ In the final experiment using the Asus Xtion Pro Live Active sensor camera, anot
 \begin{tabular}{ccc}
 \hline
 \textbf{Algorithm} & \textbf{Median Error $\times$ 1000} & \textbf{\% best results}\\ \hline
-FM2D	& 4.36 & 26.92\%\\
-FM3D	& 7.15 & 0\%\\
-ICP	& 4.76 & 34.62\%\\
-PCA	& 6.55 & 0\%\\
-FVR	& 5.3 & 7.69\%\\
-FFVR	& 4.74 & 7.69\%\\
 FVR-3D	& 4.35 & 23.08\%\\
+FM2D	& 4.36 & 26.92\%\\
+FFVR	& 4.74 & 7.69\%\\
+ICP	& 4.76 & 34.62\%\\
+FVR	& 5.3 & 7.69\%\\
+PCA	& 6.55 & 0\%\\
+FM3D	& 7.15 & 0\%\\
 \end{tabular}
 \label{tab:officetexturerotation}
 \end{table} 

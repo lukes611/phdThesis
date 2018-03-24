@@ -51,22 +51,16 @@ Table \ref{tab:kittidata0001sync} presents results for the Kitti 0001 Sync data 
 \begin{tabular}{ccc}
 \hline
 \textbf{Algorithm} & \textbf{Median Error $\times$ 1000} & \textbf{\% best results}\\ \hline
-FM2D	& 5.28 & 13.21\%\\
-FM3D	& 9235.71 & 0.94\%\\
+FVR-3D	& 5.1 & 34.91\%\\
 ICP	& 5.15 & 27.36\%\\
-PCA	& 5.66 & 2.83\%\\
+FM2D	& 5.28 & 13.21\%\\
 FVR	& 5.5 & 13.21\%\\
 FFVR	& 5.59 & 7.55\%\\
-FVR-3D	& 5.1 & 34.91\%\\
+PCA	& 5.66 & 2.83\%\\
+FM3D	& 9235.71 & 0.94\%\\
 \end{tabular}
 \label{tab:kittidata0001sync}
 \end{table}
-
-
-
-
-
-
 
 
 Table \ref{tab:kittidata0002sync} presents median error and percent best result statistics for the Kitti 0002 Sync Data Set, example colour frames are shown in Figure \ref{fig:KT2DSS}. The road in which this scene contains some parked cars to the left as well as a building, some grass and some large trees. To the right there is an orange brick wall and some trees and gardens as well as two moving cyclists. Results for the full 74 frames of the data set show that the FVR-3D method achieved the lowest median registration error at 4.27. The ICP algorithm achieved the next best result at 4.43 and the non-rotation-invariant FVR method achieved the third best result. Combined, the FVR based methods achieved the best result ~50.67 \% of the time compared to ICP at 30.67 \%. In this scene, the FM-3D method did not have as many registration failures and achieved a better result than the FFVR method and a comparable result to the PCA method. \\ 
@@ -78,13 +72,13 @@ Table \ref{tab:kittidata0002sync} presents median error and percent best result 
 \begin{tabular}{ccc}
 \hline
 \textbf{Algorithm} & \textbf{Median Error $\times$ 1000} & \textbf{\% best results}\\ \hline
+FVR-3D	& 4.27 & 38.67\%\\
+ICP	& 4.43 & 30.67\%\\
+FVR	& 4.67 & 6.67\%\\
 FM2D	& 4.78 & 5.33\%\\
 FM3D	& 4.85 & 6.67\%\\
-ICP	& 4.43 & 30.67\%\\
 PCA	& 4.86 & 6.67\%\\
-FVR	& 4.67 & 6.67\%\\
 FFVR	& 5.23 & 5.33\%\\
-FVR-3D	& 4.27 & 38.67\%\\
 \end{tabular}
 \label{tab:kittidata0002sync}
 \end{table} 
@@ -127,12 +121,12 @@ Statistics for the Kitti 0005 Sync Data Set are presented in Table \ref{tab:kitt
 \hline
 \textbf{Algorithm} & \textbf{Median Error $\times$ 1000} & \textbf{\% best results}\\ \hline
 FM2D	& 3.39 & 39.22\%\\
-FM3D	& 3.83 & 0\%\\
-ICP	& 3.49 & 25.49\%\\
-PCA	& 4.06 & 0\%\\
-FVR	& 3.7 & 5.88\%\\
-FFVR	& 4.25 & 1.96\%\\
 FVR-3D	& 3.42 & 27.45\%\\
+ICP	& 3.49 & 25.49\%\\
+FVR	& 3.7 & 5.88\%\\
+FM3D	& 3.83 & 0\%\\
+PCA	& 4.06 & 0\%\\
+FFVR	& 4.25 & 1.96\%\\
 \end{tabular}
 \label{tab:kittidata0005sync}
 \end{table}
@@ -170,13 +164,13 @@ Table \ref{tab:kittidata0091sync} presents results for the Kitti 0091 Data Set, 
 \begin{tabular}{ccc}
 \hline
 \textbf{Algorithm} & \textbf{Median Error $\times$ 1000} & \textbf{\% best results}\\ \hline
-FM2D	& 3.6 & 17.11\%\\
-FM3D	& 4.04 & 0.88\%\\
-ICP	& 3.61 & 15.63\%\\
-PCA	& 4.1 & 1.18\%\\
-FVR	& 3.57 & 20.94\%\\
-FFVR	& 3.78 & 5.9\%\\
 FVR-3D	& 3.43 & 38.35\%\\
+FVR	& 3.57 & 20.94\%\\
+FM2D	& 3.6 & 17.11\%\\
+ICP	& 3.61 & 15.63\%\\
+FFVR	& 3.78 & 5.9\%\\
+FM3D	& 4.04 & 0.88\%\\
+PCA	& 4.1 & 1.18\%\\
 \end{tabular}
 \label{tab:kittidata0091sync}
 \end{table} 
@@ -215,13 +209,13 @@ Results for the Kitti 00095 Data Set are presented in Table \ref{tab:kittidata00
 \begin{tabular}{ccc}
 \hline
 \textbf{Algorithm} & \textbf{Median Error $\times$ 1000} & \textbf{\% best results}\\ \hline
-FM2D	& 4.19 & 12.36\%\\
-FM3D	& 5.18 & 0\%\\
-ICP	& 4.4 & 13.48\%\\
-PCA	& 5.32 & 0.37\%\\
-FVR	& 4.12 & 22.85\%\\
-FFVR	& 4.73 & 4.12\%\\
 FVR-3D	& 3.96 & 46.82\%\\
+FVR	& 4.12 & 22.85\%\\
+FM2D	& 4.19 & 12.36\%\\
+ICP	& 4.4 & 13.48\%\\
+FFVR	& 4.73 & 4.12\%\\
+FM3D	& 5.18 & 0\%\\
+PCA	& 5.32 & 0.37\%\\
 \end{tabular}
 \label{tab:kittidata0095sync}
 \end{table} 
